@@ -230,15 +230,15 @@ def get_pack() -> CoursePack:
         .add_callout(Callout("focus", "Kritik Odak: İsteme ve Tasarım Olarak Dünya",
             "Schopenhauer'un başyapıtı; mutluluğun kendi başına var olan pozitif bir durum değil, yalnızca "
             "<b>'acı ve ızdırabın yokluğu'</b> olduğunu savunur."))
-    )
-    ch2.pages.append(
-        ChapterPage(continue_tag="Nietzsche: Güç İstenci ve Üst İnsan")
         .add_terms([
             KeyTerm("Nihilizm (Hiççilik)", "Hayatın, ahlakın, bilginin ve değerlerin nesnel bir temeli veya içsel bir anlamı olmadığını savunan felsefi görüş."),
             KeyTerm("Sürü İnsanı", "Kendi kararlarını alamayan, yönetilmek için sürekli bir lidere veya otoriteye ihtiyaç duyan itaatkâr insan tipi."),
             KeyTerm("Trajik İnsan", "Nietzsche'ye göre geçmişini kabul eden, yaşamı tüm acılarına rağmen olumlayan nihai insan evresi."),
             KeyTerm("Özgür İnsan", "Sürüden ayrılmayı başarmış, dünyayı kendi gözleriyle görmek ve anlamlandırmak isteyen insan."),
         ])
+    )
+    ch2.pages.append(
+        ChapterPage(continue_tag="Nietzsche: Güç İstenci ve Üst İnsan")
         .add_person(NIETZSCHE)
         .add_block(BulletBlock(1, "Hayatı ve Entelektüel Dönüşümü", [
             "1844'te Saksonya'da doğmuş; daha 13 yaşındayken kötülük olgusu üzerine düşünmeye başlamış, "
@@ -439,9 +439,6 @@ def get_pack() -> CoursePack:
             FlowStep("Ego", "Gerçeklik İlkesi — haz ilkesini dengeler"),
             FlowStep("Süperego", "Üst Ben — ahlaki beklentileri içselleştirir"),
         ], caption="Freud'un Zihin Modeli: İnsan Zihninin Katmanları ve Çatışma"))
-    )
-    ch5.pages.append(
-        ChapterPage(continue_tag="Bilinç ve Bilinçdışı Metaforu")
         .add_table(ComparisonTable(
             "Freud'un Mekansal Zihin Metaforu",
             ["Mekân", "Karşılığı"],

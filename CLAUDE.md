@@ -186,6 +186,45 @@ Otomatik taşma denetimi "içerik kesiliyor mu" sorusunu cevaplar; görsel kontr
 "iyi görünüyor mu" sorusunu cevaplar — ikisi de gereklidir, biri diğerinin
 yerini tutmaz.
 
+### 6b. Sayfa denge kontrolü (boşluk dengeleme) — taşma kadar rutin bir adım
+Taşma "✓" demiş olması sayfaların İYİ kullanıldığı anlamına gelmez — sadece
+taşmadığı anlamına gelir. Bir sayfanın içeriği erken bitip altında büyük boş
+alan kalması da ayrı bir kalite sorunudur (kağıt israfı, dağınık okuma
+deneyimi). Bu yüzden HER ders build edildikten sonra (taşma denetiminin hemen
+ardından, adım 6'daki görsel kontrolle birlikte) şunu yap:
+
+1. Her bölümün TÜM fiziksel sayfalarını (özellikle `continue_tag`'li devam
+   sayfalarını — ilk sayfalar genelde terms+person+block ile zaten dolu
+   olduğundan asıl israf devam sayfalarında birikir) PNG'ye çevirip tek tek
+   görme aracıyla incele.
+2. İçeriğin sayfanın **yarısından önce** bittiği (altında sayfanın %50'sinden
+   fazlası boş kalan) sayfaları işaretle — bunlar gerçek adaylardır. İçerik
+   %55-70 civarında bitiyorsa bu normaldir, dokunma.
+3. İşaretlediğin bir sayfa için, AYNI bölümün komşu bir sayfasından mevcut bir
+   `.add_*()` bloğunu (bir `BulletBlock`, `ComparisonTable`, `FlowDiagram`,
+   `KeyTerm` listesi...) o sayfaya taşı — asla yeni madde/callout/cümle UYDURMA
+   ("doldurmak" için içerik icat etmek, taşma kadar ciddi bir hatadır, çünkü
+   kaynakta olmayan bilgi üretmiş olursun). İki komşu sayfa da zaten orta
+   doluluktaysa (~%60+) ve biri diğerine göre daha boşsa, aralarında içerik
+   taşımak yerine o iki sayfayı TEK sayfada BİRLEŞTİRMeyi dene (bir
+   `ChapterPage()` çağrısını tamamen kaldırıp içeriğini bir öncekine ekle) —
+   bu, sayfa sayısını gerçekten azaltan tek yöntemdir.
+4. Her denemeden sonra yeniden derle ve taşma çıktısını oku. Taşarsa (çoğu
+   zaman taşar — pratikte denenen birleştirmelerin fazlası taşmayla
+   sonuçlanıyor) değişikliği geri al ve sayfayı olduğu gibi bırak. Zorla
+   sıkıştırmaya çalışıp elemanlar arası boşlukları (`gap`, `margin`) küçültme
+   — tasarım sistemi sabit kalmalı.
+5. Emin olamadığın (birleşince taşıp taşmayacağını kestiremediğin, ya da
+   taşımanın başka bir sayfayı daha da seyrekleştireceği) durumlarda hiçbir
+   şey yapma — mevcut boşluk seviyesini koru. Riskli bir "iyileştirme",
+   iyileştirmemekten daha kötüdür.
+
+Pratikte: bu kontrol çoğu zaman "temiz bir kazanç yok, olduğu gibi bırak"
+sonucuna varır — bu BAŞARISIZLIK değildir, adımın kendisi zaten riskli
+birleştirmeleri elemek için var. Sadece gerçekten güvenli (taşmayan, madde
+icat etmeyen, komşu sayfayı yeni bir israf noktasına çevirmeyen) değişiklikleri
+kalıcı yap.
+
 ### 7. Bookmark/link doğrulaması
 ```bash
 python3 -c "
@@ -422,17 +461,21 @@ GLOSSARY_PER_PAGE = 18     # sözlük sayfası başına kavram (2 sütun x 9 sat
 QA_PER_PAGE = 10           # LEGACY — soru-cevap sayfası başına madde
 DISTINCTIONS_PER_PAGE = 6  # LEGACY — ayrım kartı sayfası başına
 MATCHTABLE_PER_PAGE = 9    # LEGACY — eşleştirme tablosu sayfası başına
-TEST_PER_PAGE = 4          # test sayfası başına soru (5 seçenekli MCQ)
-ANSWER_PER_PAGE = 10       # cevap anahtarı sayfası başına çözüm
+TEST_PER_PAGE = 6          # test sayfası başına soru (2 sütunlu düzen, 5 seçenekli MCQ)
+ANSWER_PER_PAGE = 16       # cevap anahtarı sayfası başına çözüm (2 sütunlu düzen)
 ```
-Bu sayılar, tanım uzunluğu ortalama olduğunda güvenlik paylıdır. Bir ders
-alışılmadık uzun tanımlar kullanıyorsa yine de `[TAŞMA UYARISI]` seni uyarır —
-o durumda sabiti küçültme, bunun yerine görsel olarak sayfanın gerçekten
-sığıp sığmadığını kontrol et. `TEST_PER_PAGE=4`, ilk test sayfasında (bilgi
-çubuğu + talimat kutusu yüzünden daha az yer var) taşmayı önlemek için TÜM
-test sayfalarına uygulanan tek bir sabittir — bu yüzden devam sayfalarında
-biraz boş alan kalması normaldir (5 yaptığımızda ilk sayfa taştı, bkz.
-"Bilinen tuzaklar" #6). Sözlüğün son sayfası kavram sayısı %20'nin altında
+Test ve Cevap Anahtarı bölümleri artık **2 sütunlu** düzende render edilir
+(`templates/style.css` içinde `.tq-list`/`.ans-list` → `column-count: 2`,
+`column-fill: balance`; her madde `break-inside: avoid` ile bir sütunda
+bölünmeden kalır). Bu sayılar, tanım uzunluğu ortalama olduğunda güvenlik
+paylıdır. Bir ders alışılmadık uzun soru/cevap metinleri kullanıyorsa yine de
+`[TAŞMA UYARISI]` seni uyarır — o durumda sabiti küçültme, bunun yerine
+görsel olarak sayfanın gerçekten sığıp sığmadığını kontrol et.
+`TEST_PER_PAGE=6`, ilk test sayfasında (bilgi çubuğu + talimat kutusu
+yüzünden daha az yer var) taşmayı önlemek için TÜM test sayfalarına
+uygulanan tek bir sabittir — bu yüzden devam sayfalarında biraz boş alan
+kalması normaldir (7 denendiğinde bazı derslerde ilk sayfa taştı, bkz.
+"Bilinen tuzaklar" #7). Sözlüğün son sayfası kavram sayısı %20'nin altında
 kalacak kadar seyrekse (örn. 20 kavram → 18+2), ders içeriğinden gerçek,
 atlanmış birkaç kavram (önemli bir tarih, kişi, savaş adı vb.) daha
 ekleyerek dengele — bu hem daha iyi görünür hem sözlüğü zenginleştirir.
@@ -484,10 +527,21 @@ Bunlar `templates/style.css` içinde zaten düzeltilmiş durumda — sadece
 
 7. **`TEST_PER_PAGE` çok yüksek olursa ilk test sayfası taşar**: İlk sayfada
    banner + 3'lü bilgi çubuğu + talimat kutusu da olduğu için, devam
-   sayfalarına göre daha az yer kalır. `5` denendiğinde ilk sayfa ~37mm
-   taştı; `4`'e düşürülünce düzeldi (bkz. yukarıdaki "Sayfalama sabitleri").
+   sayfalarına göre daha az yer kalır. 2 sütunlu düzene geçildiğinde `8`
+   denendi, bazı derslerde ilk sayfa taştı; `7`'de bile başka bir derste
+   taştı; `6`'da üç ders de (Felsefe/Sosyoloji/Psikoloji) taşmadan geçti —
+   bu yüzden sabit `6`'da tutuluyor (bkz. yukarıdaki "Sayfalama sabitleri").
    Yeni bir ders TEST_PER_PAGE'i global olarak değiştirmemeli — sabit zaten
-   en sıkı senaryoya göre kalibredir.
+   birden fazla dersin en sıkı senaryosuna göre kalibredir; sadece o dersin
+   soru metinleri alışılmadık uzunsa yine de taşma çıkabilir, o zaman
+   metni kısaltmayı düşün, sabiti değil.
+
+8. **Test/Cevap Anahtarı 2 sütunlu düzen**: `column-count:2` ile CSS çoklu
+   sütun düzeni kullanılıyor (CSS Grid değil) çünkü tarayıcı önce birinci
+   sütunu doldurup sonra ikinciye geçiyor (`column-fill: balance` ile iki
+   sütun dengeli yükseklikte kalıyor) — bu, gerçek bir sınav kağıdının okuma
+   sırasına benzer. Her `.tq`/`.ans-item`'a `break-inside: avoid` şart,
+   yoksa bir soru/cevap sütun sınırında ortadan bölünebilir.
 
 ## Tasarım sistemi özeti (referans amaçlı — değiştirmen gerekmemeli)
 
@@ -552,5 +606,10 @@ python3 theme_engine.py
 - [ ] Kapak (yeni renk doğru mu?) + içindekiler + genel bakış + her bölüm
       ilk sayfası + en az bir tablo sayfası + sözlük son sayfası + test
       son sayfası + cevap anahtarı son sayfası görsel kontrol ettim
+- [ ] Her bölümün TÜM sayfalarını (özellikle devam sayfalarını) tek tek
+      inceleyip içeriğin sayfanın yarısından önce bitmediğini (büyük boş alan
+      kalmadığını) doğruladım; gerekirse komşu sayfalar arasında mevcut
+      içeriği taşıdım/birleştirdim — asla yeni içerik uydurmadım, taşan
+      denemeleri geri aldım
 - [ ] Bookmark/link sayısını doğruladım
 - [ ] PDF'i kullanıcıya sundum

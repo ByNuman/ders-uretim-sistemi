@@ -538,8 +538,8 @@ table.matchtable tr:nth-child(even) td { background: var(--accent-tint); }
   margin-top: 4mm; background: var(--caution-bg); border: 1px solid #b9cdf2; color: var(--caution-ink);
   border-radius: 8px; padding: 3mm 4mm; font-size: 8.4pt; line-height:1.5;
 }
-.tq-list { margin-top: 6mm; display:flex; flex-direction:column; gap: 5.5mm; }
-.tq { }
+.tq-list { margin-top: 6mm; column-count: 2; column-gap: 8mm; column-fill: balance; }
+.tq { break-inside: avoid; -webkit-column-break-inside: avoid; margin-bottom: 5.5mm; }
 .tq-head { display:flex; align-items:flex-start; gap: 2.8mm; margin-bottom: 2.2mm; }
 .tq-num {
   flex:0 0 auto; width: 6.4mm; height:6.4mm; border-radius:6px;
@@ -556,8 +556,8 @@ table.matchtable tr:nth-child(even) td { background: var(--accent-tint); }
 }
 
 /* ================= CEVAP ANAHTARI VE ÇÖZÜMLER ================= */
-.ans-list { margin-top: 6mm; display:flex; flex-direction:column; gap: 3.6mm; }
-.ans-item { display:flex; gap: 3mm; }
+.ans-list { margin-top: 6mm; column-count: 2; column-gap: 8mm; column-fill: balance; }
+.ans-item { display:flex; gap: 3mm; break-inside: avoid; -webkit-column-break-inside: avoid; margin-bottom: 3.6mm; }
 .ans-num {
   flex:0 0 auto; width: 6.4mm; height:6.4mm; border-radius:6px;
   background: var(--accent-soft); color: var(--accent-dark); font-size: 8.4pt; font-weight:700;

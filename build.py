@@ -73,8 +73,8 @@ GLOSSARY_PER_PAGE = 18     # 2 sütun x 9 satır -- değişken tanım uzunluğun
 QA_PER_PAGE = 10
 DISTINCTIONS_PER_PAGE = 6
 MATCHTABLE_PER_PAGE = 9
-TEST_PER_PAGE = 4          # sayfa başına soru (5 seçenekli MCQ, ilk sayfada bilgi çubuğu+talimat da var — güvenlik paylı)
-ANSWER_PER_PAGE = 10       # sayfa başına çözümlü cevap
+TEST_PER_PAGE = 6          # sayfa başına soru (2 sütunlu düzen, 5 seçenekli MCQ, ilk sayfada bilgi çubuğu+talimat da var — güvenlik paylı)
+ANSWER_PER_PAGE = 16       # sayfa başına çözümlü cevap (2 sütunlu düzen)
 
 
 def exam_page_count(pack) -> int:
