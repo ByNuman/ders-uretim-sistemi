@@ -1,0 +1,5 @@
+node_modules/
+__pycache__/
+*.pyc
+output/preview/
+output/_render.js

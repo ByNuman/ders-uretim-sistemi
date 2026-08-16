@@ -1,0 +1,250 @@
+# -*- coding: utf-8 -*-
+"""
+DERS ÜRETİM SİSTEMİ — İçerik Veri Modeli
+==========================================
+Bu modül, herhangi bir dersin görsel ders notu kitabına dönüştürülmesi için
+kullanılan ortak şemayı tanımlar. Tasarım (HTML/CSS) sabittir; her ders bu
+şemaya veri doldurarak farklı bir kitap üretir.
+
+Önceki (ChatGPT tabanlı) sistemin tespit edilen zaaflarını gidermek için
+buradaki modelde bilinçli olarak şu kurallar var:
+
+1. TEK KAYNAK İLKESİ: Bir kişinin doğum/ölüm tarihi, eseri gibi bilgiler
+   sadece Person nesnesinde TANIMLANIR. Sözlük, eşleştirme tablosu, biyografi
+   kartı gibi her yer aynı Person nesnesine referans verir — aynı bilgi iki
+   yerde elle iki kez yazılmaz. Böylece "iki farklı sayfada iki farklı tarih"
+   türü hatalar yapısal olarak imkansız hale gelir.
+
+2. OTOMATİK SAYIM: Kapaktaki "X Bölüm / Y Kavram" gibi istatistikler elle
+   yazılmaz; build.py içerik listesinin uzunluğundan otomatik hesaplar.
+
+3. AÇIK KAYNAK ATIFI: Her Concept, hangi bölümden geldiğini chapter_ref
+   üzerinden otomatik alır — elle "3. Bölüm" yazılıp bölüm numarası
+   değişince güncellenmeyi unutma riski ortadan kalkar.
+"""
+
+from dataclasses import dataclass, field
+from typing import Optional
+
+
+# ---------------------------------------------------------------------------
+# Temel / paylaşılan varlıklar
+# ---------------------------------------------------------------------------
+
+@dataclass
+class Person:
+    """Bir düşünür/bilim insanı/yazar. TEK KAYNAK: tarihler burada tanımlanır,
+    başka hiçbir yerde elle tekrar yazılmaz."""
+    id: str                      # örn. "freud" — Concept/Chapter'lardan referans için
+    name: str                    # "Sigmund Freud"
+    years: str                   # "1856–1939" ya da tek tarih "1856"
+    tagline: str                 # kartta isim altında tek satır etiket
+    bio: list[str]               # biyografi maddeleri (madde imli)
+    key_work: Optional[str] = None   # başyapıtı / en önemli eseri
+    initials: Optional[str] = None   # avatar baş harfleri; boşsa isimden türetilir
+
+    def avatar(self) -> str:
+        if self.initials:
+            return self.initials
+        parts = [p for p in self.name.replace(".", " ").split() if p]
+        return "".join(p[0] for p in parts[:2]).upper()
+
+
+@dataclass
+class KeyTerm:
+    """Bölüm başında verilen 4'lü tanım kutularından biri."""
+    term: str
+    definition: str
+
+
+@dataclass
+class Callout:
+    """Renkli vurgu kutusu. kind: 'focus' | 'caution' | 'insight' | 'route'"""
+    kind: str
+    title: str
+    text: str
+
+
+@dataclass
+class FlowStep:
+    title: str
+    text: str = ""
+
+
+@dataclass
+class FlowDiagram:
+    """Yatay ok'lu süreç/aşama şeması."""
+    steps: list[FlowStep]
+    caption: Optional[str] = None
+
+
+@dataclass
+class ComparisonTable:
+    caption: str
+    headers: list[str]
+    rows: list[list[str]]
+
+
+@dataclass
+class InfoCard:
+    """Küçük 2-3'lü istatistik/bilgi kartı grid'i (ör. 'Saint-Simon ile çalışma: 7 yıl')."""
+    title: str
+    text: str
+    badge: Optional[str] = None   # sağ üstte küçük sayı/etiket
+
+
+@dataclass
+class Ayah:
+    """Bir ayet-i kerime kartı: orijinal Arapça metin + referans + Türkçe meal + etimoloji.
+    Arapça metin DejaVu Sans ile (tam GSUB/Arabic-shaping desteği doğrulanmış) render edilir."""
+    reference: str        # "Lokmân 17" gibi
+    arabic: str            # orijinal Arapça metin (RTL render edilir)
+    meal: str               # Türkçe akademik meal
+    etymology: str = ""      # kilit etimoloji notu (opsiyonel)
+
+
+@dataclass
+class BulletBlock:
+    """Numaralı alt-başlık altındaki düz anlatım: başlık + madde listesi."""
+    number: int
+    title: str
+    bullets: list[str]           # her biri düz metin; "**vurgu**" markdown-benzeri kalın için kullanılabilir
+    subtitle: Optional[str] = None
+
+
+@dataclass
+class ChapterPage:
+    """Bir bölümün TEK fiziksel sayfası. items sırayla render edilir.
+    Her item şu tuple biçimindedir: (tip, veri)
+    tip ∈ {"terms","person","person_row","block","callout","flow","table",
+           "info_cards","summary","continue_tag"}
+    Yükseklik önceden bilinemediği için (CSS render-zamanlı) sayfa bölünmesine
+    içerik yazarken KENDİM karar veririm — bu, önceki sistemdeki taşma/kesilme
+    risklerini ortadan kaldırır.
+    """
+    items: list[tuple] = field(default_factory=list)
+    continue_tag: Optional[str] = None   # "1. BÖLÜM · DEVAM" gibi ikinci+ sayfa etiketi
+
+    def add_terms(self, terms: list[KeyTerm]):
+        self.items.append(("terms", terms)); return self
+    def add_person(self, person: Person):
+        self.items.append(("person", person)); return self
+    def add_person_row(self, persons: list[Person]):
+        self.items.append(("person_row", persons)); return self
+    def add_block(self, block: BulletBlock):
+        self.items.append(("block", block)); return self
+    def add_callout(self, callout: Callout):
+        self.items.append(("callout", callout)); return self
+    def add_flow(self, flow: FlowDiagram):
+        self.items.append(("flow", flow)); return self
+    def add_table(self, table: ComparisonTable):
+        self.items.append(("table", table)); return self
+    def add_ayat(self, title: str, ayat: list[Ayah]):
+        self.items.append(("ayat", (title, ayat))); return self
+    def add_info_cards(self, title: str, cards: list[InfoCard]):
+        self.items.append(("info_cards", (title, cards))); return self
+    def add_summary(self, text: str):
+        self.items.append(("summary", text)); return self
+
+
+@dataclass
+class Chapter:
+    number: int
+    title: str
+    subtitle: str
+    pages: list[ChapterPage] = field(default_factory=list)
+    key_terms: list[KeyTerm] = field(default_factory=list)   # sadece concept_count() için tutulur
+
+    def concept_count(self) -> int:
+        return len(self.key_terms)
+
+    def page_count(self) -> int:
+        return len(self.pages)
+
+
+@dataclass
+class Concept:
+    """Sözlük satırı. chapter_ref otomatik "N. Bölüm" biçimine dönüştürülür."""
+    term: str
+    definition: str
+    context: str                 # "Sigmund Freud" gibi bağlam etiketi
+    chapter_ref: int             # hangi bölümden geldiği (otomatik "N. Bölüm" yazılır)
+
+
+@dataclass
+class QAItem:
+    question: str
+    answer: str
+
+
+@dataclass
+class DistinctionPair:
+    """'En sık karıştırılanlar' kartı: A ↔ B ve farkları."""
+    left: str
+    right: str
+    text: str
+
+
+@dataclass
+class MatchRow:
+    key: str          # düşünür / kavram
+    detail: str        # temel kavram/teori
+    reference: str      # öne çıkan eser/ifade
+
+
+@dataclass
+class TestQuestion:
+    """20 soruluk çoktan seçmeli testte tek bir soru."""
+    number: int
+    stem: str
+    options: dict            # {"A": "...", "B": "...", "C": "...", "D": "...", "E": "..."}
+
+
+@dataclass
+class AnswerItem:
+    """Cevap anahtarında TestQuestion.number ile eşleşen tek bir çözüm."""
+    number: int
+    correct: str              # "A".."E"
+    explanation: str
+
+
+@dataclass
+class CoursePack:
+    """Bir dersin tüm görsel kitabı."""
+    course_code: str            # "PSİ 102" gibi küçük üst etiket (opsiyonel)
+    title: str
+    subtitle: str
+    description: str
+    theme: str                  # tema anahtarı: "indigo" | "burgundy" | "forest" ... (theme_color boşsa kullanılır)
+    icon_text: str               # kapaktaki daire logo harfi/sembolü
+    chapters: list[Chapter]
+    glossary: list[Concept]
+    theme_color: Optional[str] = None   # hex (ör. "#7A2438") verilirse `theme` yerine bunu kullan — sınırsız tema
+    distinctions: list[DistinctionPair] = field(default_factory=list)   # LEGACY — yeni derslerde kullanmayın
+    match_table: list[MatchRow] = field(default_factory=list)           # LEGACY — yeni derslerde kullanmayın
+    qa_items: list[QAItem] = field(default_factory=list)                 # LEGACY — yeni derslerde kullanmayın
+    persons: dict = field(default_factory=dict)   # id -> Person (tek kaynak kayıt defteri)
+    subtitle_short: str = ""
+    # --- Genel Bakış sayfası içeriği ---
+    overview_lead: str = ""                          # üstteki koyu-zemin özet paragrafı
+    overview_cards: list[dict] = field(default_factory=list)   # [{"title":..,"text":..}, ...] 3'lü grid
+    overview_flow: list[tuple] = field(default_factory=list)   # [(başlık, alt_metin), ...] yatay ok akışı
+    overview_note: str = ""                           # alt kısımdaki "Sınavda Ana Ayrım" callout metni
+    # --- Test + Cevap Anahtarı (STANDART sınav bölümü — distinctions/match/qa'nın yerini alır) ---
+    test_title: str = "Genel Değerlendirme Testi"
+    test_subtitle: str = ""
+    test_instructions: str = "Aşağıdaki sorularda beş seçenekten yalnızca birini işaretleyiniz."
+    test_questions: list[TestQuestion] = field(default_factory=list)
+    answer_key_intro: str = "Her sorunun doğru cevabı ve kısa gerekçesi aşağıda yer almaktadır."
+    answer_key_items: list[AnswerItem] = field(default_factory=list)
+
+    # --- Otomatik hesaplanan istatistikler (elle yazılmaz) ---
+    def chapter_count(self) -> int:
+        return len(self.chapters)
+
+    def concept_count(self) -> int:
+        return len(self.glossary)
+
+    def total_pages_estimate(self) -> int:
+        # kapak + içindekiler + genel bakış + bölümler(ortalama 2 sayfa) + sözlük + sınav hazırlık
+        return 3 + len(self.chapters) * 2 + 2
