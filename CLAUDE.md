@@ -28,9 +28,12 @@ ders_sistemi/
 ├── content_model.py       # Veri şeması (dataclass'lar) — API referansı aşağıda
 ├── build.py                # HTML üret → Playwright ile PDF'e render et → bookmark ekle
 ├── theme_engine.py         # Sınırsız renk teması motoru (tek hex'ten tam tema üretir)
-├── kaynaklar/               # Kullanıcının ham ders özeti PDF'leri (bkz. Adım 0)
-│   ├── sosyoloji-ozet.pdf
-│   └── psikoloji-ozet.pdf
+├── kaynaklar/
+│   ├── ders_ozetleri/        # Görsel PDF sisteminin girdisi (bkz. Adım 0) — bu dosyadaki süreç bunu kullanır
+│   │   ├── sosyoloji-ozet.pdf
+│   │   └── psikoloji-ozet.pdf
+│   ├── ders_kaynaklari/      # ders-anlatim skill'i Mod 1 girdisi (bu sistemden bağımsız, bkz. .claude/skills/ders-anlatim/)
+│   └── ogretmen_notlari/     # ders-anlatim skill'i Mod 2 girdisi (bu sistemden bağımsız)
 ├── templates/
 │   ├── master.html.j2      # Jinja2 şablonu (sabit — dokunma, sadece bug varsa düzelt)
 │   └── style.css            # Tasarım sistemi (sabit — dokunma, sadece bug varsa düzelt)
@@ -38,6 +41,9 @@ ders_sistemi/
 │   ├── __init__.py
 │   ├── psikoloji.py         # Örnek: tamamlanmış bir ders (indigo tema, Test+Cevap Anahtarı formatı)
 │   ├── sosyoloji.py         # Örnek (forest tema, Test+Cevap Anahtarı formatı)
+│   ├── cagdas_felsefe.py    # Örnek (theme_color #1C5C69, Test+Cevap Anahtarı formatı)
+│   ├── edebiyat.py          # Örnek (theme_color #5A6732, Test+Cevap Anahtarı formatı)
+│   ├── felsefe_tarihi_2.py  # Örnek (theme_color #724C31, Test+Cevap Anahtarı formatı)
 │   ├── ogretim_teknolojileri.py  # Örnek (slate tema, LEGACY Sınav Hazırlık formatı)
 │   ├── sanat_tarihi.py      # Örnek (burgundy tema, LEGACY Sınav Hazırlık formatı)
 │   └── tefsir2.py           # Örnek: Arapça ayet içeren ders (add_ayat kullanımı, LEGACY format)
@@ -47,44 +53,50 @@ ders_sistemi/
 Her ders, `content/` altında kendi Python dosyasında yaşar ve tek bir
 `get_pack() -> CoursePack` fonksiyonu dışa verir.
 
-**Not — iki nesil örnek var:** `psikoloji.py`/`sosyoloji.py` GÜNCEL standardı
-(Test + Cevap Anahtarı, sınırsız renk teması) kullanır; diğer 3 örnek henüz
-eski "Sınav Hazırlık" (distinctions/match_table/qa_items) formatındadır ve
-geriye dönük uyumluluk için bozulmadan çalışmaya devam eder (bkz. aşağıdaki
-"Test + Cevap Anahtarı" ve "Renk Teması" bölümleri). **Yeni bir ders
-yazarken her zaman psikoloji.py/sosyoloji.py'yi şablon alın, diğer 3'ünü
-değil.**
+**Not — iki nesil örnek var:** `psikoloji.py`/`sosyoloji.py`/`cagdas_felsefe.py`/
+`edebiyat.py`/`felsefe_tarihi_2.py` GÜNCEL standardı (Test + Cevap Anahtarı,
+sınırsız renk teması) kullanır; diğer 3 örnek (`ogretim_teknolojileri.py`,
+`sanat_tarihi.py`, `tefsir2.py`) henüz eski "Sınav Hazırlık"
+(distinctions/match_table/qa_items) formatındadır ve geriye dönük uyumluluk
+için bozulmadan çalışmaya devam eder (bkz. aşağıdaki "Test + Cevap Anahtarı"
+ve "Renk Teması" bölümleri). **Yeni bir ders yazarken her zaman GÜNCEL
+gruptaki dosyalardan birini şablon alın, LEGACY 3'ünü değil.**
 
 ## Uçtan uca iş akışı
 
 Kullanıcı sana bir ders PDF'i / ham metni verdiğinde (ya da sadece bir ders
 adı söylediğinde) şu adımları sırayla uygula:
 
-### 0. Kaynağı bul: `kaynaklar/` klasörüne bak
+### 0. Kaynağı bul: `kaynaklar/ders_ozetleri/` klasörüne bak
 Kullanıcı bir dosya eklemeden sadece bir ders adı söylerse (ör. "sosyoloji
 dersini işle" veya "tarih özetini görsel not yap"), önce PDF/metin eklenip
 eklenmediğini kontrol et; eklenmediyse **kullanıcıya sormadan önce**
-`kaynaklar/` klasörünü tara:
+`kaynaklar/ders_ozetleri/` klasörünü tara:
 ```bash
-ls kaynaklar/
+ls kaynaklar/ders_ozetleri/
 ```
 Ders adıyla eşleşen (esnek eşleştir — büyük/küçük harf, Türkçe karakter,
 "-özet"/"-ozet" gibi ekleri göz ardı ederek) bir dosya varsa onu kaynak
 olarak kullan, kullanıcıya tekrar sorma. Eşleşen dosya yoksa kullanıcıdan
-PDF'i ya sürükle-bırak yapmasını ya da `kaynaklar/` klasörüne koyup dosya
-adını söylemesini iste.
+PDF'i ya sürükle-bırak yapmasını ya da `kaynaklar/ders_ozetleri/` klasörüne
+koyup dosya adını söylemesini iste.
 
-`kaynaklar/` klasörü, kullanıcının ham ders özetlerini tek tek her seferinde
-sohbete eklemek zorunda kalmadan biriktirdiği yerdir — dosya adı serbesttir
-ama tutarlı bir kalıp (`<ders-slug>-ozet.pdf` gibi) aramayı kolaylaştırır.
-İşlenen bir dersin kaynağını bu klasörden SİLME — kullanıcı ileride revizyon
-isteyebilir.
+`kaynaklar/ders_ozetleri/` klasörü, kullanıcının ham ders özetlerini tek tek
+her seferinde sohbete eklemek zorunda kalmadan biriktirdiği yerdir — dosya
+adı serbesttir ama tutarlı bir kalıp (`<ders-slug>-ozet.pdf` gibi) aramayı
+kolaylaştırır. İşlenen bir dersin kaynağını bu klasörden SİLME — kullanıcı
+ileride revizyon isteyebilir.
+
+(Not: `kaynaklar/` altında ayrıca `ders_kaynaklari/` ve `ogretmen_notlari/`
+alt klasörleri de var — bunlar bu görsel PDF sistemine değil, tamamen ayrı
+çalışan `ders-anlatim` skill'ine ait girdilerdir, bkz.
+`.claude/skills/ders-anlatim/SKILL.md`.)
 
 ### 1. Ham içeriği oku ve Arapça kontrolü yap
 ```bash
 python3 -c "
 import pdfplumber
-with pdfplumber.open('kaynaklar/<bulunan-dosya>.pdf') as pdf:
+with pdfplumber.open('kaynaklar/ders_ozetleri/<bulunan-dosya>.pdf') as pdf:
     for i, page in enumerate(pdf.pages):
         print(f'=== SAYFA {i+1} ===')
         print(page.extract_text())
@@ -608,8 +620,8 @@ python3 theme_engine.py
 
 ## Özet — bir ders eklerken zihinsel kontrol listesi
 
-- [ ] Kaynak eklenmediyse `kaynaklar/` klasöründe ders adıyla eşleşen dosyayı
-      aradım (yoksa kullanıcıdan istedim)
+- [ ] Kaynak eklenmediyse `kaynaklar/ders_ozetleri/` klasöründe ders adıyla
+      eşleşen dosyayı aradım (yoksa kullanıcıdan istedim)
 - [ ] Ham metni tamamen okudum (atlamadım)
 - [ ] 5-7 bölüme, ham içeriğin doğal yapısını takip ederek ayırdım
 - [ ] Kullanılmamış bir renk seçtim (`theme_color=` hex, `content/`
