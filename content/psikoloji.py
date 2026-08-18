@@ -204,14 +204,14 @@ def get_pack() -> CoursePack:
         .add_callout(Callout("caution", "Dikkat / Ayırt Etme",
             "Piaget <b>iki evreli</b> (heteronom/otonom) basit bir geçişi anlatır; Kohlberg bunu <b>üç düzey altı aşamaya</b> "
             "genişletip yetişkinliğe kadar uzatır."))
-    )
-    ch3.pages.append(
-        ChapterPage(continue_tag="Yetişkinlik, Yaşlılık ve Ölüm Psikolojisi")
         .add_block(BulletBlock(2, "Yetişkinlik, Yaşlılık ve Ölüm", [
             "<b>Genç Yetişkinlik (Levinson'ın Rüyası):</b> Birey geleceğini hayal eder ve buna uygun roller geliştirir.",
             "<b>Orta Yaş Krizleri:</b> Kadınlarda menopoz (doğurganlığın bitmesi), erkeklerde andropoz (hormon azalması, cinsel ilgi kayması).",
             "<b>Yaşlılık Kuramı — İlgiyi Kesme (Henry):</b> Yaşlının toplumdan kopmasının doğal ve mutluluk getirici olduğunu savunur; eleştirilmiş bir kuramdır.",
         ]))
+    )
+    ch3.pages.append(
+        ChapterPage(continue_tag="Yetişkinlik, Yaşlılık ve Ölüm Psikolojisi")
         .add_flow(FlowDiagram([
             FlowStep("İnkâr", "'Bu ben olamam'"),
             FlowStep("Öfke", "'Neden ben?'"),

@@ -51,6 +51,9 @@ def get_pack() -> CoursePack:
             "<b>Paylaşılır:</b> Bireysel değil toplumsaldır; grupça ortaklaşa yaratılır.",
             "<b>Örüntülüdür:</b> Gelişigüzel değil, 'çekirdek değerler' etrafında bütünleşmiş bir sistemdir.",
         ]))
+        .add_callout(Callout("focus", "Kritik Odak: Fichter'e Göre Kültürün İşlevleri",
+            "Toplumsal davranışları düzenler ve bütünleştirir · toplumsal dayanışmayı sağlar · toplumun kimliği olur · "
+            "değerleri yorumlar · kişiliğin oluşmasında başat faktördür."))
     )
     ch1.pages.append(
         ChapterPage(continue_tag="Kültürün Ögeleri, Gecikme ve Kavramlar")
@@ -75,12 +78,6 @@ def get_pack() -> CoursePack:
                 ["Yüksek vs. Popüler Kültür", "Yüksek kültür seçkinlere (güzel sanatlar), popüler kültür halk kitlelerine hitap eder."],
             ]
         ))
-        .add_callout(Callout("focus", "Kritik Odak: Fichter'e Göre Kültürün İşlevleri",
-            "Toplumsal davranışları düzenler ve bütünleştirir · toplumsal dayanışmayı sağlar · toplumun kimliği olur · "
-            "değerleri yorumlar · kişiliğin oluşmasında başat faktördür."))
-    )
-    ch1.pages.append(
-        ChapterPage(continue_tag="Kültürel Süreçler")
         .add_table(ComparisonTable(
             "Kültürel Süreçler",
             ["Süreç", "Açıklama"],
@@ -165,9 +162,6 @@ def get_pack() -> CoursePack:
                 ["Toplumsal Tercihler", "Arzu edilen, beğenilen şeyler."],
             ]
         ))
-    )
-    ch2.pages.append(
-        ChapterPage(continue_tag="Davranış Kalıplarının Sonuçları")
         .add_table(ComparisonTable(
             "Davranış Kalıplarının Sonuçları ve Değiştirme Yolları",
             ["Kavram", "Açıklama"],
@@ -179,6 +173,9 @@ def get_pack() -> CoursePack:
                 ["Reklam", "Ticari etkinliktir; tercih ve arzu yaratarak satın aldırmayı hedefler."],
             ]
         ))
+    )
+    ch2.pages.append(
+        ChapterPage(continue_tag="Davranış Kalıplarının Sonuçları")
         .add_summary("Toplumsallaşma, bireyi biyolojik varlıktan toplumsal varlığa dönüştüren yaşam boyu bir süreçtir; "
             "aile, akran grubu, okul ve medya bu sürecin başlıca araçlarıdır. Davranış kalıpları ise toplumun "
             "ortaklaşa ürettiği, bireyin sorgulamadan uyduğu yinelenen eylem ve düşünüş biçimleridir.")
@@ -431,9 +428,6 @@ def get_pack() -> CoursePack:
         .add_callout(Callout("route", "Bölüm İçi Bağlantı",
             "Statü ile Rol arasındaki fark sınavda en sık sorulan ayrımlardan biridir: <b>Statü konumdur, Rol o "
             "konumun gerektirdiği eylemdir.</b> Bir kişinin anahtar statüsü genellikle onun anahtar rolüyle örtüşür."))
-    )
-    ch6.pages.append(
-        ChapterPage(continue_tag="Rol Davranışlarının Yargılanması")
         .add_table(ComparisonTable(
             "Toplumun Rol Davranışlarını Yargılama Kategorileri",
             ["Kategori", "Açıklama", "Örnek"],
@@ -443,6 +437,9 @@ def get_pack() -> CoursePack:
                 ["Yasaklanan Davranış (Cezalı)", "Toplumun ceza uyguladığı davranışlardır.", "Öğrencinin okul eşyasına zarar vermesi."],
             ]
         ))
+    )
+    ch6.pages.append(
+        ChapterPage(continue_tag="Rol Davranışlarının Yargılanması")
         .add_summary("Toplumsal rol, statünün somutlaşmış, edimsel halidir; tahsis etme veya üstlenme yoluyla kazanılır. "
             "Rol takımı, rol çatışması ve anahtar rol gibi kavramlar bireyin çoklu rollerini analiz etmeyi sağlar; "
             "toplum ise rol davranışlarını beklenen, izin verilen ve yasaklanan olmak üzere üç kategoride yargılar.")

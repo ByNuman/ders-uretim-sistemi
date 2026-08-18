@@ -193,37 +193,55 @@ alan kalması da ayrı bir kalite sorunudur (kağıt israfı, dağınık okuma
 deneyimi). Bu yüzden HER ders build edildikten sonra (taşma denetiminin hemen
 ardından, adım 6'daki görsel kontrolle birlikte) şunu yap:
 
-1. Her bölümün TÜM fiziksel sayfalarını (özellikle `continue_tag`'li devam
-   sayfalarını — ilk sayfalar genelde terms+person+block ile zaten dolu
-   olduğundan asıl israf devam sayfalarında birikir) PNG'ye çevirip tek tek
-   görme aracıyla incele.
-2. İçeriğin sayfanın **yarısından önce** bittiği (altında sayfanın %50'sinden
-   fazlası boş kalan) sayfaları işaretle — bunlar gerçek adaylardır. İçerik
-   %55-70 civarında bitiyorsa bu normaldir, dokunma.
+**HEDEF: %90-95 doluluk.** Bir bölümün/testin/cevap anahtarının **DEVAM
+sayfaları** — yani sayfa üstünde "N. BÖLÜM · DEVAM" gibi bir devam pill'i
+taşıyan VE o bölümün/section'ın fiziksel son sayfası OLMAYAN sıradan ara
+sayfalar — ortalama %90-95 doluluk oranına sahip olmalı. Buna ulaşmanın TEK
+yolu, mevcut `ChapterPage` bölünmelerini bölüm içinde **yeniden dağıtmaktır**
+(bir sayfadan diğerine mevcut bir blok taşımak veya iki sayfayı birleştirmek).
+Mekanizma HER ZAMAN "içeriği yeniden dağıt" olmalı, ASLA "aynı içeriği daha
+az yere sıkıştır" değil — element aralarındaki `gap`/`margin` değerlerini
+küçültmek veya madde aralarını sıkıştırmak yasaktır, tasarım sistemi sabit
+kalmalı.
+
+**İSTİSNALAR — bu sayfalarda %90-95 hedefini ZORLAMA, doğal doluluğunu koru:**
+- Bir bölümün/section'ın **SON fiziksel sayfası** (devam pill'i taşısa bile) —
+  örn. sadece bölüm özeti kutusu kalmışsa bu normaldir, doldurmaya çalışma.
+- **Açılış sayfaları** — devam pill'i taşımayan ilk sayfalar (Kapak,
+  İçindekiler, Genel Bakış dahil); bunlar zaten terms+person+block ile
+  doğal olarak dolu olma eğilimindedir ve bu kuralın hedef kitlesi değildir.
+- **Sözlüğün son sayfası** (aşağıdaki ayrı nottaki kural geçerli).
+
+1. Her bölümün TÜM fiziksel sayfalarını, özellikle yukarıdaki tanıma uyan
+   DEVAM sayfalarını, PNG'ye çevirip tek tek görme aracıyla incele.
+2. Doluluk oranını gözle tahmin et (sayfanın alt kenarına göre içeriğin
+   nerede bittiği). %90'ın altındaki her DEVAM sayfası (istisnalar hariç)
+   bir aday demektir — önceki gevşek "%55-70 normaldir" eşiği artık
+   GEÇERLİ DEĞİL, bu daha sıkı hedefle değiştirildi.
 3. İşaretlediğin bir sayfa için, AYNI bölümün komşu bir sayfasından mevcut bir
    `.add_*()` bloğunu (bir `BulletBlock`, `ComparisonTable`, `FlowDiagram`,
    `KeyTerm` listesi...) o sayfaya taşı — asla yeni madde/callout/cümle UYDURMA
    ("doldurmak" için içerik icat etmek, taşma kadar ciddi bir hatadır, çünkü
-   kaynakta olmayan bilgi üretmiş olursun). İki komşu sayfa da zaten orta
-   doluluktaysa (~%60+) ve biri diğerine göre daha boşsa, aralarında içerik
-   taşımak yerine o iki sayfayı TEK sayfada BİRLEŞTİRMeyi dene (bir
-   `ChapterPage()` çağrısını tamamen kaldırıp içeriğini bir öncekine ekle) —
-   bu, sayfa sayısını gerçekten azaltan tek yöntemdir.
-4. Her denemeden sonra yeniden derle ve taşma çıktısını oku. Taşarsa (çoğu
-   zaman taşar — pratikte denenen birleştirmelerin fazlası taşmayla
-   sonuçlanıyor) değişikliği geri al ve sayfayı olduğu gibi bırak. Zorla
-   sıkıştırmaya çalışıp elemanlar arası boşlukları (`gap`, `margin`) küçültme
-   — tasarım sistemi sabit kalmalı.
+   kaynakta olmayan bilgi üretmiş olursun). %90-95 hedefine, çoğu zaman
+   sayfaları TEK sayfada BİRLEŞTİRMek gerekir (bir `ChapterPage()` çağrısını
+   tamamen kaldırıp içeriğini bir öncekine/sonrakine ekle) — bu, hem sayfa
+   sayısını azaltıp hem de kalan sayfaları hedef aralığa taşıyan asıl
+   yöntemdir; tek blok taşımak çoğu zaman yetmez.
+4. Her denemeden sonra yeniden derle ve taşma çıktısını oku. Taşarsa
+   değişikliği geri al ve farklı bir birleştirme/dağıtım dene (örn. daha az
+   blok taşı, ya da iki sayfa yerine üç sayfa arasında dağıt). Zorla
+   sıkıştırmaya çalışıp elemanlar arası boşlukları (`gap`, `margin`)
+   küçültme — tasarım sistemi sabit kalmalı.
 5. Emin olamadığın (birleşince taşıp taşmayacağını kestiremediğin, ya da
-   taşımanın başka bir sayfayı daha da seyrekleştireceği) durumlarda hiçbir
-   şey yapma — mevcut boşluk seviyesini koru. Riskli bir "iyileştirme",
-   iyileştirmemekten daha kötüdür.
+   taşımanın başka bir sayfayı daha da seyrekleştireceği) durumlarda,
+   birkaç farklı dağıtımı dene; hiçbiri güvenli şekilde %90-95'e
+   ulaştıramıyorsa mevcut boşluk seviyesini koru — riskli bir "iyileştirme",
+   iyileştirmemekten daha kötüdür. Ama %90-95 hedefi eskisinden daha sıkı
+   olduğu için, "temiz kazanç yok" sonucuna eskisinden daha az sıklıkla
+   varman beklenir — çoğu devam sayfası gerçekten yeniden dağıtılabilir.
 
-Pratikte: bu kontrol çoğu zaman "temiz bir kazanç yok, olduğu gibi bırak"
-sonucuna varır — bu BAŞARISIZLIK değildir, adımın kendisi zaten riskli
-birleştirmeleri elemek için var. Sadece gerçekten güvenli (taşmayan, madde
-icat etmeyen, komşu sayfayı yeni bir israf noktasına çevirmeyen) değişiklikleri
-kalıcı yap.
+Sadece gerçekten güvenli (taşmayan, madde icat etmeyen, komşu sayfayı yeni
+bir israf noktasına çevirmeyen) değişiklikleri kalıcı yap.
 
 ### 7. Bookmark/link doğrulaması
 ```bash
@@ -607,8 +625,8 @@ python3 theme_engine.py
       ilk sayfası + en az bir tablo sayfası + sözlük son sayfası + test
       son sayfası + cevap anahtarı son sayfası görsel kontrol ettim
 - [ ] Her bölümün TÜM sayfalarını (özellikle devam sayfalarını) tek tek
-      inceleyip içeriğin sayfanın yarısından önce bitmediğini (büyük boş alan
-      kalmadığını) doğruladım; gerekirse komşu sayfalar arasında mevcut
+      inceleyip devam sayfalarının (son sayfa hariç) %90-95 dolulukta
+      olduğunu doğruladım; gerekirse komşu sayfalar arasında mevcut
       içeriği taşıdım/birleştirdim — asla yeni içerik uydurmadım, taşan
       denemeleri geri aldım
 - [ ] Bookmark/link sayısını doğruladım

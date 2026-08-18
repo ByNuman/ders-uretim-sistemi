@@ -214,7 +214,7 @@ def get_pack() -> CoursePack:
         ]))
     )
     ch2.pages.append(
-        ChapterPage(continue_tag="Mutluluğa Giden Yol ve Yalnızlık")
+        ChapterPage(continue_tag="Yalnızlıktan Nietzsche'ye Geçiş")
         .add_flow(FlowDiagram([
             FlowStep("Aşırı Arzu", "Karşılanması güç beklentiler"),
             FlowStep("Acı ve Mutsuzluk", "Beklenti karşılanmayınca doğan sonuç"),
@@ -236,9 +236,6 @@ def get_pack() -> CoursePack:
             KeyTerm("Trajik İnsan", "Nietzsche'ye göre geçmişini kabul eden, yaşamı tüm acılarına rağmen olumlayan nihai insan evresi."),
             KeyTerm("Özgür İnsan", "Sürüden ayrılmayı başarmış, dünyayı kendi gözleriyle görmek ve anlamlandırmak isteyen insan."),
         ])
-    )
-    ch2.pages.append(
-        ChapterPage(continue_tag="Nietzsche: Güç İstenci ve Üst İnsan")
         .add_person(NIETZSCHE)
         .add_block(BulletBlock(1, "Hayatı ve Entelektüel Dönüşümü", [
             "1844'te Saksonya'da doğmuş; daha 13 yaşındayken kötülük olgusu üzerine düşünmeye başlamış, "
@@ -247,15 +244,15 @@ def get_pack() -> CoursePack:
             "eserlerine ilham vermiştir.",
             "1889'da Torino'da yaşadığı zihinsel çöküşle akıl hastanesine kaldırılmış, 1900'de vefat etmiştir.",
         ]))
+    )
+    ch2.pages.append(
+        ChapterPage(continue_tag="Güç İstenci ve Tanrı'nın Ölümü")
         .add_block(BulletBlock(2, "Felsefi Yıkım: Eleştiri ve Din Karşıtlığı", [
             "Felsefesinin kalbinde 'eleştiri' yatar; Kant, Hegel ve Schopenhauer'ın yanı sıra Avrupa kültürünü "
             "ve Katolik Hristiyanlığını sertçe eleştirir.",
             "Yeryüzündeki tüm dinlerin ve politik görüşlerin insanoğlunun özgürce gelişmesini engellediğini, bu "
             "yüzden yıkılması gerektiğini savunur.",
         ]))
-    )
-    ch2.pages.append(
-        ChapterPage(continue_tag="Güç İstenci ve Tanrı'nın Ölümü")
         .add_block(BulletBlock(3, "Güç İstenci ve Mutluluk Anlayışı", [
             "Nietzsche'ye göre her canlı sadece var olmak değil, güçlü olmak da ister; mutluluk pasif bir "
             "hazda değil, güçtedir. Güç istenci herkes için geçerlidir: <b>filozof</b> hakikatin peşinde "
@@ -569,9 +566,6 @@ def get_pack() -> CoursePack:
         .add_callout(Callout("insight", "Kritik Odak: İman Şövalyesi",
             "Aklın sınırlarına ve içindeki şüpheye rağmen inanmaya devam eden birey, Kierkegaard'a göre en "
             "üstün ve gerçek dindarlık formu olan <b>'İman Şövalyesi'</b> mertebesine ulaşır."))
-    )
-    ch7.pages.append(
-        ChapterPage(continue_tag="Fenomenoloji ve Varoluşçuluk: Husserl'den Camus'ye")
         .add_terms([
             KeyTerm("Dasein (Orada-Varlık)", "Heidegger'e göre insanın dünyadaki bulunuş hali ve kendi varlığını anlayıp anlamlandırabilme kapasitesi."),
             KeyTerm("Kötü Niyet", "Sartre'ın felsefesinde, insanın kendi özgürlüğünden ve bu özgürlüğün getirdiği ağır sorumluluktan kaçma eğilimi."),
@@ -585,6 +579,9 @@ def get_pack() -> CoursePack:
             "Fenomenoloji, varoluşçuluk, hermeneutik, yapısalcılık ve eleştirel teori gibi akımlar bu dönemin "
             "belirleyici unsurlarıdır.",
         ]))
+    )
+    ch7.pages.append(
+        ChapterPage(continue_tag="Fenomenoloji ve Varoluşçuluk: Husserl'den Camus'ye")
         .add_person_row([HUSSERL, HEIDEGGER])
         .add_block(BulletBlock(4, "Fenomenoloji: Bilincin Özüne Dönüş", [
             "Husserl tarafından geliştirilen fenomenolojinin temel görevi, nesnelerin bilince nasıl "
@@ -592,9 +589,6 @@ def get_pack() -> CoursePack:
             "inançlardan ve önyargılardan tamamen sıyrılıp yalnızca bilincin deneyişine odaklanılması gerekir "
             "(<b>Fenomenolojik İndirgeme</b>).",
         ]))
-    )
-    ch7.pages.append(
-        ChapterPage(continue_tag="Dasein ve Varoluşçu Özgürlük")
         .add_block(BulletBlock(5, "Varlık ve Zaman: Heidegger'in Dasein'ı", [
             "Husserl'ın öğrencisi olan Heidegger, fenomenolojiyi doğrudan 'varlık sorusunu' merkeze alarak "
             "yeniden şekillendirmiştir. İnsan, dünyaya fırlatılmış bir <b>'Dasein'</b> (orada-varlık) olarak "
