@@ -313,11 +313,6 @@
         <div class="chbanner-title">{{ ch.title }}</div>
         <div class="chbanner-subtitle">{{ ch.subtitle }}</div>
       </div>
-    {% else %}
-      <div class="chcontinue">
-        <div class="tag">{{ ch.number }}. Bölüm · Devam</div>
-        <div class="cctitle">{{ page.continue_tag }}</div>
-      </div>
     {% endif %}
 
     {% for kind, data in page.items %}{{ render_item(kind, data) }}{% endfor %}
@@ -351,7 +346,7 @@
     </div>
     {% endfor %}
   </div>
-  {{ footer("", "A" if loop.first else "A." ~ (loop.index)) }}
+  {{ footer("", gloss_pageno.n) }}
 </section>
 {% set gloss_pageno.n = gloss_pageno.n + 1 %}
 {% endfor %}
@@ -369,6 +364,7 @@
   ("Çoktan", "Seçmeli"),
   ("5", "Seçenek (A-E)"),
 ] %}
+{% set test_pageno = namespace(n=page_starts["test"]) %}
 {% for tpage in test_pages %}
 <section class="page body-page"{% if loop.first %} id="exam"{% endif %}>
   <div class="pageband"><div>{{ pack.title }}</div><div class="pageband-course">{{ "Sınav" if loop.first else "Test · Devam" }}</div></div>
@@ -388,10 +384,12 @@
   <div class="tq-list">
     {% for q in tpage %}{{ render_test_question(q) }}{% endfor %}
   </div>
-  {{ footer("", "B" if loop.first else "B." ~ loop.index) }}
+  {{ footer("", test_pageno.n) }}
 </section>
+{% set test_pageno.n = test_pageno.n + 1 %}
 {% endfor %}
 
+{% set answer_pageno = namespace(n=page_starts["answer_key"]) %}
 {% for apage in answer_pages %}
 <section class="page body-page"{% if loop.first %} id="answer-key"{% endif %}>
   <div class="pageband"><div>{{ pack.title }}</div><div class="pageband-course">{{ "Cevap Anahtarı" if loop.first else "Çözümler · Devam" }}</div></div>
@@ -405,8 +403,9 @@
   <div class="ans-list">
     {% for a in apage %}{{ render_answer_item(a) }}{% endfor %}
   </div>
-  {{ footer("", "C" if loop.first else "C." ~ loop.index) }}
+  {{ footer("", answer_pageno.n) }}
 </section>
+{% set answer_pageno.n = answer_pageno.n + 1 %}
 {% endfor %}
 
 {% else %}
@@ -414,6 +413,7 @@
 {# ============================================================
    LEGACY: SINAV HAZIRLIK — ayrımlar + eşleştirme + hızlı soru-cevap
    ============================================================ #}
+{% set exam_pageno = namespace(n=page_starts["exam"]) %}
 <section class="page body-page" id="exam">
   <div class="pageband"><div>{{ pack.title }}</div><div class="pageband-course">Final Tekrarı</div></div>
   <div class="section-kicker">Final Tekrarı</div>
@@ -444,8 +444,9 @@
   </div>
   {% endif %}
 
-  {{ footer("", "B") }}
+  {{ footer("", exam_pageno.n) }}
 </section>
+{% set exam_pageno.n = exam_pageno.n + 1 %}
 
 {# Fazladan distinctions sayfaları (nadiren gerekir; veri kaybını önler) #}
 {% for dpage in distinctions_pages[1:] %}
@@ -460,8 +461,9 @@
     </div>
     {% endfor %}
   </div>
-  {{ footer("", "B." ~ loop.index) }}
+  {{ footer("", exam_pageno.n) }}
 </section>
+{% set exam_pageno.n = exam_pageno.n + 1 %}
 {% endfor %}
 
 {# Fazladan eşleştirme tablosu sayfaları (nadiren gerekir; veri kaybını önler) #}
@@ -479,8 +481,9 @@
       </tbody>
     </table>
   </div>
-  {{ footer("", "B." ~ loop.index) }}
+  {{ footer("", exam_pageno.n) }}
 </section>
+{% set exam_pageno.n = exam_pageno.n + 1 %}
 {% endfor %}
 
 {# QA her zaman kendi (kendi) sayfasında/sayfalarında -- ilk sayfayla asla birleştirilmez #}
@@ -497,8 +500,9 @@
     </div>
     {% endfor %}
   </div>
-  {{ footer("", "B.q" ~ loop.index) }}
+  {{ footer("", exam_pageno.n) }}
 </section>
+{% set exam_pageno.n = exam_pageno.n + 1 %}
 {% endif %}
 {% endfor %}
 

@@ -206,9 +206,14 @@ deneyimi). Bu yüzden HER ders build edildikten sonra (taşma denetiminin hemen
 ardından, adım 6'daki görsel kontrolle birlikte) şunu yap:
 
 **HEDEF: %90-95 doluluk.** Bir bölümün/testin/cevap anahtarının **DEVAM
-sayfaları** — yani sayfa üstünde "N. BÖLÜM · DEVAM" gibi bir devam pill'i
-taşıyan VE o bölümün/section'ın fiziksel son sayfası OLMAYAN sıradan ara
-sayfalar — ortalama %90-95 doluluk oranına sahip olmalı. Buna ulaşmanın TEK
+sayfaları** — yani o bölümün/section'ın `ChapterPage`/sayfa listesinde İLK
+sırada olmayan (bölüm banner'ıyla değil doğrudan içerikle başlayan) VE
+fiziksel son sayfası da OLMAYAN sıradan ara sayfalar — ortalama %90-95
+doluluk oranına sahip olmalı. (Not: bölüm devam sayfalarında artık görsel
+bir "N. Bölüm · Devam" rozeti YOK — bu rozet kaldırıldı, bkz. aşağıdaki
+ChapterPage notu — ama Sözlük/Test/Cevap Anahtarı devam sayfalarında hâlâ
+var; hangisi olursa olsun "DEVAM sayfası" tanımı sayfanın section içindeki
+SIRASINA göre yapılır, rozetin varlığına göre değil.) Buna ulaşmanın TEK
 yolu, mevcut `ChapterPage` bölünmelerini bölüm içinde **yeniden dağıtmaktır**
 (bir sayfadan diğerine mevcut bir blok taşımak veya iki sayfayı birleştirmek).
 Mekanizma HER ZAMAN "içeriği yeniden dağıt" olmalı, ASLA "aynı içeriği daha
@@ -217,9 +222,10 @@ küçültmek veya madde aralarını sıkıştırmak yasaktır, tasarım sistemi 
 kalmalı.
 
 **İSTİSNALAR — bu sayfalarda %90-95 hedefini ZORLAMA, doğal doluluğunu koru:**
-- Bir bölümün/section'ın **SON fiziksel sayfası** (devam pill'i taşısa bile) —
-  örn. sadece bölüm özeti kutusu kalmışsa bu normaldir, doldurmaya çalışma.
-- **Açılış sayfaları** — devam pill'i taşımayan ilk sayfalar (Kapak,
+- Bir bölümün/section'ın **SON fiziksel sayfası** (bir devam sayfası olsa
+  bile) — örn. sadece bölüm özeti kutusu kalmışsa bu normaldir, doldurmaya
+  çalışma.
+- **Açılış sayfaları** — her bölümün/section'ın İLK fiziksel sayfası (Kapak,
   İçindekiler, Genel Bakış dahil); bunlar zaten terms+person+block ile
   doğal olarak dolu olma eğilimindedir ve bu kuralın hedef kitlesi değildir.
 - **Sözlüğün son sayfası** (aşağıdaki ayrı nottaki kural geçerli).
@@ -337,10 +343,13 @@ from content_model import (
   `add_person(Person)`, `add_person_row(list[Person])`, `add_block(BulletBlock)`,
   `add_callout(Callout)`, `add_flow(FlowDiagram)`, `add_table(ComparisonTable)`,
   `add_ayat(title, list[Ayah])`, `add_info_cards(title, list[InfoCard])`,
-  `add_summary(text)`. İlk sayfa hariç her `ChapterPage`'e `continue_tag`
-  ver — bu, sayfa üstündeki "N. Bölüm · Devam" rozetinin yanında görünen
-  kısa başlıktır. **Kısa tut** (tek satırda kalsın, iki satıra sarılırsa
-  rozetle hizası bozulur — ~40 karakterin altında tut).
+  `add_summary(text)`. `continue_tag` parametresi hâlâ mevcuttur ama artık
+  GÖRSEL OLARAK RENDER EDİLMEZ — devam sayfalarındaki "N. Bölüm · Devam"
+  rozeti+başlık bloğu, gereksiz yer kapladığı için kaldırıldı (bölüm/sayfa
+  kimliği zaten üstteki `pageband`'de "Bölüm N" olarak görünüyor). Yeni bir
+  ders yazarken `continue_tag` vermek ARTIK ZORUNLU DEĞİL — vermemeniz
+  içerik/görünümü etkilemez; sadece geriye dönük uyumluluk için parametre
+  hâlâ kabul ediliyor.
 
 - **`Chapter(number, title, subtitle, pages=[], key_terms=[])`** —
   `pages` listesine `ChapterPage` nesnelerini sırayla ekle. `key_terms`
@@ -531,8 +540,12 @@ Bunlar `templates/style.css` içinde zaten düzeltilmiş durumda — sadece
 3. **Kapak amblem harfi**: Yunanca/özel semboller (örn. Σ) büyük punto'da
    X gibi çarpık görünür. Her zaman düz bir Latin harfi kullan.
 
-4. **Uzun `continue_tag`**: İki satıra sarılırsa yanındaki rozetle dikey
-   hizası bozulur. Kısa tut.
+4. **(ARTIK GEÇERLİ DEĞİL) Uzun `continue_tag`**: Bölüm devam sayfalarındaki
+   "N. Bölüm · Devam" rozeti+başlık bloğu tamamen kaldırıldığı için
+   `ChapterPage(continue_tag=...)` artık hiç render edilmiyor — bu tuzak
+   sadece tarihi referans olarak duruyor. Sözlük/Test/Cevap Anahtarı devam
+   sayfalarındaki sabit etiketler ("Sözlük · Devam" vb.) zaten kısa
+   olduğundan bu risk onlarda hiç yaşanmadı.
 
 5. **Aşırı yüklü tek sayfa**: Bir `ChapterPage`'e terms + person + 2 büyük
    tablo + callout + summary gibi çok fazla şey eklemek neredeyse her zaman
@@ -572,6 +585,22 @@ Bunlar `templates/style.css` içinde zaten düzeltilmiş durumda — sadece
    sütun dengeli yükseklikte kalıyor) — bu, gerçek bir sınav kağıdının okuma
    sırasına benzer. Her `.tq`/`.ans-item`'a `break-inside: avoid` şart,
    yoksa bir soru/cevap sütun sınırında ortadan bölünebilir.
+
+9. **Bölüm devam başlığı kaldırıldı + alt bilgi artık gerçek sayfa numarası
+   gösteriyor**: Eskiden bölüm devam sayfalarında "N. Bölüm · Devam" rozeti
+   + `continue_tag` başlığı vardı — kullanıcı bunun gereksiz yer kapladığını
+   bildirdi, bu yüzden `master.html.j2`'deki `{% else %}` dalı (chcontinue
+   bloğu) chapter döngüsünden tamamen kaldırıldı (bkz. yukarıdaki
+   `ChapterPage` notu — Sözlük/Test/Cevap Anahtarı/LEGACY Sınav Hazırlık
+   devam sayfalarında bu rozet hâlâ var, sadece bölüm sayfalarından
+   kaldırıldı). Ayrıca Sözlük/Test/Cevap Anahtarı/LEGACY Sınav Hazırlık alt
+   bilgilerindeki "A"/"A.2"/"B"/"B.2"/"C"/"C.2" gibi harf-bazlı sahte sayfa
+   numaraları, İçindekiler'deki gerçek sayılarla (`page_starts`) eşleşmiyordu
+   — bunlar da `page_starts["glossary"|"test"|"answer_key"|"exam"]`'den
+   başlayan, chapter döngüsündeki `pageno` namespace'iyle AYNI desende
+   artan gerçek tam sayı sayaçlarına çevrildi. Yeni bir sınav/sözlük
+   sayfa türü eklenirse aynı deseni (namespace + her sayfa sonunda +1)
+   kullan, harf-bazlı placeholder'a asla geri dönme.
 
 ## Tasarım sistemi özeti (referans amaçlı — değiştirmen gerekmemeli)
 
