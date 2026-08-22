@@ -209,6 +209,43 @@ class AnswerItem:
 
 
 @dataclass
+class BookPack:
+    """BİRLEŞİK KİTAP — 13-14 dersin tek ciltte toplanmış hali.
+
+    Ders içeriğini KOPYALAMAZ; sadece hangi derslerin hangi sırayla
+    birleşeceğini ve kitabın kendi kimliğini (kapak, önsöz vb.) tutar.
+    Dersler her zaman kendi content/<slug>.py dosyalarından taze okunur —
+    bir derste yapılan düzeltme, kitap yeniden derlendiğinde otomatik gelir.
+    (Kitabın ön kısmı — kapak/künye/önsöz/rehber/ana içindekiler — Faz 2'de
+    eklenecek; bu sınıf o alanlarla genişletilecek.)
+    """
+    title: str
+    subtitle: str
+    description: str
+    course_modules: list[str]          # ["content.tefsir2", "content.psikoloji", ...] — SIRA önemlidir
+    theme: str = "slate"               # kitabın kendi ön kısmı için (dersler kendi temasını korur)
+    theme_color: Optional[str] = None
+    icon_text: str = "K"
+
+    # --- Ön kısım (kapak / künye / önsöz / rehber / ana içindekiler / harita) ---
+    cover_kicker: str = "Görsel Ders Notu Kitabı · Dönem Cildi"
+    cover_code: str = ""                          # kapakta başlığın üstündeki küçük etiket
+    imprint_rows: list[tuple] = field(default_factory=list)   # [("Dönem", "2025-2026 Bahar"), ...]
+    imprint_note: str = ""
+    preface_lead: str = ""                        # önsözün koyu zeminli giriş paragrafı
+    preface_cards: list[tuple] = field(default_factory=list)  # [(başlık, metin), ...] 2x2 kart
+    preface_note: str = ""                        # önsöz altındaki vurgu kutusu metni
+    guide_lede: str = ""
+    guide_note: str = ""
+    toc_lede: str = ""
+    map_lede: str = ""
+    map_note: str = ""
+
+    def course_count(self) -> int:
+        return len(self.course_modules)
+
+
+@dataclass
 class CoursePack:
     """Bir dersin tüm görsel kitabı."""
     course_code: str            # "PSİ 102" gibi küçük üst etiket (opsiyonel)

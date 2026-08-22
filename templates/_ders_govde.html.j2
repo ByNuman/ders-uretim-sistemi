@@ -1,0 +1,516 @@
+{# ============================================================
+   BİR DERSİN GÖVDESİ — TEK KAYNAK
+   Kapak -> İçindekiler -> Genel Bakış -> Bölümler -> Sözlük -> Test/Cevap
+   Anahtarı (ya da LEGACY Sınav Hazırlık). Hem tek ders build'i
+   (master.html.j2) hem kitap build'i (kitap.html.j2) bunu kullanır --
+   tasarımda bir düzeltme yapılacaksa TEK yer burasıdır.
+
+   ctx sözlüğü (build.py -> course_context() üretir):
+     page_starts -> bölüm/sözlük/test'in GLOBAL başlangıç sayfa numaraları
+     *_pages     -> sayfalanmış sözlük/test/cevap/LEGACY listeleri
+     prefix      -> anchor öneki ("" tek derste, "d3-" kitapta)
+     pagecls     -> her .page'e eklenen tema kapsam sınıfı ("" ya da " ders-3")
+   ============================================================ #}
+
+
+{% macro icon_svg(kind) %}
+{% if kind == "focus" %}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.5"/><line x1="12" y1="7.5" x2="12" y2="13"/><circle cx="12" cy="16.5" r="0.6" fill="currentColor" stroke="none"/></svg>
+{% elif kind == "caution" %}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.5"/><line x1="12" y1="11" x2="12" y2="16.5"/><circle cx="12" cy="7.5" r="0.6" fill="currentColor" stroke="none"/></svg>
+{% elif kind == "insight" %}<svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 1.5 L14.6 9 L22 9 L15.9 13.6 L18.2 21 L12 16.6 L5.8 21 L8.1 13.6 L2 9 L9.4 9 Z"/></svg>
+{% elif kind == "route" %}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.5"/><polygon points="15.5 8.5 13.2 13.2 8.5 15.5 10.8 10.8 15.5 8.5" fill="currentColor" stroke="none"/></svg>
+{% endif %}
+{% endmacro %}
+
+{% macro arrow_svg() %}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="19" y2="12"/><polyline points="13 6 19 12 13 18"/></svg>{% endmacro %}
+
+{% macro render_terms(terms) %}
+<div class="terms-grid">
+  {% for t in terms %}
+  <div class="term-box">
+    <div class="term-name">{{ t.term }}</div>
+    <div class="term-def">{{ t.definition }}</div>
+  </div>
+  {% endfor %}
+</div>
+{% endmacro %}
+
+{% macro render_person(p) %}
+<div class="person-card">
+  <div class="person-avatar">{{ p.avatar() }}</div>
+  <div>
+    <div class="person-name">{{ p.name }}</div>
+    <div class="person-tag">{{ p.years }} · {{ p.tagline }}</div>
+    <div class="person-bio">{{ p.bio[0] | safe }}</div>
+  </div>
+</div>
+{% endmacro %}
+
+{% macro render_person_row(persons) %}
+<div class="person-row">
+  {% for p in persons %}
+  <div class="person-card">
+    <div class="person-avatar">{{ p.avatar() }}</div>
+    <div>
+      <div class="person-name">{{ p.name }}</div>
+      <div class="person-tag">{{ p.years }} · {{ p.tagline }}</div>
+      <div class="person-bio">{{ p.bio[0] | safe }}</div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endmacro %}
+
+{% macro render_block(b) %}
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">{{ b.number }}</div>
+    <div class="block-title">{{ b.title }}</div>
+  </div>
+  {% if b.subtitle %}<div class="block-subtitle">{{ b.subtitle }}</div>{% endif %}
+  <ul>
+    {% for bullet in b.bullets %}<li>{{ bullet | safe }}</li>{% endfor %}
+  </ul>
+</div>
+{% endmacro %}
+
+{% macro render_callout(c) %}
+<div class="callout {{ c.kind }}">
+  <div class="callout-icon">{{ icon_svg(c.kind) }}</div>
+  <div>
+    <div class="callout-title">{{ c.title }}</div>
+    <div class="callout-text">{{ c.text | safe }}</div>
+  </div>
+</div>
+{% endmacro %}
+
+{% macro render_flow(f) %}
+<div class="flowdiag">
+  {% for step in f.steps %}
+  {% if not loop.first %}<div class="farrow">{{ arrow_svg() }}</div>{% endif %}
+  <div class="fstep">
+    <div class="fstep-title">{{ step.title }}</div>
+    {% if step.text %}<div class="fstep-text">{{ step.text }}</div>{% endif %}
+  </div>
+  {% endfor %}
+</div>
+{% if f.caption %}<div class="flow-caption">{{ f.caption }}</div>{% endif %}
+{% endmacro %}
+
+{% macro render_table(t) %}
+<div class="ctable-wrap">
+  <div class="ctable-caption">{{ t.caption }}</div>
+  <table class="ctable">
+    <thead><tr>{% for h in t.headers %}<th>{{ h }}</th>{% endfor %}</tr></thead>
+    <tbody>
+      {% for row in t.rows %}
+      <tr>{% for cell in row %}<td>{{ cell | safe }}</td>{% endfor %}</tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endmacro %}
+
+{% macro render_info_cards(title, cards) %}
+<div class="block-subtitle" style="margin-left:0; font-weight:700; color:var(--ink); font-size:8.6pt; margin-top:5.5mm; margin-bottom:2mm;">{{ title }}</div>
+<div class="info-grid">
+  {% for c in cards %}
+  <div class="info-card">
+    {% if c.badge %}<div class="badge">{{ c.badge }}</div>{% endif %}
+    <div class="ic-title">{{ c.title }}</div>
+    <div class="ic-text">{{ c.text }}</div>
+  </div>
+  {% endfor %}
+</div>
+{% endmacro %}
+
+{% macro render_ayat(title, ayat) %}
+<div class="ayat-section-title">{{ title }}</div>
+{% for a in ayat %}
+<div class="ayah-card">
+  <div class="ayah-ref">{{ a.reference }}</div>
+  <div class="ayah-arabic">{{ a.arabic }}</div>
+  <div class="ayah-meal">"{{ a.meal }}"</div>
+  {% if a.etymology %}<div class="ayah-etym">{{ a.etymology | safe }}</div>{% endif %}
+</div>
+{% endfor %}
+{% endmacro %}
+
+{% macro render_summary(text) %}
+<div class="chsummary"><b>Bölüm Özeti</b>{{ text | safe }}</div>
+{% endmacro %}
+
+{% macro render_test_question(q) %}
+<div class="tq">
+  <div class="tq-head">
+    <div class="tq-num">{{ q.number }}</div>
+    <div class="tq-stem">{{ q.stem | safe }}</div>
+  </div>
+  <ul class="tq-options">
+    {% for letter, text in q.options.items() %}
+    <li><span class="opt-letter">{{ letter }}</span><span>{{ text | safe }}</span></li>
+    {% endfor %}
+  </ul>
+</div>
+{% endmacro %}
+
+{% macro render_answer_item(a) %}
+<div class="ans-item">
+  <div class="ans-num">{{ a.number }}</div>
+  <div>
+    <span class="ans-correct">Doğru Cevap: {{ a.correct }}</span>
+    <div class="ans-explain">{{ a.explanation | safe }}</div>
+  </div>
+</div>
+{% endmacro %}
+
+{% macro render_item(kind, data) %}
+  {% if kind == "terms" %}{{ render_terms(data) }}
+  {% elif kind == "person" %}{{ render_person(data) }}
+  {% elif kind == "person_row" %}{{ render_person_row(data) }}
+  {% elif kind == "block" %}{{ render_block(data) }}
+  {% elif kind == "callout" %}{{ render_callout(data) }}
+  {% elif kind == "flow" %}{{ render_flow(data) }}
+  {% elif kind == "table" %}{{ render_table(data) }}
+  {% elif kind == "ayat" %}{{ render_ayat(data[0], data[1]) }}
+  {% elif kind == "info_cards" %}{{ render_info_cards(data[0], data[1]) }}
+  {% elif kind == "summary" %}{{ render_summary(data) }}
+  {% endif %}
+{% endmacro %}
+
+{% macro footer(pack, pageno) %}
+<div class="footer">
+  <div>{{ pack.title }}</div>
+  <div class="fnum">{{ pageno }}</div>
+</div>
+{% endmacro %}
+
+{% macro course(pack, ctx) %}
+{# ============================================================
+   1. KAPAK
+   ============================================================ #}
+<section class="page cover{{ ctx.pagecls }}" id="{{ ctx.prefix }}cover">
+  <div class="cover-corner tl"></div>
+  <div class="cover-corner tr"></div>
+  <div class="cover-corner bl"></div>
+  <div class="cover-corner br"></div>
+  <div class="cover-top">
+    <div class="cover-kicker">Görsel Ders Notu Kitabı · Final Özeti</div>
+    <div class="cover-emblem">
+      <div class="ring-outer"></div>
+      <div class="ring-mid"></div>
+      {% for deg in [0,30,60,90,120,150,180,210,240,270,300,330] %}
+      <div class="tick{{ ' major' if deg in [0,90,180,270] else '' }}" style="transform: translateX(-50%) rotate({{ deg }}deg);"></div>
+      {% endfor %}
+      <div class="ring-inner"><span>{{ pack.icon_text }}</span></div>
+    </div>
+  </div>
+  <div class="cover-mid">
+    <div class="cover-motif">{{ pack.icon_text }}</div>
+    {% if pack.course_code %}<div class="cover-code">{{ pack.course_code }}</div>{% endif %}
+    <div class="cover-title">{{ pack.title | safe }}</div>
+    <div class="cover-subtitle">{{ pack.subtitle }}</div>
+    <div class="cover-rule"></div>
+    <div class="cover-desc">{{ pack.description }}</div>
+  </div>
+  <div class="cover-bottom">
+    <div class="cover-stats">
+      <div class="cover-stat"><b>{{ pack.chapter_count() }}</b>Bölüm</div>
+      <div class="cover-stat"><b>{{ pack.concept_count() }}</b>Anahtar Kavram</div>
+      <div class="cover-stat"><b>Final</b>Sınav Hazırlık</div>
+    </div>
+    <div class="cover-foot">
+      <div>Ders Notu Serisi</div>
+      <div>{{ pack.chapter_count() }} Bölüm · Final Sınavı Hazırlığı</div>
+    </div>
+  </div>
+</section>
+
+{# ============================================================
+   2. İÇİNDEKİLER
+   ============================================================ #}
+<section class="page body-page{{ ctx.pagecls }}">
+  <div class="pageband"><div>{{ pack.title }}</div><div class="pageband-course">{{ pack.course_code }}</div></div>
+  <div class="toc-kicker">Kitap Planı</div>
+  <div class="toc-title">İçindekiler</div>
+  <div class="toc-lede">{{ pack.subtitle }} — bölüm bölüm takip edilecek çalışma haritası.</div>
+  <div class="toc-list">
+    {% for ch in pack.chapters %}
+    <a class="toc-row" href="#{{ ctx.prefix }}ch-{{ ch.number }}">
+      <div class="toc-num">{{ ch.number }}</div>
+      <div class="toc-body">
+        <div class="toc-heading">{{ ch.title }}</div>
+        <div class="toc-sub">{{ ch.subtitle }}</div>
+      </div>
+      <div class="toc-page">s.{{ ctx.page_starts[ch.number] }}</div>
+    </a>
+    {% endfor %}
+    <a class="toc-row" href="#{{ ctx.prefix }}glossary">
+      <div class="toc-num alt">A</div>
+      <div class="toc-body">
+        <div class="toc-heading">Anahtar Kavramlar Sözlüğü</div>
+        <div class="toc-sub">Tanımlı ve bağlamlandırılmış {{ pack.concept_count() }} kavram</div>
+      </div>
+      <div class="toc-page">s.{{ ctx.page_starts["glossary"] }}</div>
+    </a>
+    <a class="toc-row" href="#{{ ctx.prefix }}exam">
+      <div class="toc-num alt">B</div>
+      <div class="toc-body">
+        <div class="toc-heading">{% if pack.test_questions %}{{ pack.test_title }}{% else %}Sınav Hazırlık{% endif %}</div>
+        <div class="toc-sub">{% if pack.test_questions %}{{ pack.test_questions|length }} soruluk çoktan seçmeli test ve çözümlü cevap anahtarı{% else %}Karıştırılan ayrımlar, eşleştirmeler ve son kontrol{% endif %}</div>
+      </div>
+      <div class="toc-page">s.{{ ctx.page_starts["test"] if pack.test_questions else ctx.page_starts["exam"] }}</div>
+    </a>
+  </div>
+  {{ footer(pack, ctx.page_starts["toc"]) }}
+</section>
+
+{# ============================================================
+   3. GENEL BAKIŞ
+   ============================================================ #}
+<section class="page body-page{{ ctx.pagecls }}">
+  <div class="pageband"><div>{{ pack.title }}</div><div class="pageband-course">{{ pack.course_code }}</div></div>
+  <div class="toc-kicker">Dersin Büyük Resmi</div>
+  <div class="toc-title">Genel Bakış</div>
+
+  <div class="ov-hero">{{ pack.overview_lead | safe }}</div>
+
+  <div class="ov-grid">
+    {% for card in pack.overview_cards %}
+    <div class="ov-card">
+      <div class="ov-card-title">{{ card.title }}</div>
+      <div class="ov-card-text">{{ card.text }}</div>
+    </div>
+    {% endfor %}
+  </div>
+
+  {% if pack.overview_flow %}
+  <div class="ov-flow">
+    {% for step in pack.overview_flow %}
+    {% if not loop.first %}<div class="ov-flow-arrow">{{ arrow_svg() }}</div>{% endif %}
+    <div class="ov-flow-step"><b>{{ step[0] }}</b><span>{{ step[1] }}</span></div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  {% if pack.overview_note %}
+  <div class="callout caution" style="margin-top:6mm;">
+    <div class="callout-icon">{{ icon_svg("caution") }}</div>
+    <div><div class="callout-title">Sınavda Ana Ayrım</div><div class="callout-text">{{ pack.overview_note | safe }}</div></div>
+  </div>
+  {% endif %}
+
+  {{ footer(pack, ctx.page_starts["overview"]) }}
+</section>
+
+{# ============================================================
+   4. BÖLÜM SAYFALARI
+   ============================================================ #}
+{% set pageno = namespace(n=ctx.page_starts["chapters"]) %}
+{% for ch in pack.chapters %}
+  {% for page in ch.pages %}
+  <section class="page body-page{{ ctx.pagecls }}"{% if loop.first %} id="{{ ctx.prefix }}ch-{{ ch.number }}"{% endif %}>
+    <div class="pageband"><div>{{ pack.title }}</div><div class="pageband-course">Bölüm {{ ch.number }}</div></div>
+
+    {% if loop.first %}
+      <div class="chbanner">
+        <div class="chbanner-kicker">{{ ch.number }}. Bölüm</div>
+        <div class="chbanner-title">{{ ch.title }}</div>
+        <div class="chbanner-subtitle">{{ ch.subtitle }}</div>
+      </div>
+    {% endif %}
+
+    {% for kind, data in page.items %}{{ render_item(kind, data) }}{% endfor %}
+
+    {{ footer(pack, pageno.n) }}
+  </section>
+  {% set pageno.n = pageno.n + 1 %}
+  {% endfor %}
+{% endfor %}
+
+{# ============================================================
+   5. SÖZLÜK — taşma riski olmasın diye N'li sayfalara bölünmüş halde basılır
+   ============================================================ #}
+{% set gloss_pageno = namespace(n=ctx.page_starts["glossary"]) %}
+{% for gpage in ctx.glossary_pages %}
+<section class="page body-page{{ ctx.pagecls }}"{% if loop.first %} id="{{ ctx.prefix }}glossary"{% endif %}>
+  <div class="pageband"><div>{{ pack.title }}</div><div class="pageband-course">Genel Tekrar</div></div>
+  {% if loop.first %}
+    <div class="section-kicker">Genel Tekrar</div>
+    <div class="section-title">Anahtar Kavramlar Sözlüğü</div>
+    <div class="section-lede">Her kavram, kısa tanımı ve geldiği bölümle birlikte listelenmiştir — hızlı tekrar ve eşleştirme için.</div>
+  {% else %}
+    <div class="chcontinue"><div class="tag">Sözlük · Devam</div><div class="cctitle">Anahtar Kavramlar (devamı)</div></div>
+  {% endif %}
+  <div class="gloss-grid">
+    {% for c in gpage %}
+    <div class="gloss-item">
+      <div class="gloss-term">{{ c.term }}</div>
+      <div class="gloss-def">{{ c.definition }}</div>
+      <div class="gloss-ref">{{ c.context }} · {{ c.chapter_ref }}. Bölüm</div>
+    </div>
+    {% endfor %}
+  </div>
+  {{ footer(pack, gloss_pageno.n) }}
+</section>
+{% set gloss_pageno.n = gloss_pageno.n + 1 %}
+{% endfor %}
+
+{# ============================================================
+   6. TEST + CEVAP ANAHTARI (standart) — pack.test_questions doluysa bu
+      render edilir. LEGACY: pack.test_questions boşsa, eski "Sınav Hazırlık"
+      (ayrımlar + eşleştirme + hızlı soru-cevap) render edilir (geriye dönük
+      uyumluluk için — yeni derslerde test_questions kullanılmalı).
+   ============================================================ #}
+{% if pack.test_questions %}
+
+{% set tchips = [
+  (pack.test_questions|length, "Soru"),
+  ("Çoktan", "Seçmeli"),
+  ("5", "Seçenek (A-E)"),
+] %}
+{% set test_pageno = namespace(n=ctx.page_starts["test"]) %}
+{% for tpage in ctx.test_pages %}
+<section class="page body-page{{ ctx.pagecls }}"{% if loop.first %} id="{{ ctx.prefix }}exam"{% endif %}>
+  <div class="pageband"><div>{{ pack.title }}</div><div class="pageband-course">{{ "Sınav" if loop.first else "Test · Devam" }}</div></div>
+  {% if loop.first %}
+    <div class="section-kicker">Sınav</div>
+    <div class="section-title">{{ pack.test_title }}</div>
+    {% if pack.test_subtitle %}<div class="section-lede">{{ pack.test_subtitle }}</div>{% endif %}
+    <div class="test-chip-row">
+      {% for num, label in tchips %}
+      <div class="test-chip"><b>{{ num }}</b><span>{{ label }}</span></div>
+      {% endfor %}
+    </div>
+    {% if pack.test_instructions %}<div class="test-instructions">{{ pack.test_instructions }}</div>{% endif %}
+  {% else %}
+    <div class="chcontinue"><div class="tag">Test · Devam</div><div class="cctitle">{{ pack.test_title }}</div></div>
+  {% endif %}
+  <div class="tq-list">
+    {% for q in tpage %}{{ render_test_question(q) }}{% endfor %}
+  </div>
+  {{ footer(pack, test_pageno.n) }}
+</section>
+{% set test_pageno.n = test_pageno.n + 1 %}
+{% endfor %}
+
+{% set answer_pageno = namespace(n=ctx.page_starts["answer_key"]) %}
+{% for apage in ctx.answer_pages %}
+<section class="page body-page{{ ctx.pagecls }}"{% if loop.first %} id="{{ ctx.prefix }}answer-key"{% endif %}>
+  <div class="pageband"><div>{{ pack.title }}</div><div class="pageband-course">{{ "Cevap Anahtarı" if loop.first else "Çözümler · Devam" }}</div></div>
+  {% if loop.first %}
+    <div class="section-kicker">Çözümler</div>
+    <div class="section-title">Cevap Anahtarı ve Çözümler</div>
+    {% if pack.answer_key_intro %}<div class="section-lede">{{ pack.answer_key_intro }}</div>{% endif %}
+  {% else %}
+    <div class="chcontinue"><div class="tag">Çözümler · Devam</div><div class="cctitle">Cevap Anahtarı ve Çözümler</div></div>
+  {% endif %}
+  <div class="ans-list">
+    {% for a in apage %}{{ render_answer_item(a) }}{% endfor %}
+  </div>
+  {{ footer(pack, answer_pageno.n) }}
+</section>
+{% set answer_pageno.n = answer_pageno.n + 1 %}
+{% endfor %}
+
+{% else %}
+
+{# ============================================================
+   LEGACY: SINAV HAZIRLIK — ayrımlar + eşleştirme + hızlı soru-cevap
+   ============================================================ #}
+{% set exam_pageno = namespace(n=ctx.page_starts["exam"]) %}
+<section class="page body-page{{ ctx.pagecls }}" id="{{ ctx.prefix }}exam">
+  <div class="pageband"><div>{{ pack.title }}</div><div class="pageband-course">Final Tekrarı</div></div>
+  <div class="section-kicker">Final Tekrarı</div>
+  <div class="section-title">Sınav Hazırlık</div>
+  <div class="section-lede">En sık karıştırılan ayrımlar, düşünür/kavram eşleştirmesi ve hızlı soru-cevapla son tekrar.</div>
+
+  {% if ctx.distinctions_pages[0] %}
+  <div class="dist-grid">
+    {% for d in ctx.distinctions_pages[0] %}
+    <div class="dist-card">
+      <div class="dist-title">{{ d.left }} <span class="dist-vs">↔</span> {{ d.right }}</div>
+      <div class="dist-text">{{ d.text | safe }}</div>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  {% if ctx.matchtable_pages[0] %}
+  <div class="match-table-wrap">
+    <table class="matchtable">
+      <thead><tr><th>Kavram / Kişi</th><th>Temel İçerik</th><th>Anahtar İpucu</th></tr></thead>
+      <tbody>
+        {% for m in ctx.matchtable_pages[0] %}
+        <tr><td>{{ m.key }}</td><td>{{ m.detail }}</td><td>{{ m.reference }}</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+
+  {{ footer(pack, exam_pageno.n) }}
+</section>
+{% set exam_pageno.n = exam_pageno.n + 1 %}
+
+{# Fazladan distinctions sayfaları (nadiren gerekir; veri kaybını önler) #}
+{% for dpage in ctx.distinctions_pages[1:] %}
+<section class="page body-page{{ ctx.pagecls }}">
+  <div class="pageband"><div>{{ pack.title }}</div><div class="pageband-course">Final Tekrarı</div></div>
+  <div class="chcontinue"><div class="tag">Sınav Hazırlık · Devam</div><div class="cctitle">Karıştırılan Ayrımlar (devamı)</div></div>
+  <div class="dist-grid">
+    {% for d in dpage %}
+    <div class="dist-card">
+      <div class="dist-title">{{ d.left }} <span class="dist-vs">↔</span> {{ d.right }}</div>
+      <div class="dist-text">{{ d.text | safe }}</div>
+    </div>
+    {% endfor %}
+  </div>
+  {{ footer(pack, exam_pageno.n) }}
+</section>
+{% set exam_pageno.n = exam_pageno.n + 1 %}
+{% endfor %}
+
+{# Fazladan eşleştirme tablosu sayfaları (nadiren gerekir; veri kaybını önler) #}
+{% for mpage in ctx.matchtable_pages[1:] %}
+<section class="page body-page{{ ctx.pagecls }}">
+  <div class="pageband"><div>{{ pack.title }}</div><div class="pageband-course">Final Tekrarı</div></div>
+  <div class="chcontinue"><div class="tag">Sınav Hazırlık · Devam</div><div class="cctitle">Eşleştirme Tablosu (devamı)</div></div>
+  <div class="match-table-wrap">
+    <table class="matchtable">
+      <thead><tr><th>Kavram / Kişi</th><th>Temel İçerik</th><th>Anahtar İpucu</th></tr></thead>
+      <tbody>
+        {% for m in mpage %}
+        <tr><td>{{ m.key }}</td><td>{{ m.detail }}</td><td>{{ m.reference }}</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {{ footer(pack, exam_pageno.n) }}
+</section>
+{% set exam_pageno.n = exam_pageno.n + 1 %}
+{% endfor %}
+
+{# QA her zaman kendi (kendi) sayfasında/sayfalarında -- ilk sayfayla asla birleştirilmez #}
+{% for qpage in ctx.qa_pages %}
+{% if qpage %}
+<section class="page body-page{{ ctx.pagecls }}">
+  <div class="pageband"><div>{{ pack.title }}</div><div class="pageband-course">Final Tekrarı</div></div>
+  <div class="chcontinue"><div class="tag">Sınav Hazırlık · Devam</div><div class="cctitle">Hızlı Soru-Cevap</div></div>
+  <div class="qa-grid">
+    {% for qa in qpage %}
+    <div class="qa-item">
+      <div class="qa-q">{{ loop.index }}. {{ qa.question }}</div>
+      <div class="qa-a">{{ qa.answer }}</div>
+    </div>
+    {% endfor %}
+  </div>
+  {{ footer(pack, exam_pageno.n) }}
+</section>
+{% set exam_pageno.n = exam_pageno.n + 1 %}
+{% endif %}
+{% endfor %}
+
+{% endif %}
+
+
+{% endmacro %}

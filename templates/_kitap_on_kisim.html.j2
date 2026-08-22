@@ -1,0 +1,282 @@
+{# ============================================================
+   KİTABIN ÖN KISMI — ana kapak, künye, önsöz, sayfa rehberi,
+   ana içindekiler, ders haritası.
+
+   Bu sayfalar derslerden ÖNCE gelir ve derslerin sayfa offset'ini
+   belirler; sayfa numaraları build_kitap.py'deki front_matter_pages()
+   tarafından hesaplanır (fm sözlüğü), burada elle sayı yazılmaz.
+
+   fm: cover/imprint/preface/guide/toc/map -> sayfa numaraları
+       toc_chunks -> ana içindekiler sayfalarına bölünmüş ders listesi
+       stats -> kitap geneli sayımlar
+   ============================================================ #}
+
+{# callout ikonları ders gövdesiyle AYNI kaynaktan gelir — ikinci bir kopya tutulmaz #}
+{% import "_ders_govde.html.j2" as ders %}
+
+{% macro bfooter(book, pageno) %}
+<div class="footer">
+  <div>{{ book.title }}</div>
+  <div class="fnum">{{ pageno }}</div>
+</div>
+{% endmacro %}
+
+{% macro bband(book, right) %}
+<div class="pageband"><div>{{ book.title }}</div><div class="pageband-course">{{ right }}</div></div>
+{% endmacro %}
+
+{% macro front_matter(book, courses, fm) %}
+
+{# ---------------- 1. ANA KAPAK ---------------- #}
+<section class="page cover kitap" id="kitap-kapak">
+  <div class="cover-corner tl"></div>
+  <div class="cover-corner tr"></div>
+  <div class="cover-corner bl"></div>
+  <div class="cover-corner br"></div>
+  <div class="cover-top">
+    <div class="cover-kicker">{{ book.cover_kicker }}</div>
+    <div class="cover-emblem">
+      <div class="ring-outer"></div>
+      <div class="ring-mid"></div>
+      {% for deg in [0,30,60,90,120,150,180,210,240,270,300,330] %}
+      <div class="tick{{ ' major' if deg in [0,90,180,270] else '' }}" style="transform: translateX(-50%) rotate({{ deg }}deg);"></div>
+      {% endfor %}
+      <div class="ring-inner"><span>{{ book.icon_text }}</span></div>
+    </div>
+  </div>
+  <div class="cover-mid">
+    <div class="cover-motif">{{ book.icon_text }}</div>
+    {% if book.cover_code %}<div class="cover-code">{{ book.cover_code }}</div>{% endif %}
+    <div class="cover-title">{{ book.title | safe }}</div>
+    <div class="cover-subtitle">{{ book.subtitle }}</div>
+    <div class="cover-rule"></div>
+    <div class="cover-desc">{{ book.description }}</div>
+  </div>
+  <div class="cover-bottom">
+    <div class="cover-stats">
+      <div class="cover-stat"><b>{{ fm.stats.courses }}</b>Ders</div>
+      <div class="cover-stat"><b>{{ fm.stats.chapters }}</b>Bölüm</div>
+      <div class="cover-stat"><b>{{ fm.stats.concepts }}</b>Kavram</div>
+      <div class="cover-stat"><b>{{ fm.stats.questions }}</b>Soru</div>
+    </div>
+    <div class="cover-foot">
+      <div>Ders Notu Serisi</div>
+      <div>{{ fm.stats.pages }} Sayfa · {{ fm.stats.courses }} Ders</div>
+    </div>
+  </div>
+</section>
+
+{# ---------------- 2. KÜNYE ---------------- #}
+<section class="page body-page kitap" id="kitap-kunye">
+  {{ bband(book, "Künye") }}
+  <div class="toc-kicker">Kitap Hakkında</div>
+  <div class="toc-title">Künye</div>
+  <div class="imprint-grid">
+    {% for label, value in book.imprint_rows %}
+    <div class="imprint-row">
+      <div class="imprint-label">{{ label }}</div>
+      <div class="imprint-value">{{ value | safe }}</div>
+    </div>
+    {% endfor %}
+    <div class="imprint-row">
+      <div class="imprint-label">Kapsam</div>
+      <div class="imprint-value">
+        <b>{{ fm.stats.courses }} ders</b> · {{ fm.stats.chapters }} bölüm ·
+        {{ fm.stats.concepts }} anahtar kavram · {{ fm.stats.questions }} soru ·
+        {{ fm.stats.pages }} sayfa
+      </div>
+    </div>
+    <div class="imprint-row">
+      <div class="imprint-label">İçindeki Dersler</div>
+      <div class="imprint-value">
+        {% for c in courses %}{{ c.plain_title }}{% if not loop.last %} · {% endif %}{% endfor %}
+      </div>
+    </div>
+  </div>
+  {% if book.imprint_note %}<div class="imprint-note">{{ book.imprint_note | safe }}</div>{% endif %}
+  {{ bfooter(book, fm.imprint) }}
+</section>
+
+{# ---------------- 3. ÖNSÖZ ---------------- #}
+<section class="page body-page kitap" id="kitap-onsoz">
+  {{ bband(book, "Önsöz") }}
+  <div class="toc-kicker">Başlarken</div>
+  <div class="toc-title">Bu Kitap Nasıl Kullanılır</div>
+  {% if book.preface_lead %}<div class="ov-hero" style="margin-top:5mm;">{{ book.preface_lead | safe }}</div>{% endif %}
+  <div class="pref-grid">
+    {% for title, text in book.preface_cards %}
+    <div class="pref-card">
+      <div class="pref-card-title">{{ title }}</div>
+      <div class="pref-card-text">{{ text | safe }}</div>
+    </div>
+    {% endfor %}
+  </div>
+  {% if book.preface_note %}
+  <div class="callout focus" style="margin-top:6mm;">
+    <div class="callout-icon">{{ ders.icon_svg("focus") }}</div>
+    <div><div class="callout-title">Çalışma Sırası Önerisi</div><div class="callout-text">{{ book.preface_note | safe }}</div></div>
+  </div>
+  {% endif %}
+  {{ bfooter(book, fm.preface) }}
+</section>
+
+{# ---------------- 4. SAYFA REHBERİ (LEGEND) ---------------- #}
+<section class="page body-page kitap" id="kitap-rehber">
+  {{ bband(book, "Sayfa Rehberi") }}
+  <div class="toc-kicker">Sayfaları Okuma Kılavuzu</div>
+  <div class="toc-title">Sayfa Rehberi</div>
+  {% if book.guide_lede %}<div class="toc-lede">{{ book.guide_lede }}</div>{% endif %}
+
+  <div class="guide-grid">
+    <div class="guide-item">
+      <div class="guide-cap">Terim Kutusu<span>Her bölümün başındaki dört tanım. Sınavdaki tanım sorularının ilk adresi.</span></div>
+      <div class="guide-demo">
+        <div class="term-box">
+          <div class="term-name">Anahtar Terim</div>
+          <div class="term-def">Terimin bir cümlelik, sınavda yeterli olan tanımı.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="guide-item">
+      <div class="guide-cap">Sarı Kutu · Dikkat<span>Sınavda doğrudan çıkması muhtemel, altı çizili bilgi.</span></div>
+      <div class="guide-demo">
+        <div class="callout focus">
+          <div class="callout-icon">{{ ders.icon_svg("focus") }}</div>
+          <div><div class="callout-title">Odak</div><div class="callout-text">Bu kutudaki bilgi sınavda sık sorulur.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="guide-item">
+      <div class="guide-cap">Mavi Kutu · Uyarı<span>Birbirine karıştırılan iki kavramın ayrımı burada verilir.</span></div>
+      <div class="guide-demo">
+        <div class="callout caution">
+          <div class="callout-icon">{{ ders.icon_svg("caution") }}</div>
+          <div><div class="callout-title">Karıştırma</div><div class="callout-text">Benzeyen iki kavram arasındaki fark.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="guide-item">
+      <div class="guide-cap">Koyu Kutu · İçgörü<span>Konunun bütününü tek cümlede toparlayan yorum.</span></div>
+      <div class="guide-demo">
+        <div class="callout insight">
+          <div class="callout-icon">{{ ders.icon_svg("insight") }}</div>
+          <div><div class="callout-title">İçgörü</div><div class="callout-text">Bölümün ana fikrini bağlayan cümle.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="guide-item">
+      <div class="guide-cap">Bölüm Özeti<span>Her bölümün sonundaki toparlama. Hızlı tekrarda tek başına okunabilir.</span></div>
+      <div class="guide-demo">
+        <div class="chsummary"><b>Bölüm Özeti</b>Bölümün tamamını birkaç cümlede toparlayan kapanış.</div>
+      </div>
+    </div>
+
+    <div class="guide-item">
+      <div class="guide-cap">Test ve Cevap Anahtarı<span>Her dersin sonunda 20 soruluk test, hemen ardından çözümlü cevap anahtarı gelir.</span></div>
+      <div class="guide-demo">
+        <div class="ans-item" style="margin:0;">
+          <div class="ans-num">1</div>
+          <div>
+            <span class="ans-correct">Doğru Cevap: C</span>
+            <div class="ans-explain">Cevabın <b>neden</b> doğru olduğunu açıklayan kısa gerekçe.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="guide-item">
+      <div class="guide-cap">Karşılaştırma Tablosu<span>İki kavramın farkı satır satır yan yana. Sınavda ayrım sorusu geldiğinde buraya bakın.</span></div>
+      <div class="guide-demo">
+        <div class="ctable-wrap" style="margin:0;">
+          <table class="ctable">
+            <thead><tr><th>Birinci Kavram</th><th>İkinci Kavram</th></tr></thead>
+            <tbody>
+              <tr><td>Ayrımın bir yönü</td><td>Karşıt yönü</td></tr>
+              <tr><td>İkinci ölçüt</td><td>Karşılığı</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="guide-item">
+      <div class="guide-cap">Akış Şeması<span>Bir sürecin aşamaları, soldan sağa sırayla. Sıralama sorularının kaynağı.</span></div>
+      <div class="guide-demo">
+        <div class="flowdiag" style="margin:0;">
+          <div class="fstep"><div class="fstep-title">1. Aşama</div></div>
+          <div class="farrow">{{ ders.arrow_svg() }}</div>
+          <div class="fstep"><div class="fstep-title">2. Aşama</div></div>
+          <div class="farrow">{{ ders.arrow_svg() }}</div>
+          <div class="fstep"><div class="fstep-title">3. Aşama</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {% if book.guide_note %}
+  <div class="imprint-note" style="margin-top:6mm;">{{ book.guide_note | safe }}</div>
+  {% endif %}
+  {{ bfooter(book, fm.guide) }}
+</section>
+
+{# ---------------- 5. ANA İÇİNDEKİLER ---------------- #}
+{% set tocno = namespace(n=fm.toc) %}
+{% for chunk in fm.toc_chunks %}
+<section class="page body-page kitap"{% if loop.first %} id="kitap-icindekiler"{% endif %}>
+  {{ bband(book, "Ana İçindekiler" if loop.first else "İçindekiler · Devam") }}
+  {% if loop.first %}
+    <div class="toc-kicker">Kitap Planı</div>
+    <div class="toc-title">Ana İçindekiler</div>
+    {% if book.toc_lede %}<div class="toc-lede">{{ book.toc_lede }}</div>{% endif %}
+  {% else %}
+    <div class="chcontinue"><div class="tag">İçindekiler · Devam</div><div class="cctitle">Ana İçindekiler (devamı)</div></div>
+  {% endif %}
+  <div class="btoc-list">
+    {% for c in chunk %}
+    <a class="btoc-row" href="#d{{ c.index }}-cover">
+      <div class="btoc-chip" style="background: linear-gradient(150deg, {{ c.accent_dark }}, {{ c.accent }});">{{ c.index }}</div>
+      <div class="btoc-body">
+        <div class="btoc-name">{{ c.plain_title }}</div>
+        <div class="btoc-sub">{{ c.pack.subtitle }}</div>
+      </div>
+      <div class="btoc-meta">
+        {{ c.pack.chapter_count() }} bölüm · {{ c.pack.concept_count() }} kavram<br>
+        {{ c.question_count }} soru · {{ c.page_count }} sayfa
+      </div>
+      <div class="btoc-range" style="background: {{ c.accent }};">s.{{ c.first_page }}</div>
+    </a>
+    {% endfor %}
+  </div>
+  {{ bfooter(book, tocno.n) }}
+</section>
+{% set tocno.n = tocno.n + 1 %}
+{% endfor %}
+
+{# ---------------- 6. DERS HARİTASI ---------------- #}
+<section class="page body-page kitap" id="kitap-harita">
+  {{ bband(book, "Ders Haritası") }}
+  <div class="toc-kicker">Renk Anahtarı</div>
+  <div class="toc-title">Ders Haritası</div>
+  {% if book.map_lede %}<div class="toc-lede">{{ book.map_lede }}</div>{% endif %}
+  <div class="map-list">
+    {% for c in courses %}
+    <div class="map-row">
+      <div class="map-name">{{ c.plain_title }}</div>
+      <div class="map-track">
+        <div class="map-fill" style="width: {{ c.bar_pct }}%; background: linear-gradient(90deg, {{ c.accent_dark }}, {{ c.accent }});">
+          <span>{{ c.page_count }} s.</span>
+        </div>
+      </div>
+      <div class="map-range">s.{{ c.first_page }}-{{ c.last_page }}</div>
+    </div>
+    {% endfor %}
+  </div>
+  {% if book.map_note %}<div class="map-note" style="margin-top:7mm;">{{ book.map_note | safe }}</div>{% endif %}
+  {{ bfooter(book, fm.map) }}
+</section>
+
+{% endmacro %}

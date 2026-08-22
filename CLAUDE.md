@@ -18,15 +18,22 @@ sayfalı bir PDF.
 Tasarım (HTML şablonu + CSS) sabittir ve zaten olgunlaşmıştır — **tasarımı
 değiştirme, sadece içerik ekle.** Kullanıcı tasarımda bir sorun bildirirse
 (kesilme, kontrast, taşma) o zaman `templates/style.css` veya
-`templates/master.html.j2` üzerinde kalıcı bir düzeltme yap, çünkü bu dosyalar
-TÜM derslerde paylaşılır.
+`templates/_ders_govde.html.j2` üzerinde kalıcı bir düzeltme yap, çünkü bu
+dosyalar TÜM derslerde paylaşılır. (`master.html.j2` artık sadece 13 satırlık
+bir sarmalayıcıdır; bir dersin gerçek sayfa yapısı `_ders_govde.html.j2`
+içindedir ve tek ders PDF'i ile birleşik kitap ONU ortak kullanır — düzeltmeyi
+oraya yapınca her iki çıktı birden düzelir.)
+
+Ayrıca tüm dersleri **tek bir cilt** halinde birleştiren ikinci bir çıktı
+vardır: `python build_kitap.py` (bkz. aşağıdaki "Birleşik Kitap" bölümü).
 
 ## Dizin yapısı
 
 ```
 ders_sistemi/
 ├── content_model.py       # Veri şeması (dataclass'lar) — API referansı aşağıda
-├── build.py                # HTML üret → Playwright ile PDF'e render et → bookmark ekle
+├── build.py                # TEK DERS: HTML üret → PDF'e render et → küçült → bookmark ekle
+├── build_kitap.py          # BİRLEŞİK KİTAP: tüm dersleri tek ciltte birleştirir
 ├── theme_engine.py         # Sınırsız renk teması motoru (tek hex'ten tam tema üretir)
 ├── kaynaklar/
 │   ├── ders_ozetleri/        # Görsel PDF sisteminin girdisi (bkz. Adım 0) — bu dosyadaki süreç bunu kullanır
@@ -35,10 +42,14 @@ ders_sistemi/
 │   ├── ders_kaynaklari/      # ders-anlatim skill'i Mod 1 girdisi (bu sistemden bağımsız, bkz. .claude/skills/ders-anlatim/)
 │   └── ogretmen_notlari/     # ders-anlatim skill'i Mod 2 girdisi (bu sistemden bağımsız)
 ├── templates/
-│   ├── master.html.j2      # Jinja2 şablonu (sabit — dokunma, sadece bug varsa düzelt)
-│   └── style.css            # Tasarım sistemi (sabit — dokunma, sadece bug varsa düzelt)
+│   ├── _ders_govde.html.j2      # BİR DERSİN GÖVDESİ — asıl şablon, tek kaynak (sabit)
+│   ├── master.html.j2            # Tek ders sarmalayıcısı (13 satır — _ders_govde'yi çağırır)
+│   ├── kitap.html.j2             # Kitap sarmalayıcısı (ön kısım + tüm dersler)
+│   ├── _kitap_on_kisim.html.j2   # Kitabın kapak/künye/önsöz/rehber/içindekiler/harita sayfaları
+│   └── style.css                  # Tasarım sistemi (sabit — dokunma, sadece bug varsa düzelt)
 ├── content/
 │   ├── __init__.py
+│   ├── kitap.py             # BİRLEŞİK KİTAP tanımı: ders sırası + kitabın ön kısım metinleri
 │   ├── psikoloji.py         # Örnek: tamamlanmış bir ders (indigo tema, Test+Cevap Anahtarı formatı)
 │   ├── sosyoloji.py         # Örnek (forest tema, Test+Cevap Anahtarı formatı)
 │   ├── cagdas_felsefe.py    # Örnek (theme_color #1C5C69, Test+Cevap Anahtarı formatı)
@@ -46,7 +57,9 @@ ders_sistemi/
 │   ├── felsefe_tarihi_2.py  # Örnek (theme_color #724C31, Test+Cevap Anahtarı formatı)
 │   ├── ogretim_teknolojileri.py  # Örnek (slate tema, LEGACY Sınav Hazırlık formatı)
 │   ├── sanat_tarihi.py      # Örnek (burgundy tema, LEGACY Sınav Hazırlık formatı)
-│   └── tefsir2.py           # Örnek: Arapça ayet içeren ders (add_ayat kullanımı, LEGACY format)
+│   ├── islam_tarihi_3.py    # Örnek (theme_color #1D4E79, Test+Cevap Anahtarı formatı)
+│   ├── ogretim_ilke_yontem.py    # Örnek (theme_color #863C5E, Test+Cevap Anahtarı formatı)
+│   └── tefsir2.py           # Örnek: Arapça ayet içeren ders (theme_color #246038, add_ayat + Test/Cevap Anahtarı)
 └── output/                  # build.py çıktıları buraya yazılır (.html + .pdf)
 ```
 
@@ -54,9 +67,10 @@ Her ders, `content/` altında kendi Python dosyasında yaşar ve tek bir
 `get_pack() -> CoursePack` fonksiyonu dışa verir.
 
 **Not — iki nesil örnek var:** `psikoloji.py`/`sosyoloji.py`/`cagdas_felsefe.py`/
-`edebiyat.py`/`felsefe_tarihi_2.py` GÜNCEL standardı (Test + Cevap Anahtarı,
-sınırsız renk teması) kullanır; diğer 3 örnek (`ogretim_teknolojileri.py`,
-`sanat_tarihi.py`, `tefsir2.py`) henüz eski "Sınav Hazırlık"
+`edebiyat.py`/`felsefe_tarihi_2.py`/`islam_tarihi_3.py`/`ogretim_ilke_yontem.py`/
+`tefsir2.py` GÜNCEL standardı (Test + Cevap Anahtarı,
+sınırsız renk teması) kullanır; kalan 2 örnek (`ogretim_teknolojileri.py`,
+`sanat_tarihi.py`) henüz eski "Sınav Hazırlık"
 (distinctions/match_table/qa_items) formatındadır ve geriye dönük uyumluluk
 için bozulmadan çalışmaya devam eder (bkz. aşağıdaki "Test + Cevap Anahtarı"
 ve "Renk Teması" bölümleri). **Yeni bir ders yazarken her zaman GÜNCEL
@@ -105,6 +119,25 @@ with pdfplumber.open('kaynaklar/ders_ozetleri/<bulunan-dosya>.pdf') as pdf:
 Metnin TAMAMINI oku (görme aracıyla dosyayı görüntüle, kesme). Arapça karakter
 (ayet, hadis) varsa sorun değil — sistem `add_ayat()` ile bunu destekliyor
 (bkz. aşağıdaki API referansı ve `content/tefsir2.py` örneği).
+
+**Arapça (RTL) metinde pdfplumber'a GÜVENME.** pdfplumber bu tür PDF'lerde
+Arapçayı harf harf ters çıkarabilir; aynı sayfayı PyMuPDF ile de çıkar ve
+karşılaştır:
+```bash
+python -c "
+import pymupdf, io
+d = pymupdf.open('kaynaklar/ders_ozetleri/<dosya>.pdf')
+out = io.open('cikti.txt','w',encoding='utf-8')   # Windows konsolu Arapça basamaz
+for i in range(len(d)): out.write(f'=== SAYFA {i+1} ===\n' + d[i].get_text('text') + '\n')
+out.close()"
+```
+Metni doğrulamak için bilinen bir çapa kullan: alıntıların içindeki **ayet
+parçaları** sabit Mushaf metnidir; senin çıkardığın metin onlarla birebir
+örtüşüyorsa yöntem güvenilirdir. Font ToUnicode hataları için tipik onarımlar:
+`هللا→الله`, `اْل→الأ`, `اإل→الإ`, `اال→الا`, fatha-lam bağı `→لا`. Bir sayfa
+satır içi *döndürülmüş* (cümle parçaları kaymış) geliyorsa doğru sırayı `﴿﴾`
+parantez dengesi ve kaynaktaki Türkçe çeviriyle kur. Her alıntıyı üretilen
+PDF üzerinde görsel olarak oku; emin olamadığın kısmı EKLEME.
 
 ### 2. İçeriği 5-7 bölüme planla
 Ham metnin doğal başlık yapısını takip et (uydurma bölümleme yapma). Her bölüm
@@ -437,8 +470,8 @@ olabilir. `content/sosyoloji.py` ve `content/psikoloji.py`'deki
 `test_questions`/`answer_key_items` listelerini şablon olarak kullanın.
 
 `pack.test_questions` boş bırakılırsa (yazmazsanız) şablon otomatik olarak
-eski LEGACY "Sınav Hazırlık" formatına düşer — bu sadece 3 eski örnek
-dersin (ogretim_teknolojileri/sanat_tarihi/tefsir2) bozulmadan çalışmaya
+eski LEGACY "Sınav Hazırlık" formatına düşer — bu sadece 2 eski örnek
+dersin (ogretim_teknolojileri/sanat_tarihi) bozulmadan çalışmaya
 devam etmesi içindir. **Yeni bir ders yazarken her zaman `test_questions`/
 `answer_key_items` kullanın, `distinctions`/`match_table`/`qa_items` değil.**
 
@@ -519,6 +552,67 @@ kalacak kadar seyrekse (örn. 20 kavram → 18+2), ders içeriğinden gerçek,
 atlanmış birkaç kavram (önemli bir tarih, kişi, savaş adı vb.) daha
 ekleyerek dengele — bu hem daha iyi görünür hem sözlüğü zenginleştirir.
 
+## Birleşik Kitap (`build_kitap.py`)
+
+Tek tek üretilen derslerin hepsini, **kesintisiz sayfa numaralarına sahip tek
+bir cilt** halinde birleştirir. Dersleri kopyalamaz — her dersin
+`content/<slug>.py` dosyasını taze okur; bir derste düzeltme yapıp kitabı
+yeniden derlemek, tüm numaraları/içindekileri/yer imlerini otomatik günceller.
+
+```bash
+python build_kitap.py            # content/kitap.py'deki ders sırasına göre
+```
+
+### Kitaba yeni ders eklemek
+`content/kitap.py` içindeki `COURSE_MODULES` listesine **tek satır** ekle:
+```python
+COURSE_MODULES = [
+    "content.tefsir2",
+    ...
+    "content.yeni_ders",     # <- eklenen
+]
+```
+Başka hiçbir yeri elle güncellemek gerekmez (sayfa numaraları, ana
+içindekiler, ders haritası, kapak istatistikleri, yer imleri — hepsi hesaplanır).
+
+### Kitabın yapısı
+| Bölüm | İçerik |
+|---|---|
+| Ön kısım | Ana kapak · Künye · Bu Kitap Nasıl Kullanılır · Sayfa Rehberi · Ana İçindekiler · Ders Haritası |
+| Gövde | Her ders, tek ders PDF'iyle BİREBİR aynı sayfalarla (kapak → içindekiler → genel bakış → bölümler → sözlük → test → cevap anahtarı) |
+
+Ön kısım sayfa sayısı ders sayısına göre kendini ayarlar: 11 derse kadar ana
+içindekiler tek sayfa (ön kısım 6 sayfa), 12+ derste dengeli iki sayfa
+(ön kısım 7 sayfa). Bu sayı `front_matter_page_count()` ile derslerden ÖNCE
+hesaplanır, çünkü ilk dersin sayfa offset'i buna bağlıdır.
+
+### Kitabın metinleri
+Kapak başlığı, künye satırları, önsöz kartları, rehber ve harita açıklamaları
+`content/kitap.py` içindeki `BookPack` alanlarındadır. Ders içeriğiyle
+karıştırma — orada bir dersin bilgisi DEĞİL, kitabın kendi tanıtımı yazılır.
+
+### Mimari: iki çıktı, tek şablon
+```
+_ders_govde.html.j2   (bir dersin tüm sayfaları — TEK KAYNAK)
+    ├── master.html.j2   -> tek ders PDF'i (offset=0, anchor öneki yok)
+    └── kitap.html.j2    -> kitap (her derse offset + "d3-" anchor öneki + tema kapsamı)
+```
+`build.py`'deki `course_context(pack, offset, prefix, pagecls)` her iki yolu da
+besler; sayfalama mantığı ikiye ayrılmadığı için "tek derste doğru, kitapta
+yanlış numara" durumu yapısal olarak imkânsızdır.
+
+### Otomatik denetimler (hepsi build çıktısında görünür)
+1. **Taşma denetimi** — tek derstekiyle aynı; kitapta ayrıca taşan sayfanın
+   HANGİ dersin kaçıncı sayfası olduğu yazdırılır.
+2. **Sayfa numarası zinciri** — dersler boşluksuz/çakışmasız mı, hesaplanan
+   toplam PDF'in gerçek sayfa sayısıyla ve kapaktaki istatistikle aynı mı.
+3. **Render doğrulaması** — bkz. aşağıdaki 10 numaralı tuzak.
+4. **Boyut optimizasyonu** — `optimize_pdf()`, tekrar eden görsel nesneleri
+   birleştirir (kitapta 36.4 MB → 20.0 MB, tek derste ~%26). Sayfa ya da yer
+   imi sayısı değişirse değişikliği geri alır.
+
+Bunlardan biri hata verirse **PDF'i teslim etme** — önce sebebini bul.
+
 ## Bilinen tuzaklar / geçmişte düzeltilen buglar
 
 Bunlar `templates/style.css` içinde zaten düzeltilmiş durumda — sadece
@@ -589,7 +683,7 @@ Bunlar `templates/style.css` içinde zaten düzeltilmiş durumda — sadece
 9. **Bölüm devam başlığı kaldırıldı + alt bilgi artık gerçek sayfa numarası
    gösteriyor**: Eskiden bölüm devam sayfalarında "N. Bölüm · Devam" rozeti
    + `continue_tag` başlığı vardı — kullanıcı bunun gereksiz yer kapladığını
-   bildirdi, bu yüzden `master.html.j2`'deki `{% else %}` dalı (chcontinue
+   bildirdi, bu yüzden `_ders_govde.html.j2`'deki `{% else %}` dalı (chcontinue
    bloğu) chapter döngüsünden tamamen kaldırıldı (bkz. yukarıdaki
    `ChapterPage` notu — Sözlük/Test/Cevap Anahtarı/LEGACY Sınav Hazırlık
    devam sayfalarında bu rozet hâlâ var, sadece bölüm sayfalarından
@@ -601,6 +695,31 @@ Bunlar `templates/style.css` içinde zaten düzeltilmiş durumda — sadece
    artan gerçek tam sayı sayaçlarına çevrildi. Yeni bir sınav/sözlük
    sayfa türü eklenirse aynı deseni (namespace + her sayfa sonunda +1)
    kullan, harf-bazlı placeholder'a asla geri dönme.
+
+10. **Chromium PDF çıktısını SESSİZCE kesebilir (kritik)**: 200+ sayfalık
+    dokümanlarda `page.pdf()`, hiçbir hata vermeden eksik PDF üretebiliyor —
+    aynı HTML bir denemede 273 sayfa, bir sonrakinde 132 sayfa verdi. Dosya
+    sorunsuz açıldığı için fark edilmesi neredeyse imkânsızdır. Bu yüzden
+    `render_pdf()` artık `expected_pages` alır, çıktının sayfa sayısını
+    doğrular ve tutmuyorsa 3 kez yeniden dener, yine tutmazsa build'i
+    hatayla durdurur. **Bu parametreyi kaldırma** — kaldırırsan kitabın
+    yarısının eksik olduğu bir PDF sessizce teslim edilebilir.
+
+11. **Kitapta tema `:root` ile enjekte edilemez**: 14 dersin teması tek HTML'de
+    yan yana durduğu için her ders kendi kapsamını alır —
+    `resolve_theme_css(hex, ".ders-3")` ve o sınıf `.page` elementinin
+    ÜZERİNE yazılır (custom property'ler tanımlandıkları elementte ve altında
+    geçerlidir, bu yüzden çalışır). `theme_color`'ı olmayan LEGACY dersler
+    aynı yere `.theme-slate` gibi sabit sınıfı alır. Kitapta bir dersin rengi
+    yanlış çıkıyorsa ilk bakılacak yer burasıdır (bkz. 6 numaralı tuzak —
+    aynı problemin tek ders hâli).
+
+12. **Ön kısım sayfa sayısı, ilk dersin offset'idir**: `front_matter_page_count()`
+    ders sayısından ÖNCE hesaplanabilir olmak zorundadır (ana içindekiler kaç
+    sayfa tutacak → dersler nereden başlayacak). Ön kısma yeni bir sayfa
+    eklersen `FRONT_FIXED_PAGES` sabitini de artır; unutursan `build_front_matter()`
+    içindeki assert derhal patlar (harita sayfası ile toplam uyuşmaz) — bu
+    kasıtlıdır, sessiz kaymaya izin verme.
 
 ## Tasarım sistemi özeti (referans amaçlı — değiştirmen gerekmemeli)
 
@@ -627,8 +746,11 @@ Bunlar `templates/style.css` içinde zaten düzeltilmiş durumda — sadece
 ## Hızlı komut özeti
 
 ```bash
-# Derle
+# Tek dersi derle
 cd ders_sistemi && python3 build.py content.<slug>
+
+# TÜM dersleri tek kitap halinde derle (content/kitap.py'deki sıraya göre)
+python build_kitap.py
 
 # Belirli sayfaları PNG'ye çevirip incele
 pdftoppm -png -r 100 -f <ilk> -l <son> output/<slug>.pdf output/preview/pg
@@ -671,4 +793,7 @@ python3 theme_engine.py
       içeriği taşıdım/birleştirdim — asla yeni içerik uydurmadım, taşan
       denemeleri geri aldım
 - [ ] Bookmark/link sayısını doğruladım
+- [ ] Yeni dersi `content/kitap.py` içindeki `COURSE_MODULES` listesine ekledim
+      ve `python build_kitap.py` ile birleşik kitabı yeniden derledim; taşma,
+      sayfa zinciri ve render doğrulamalarının hepsi "✓" verdi
 - [ ] PDF'i kullanıcıya sundum

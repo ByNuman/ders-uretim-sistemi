@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<title>{{ book.title }}</title>
+<style>{{ css }}</style>
+{# Her dersin tema bloğu KENDİ kapsamıyla enjekte edilir (.ders-N). ":root"
+   kullanılsaydı 14 dersin teması birbirini ezerdi — bkz. theme_engine.py. #}
+{% for c in courses %}{% if c.theme_css %}<style>{{ c.theme_css }}</style>
+{% endif %}{% endfor %}
+{# kitabın kendi ön kısmı da aynı mantıkla kendi kapsamını (.kitap) alır #}
+{% if front_theme_css %}<style>{{ front_theme_css }}</style>{% endif %}
+</head>
+{# body sınıfı bilinçli olarak hiçbir CSS kuralıyla eşleşmez: renk her zaman
+   sayfanın kendi .ders-N / .theme-XXXX sınıfından gelir. #}
+<body class="theme-custom">
+{% import "_ders_govde.html.j2" as ders %}
+{% import "_kitap_on_kisim.html.j2" as on %}
+
+{{ on.front_matter(book, courses, fm) }}
+
+{% for c in courses %}
+{{ ders.course(c.pack, c.ctx) }}
+{% endfor %}
+
+</body>
+</html>

@@ -78,18 +78,25 @@ def generate_theme_vars_from_hex(hexcolor: str) -> dict:
     return generate_theme_vars(hue, sat, light)
 
 
-def theme_css_block(theme_vars: dict) -> str:
+def theme_css_block(theme_vars: dict, selector: str = ":root") -> str:
     decls = "\n".join(f"  {k}: {v};" for k, v in theme_vars.items())
-    return f":root {{\n{decls}\n}}"
+    return f"{selector} {{\n{decls}\n}}"
 
 
-def resolve_theme_css(theme_color) -> str:
+def resolve_theme_css(theme_color, selector: str = ":root") -> str:
     """pack.theme_color (hex ya da None) alır, enjekte edilecek CSS override
     bloğunu döner. theme_color yoksa boş string döner (sabit .theme-XXXX
-    sınıfları geçerliliğini korur — geriye dönük uyumluluk)."""
+    sınıfları geçerliliğini korur — geriye dönük uyumluluk).
+
+    `selector`: tek ders build'inde ":root" (varsayılan, eski davranış). KİTAP
+    build'inde her ders kendi kapsamını alır (".ders-3" gibi) — 14 ders tek
+    HTML'de yan yana durduğu için ":root" hepsini birbirine karıştırırdı.
+    Kapsam sınıfı `.page` elementinin ÜZERİNE yazılır: custom property'ler
+    tanımlandıkları elementin kendisinde ve altında geçerli olduğu için bu,
+    o dersin tüm sayfalarını (kapak dahil) doğru renge boyar."""
     if not theme_color:
         return ""
-    return theme_css_block(generate_theme_vars_from_hex(theme_color))
+    return theme_css_block(generate_theme_vars_from_hex(theme_color), selector)
 
 
 # ---------------------------------------------------------------------------

@@ -27,9 +27,15 @@ OUTPUT = ROOT / "output"
 OUTPUT.mkdir(exist_ok=True)
 
 
-def slugify(s: str) -> str:
+def strip_tags(s: str) -> str:
+    """Başlıktaki HTML etiketlerini (accent-word span'ı vb.) atar — dosya adı,
+    yer imi ve konsol çıktısı gibi düz metin gereken yerler için."""
     import re
-    s = re.sub(r"<[^>]+>", "", s)   # başlıktaki olası HTML etiketlerini (accent-word span'ı vb.) at
+    return re.sub(r"<[^>]+>", "", s)
+
+
+def slugify(s: str) -> str:
+    s = strip_tags(s)
     m = {"ı": "i", "ğ": "g", "ü": "u", "ş": "s", "ö": "o", "ç": "c",
          "İ": "i", "Ğ": "g", "Ü": "u", "Ş": "s", "Ö": "o", "Ç": "c"}
     out = "".join(m.get(c, c) for c in s)
@@ -47,12 +53,23 @@ def paginate(items: list, per_page: int) -> list[list]:
     return [items[i:i + per_page] for i in range(0, len(items), per_page)] or [[]]
 
 
-def compute_page_numbers(pack) -> dict:
-    """Her bölümün gerçek başlangıç sayfa numarasını hesaplar (kapak=1,
-    içindekiler=2, genel bakış=3, sonra bölümler sırayla kendi page_count()
-    kadar yer kaplar). İçindekilerdeki 'sahte' referansların yerini alır."""
-    n = 4
-    starts = {}
+def compute_page_numbers(pack, offset: int = 0) -> dict:
+    """Her bölümün gerçek başlangıç sayfa numarasını hesaplar. Tek ders
+    build'inde offset=0 -> kapak=1, içindekiler=2, genel bakış=3, sonra
+    bölümler sırayla kendi page_count() kadar yer kaplar.
+
+    KİTAP build'inde offset, o dersten ÖNCE gelen tüm sayfaların toplamıdır --
+    böylece hem alt bilgideki numara hem dersin kendi İçindekiler'i hem de
+    ana içindekiler kitap boyunca kesintisiz akan AYNI numarayı gösterir.
+
+    Dönen sözlükteki ek anahtarlar:
+      cover/toc/overview/chapters -> dersin ön sayfalarının numaraları
+      end                          -> dersin son fiziksel sayfa numarası
+      total                        -> dersin toplam sayfa sayısı (offset zinciri için)
+    """
+    n = offset + 1
+    starts = {"cover": n, "toc": n + 1, "overview": n + 2, "chapters": n + 3}
+    n += 3
     for ch in pack.chapters:
         starts[ch.number] = n
         n += ch.page_count()
@@ -66,7 +83,27 @@ def compute_page_numbers(pack) -> dict:
         n += len(paginate(pack.answer_key_items, ANSWER_PER_PAGE))
     else:
         starts["exam"] = n
+        n += exam_page_count(pack)
+    starts["end"] = n - 1
+    starts["total"] = n - offset - 1
     return starts
+
+
+def course_context(pack, offset: int = 0, prefix: str = "", pagecls: str = "") -> dict:
+    """_ders_govde.html.j2 makrosunun ihtiyaç duyduğu her şeyi tek sözlükte
+    toplar. Tek ders build'i ve kitap build'i AYNI fonksiyonu kullanır --
+    sayfalama mantığının iki yerde ayrışması böylece imkansız olur."""
+    return {
+        "page_starts": compute_page_numbers(pack, offset),
+        "glossary_pages": paginate(pack.glossary, GLOSSARY_PER_PAGE),
+        "qa_pages": paginate(pack.qa_items, QA_PER_PAGE),
+        "distinctions_pages": paginate(pack.distinctions, DISTINCTIONS_PER_PAGE),
+        "matchtable_pages": paginate(pack.match_table, MATCHTABLE_PER_PAGE),
+        "test_pages": paginate(pack.test_questions, TEST_PER_PAGE),
+        "answer_pages": paginate(pack.answer_key_items, ANSWER_PER_PAGE),
+        "prefix": prefix,
+        "pagecls": pagecls,
+    }
 
 
 GLOSSARY_PER_PAGE = 18     # 2 sütun x 9 satır -- değişken tanım uzunluğuna karşı güvenlik paylı
@@ -95,24 +132,15 @@ def build(module_name: str):
     mod = importlib.import_module(module_name)
     pack = mod.get_pack()
 
-    page_starts = compute_page_numbers(pack)
-    glossary_pages = paginate(pack.glossary, GLOSSARY_PER_PAGE)
-    qa_pages = paginate(pack.qa_items, QA_PER_PAGE)
-    distinctions_pages = paginate(pack.distinctions, DISTINCTIONS_PER_PAGE)
-    matchtable_pages = paginate(pack.match_table, MATCHTABLE_PER_PAGE)
-    test_pages = paginate(pack.test_questions, TEST_PER_PAGE)
-    answer_pages = paginate(pack.answer_key_items, ANSWER_PER_PAGE)
+    ctx = course_context(pack)
+    page_starts = ctx["page_starts"]
 
     css = (TEMPLATES / "style.css").read_text(encoding="utf-8")
     theme_override_css = resolve_theme_css(pack.theme_color)
     env = Environment(loader=FileSystemLoader(str(TEMPLATES)))
     template = env.get_template("master.html.j2")
     html = template.render(
-        pack=pack, css=css, theme_override_css=theme_override_css, page_starts=page_starts,
-        glossary_pages=glossary_pages, qa_pages=qa_pages,
-        distinctions_pages=distinctions_pages,
-        matchtable_pages=matchtable_pages,
-        test_pages=test_pages, answer_pages=answer_pages,
+        pack=pack, css=css, theme_override_css=theme_override_css, ctx=ctx,
     )
 
     slug = slugify(pack.title)
@@ -126,7 +154,8 @@ def build(module_name: str):
     for w in warnings:
         print(f"[UYARI] {w}")
 
-    render_pdf(html_path, pdf_path)
+    render_pdf(html_path, pdf_path, expected_pages=page_starts["end"])
+    optimize_pdf(pdf_path)
     add_bookmarks(pdf_path, pack, page_starts)
     print(f"[build] PDF üretildi: {pdf_path}")
     return pdf_path
@@ -150,6 +179,39 @@ def add_bookmarks(pdf_path: Path, pack, page_starts: dict):
         writer.add_outline_item("Sınav Hazırlık", page_starts["exam"] - 1)
     with open(pdf_path, "wb") as f:
         writer.write(f)
+
+
+def optimize_pdf(pdf_path: Path) -> tuple[int, int]:
+    """PDF boyutunu, TEKRAR EDEN nesneleri birleştirerek küçültür.
+
+    Chromium her sayfanın CSS gradyanlarını/nokta dokusunu ayrı birer görsel
+    nesne olarak gömüyor: 272 sayfalık kitapta 5002 görsel nesnenin sadece
+    1646'sı benzersizdi, 15 MB'ı birebir tekrardı. MuPDF'in garbage=4 modu
+    aynı içerikli stream'leri tek nesnede birleştirir -- görüntü kalitesi
+    hiç düşmez, sadece kopyalar silinir (36.6 MB -> 20.0 MB ölçüldü).
+
+    Sayfa sayısı değişirse değişiklik geri alınır: küçültme uğruna içerik
+    kaybetmektense büyük dosya yeğdir."""
+    import os
+    import pymupdf
+    before = pdf_path.stat().st_size
+    tmp = pdf_path.with_name(pdf_path.stem + "._opt.pdf")
+    doc = pymupdf.open(str(pdf_path))
+    pages_before, toc_before = len(doc), len(doc.get_toc())
+    doc.save(str(tmp), garbage=4, deflate=True, clean=True)
+    doc.close()
+    check = pymupdf.open(str(tmp))
+    ok = (len(check) == pages_before and len(check.get_toc()) == toc_before)
+    check.close()
+    if not ok:
+        tmp.unlink(missing_ok=True)
+        print("[UYARI] Boyut optimizasyonu içeriği değiştirdi -- atlandı, PDF olduğu gibi bırakıldı.")
+        return before, before
+    os.replace(str(tmp), str(pdf_path))
+    after = pdf_path.stat().st_size
+    print(f"[build] Boyut: {before/1024/1024:.1f} MB -> {after/1024/1024:.1f} MB "
+          f"(%{round((1 - after / before) * 100)} küçüldü, tekrar eden nesneler birleştirildi)")
+    return before, after
 
 
 def validate(pack) -> list[str]:
@@ -182,7 +244,31 @@ def validate(pack) -> list[str]:
     return warnings
 
 
-def render_pdf(html_path: Path, pdf_path: Path):
+def render_pdf(html_path: Path, pdf_path: Path, expected_pages: int | None = None,
+               attempts: int = 3):
+    """PDF'i render eder ve (expected_pages verilmişse) çıktının GERÇEKTEN
+    beklenen sayıda sayfa içerdiğini doğrular.
+
+    NEDEN: Chromium, çok sayfalı (200+) dokümanlarda page.pdf() çıktısını
+    ARALIKLI olarak sessizce kesebiliyor -- aynı HTML bir denemede 273, bir
+    sonrakinde 132 sayfa üretti. Hata vermediği için fark edilmesi imkânsıza
+    yakın; bu yüzden sayfa sayısı burada doğrulanır ve tutmuyorsa yeniden
+    denenir. Hiçbir koşulda eksik PDF teslim edilmez."""
+    for attempt in range(1, attempts + 1):
+        overflow = _render_pdf_once(html_path, pdf_path)
+        if expected_pages is None:
+            return overflow
+        from pypdf import PdfReader
+        real = len(PdfReader(str(pdf_path)).pages)
+        if real == expected_pages:
+            return overflow
+        print(f"[RENDER UYARISI] PDF {real} sayfa çıktı, {expected_pages} olmalıydı "
+              f"(Chromium çıktıyı kesti) -- yeniden deneniyor {attempt}/{attempts}")
+    raise RuntimeError(
+        f"PDF {attempts} denemede de eksik render edildi ({real}/{expected_pages} sayfa).")
+
+
+def _render_pdf_once(html_path: Path, pdf_path: Path):
     script = f"""
 const {{ chromium }} = require('playwright');
 (async () => {{
@@ -226,16 +312,19 @@ const {{ chromium }} = require('playwright');
         print(result.stderr)
         raise RuntimeError("PDF render başarısız")
 
+    overflow = []
     for line in result.stdout.splitlines():
         if line.startswith("__OVERFLOW__"):
             import json as _json
             bad = _json.loads(line[len("__OVERFLOW__"):])
+            overflow = bad
             if bad:
                 print(f"[TAŞMA UYARISI] {len(bad)} sayfa A4 sınırını aşıyor -- içerik kesiliyor olabilir:")
                 for b in bad:
                     print(f"    - Sayfa (fiziksel sıra) {b['index']}: ~{b['overflowMm']}mm taşma")
             else:
                 print("[build] Taşma denetimi: tüm sayfalar A4 sınırları içinde. ✓")
+    return overflow   # kitap build'i taşan sayfayı hangi dersin olduğuna çevirmek için kullanır
 
 
 if __name__ == "__main__":
