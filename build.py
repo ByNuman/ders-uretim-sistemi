@@ -43,10 +43,10 @@ TRIM_W_MM = 175.0          # bitmiş (kesilmiş) sayfa genişliği
 TRIM_H_MM = 250.0          # bitmiş (kesilmiş) sayfa yüksekliği
 BLEED_MM = 3.0             # taşma payı (her kenar) — full-bleed zeminler için
 
-MARGIN_TOP_MM = 16.0
+MARGIN_TOP_MM = 11.0
 MARGIN_BOTTOM_MM = 19.0    # sayfa numarası payı dahil
-MARGIN_INNER_MM = 22.0     # sırt/gutter tarafı — PUR Amerikan cilt payı
-MARGIN_OUTER_MM = 16.0
+MARGIN_INNER_MM = 14.0     # sırt/gutter tarafı — PUR Amerikan cilt payı
+MARGIN_OUTER_MM = 9.0
 
 # Ayna simetri yönü. Standart kitap ciltlemesinde TEK (1, 3, 5...) sayfa sağ
 # yapraktır, dolayısıyla sırtı SOLDA kalır -> "left".  Ciltçiniz tersini
@@ -282,27 +282,27 @@ def course_context(pack, offset: int = 0, prefix: str = "", pagecls: str = "") -
 # hepsinde render edilip taşma denetimine sokuldu, taşmayan en büyük değer
 # alındı. Sayfa boyutunu değiştirirseniz `python tools/kalibre.py` çalıştırıp
 # bu bloğu yenileyin -- tahminle değiştirmeyin.
-GLOSSARY_PER_PAGE = 12     # 2 sütun x 6 satır
-QA_PER_PAGE = 3            # LEGACY
-DISTINCTIONS_PER_PAGE = 3  # LEGACY
-MATCHTABLE_PER_PAGE = 5    # LEGACY
-TEST_PER_PAGE_FIRST = 3    # ilk test sayfasında bilgi çubuğu + talimat kutusu da var
-TEST_PER_PAGE = 4          # devam sayfalarında (2 sütunlu düzen, 5 seçenekli MCQ)
-ANSWER_PER_PAGE = 12       # sayfa başına çözümlü cevap (2 sütunlu düzen)
+GLOSSARY_PER_PAGE = 22     # 2 sütun x 6 satır
+QA_PER_PAGE = 12            # LEGACY
+DISTINCTIONS_PER_PAGE = 8  # LEGACY
+MATCHTABLE_PER_PAGE = 11    # LEGACY
+TEST_PER_PAGE_FIRST = 7    # ilk test sayfasında bilgi çubuğu + talimat kutusu da var
+TEST_PER_PAGE = 8          # devam sayfalarında (2 sütunlu düzen, 5 seçenekli MCQ)
+ANSWER_PER_PAGE = 23       # sayfa başına çözümlü cevap (2 sütunlu düzen)
 
 # İçindekiler satırı, 137mm'lik metin genişliğinde alt başlığı iki satıra
 # sardığı için A4'tekinden (~18mm) yüksek (~25mm). İlk sayfada ayrıca
 # kicker+başlık+lede var, bu yüzden kapasitesi ayrı.
 # En yüksek satır 30.8mm ölçüldü (uzun alt başlıklı ders); ilk sayfada
 # 160mm, devam sayfasında 202mm boş yer var -> 5 ve 6 satır her derste güvenli.
-TOC_ROWS_FIRST = 5
-TOC_ROWS_REST = 6
+TOC_ROWS_FIRST = 7
+TOC_ROWS_REST = 8
 
 # Genel Bakış 175x250mm'de tek sayfaya sığmıyor (ölçüldü: 214-264mm / 215mm).
 # SABİT olarak ikiye bölünür: 1. sayfa hero + 6 kart, 2. sayfa akış + not.
 # Ölçüye göre değil yapıya göre bölmek bilinçli: sayfa numaraları render'dan
 # ÖNCE hesaplanabilir olmalı (bkz. compute_page_numbers).
-OVERVIEW_PAGES = 2
+OVERVIEW_PAGES = 1
 
 
 def exam_page_count(pack) -> int:

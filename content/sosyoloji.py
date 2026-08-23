@@ -44,9 +44,6 @@ def get_pack() -> CoursePack:
             "Kültür; bilimsel veya estetik anlamının ötesinde, sosyolojik olarak toplumun üyesi olan insanın kazandığı "
             "bilgi, inanç, sanat, ahlak, hukuk ve geleneklerin karmaşık bütünüdür.",
         ]))
-    )
-    ch1.pages.append(
-        ChapterPage()
         .add_block(BulletBlock(2, "Kültürün 5 Temel Özelliği", [
             "<b>Her Şeyi Kapsayıcıdır:</b> Toplumun paylaştığı maddi/manevi tüm ögelerin toplamıdır; kültürsüz toplum düşünülemez.",
             "<b>Öğrenilir:</b> Doğuştan gelmez — bilinçli öğretim, gözlem ve birikimsellikle kazanılır.",
@@ -57,6 +54,9 @@ def get_pack() -> CoursePack:
         .add_callout(Callout("focus", "Kritik Odak: Fichter'e Göre Kültürün İşlevleri",
             "Toplumsal davranışları düzenler ve bütünleştirir · toplumsal dayanışmayı sağlar · toplumun kimliği olur · "
             "değerleri yorumlar · kişiliğin oluşmasında başat faktördür."))
+    )
+    ch1.pages.append(
+        ChapterPage()
         .add_table(ComparisonTable(
             "Kültürün Ögeleri ve Kültürel Gecikme",
             ["Kavram", "Açıklama"],
@@ -66,9 +66,6 @@ def get_pack() -> CoursePack:
                 ["Kültürel Gecikme (Ogburn)", "Maddi kültür hızlı, manevi kültür yavaş değişir — bu fark uyumsuzluk yaratır."],
             ]
         ))
-    )
-    ch1.pages.append(
-        ChapterPage()
         .add_table(ComparisonTable(
             "Kültürel Kavramlar",
             ["Kavram", "Açıklama"],
@@ -92,9 +89,6 @@ def get_pack() -> CoursePack:
                 ["Kültür Şoku", "Başka bir kültüre giren bireyin yaşadığı uyum sıkıntısı."],
             ]
         ))
-    )
-    ch1.pages.append(
-        ChapterPage()
         .add_summary("Kültür, öğrenilen, paylaşılan ve örüntülü bir bütündür; maddi ve manevi ögelerden oluşur. "
             "Maddi kültürün manevi kültürden hızlı değişmesi 'kültürel gecikme' yaratır. Etnosentrizm ile kültürel "
             "relativizm, bir kültürü değerlendirirken alınabilecek iki karşıt tutumdur.")
@@ -131,9 +125,6 @@ def get_pack() -> CoursePack:
                 ["Başarısız Toplumsallaşma", "Kuralların öğrenilememesi/çelişkili aktarılması sonucu sapkın (patolojik) davranışlar gelişir."],
             ]
         ))
-    )
-    ch2.pages.append(
-        ChapterPage()
         .add_block(BulletBlock(2, "Toplumsallaşma Araçları", [
             "<b>Aile:</b> İlk ve en etkili araçtır; duygusal boyutu benlik oluşumunda kritiktir.",
             "<b>Arkadaş Grupları:</b> Aileden farklı olarak eşitlikçidir; çocuğa bağımsız bir kimlik alanı sağlar.",
@@ -143,6 +134,9 @@ def get_pack() -> CoursePack:
         .add_callout(Callout("caution", "Dikkat: Toplumsallaşma Çocuklukla Bitmez",
             "Askerlik, evlilik gibi yeni rollerle yetişkinler de değişir. Bireyin değer ve davranışlarını temelden "
             "değiştirmesine <b>Yeniden Toplumsallaşma (Resocialization)</b> denir."))
+    )
+    ch2.pages.append(
+        ChapterPage()
         .add_block(BulletBlock(3, "Davranış Kalıplarının Tanımı", [
             "Toplumda genelleşmiş, düzenlilik kazanmış, yinelenen düşünüş ve eylem biçimleridir; bireysel değil "
             "toplumsaldır. Birey bunları düşünmeden otomatik yapar ('Herkes öyle yaptığı için').",
@@ -158,9 +152,6 @@ def get_pack() -> CoursePack:
                 ["İçsel Davranış Kalıpları", "Düşünce ve inanç biçimleridir, doğrudan gözlenemez; dışsaldan daha süreklidir."],
             ]
         ))
-    )
-    ch2.pages.append(
-        ChapterPage()
         .add_table(ComparisonTable(
             "Tan'ın İçsel Davranış Kalıpları Sınıflandırması (1981)",
             ["Kalıp", "Açıklama"],
@@ -221,9 +212,6 @@ def get_pack() -> CoursePack:
                 ["Evrim", "Çok uzun süreli değişimlerin tümüdür."],
             ]
         ))
-    )
-    ch3.pages.append(
-        ChapterPage()
         .add_callout(Callout("insight", "Ortak Payda",
             "Toplumsal değişme bu dört kavramın hepsini kapsayan, <b>nesnel</b> (iyi/kötü yargısı içermeyen) bir çatı "
             "kavramdır — Gelişme, Kalkınma, Modernleşme ve Evrim onun özel görünümleridir."))
@@ -232,6 +220,9 @@ def get_pack() -> CoursePack:
             "<b>Faktörler:</b> Demografik (nüfus), Coğrafi (afetler), Teknolojik (doğanın denetimi), Kültürel (tutumlar), Toplumsal Çevre (savaşlar).",
             "<b>Kaynaklar:</b> İç kaynaklar (iç göç, keşifler) ve dış kaynaklar (planlı fetihler veya plansız etkileşimler).",
         ]))
+    )
+    ch3.pages.append(
+        ChapterPage()
         .add_table(ComparisonTable(
             "Toplumsal Değişme Kuramları",
             ["Ölçek", "Yaklaşım", "Temsilciler"],
@@ -244,9 +235,6 @@ def get_pack() -> CoursePack:
                 ["Küçük Boy", "Sosyal psikoloji odaklı değişim.", "—"],
             ]
         ))
-    )
-    ch3.pages.append(
-        ChapterPage()
         .add_table(ComparisonTable(
             "Gelenekselden Sanayi Toplumuna Geçiş",
             ["Alan", "Dönüşüm"],
@@ -291,9 +279,6 @@ def get_pack() -> CoursePack:
             InfoCard("Émile Durkheim", "İş bölümü kavramıyla toplumsal dayanışmanın dönüşümünü inceler.", "2"),
             InfoCard("Max Weber", "Akılcılık ve bürokrasi kavramlarıyla modern kurumsallaşmayı çözümler.", "3"),
         ])
-    )
-    ch4.pages.append(
-        ChapterPage()
         .add_table(ComparisonTable(
             "Modernliğin Boyutları (Tekeli)",
             ["Boyut", "İçerik"],
@@ -304,6 +289,9 @@ def get_pack() -> CoursePack:
                 ["Kurumsal", "Ulus devlet, demokrasi."],
             ]
         ))
+    )
+    ch4.pages.append(
+        ChapterPage()
         .add_block(BulletBlock(2, "Postmodernizm", [
             "<b>Nedir?</b> Modernizmin sonrası veya ötesidir (Lyotard, 1979); modernliğin kesinlik, evrensellik gibi "
             "parametrelerine karşı çıkar, belirsizliği, farklılığı ve çoğulculuğu savunur.",
@@ -349,9 +337,6 @@ def get_pack() -> CoursePack:
                 ["Kişisel Saygınlık", "Bireyin statünün gereklerini ne kadar başarıyla yerine getirdiğiyle ilgilidir.", "Alkol bağımlısı bir doktor kişisel saygınlığını yitirebilir; işini iyi yapan bir temizlik işçisi yüksek kişisel saygınlık kazanabilir."],
             ]
         ))
-    )
-    ch5.pages.append(
-        ChapterPage()
         .add_table(ComparisonTable(
             "Verilmiş (Ascribed) Statünün Belirleyicileri",
             ["Faktör", "Açıklama"],
@@ -362,6 +347,9 @@ def get_pack() -> CoursePack:
                 ["Biyolojik Nitelikler", "Irk, fiziksel görünüm, zekâ veya engellilik gibi doğuştan gelen özellikler."],
             ]
         ))
+    )
+    ch5.pages.append(
+        ChapterPage()
         .add_table(ComparisonTable(
             "Kazanılmış (Achieved) Statünün Belirleyicileri",
             ["Faktör", "Açıklama"],
@@ -381,9 +369,6 @@ def get_pack() -> CoursePack:
             "<b>Statü Aktarımı:</b> Bir statünün saygınlığının, o statüye sahip kişi üzerinden yakınlarına geçmesidir. "
             "Geleneksel yapıda aile reisi ailenin dış temsilcisidir; kadın ve çocuklar onun statüsüne göre değerlendirilir.",
         ]))
-    )
-    ch5.pages.append(
-        ChapterPage()
         .add_summary("Statü, bireyin toplumdaki konumudur ve ancak başka statülerle ilişkilendiğinde anlam kazanır. "
             "Verilmiş statüler doğuştan (soy, yaş, cinsiyet), kazanılmış statüler ise çabayla (servet, eğitim, meslek) "
             "elde edilir; anahtar statü bunlardan kimliği en çok belirleyenidir.")
@@ -443,9 +428,6 @@ def get_pack() -> CoursePack:
         .add_callout(Callout("route", "Bölüm İçi Bağlantı",
             "Statü ile Rol arasındaki fark sınavda en sık sorulan ayrımlardan biridir: <b>Statü konumdur, Rol o "
             "konumun gerektirdiği eylemdir.</b> Bir kişinin anahtar statüsü genellikle onun anahtar rolüyle örtüşür."))
-    )
-    ch6.pages.append(
-        ChapterPage()
         .add_table(ComparisonTable(
             "Toplumun Rol Davranışlarını Yargılama Kategorileri",
             ["Kategori", "Açıklama", "Örnek"],

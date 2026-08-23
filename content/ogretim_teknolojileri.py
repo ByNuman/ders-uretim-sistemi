@@ -47,9 +47,6 @@ def get_pack() -> CoursePack:
             "etkili kullandırır ve vakit kaybını önler.",
         ]))
         .add_person(DALE)
-    )
-    ch1.pages.append(
-        ChapterPage()
         .add_table(ComparisonTable(
             "Dale'in Öğrenme Oranları",
             ["Etkinlik", "Hatırlama Oranı"],
@@ -63,6 +60,9 @@ def get_pack() -> CoursePack:
         .add_callout(Callout("insight", "Piramidin Mantığı",
             "Öğretim <b>'Basitten Karmaşığa'</b> ve <b>'Somuttan Soyuta'</b> doğru ilerlemelidir. En kalıcı öğrenme, "
             "<b>'yaparak ve yaşayarak'</b> gerçekleşendir."))
+    )
+    ch1.pages.append(
+        ChapterPage()
         .add_table(ComparisonTable(
             "Eğitimsel Yaklaşımların 4 Temel Unsuru",
             ["Unsur", "Açıklama"],
@@ -73,9 +73,6 @@ def get_pack() -> CoursePack:
                 ["Etkinlik ve Materyal", "Dersler yalnızca anlatımla değil; inceleme, araştırma ve tartışmayla işlenmelidir."],
             ]
         ))
-    )
-    ch1.pages.append(
-        ChapterPage()
         .add_block(BulletBlock(2, "Öğretimde Hedeflerin Sınıflandırılması", [
             "Eğitim faaliyetlerinde hedefler üç düzeyde ele alınır:",
             "<b>Uzak Hedef:</b> Devletin eğitim politikası ve felsefesidir.",
@@ -112,9 +109,6 @@ def get_pack() -> CoursePack:
         .add_callout(Callout("route", "Bölümün Rotası",
             "Bloom'un taksonomisi hedefleri üç alanda basitten karmaşığa sıralar: <b>Bilişsel</b> (zihin), "
             "<b>Duyuşsal</b> (duygu) ve <b>Psiko-motor</b> (beden). Ardından materyal hazırlamanın 6 temel ilkesine geçilir."))
-    )
-    ch2.pages.append(
-        ChapterPage()
         .add_table(ComparisonTable(
             "A. Bilişsel Amaçlar (Zihinsel Süreçler) — Basitten Karmaşığa",
             ["Düzey", "Açıklama"],
@@ -127,6 +121,9 @@ def get_pack() -> CoursePack:
                 ["6. Değerlendirme", "Yargılama, hüküm verme, kritize etme (Karar verme)."],
             ]
         ))
+    )
+    ch2.pages.append(
+        ChapterPage()
         .add_table(ComparisonTable(
             "B. Duyuşsal Amaçlar (Basitten Karmaşığa)",
             ["Düzey", "Açıklama"],
@@ -138,9 +135,6 @@ def get_pack() -> CoursePack:
                 ["5. Kişilik (Nitelenmişlik)", "Davranışı kişilik haline getirme, adanma, sürekli yapma (karakter haline gelmesi)."],
             ]
         ))
-    )
-    ch2.pages.append(
-        ChapterPage()
         .add_table(ComparisonTable(
             "C. Psiko-Motor Amaçlar (Basitten Karmaşığa)",
             ["Düzey", "Açıklama"],
@@ -201,9 +195,6 @@ def get_pack() -> CoursePack:
                 ["Renk", "Materyale canlılık katar, dikkat çeker ve iletişimde önemlidir."],
             ]
         ))
-    )
-    ch3.pages.append(
-        ChapterPage()
         .add_table(ComparisonTable(
             "Görsel Tasarım İlkeleri",
             ["İlke", "Açıklama"],
@@ -215,6 +206,9 @@ def get_pack() -> CoursePack:
                 ["Hizalama / Ritim", "Gözün bir objeden diğerine rahatça kayabilmesidir."],
             ]
         ))
+    )
+    ch3.pages.append(
+        ChapterPage()
         .add_block(BulletBlock(1, "Ders Planı Nedir?", [
             "Öğretim etkinliklerinin kâğıt üzerinde planlanmasıdır.",
             "<b>Kazanım Yazma:</b> Kazanımlar öğretmen değil, öğrenci davranışı olarak yazılmalıdır. Bir ders için "
@@ -227,9 +221,6 @@ def get_pack() -> CoursePack:
             FlowStep("Gelişme", "Konunun işlenmesi"),
             FlowStep("Sonuç", "Özet, ölçme-değerlendirme"),
         ], caption="Ders planının beş temel bölümü."))
-    )
-    ch3.pages.append(
-        ChapterPage()
         .add_table(ComparisonTable(
             "Giriş ve Sonuç Bölümlerinin Alt Ögeleri",
             ["Bölüm", "Alt Öge", "Açıklama"],
@@ -278,14 +269,14 @@ def get_pack() -> CoursePack:
                 ["İçerik", "Kitabın aynısı olmamalı; özet ve anahtar kelimeler içermeli."],
             ]
         ))
-    )
-    ch4.pages.append(
-        ChapterPage()
         .add_block(BulletBlock(1, "Kavram Öğretimi", [
             "<b>Kavram:</b> Belli parçaların oluşturduğu bütündür; bilgiyi sistematik hale getiren unsurdur.",
             "<b>Yararları:</b> İletişimi kolaylaştırır, soyut düşünceyi somutlaştırır, zihinsel gelişime katkı sağlar.",
             "<b>Aşamaları:</b> Planlama, Uygulama, Değerlendirme.",
         ]))
+    )
+    ch4.pages.append(
+        ChapterPage()
         .add_table(ComparisonTable(
             "Kavram Öğretim Araçları",
             ["Araç", "Açıklama"],
@@ -300,9 +291,6 @@ def get_pack() -> CoursePack:
         .add_callout(Callout("caution", "Dikkat: Kavram Haritası Türleri",
             "Kavram haritalarının başlıca türleri: Akış Çizgesi, Dönen Diyagramlar, Dayandırılabilir Ağaçlar, "
             "Örümcek Ağı, Hiyerarşik Harita, Sistemler Haritası, Zincir Haritası ve <b>Balık Kılçığı</b>."))
-    )
-    ch4.pages.append(
-        ChapterPage()
         .add_summary("Etkili bir sununun temeli 6x6 kuralı, punto ve renk kontrastı ilkeleridir. Kavram öğretimi ise "
             "soyut bilgiyi somutlaştırmayı hedefler; kavram ağları, ACT, kavram haritaları, kavram karikatürü ve "
             "zihin haritaları bu amaçla kullanılan başlıca araçlardır.")
@@ -338,14 +326,14 @@ def get_pack() -> CoursePack:
                 ["Resimle Bütünleşme", "Resmin içine dalıp hissetmektir."],
             ]
         ))
-    )
-    ch5.pages.append(
-        ChapterPage()
         .add_info_cards("Karikatürün Üç Unsuru", [
             InfoCard("Sanat", "Çizim yeteneğidir.", "1"),
             InfoCard("Fikir", "Verilmek istenen mesajdır.", "2"),
             InfoCard("Mizah", "Mesajı iletme aracıdır — mizah yoksa karikatür sayılmaz.", "3"),
         ])
+    )
+    ch5.pages.append(
+        ChapterPage()
         .add_table(ComparisonTable(
             "Afişler",
             ["Unsur / Tür", "Açıklama"],
@@ -361,9 +349,6 @@ def get_pack() -> CoursePack:
             "<b>Çalışma Yaprağı Etkinlik Listesi:</b> Çoktan seçmeli, açık uçlu, doğru/yanlış, eşleştirme, boşluk "
             "doldurma, sıraya koyma, 5N1K, A'dan Z'ye etkinlikleri, boyama, broşürler vb.",
         ]))
-    )
-    ch5.pages.append(
-        ChapterPage()
         .add_table(ComparisonTable(
             "Materyal Hazırlama İlkeleri — Genel Özet",
             ["İlke", "Açıklama"],

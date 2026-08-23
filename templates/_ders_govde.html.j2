@@ -259,9 +259,11 @@
 {% endfor %}
 
 {# ============================================================
-   3. GENEL BAKIŞ — iki sabit sayfa (build.py: OVERVIEW_PAGES).
-   1. sayfa: hero + 6 kart · 2. sayfa: çalışma akışı + sınav notu.
-   175x250mm'de dördü birden tek sayfaya sığmıyor (ölçüldü: 214-264mm).
+   3. GENEL BAKIŞ — TEK sabit sayfa (build.py: OVERVIEW_PAGES = 1).
+   hero + 6 kart + çalışma akışı + sınav notu tek sayfada.
+   (Küçültülmüş punto + genişletilmiş metin alanında dördü birden sığıyor;
+   taşma denetimi hakemdir — sığmazsa OVERVIEW_PAGES'i 2'ye çevirip bu
+   bölümü tekrar ikiye ayırın.)
    ============================================================ #}
 <section class="page body-page{{ ctx.pagecls }}">
   <div class="pageband"><div>{{ pack.title }}</div><div class="pageband-course">{{ pack.course_code }}</div></div>
@@ -279,14 +281,8 @@
     {% endfor %}
   </div>
 
-  {{ footer(pack, ctx.page_starts["overview"]) }}
-</section>
-
-<section class="page body-page{{ ctx.pagecls }}">
-  <div class="pageband"><div>{{ pack.title }}</div><div class="pageband-course">Genel Bakış · Devam</div></div>
-
   {% if pack.overview_flow %}
-  <div class="section-kicker">Çalışma Akışı</div>
+  <div class="section-kicker" style="margin-top:3.5mm;">Çalışma Akışı</div>
   <div class="ov-flow">
     {% for step in pack.overview_flow %}
     {% if not loop.first %}<div class="ov-flow-arrow">{{ arrow_svg() }}</div>{% endif %}
@@ -296,13 +292,13 @@
   {% endif %}
 
   {% if pack.overview_note %}
-  <div class="callout caution" style="margin-top:6mm;">
+  <div class="callout caution" style="margin-top:3.5mm;">
     <div class="callout-icon">{{ icon_svg("caution") }}</div>
     <div><div class="callout-title">Sınavda Ana Ayrım</div><div class="callout-text">{{ pack.overview_note | safe }}</div></div>
   </div>
   {% endif %}
 
-  {{ footer(pack, ctx.page_starts["overview"] + 1) }}
+  {{ footer(pack, ctx.page_starts["overview"]) }}
 </section>
 
 {# ============================================================

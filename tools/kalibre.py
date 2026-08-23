@@ -35,9 +35,9 @@ from theme_engine import resolve_theme_css           # noqa: E402
 
 # sabit adı -> (aday değerler, o bölümün ilk sayfasının anchor'ı)
 CANDIDATES = {
-    "GLOSSARY_PER_PAGE": list(range(20, 5, -1)),
-    "TEST_PER_PAGE": list(range(8, 1, -1)),
-    "ANSWER_PER_PAGE": list(range(18, 3, -1)),
+    "GLOSSARY_PER_PAGE": list(range(26, 5, -1)),
+    "TEST_PER_PAGE": list(range(12, 1, -1)),
+    "ANSWER_PER_PAGE": list(range(24, 3, -1)),
     "QA_PER_PAGE": list(range(12, 2, -1)),
     "DISTINCTIONS_PER_PAGE": list(range(8, 1, -1)),
     "MATCHTABLE_PER_PAGE": list(range(11, 2, -1)),

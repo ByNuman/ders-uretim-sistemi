@@ -108,9 +108,6 @@ def get_pack() -> CoursePack:
                 "<b>Ma'rûf:</b> Akıl ve dinin iyi kabul ettiği, toplumun ortak vicdanında 'tanıdık' ve güzel karşılanan her şey.",
             ),
         ])
-    )
-    ch1.pages.append(
-        ChapterPage()
         .add_ayat(None, [
             Ayah(
                 "Furkân 63 — Tevazu ve Vakâr",
@@ -125,6 +122,9 @@ def get_pack() -> CoursePack:
                 "<b>Azîm:</b> Kadri, kıymeti ve etkisi çok büyük; takdir edilemeyecek kadar yüce olan.",
             ),
         ])
+    )
+    ch1.pages.append(
+        ChapterPage()
         .add_block(BulletBlock(1, "Cahiliyeden İslam'a Ahlâkî Dönüşüm", [
             "İslam öncesi Arap toplumunda ahlâk, kabile asabiyetine (ırkçılığına) ve bedevî yaşam tarzına dayalı "
             "<b>'Mürüvvet'</b> kavramıyla ifade edilirdi. Mürüvvet; cesaret, misafirperverlik ve intikam gibi "
@@ -137,9 +137,6 @@ def get_pack() -> CoursePack:
             "nefsini arındıran kurtuluşa erer, fücura daldıran ise ahlâken <b>'Esfel-i Sâfilîn'e</b> (aşağıların "
             "aşağısına) yuvarlanır.",
         ]))
-    )
-    ch1.pages.append(
-        ChapterPage()
         .add_table(ComparisonTable(
             "Değerlerin Kaynağı Tartışması (Sınavlık Mezhep Ayrımı)",
             ["Ekol", "Ahlâkî değerlerin kaynağı hakkındaki görüşü"],
@@ -185,9 +182,6 @@ def get_pack() -> CoursePack:
                 "",
             ),
         ])
-    )
-    ch1.pages.append(
-        ChapterPage()
         .add_ayat(None, [
             Ayah(
                 "5 — En Kapsamlı Tefsir: Hz. Âişe'nin Cevabı",
@@ -202,6 +196,9 @@ def get_pack() -> CoursePack:
                 "",
             ),
         ])
+    )
+    ch1.pages.append(
+        ChapterPage()
         .add_callout(Callout("focus", "Akademik Nahiv ve Belâgat Nüktesi",
             "<b>Nahiv (Temekkün / Harf-i Cer Analizi):</b> Tâhir b. Âşûr, <b>'Alâ'</b> edatının sıradan bir "
             "'üzerinde olma' bildirmediğini açıklar. Bu edat, atın sırtına sağlamca oturan bir binici gibi, Hz. "
@@ -210,9 +207,6 @@ def get_pack() -> CoursePack:
             "<b>Belâgat (İstiare):</b> 'Azîm' kelimesinin, dağ gibi maddi varlıkların gözle görülen "
             "büyüklüğünden alınarak soyut bir karakter yüceliği için kullanılması güçlü bir <b>İstiare</b> "
             "sanatıdır; manevi büyüklük, maddi büyüklük üzerinden somutlaştırılarak zihne kazınmıştır."))
-    )
-    ch1.pages.append(
-        ChapterPage()
         .add_person(TAHIR_IBN_ASHUR)
         .add_info_cards("Tâhir b. Âşûr'un Tefsir Metodu ve Eserleri", [
             InfoCard("Metodu", "Ayetlerin edebî ve belâgat yönlerini eşsiz bir titizlikle inceler; Kur'an'ın her "
@@ -254,9 +248,6 @@ def get_pack() -> CoursePack:
                 "<b>Tecessüs:</b> İnsanların gizli hallerini, ayıp ve kusurlarını kötü niyetle araştırmak, casusluk yapmak. İslâm ahlâkı tecessüsü, sosyal barışı zehirleyen bir hastalık olarak reddeder.",
             ),
         ])
-    )
-    ch2.pages.append(
-        ChapterPage()
         .add_ayat(None, [
             Ayah(
                 "Hümeze 1-3 — Mal Hırsı ve Alaycılık",
@@ -265,6 +256,9 @@ def get_pack() -> CoursePack:
                 "<b>Hümeze ve Lümeze:</b> Hümeze, birini arkasından çekiştirmek ve kaş-göz işaretiyle ayıplamak; lümeze ise kişinin yüzüne karşı onu küçük düşürmek ve alay etmektir.",
             ),
         ])
+    )
+    ch2.pages.append(
+        ChapterPage()
         .add_block(BulletBlock(1, "Kötü Ahlâkın Kavramsal Ağı ve Hevâ Engeli", [
             "Kur'an-ı Kerîm, yerilen olumsuz davranışları ifade etmek için çok geniş bir kavramsal yapı kullanır: "
             "günah (<b>ism</b>), sapıklık (<b>dalâl</b>), hayasızlık (<b>fahşâ</b>), haddi aşma/zulüm "
@@ -277,9 +271,6 @@ def get_pack() -> CoursePack:
             "Kur'an, kötü arzularının esiri olan insanı <b>'hevâsını ilah edinen'</b> kişi olarak nitelendirir; "
             "zira hevâ, hakkı görmeyi engelleyen ve insanı adaletten saptıran zifiri bir perdedir.",
         ]))
-    )
-    ch2.pages.append(
-        ChapterPage()
         .add_table(ComparisonTable(
             "Toplumsal Çöküşün Sebepleri — Kur'an'da Yerilen Temel Davranışlar",
             ["Davranış", "Kur'ânî Değerlendirme"],
@@ -327,9 +318,6 @@ def get_pack() -> CoursePack:
                 "",
             ),
         ])
-    )
-    ch2.pages.append(
-        ChapterPage()
         .add_ayat(None, [
             Ayah(
                 "6 — 'Ölü Kardeş Eti' Teşbihi",
@@ -338,6 +326,9 @@ def get_pack() -> CoursePack:
                 "",
             ),
         ])
+    )
+    ch2.pages.append(
+        ChapterPage()
         .add_callout(Callout("focus", "Akademik Nahiv ve Belâgat Nüktesi",
             "<b>Nahiv (Hâl ve Kıraat):</b> Ayette geçen <b>'meyten' (ölü)</b> kelimesi irab bakımından "
             "<b>Hâl</b>'dir (durum zarfı) — yani 'Kardeşinin etini <u>ölü olduğu halde</u> yeme' demektir. "
@@ -347,9 +338,6 @@ def get_pack() -> CoursePack:
             "kardeşinin etini yemek!</b> Ayrıca en iğrenç şey sorulurken <b>'Sever misiniz?'</b> fiilinin "
             "kullanılması muazzam bir <b>Tezat Sanatı (İstifhâm-ı İnkârî)</b>dır."))
         .add_person(IBN_JUZAYY)
-    )
-    ch2.pages.append(
-        ChapterPage()
         .add_info_cards("İbn Cüzey el-Kelbî'nin Eserleri", [
             InfoCard("et-Teshîl li-'ulûmi't-tenzîl", "Kur'an ilimlerini sadeleştiren şaheseri. <b>İşlenen örnek "
                      "metin buradan alınmıştır.</b>", "Tefsir"),
@@ -397,9 +385,6 @@ def get_pack() -> CoursePack:
                 "<b>Kıst:</b> Pay, nasip ve hakkaniyet. 'Adl' genel bir dengeyi ifade ederken 'Kıst' hakkı sahibine eksiksiz ve pratik olarak teslim etmeyi ifade eder.",
             ),
         ])
-    )
-    ch3.pages.append(
-        ChapterPage()
         .add_ayat(None, [
             Ayah(
                 "Nisâ 58 — Emanet ve Liyakat",
@@ -408,6 +393,9 @@ def get_pack() -> CoursePack:
                 "<b>Adl:</b> Denk olmak, eşitlik, insaf etmek; terazinin kefelerini eşitlemek ve ifrat ile tefrit arasında orta yolu bulmak.",
             ),
         ])
+    )
+    ch3.pages.append(
+        ChapterPage()
         .add_ayat("Ayet-i Kerîmeler · Devam", [
             Ayah(
                 "Mâide 8 — Düşmana Karşı Bile Adalet",
@@ -429,9 +417,6 @@ def get_pack() -> CoursePack:
             "salması amaçlanır. Hesaba çekileceği inancı, insanı <b>hiçbir otoritenin bulunmadığı gizli "
             "yerlerde bile</b> zulümden uzaklaştıran en büyük denetim gücüdür.",
         ]))
-    )
-    ch3.pages.append(
-        ChapterPage()
         .add_table(ComparisonTable(
             "Kur'an'da Adaletin Temel Uygulama Alanları (Medine Dönemi)",
             ["Alan", "Kur'ânî İlke"],
@@ -445,6 +430,9 @@ def get_pack() -> CoursePack:
         .add_callout(Callout("insight", "Kritik Çıkarım",
             "İslam'da adaletin gerçekleştirilmesi sadece kanun maddelerine değil, her an Allah tarafından "
             "denetlendiği şuuruna sahip <b>'vicdanlı insan' modeline</b> emanet edilmiştir."))
+    )
+    ch3.pages.append(
+        ChapterPage()
         .add_ayat("Örnek Metin — Nesefî, Nisâ 135 Tefsiri (Medârikü't-Tenzîl)", [
             Ayah(
                 "1 — 'Kıst ile Kāim Olmak'",
@@ -453,9 +441,6 @@ def get_pack() -> CoursePack:
                 "",
             ),
         ])
-    )
-    ch3.pages.append(
-        ChapterPage()
         .add_ayat(None, [
             Ayah(
                 "2 — 'Şühedâe' Kelimesinin İrabı",
@@ -476,9 +461,6 @@ def get_pack() -> CoursePack:
                 "",
             ),
         ])
-    )
-    ch3.pages.append(
-        ChapterPage()
         .add_ayat(None, [
             Ayah(
                 "5 — Zengin ve Fakir Karşısında Objektiflik",
@@ -487,6 +469,9 @@ def get_pack() -> CoursePack:
                 "",
             ),
         ])
+    )
+    ch3.pages.append(
+        ChapterPage()
         .add_ayat("Örnek Metin (devamı) — Nesefî, Nisâ 135 Tefsiri", [
             Ayah(
                 "6 — 'Ve İn Telvû' Kıraat Farkı",
@@ -495,9 +480,6 @@ def get_pack() -> CoursePack:
                 "",
             ),
         ])
-    )
-    ch3.pages.append(
-        ChapterPage()
         .add_callout(Callout("focus", "Akademik Nahiv ve Belâgat Nüktesi",
             "<b>Nahiv (Kıraat ve Gramer Etkisi):</b> 'Ve in telvû' kelimesi iki farklı kıraatle okunur. İbn Âmir "
             "ve Hamza'nın okuyuşunda (<b>tülû</b>) ayet <b>'siyasi/yönetimsel adalet'</b> bağlamına kayarken; "
@@ -543,9 +525,6 @@ def get_pack() -> CoursePack:
                 "<b>Vizr:</b> Ağır yük, vebal ve günah. İslam hukukundaki <b>'suçun ve cezanın şahsîliği'</b> ilkesinin temel teolojik dayanağıdır.",
             ),
         ])
-    )
-    ch4.pages.append(
-        ChapterPage()
         .add_ayat(None, [
             Ayah(
                 "Fussilet 46 — İrade ve Özgürlüğün Bedeli",
@@ -558,6 +537,9 @@ def get_pack() -> CoursePack:
             "İslâm'da insan, eylemlerini Allah'ın belirlediği imkân alanı (<b>istitâat</b>) içinde gerçekleştiren "
             "özgür bir varlıktır. Özgürlük insanın yeryüzündeki <b>en büyük sermayesi</b>; sorumluluk ise bu "
             "sermayeyi doğru kullanıp kullanmadığının <b>yegâne ölçüsüdür</b>."))
+    )
+    ch4.pages.append(
+        ChapterPage()
         .add_block(BulletBlock(1, "Özgürlüğün İki Kur'ânî Temeli ve Sorumluluğun Engelleri", [
             "<b>Hilâfet:</b> Allah insanı yeryüzüne <b>halife</b> kılmış, ona tasarrufta bulunma yetkisi "
             "vermiştir. Bu yetki, insanın seçme kabiliyetinin ve dolayısıyla sorumluluğunun ilk temelidir.",
@@ -570,9 +552,6 @@ def get_pack() -> CoursePack:
             "olmadığını</b>, onun sadece vesvese vererek kötülüğü süslü gösterdiğini vurgular. Böylece sorumluluk "
             "her hâlükârda insanın kendisinde kalır.",
         ]))
-    )
-    ch4.pages.append(
-        ChapterPage()
         .add_table(ComparisonTable(
             "Fiillerin Yaratıcısı Kimdir? — Ef'âlü'l-İbâd Tartışması (Sınavlık)",
             ["Ekol", "Görüşü ve Eleştirisi"],
@@ -619,9 +598,6 @@ def get_pack() -> CoursePack:
                 "",
             ),
         ])
-    )
-    ch4.pages.append(
-        ChapterPage()
         .add_ayat(None, [
             Ayah(
                 "5 — Mühürlenmenin Sonucu",
@@ -638,10 +614,10 @@ def get_pack() -> CoursePack:
             "<b>Belâgat (Kinaye ve Temsil):</b> 'Gözlerinde perde vardır, kalpleri mühürlüdür' ibaresi fiziksel "
             "bir körlük veya mühür değil; inatları yüzünden hakikati algılama yetilerini yitiren insanları "
             "anlatan muazzam bir <b>Kinaye ve Temsil</b> sanatıdır."))
-        .add_person(DARWAZA)
     )
     ch4.pages.append(
         ChapterPage()
+        .add_person(DARWAZA)
         .add_info_cards("Derveze'nin Tefsir Metodu ve Eserleri", [
             InfoCard("Nüzul Sırasına Göre Tefsir", "Klasik gelenekten (Fâtiha'dan başlayıp Nâs'ta bitiren "
                      "sistemden) ayrılarak Kur'an'ı <b>ayetlerin iniş sırasına göre</b> tefsir etmiş; bu metodun "
@@ -684,9 +660,6 @@ def get_pack() -> CoursePack:
             "Kur'ân'da <b>'ikame'</b> kelimesiyle ifade edilen namaz, şeklî bir hareketten ziyade; eksiksiz, huşû "
             "içinde ve vaktine riayet edilerek <b>'ayakta tutulması'</b> gereken bir bilinç halidir.",
         ]))
-    )
-    ch5.pages.append(
-        ChapterPage()
         .add_flow(FlowDiagram([
             FlowStep("İlk Dönem", "Sabah ve akşam olmak üzere günde <b>iki vakit</b> namaz"),
             FlowStep("Ara Dönem", "Bir süreliğine <b>gece namazı (teheccüd)</b> farz kılındı"),
@@ -699,6 +672,9 @@ def get_pack() -> CoursePack:
             "ibaret kalır. Sosyolojik açıdan ise cemaatle kılınan namaz; <b>ırk, dil, renk ve makam farkı "
             "gözetmeksizin</b> tüm müminleri aynı safta eşitleyerek muazzam bir toplumsal barış ve dayanışma "
             "nizamı kurar."))
+    )
+    ch5.pages.append(
+        ChapterPage()
         .add_ayat("Ayet-i Kerîmeler", [
             Ayah(
                 "Ankebût 45 — Namazın Ahlâkî ve Koruyucu İşlevi",
@@ -707,9 +683,6 @@ def get_pack() -> CoursePack:
                 "<b>Salât:</b> Arapça'da sözlük olarak 'dua etmek, ibadet etmek, bağışlanma dilemek'. Namazın her rüknünün fiilî ve sözlü bir dua niteliği taşıması, kelimenin etimolojisiyle derin bir bağ kurar.",
             ),
         ])
-    )
-    ch5.pages.append(
-        ChapterPage()
         .add_ayat(None, [
             Ayah(
                 "Nisâ 103 — Zamanı Belirlenmiş Bir Farz",
@@ -755,9 +728,6 @@ def get_pack() -> CoursePack:
                 "",
             ),
         ])
-    )
-    ch5.pages.append(
-        ChapterPage()
         .add_ayat(None, [
             Ayah(
                 "6 — Zikrin Taatlerin En Faziletlisi Oluşu",
@@ -772,6 +742,9 @@ def get_pack() -> CoursePack:
                 "",
             ),
         ])
+    )
+    ch5.pages.append(
+        ChapterPage()
         .add_callout(Callout("focus", "Akademik Nahiv ve Belâgat Nüktesi",
             "<b>Nahiv (İstimrâr ve Tekrâr Bağlamı):</b> el-Hâzin'e göre imanın (kalbî ibadetin) ayette "
             "emredilmemesinin sebebi, itikat eyleminin kesintisiz bir <b>süreklilik (istimrâr)</b> bildirmesi ve "
@@ -784,9 +757,6 @@ def get_pack() -> CoursePack:
             "Namaz; Allah'ın büyüklüğünü (<b>tekbir</b>) itiraf, O'na teslimiyeti (<b>kıyam, rükû, secde</b>) "
             "bedensel olarak kanıtlama ve ruhu günah kirlerinden her gün düzenli olarak yıkama (<b>tövbe</b>) "
             "ameliyesidir."))
-    )
-    ch5.pages.append(
-        ChapterPage()
         .add_person(AL_KHAZIN)
         .add_info_cards("el-Hâzin'in İlmî Çizgisi ve Eseri", [
             InfoCard("Derlemeci Metodu", "Kütüphane yöneticiliği ona kaynaklara sınırsız erişim sağlamış; "

@@ -77,9 +77,6 @@ def get_pack() -> CoursePack:
             "Edebiyatı insandan, insanı da toplumdan ayırmak imkânsızdır — savaşlar, göçler, ekonomik krizler gibi toplumsal olaylar doğrudan romanların ve hikâyelerin konusunu oluşturur.",
             "<b>Edebî Akım (Sanat Akımı):</b> Belli bir sanatkâr grubunun belli bir dönemde, müşterek dünya görüşü ve edebiyat anlayışı çerçevesinde oluşturduğu hareketlerin bütünüdür; her akım ortaya çıktığı toplumun sosyal ve siyasal hayatının bir sonucudur, farklılaşma ihtiyacından doğar.",
         ]))
-    )
-    ch1.pages.append(
-        ChapterPage()
         .add_table(ComparisonTable(
             "Türk Edebiyatına Özgü Şiir Akımları",
             ["Akımın Adı", "Temel Özellikleri", "Temsilcileri"],
@@ -90,6 +87,9 @@ def get_pack() -> CoursePack:
                 ["Garip Akımı", "Ölçü, uyak ve tüm nazım kurallarına karşı çıkılmış; halkın günlük dili kullanılmıştır.", "Orhan Veli, Melih Cevdet Anday, Oktay Rifat"],
             ]
         ))
+    )
+    ch1.pages.append(
+        ChapterPage()
         .add_block(BulletBlock(2, "Cumhuriyet Dönemi'nde Hikâye (1923-1960)", [
             "<b>1923-1940 Arası:</b> Gözleme dayalı gerçekçiliğe önem verilmiştir; modern yaşayışın yanlış anlaşılması, geçim sıkıntısı ve kadınların durumu işlenir (Reşat Nuri, Yakup Kadri vb.).",
             "<b>1940-1960 Arası — Dört Eğilim:</b> Klasik olay hikâyesi dışında dört farklı hikâye türü ortaya çıkar.",
@@ -98,9 +98,6 @@ def get_pack() -> CoursePack:
             "<b>Modernizmi Esas Alanlar:</b> Serim-düğüm-çözüm kuralını yıkarlar; insanın yalnızlığını ve yabancılaşmasını kurgularlar (Sait Faik, Haldun Taner, Oğuz Atay).",
             "<b>Millî ve Dinî Duyarlılıkları Yansıtanlar:</b> Kültürel bağlara ve dinî motiflere odaklanırlar.",
         ]))
-    )
-    ch1.pages.append(
-        ChapterPage()
         .add_person(SAIT_FAIK)
         .add_callout(Callout("caution", "Dikkat / Püf Noktası: Olay Hikâyesi mi, Durum Hikâyesi mi?",
             "Olay Hikâyesinde (Maupassant tarzı) 'serim, düğüm, çözüm' planına katı uyma zorunluluğu vardır. "
@@ -162,9 +159,6 @@ def get_pack() -> CoursePack:
             "<b>Fecr-i Âti Şiiri:</b> Servetifünun'a tepki olarak doğsa da onu taklit etmekten öteye "
             "geçememiştir; dil ağır, temalar (aşk, doğa) bireyseldir (Örn: Ahmet Haşim).",
         ]))
-    )
-    ch2.pages.append(
-        ChapterPage()
         .add_block(BulletBlock(2, "Saf Şiir'den Türk Dünyası Edebiyatına", [
             "<b>Saf (Öz) Şiir Anlayışı:</b> İdeolojiye ve öğüt vermeye (didaktizme) kesinlikle karşı çıkılır; "
             "amaç yalnızca estetik haz ve 'musiki/ahenk' yaratmaktır. Dili imge ve çağrışımlarla doludur; "
@@ -176,6 +170,9 @@ def get_pack() -> CoursePack:
             "tutmak için yazılan eserlerdir; özgürlük ve anadile bağlılık işlenir (Örn: Bahtiyar Vahapzade).",
         ]))
         .add_person(MEHMET_AKIF)
+    )
+    ch2.pages.append(
+        ChapterPage()
         .add_callout(Callout("insight", "Kavram: Manzum Hikâye",
             "Yaşanmış veya yaşanması muhtemel olayların şiir (nazım) biçiminde anlatılmasıdır. Metin dışarıdan "
             "şiir gibi görünür — ölçüsü ve uyağı vardır — ama içinde olay, zaman ve mekân barındıran bir "
@@ -187,9 +184,6 @@ def get_pack() -> CoursePack:
             "<b>İlk Makale:</b> Türk edebiyatında ilk makale, Tanzimat Dönemi'nde (1860) Şinasi'nin çıkardığı "
             "Tercüman-ı Ahval gazetesinde yayımlanan 'Tercüman-ı Ahval Mukaddimesi'dir.",
         ]))
-    )
-    ch2.pages.append(
-        ChapterPage()
         .add_table(ComparisonTable(
             "Sohbet (Söyleşi) ile Fıkra (Köşe Yazısı) Farkı",
             ["Özellik", "Sohbet (Söyleşi)", "Fıkra (Köşe Yazısı)"],
@@ -253,9 +247,6 @@ def get_pack() -> CoursePack:
             "dağa çıkan Memed'in efsaneleşen isyanı; <b>Yılkı Atı</b> (Abbas Sayar) — yaşlanıp işe yaramadığı "
             "için doğaya salınan Dorukısrak adlı atın hikâyesi üzerinden doğa-insan ve emek ilişkisi işlenir.",
         ]))
-    )
-    ch3.pages.append(
-        ChapterPage()
         .add_callout(Callout("insight", "Dünya Edebiyatında Roman",
             "Roman türünün dünyadaki ilk başarılı örneği <b>Cervantes'in Don Kişot</b> adlı eseridir. "
             "Sınavlarda sıkça sorulan <b>Yaşlı Adam ve Deniz</b> ise Ernest Hemingway'e aittir; Santiago adlı "
@@ -264,6 +255,9 @@ def get_pack() -> CoursePack:
             "Çağdaş Türk tiyatrosunun kurumsallaşmasında ve Batı seviyesine ulaşmasında en büyük pay, "
             "<b>Küçük Sahne Tiyatrosu</b>'nu kuran <b>Muhsin Ertuğrul</b>'a aittir.",
         ]))
+    )
+    ch3.pages.append(
+        ChapterPage()
         .add_table(ComparisonTable(
             "Sınavlık Yazar - Eser - Tür Eşleştirmeleri",
             ["Yazar", "Eser", "Tür / Konu"],
@@ -274,9 +268,6 @@ def get_pack() -> CoursePack:
                 ["Haldun Taner", "Keşanlı Ali Destanı", "Türk edebiyatında Epik Tiyatro'nun en önemli örneği."],
             ]
         ))
-    )
-    ch3.pages.append(
-        ChapterPage()
         .add_table(ComparisonTable(
             "Trajedi, Komedi ve Dram Arasındaki Farklar",
             ["Tür", "Konu ve Kişiler", "Kural"],
@@ -329,9 +320,6 @@ def get_pack() -> CoursePack:
             "zevkine göre öznel değerlendirir; Nesnel (Bilimsel) Eleştiri — eleştirmen kişisel hislerini bir "
             "kenara bırakıp bilimsel ölçütlerle tarafsız değerlendirir.",
         ]))
-    )
-    ch4.pages.append(
-        ChapterPage()
         .add_table(ComparisonTable(
             "Konusuna Göre Eleştiri Türleri",
             ["Tür", "Odak Noktası"],
@@ -348,6 +336,9 @@ def get_pack() -> CoursePack:
             "Osmanînin Edebiyatı Hakkında Bazı Mülâhâzâtı Şâmildir' makalesidir. Yine Namık Kemal'in Ziya "
             "Paşa'ya karşı yazdığı 'Tahrib-i Harabat' adlı eseri ise Türk edebiyatındaki <b>ilk eleştiri "
             "kitabı</b>dır."))
+    )
+    ch4.pages.append(
+        ChapterPage()
         .add_block(BulletBlock(2, "Mülakat (Görüşme) ve Röportaj", [
             "<b>Mülakat (Görüşme):</b> Bir gazetecinin ünlü ya da uzman bir kişiyle yaptığı görüşmeleri "
             "aktardığı yazılardır; soru-cevap tekniği esastır.",
@@ -359,9 +350,6 @@ def get_pack() -> CoursePack:
             "fotoğraflardan yararlanılarak hazırlanan araştırmaya yönelik metinlerdir (Önemli temsilcisi: "
             "Yaşar Kemal).",
         ]))
-    )
-    ch4.pages.append(
-        ChapterPage()
         .add_person(RUSEN_ESREF)
         .add_table(ComparisonTable(
             "Mülakat ve Röportaj Farkı",
@@ -406,9 +394,6 @@ def get_pack() -> CoursePack:
             "Ali Yücel'in kaleme aldığı 'Goethe - Bir Dehanın Romanı'dır. Diğer önemli örnekler: Gazi Paşa "
             "(Attilâ İlhan), Hava Kurşun Gibi Ağır (Hıfzı Topuz).",
         ]))
-    )
-    ch5.pages.append(
-        ChapterPage()
         .add_person(OGUZ_ATAY)
         .add_block(BulletBlock(2, "Toplumcu Gerçekçi, Türk Dünyası ve Dünya Romanı", [
             "<b>Toplumcu Gerçekçi Roman — Sabahattin Ali, Kuyucaklı Yusuf:</b> Toplumsal gerçekçi akımın en "
@@ -421,6 +406,9 @@ def get_pack() -> CoursePack:
             "eseridir. Paulo Coelho'nun Simyacı'sı ise Endülüslü çoban Santiago'nun Mısır Piramitleri'ne "
             "giderek 'Kişisel Menkıbe'sini bulmasını anlatan, alegorik bir dünya edebiyatı şaheseridir.",
         ]))
+    )
+    ch5.pages.append(
+        ChapterPage()
         .add_table(ComparisonTable(
             "Edebiyat 8 Roman Eşleştirmeleri (Hızlı Bakış)",
             ["Yazar", "Eser", "Anahtar Kavram"],
@@ -432,9 +420,6 @@ def get_pack() -> CoursePack:
                 ["Paulo Coelho", "Simyacı", "Alegorik dünya romanı"],
             ]
         ))
-    )
-    ch5.pages.append(
-        ChapterPage()
         .add_block(BulletBlock(3, "Tiyatroda Yazar-Eser-Tür Eşleştirmeleri ve Radyo Tiyatrosu", [
             "<b>Turan Oflazoğlu - Genç Osman:</b> Osmanlı tarihinden alınan, devlet yapısındaki bozulmaları "
             "anlatan Trajedi türünde bir eserdir.",

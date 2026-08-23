@@ -48,9 +48,6 @@ def get_pack() -> CoursePack:
             FlowStep("Talas Savaşı", "751 — dönüm noktası"),
             FlowStep("Kitlevi Geçiş", "10. yy — Oğuzlar"),
         ], caption="Türklerin İslamlaşma süreci, aşama aşama."))
-    )
-    ch1.pages.append(
-        ChapterPage()
         .add_block(BulletBlock(2, "İlk Türk-İslam Sanatı Özellikleri", [
             "Türklerin İslamiyeti kabul ettikten sonra verdikleri ilk eserlerde, göçebelikten gelen özgür tutumun ve "
             "özgünlüğün izleri görülür. Bu dönemin mimarisinde göze çarpan üç temel yenilik şöyledir:",
@@ -64,6 +61,9 @@ def get_pack() -> CoursePack:
                 ["Medrese Mimarisi", "İlk örneklerin ortaya çıkışı bu döneme rastlar."],
             ]
         ))
+    )
+    ch1.pages.append(
+        ChapterPage()
         .add_summary("Türklerin İslamlaşması, Hz. Ömer döneminden başlayıp Talas Savaşı (751) ile dönüm noktasına "
             "ulaşan, 10. yüzyılda Oğuzların kitlevi geçişiyle tamamlanan bir süreçtir. Bu sürecin ürünü olan ilk "
             "Türk-İslam eserleri, göçebe geleneğin özgünlüğünü kübik yapı, silindirik minare ve ilk medrese "
@@ -99,9 +99,6 @@ def get_pack() -> CoursePack:
             InfoCard("Kaşgarlı Mahmut", "Divân-ı Lügâti't-Türk'ün yazarıdır.", "2"),
             InfoCard("Fârâbî", "Büyük İslam filozofudur.", "3"),
         ])
-    )
-    ch2.pages.append(
-        ChapterPage()
         .add_table(ComparisonTable(
             "Cami Mimarisi — Öne Çıkan Üç Örnek",
             ["Eser", "Özellik"],
@@ -111,6 +108,9 @@ def get_pack() -> CoursePack:
                 ["Buhara Muğak Attari Camii (XII. yy)", "Cephe düzeni (geometrik/bitkisel süsleme, taç kapı) Anadolu Selçuklu camilerini hatırlatır; büyük bir geleneğin başlangıcıdır."],
             ]
         ))
+    )
+    ch2.pages.append(
+        ChapterPage()
         .add_block(BulletBlock(2, "Minare Mimarisi — 'Doğu Minareleri'", [
             "Erken devir Arap minarelerinin (kilise çan kulelerini andıran kare/çokgen kuleler) aksine, Türkler Orta "
             "Asya'da yeni bir tip geliştirmiştir: genellikle tuğla malzemeli, silindirik formlu ve yukarı doğru "
@@ -128,9 +128,6 @@ def get_pack() -> CoursePack:
                 ["Delhi Kutub Minar", "1206"],
             ]
         ))
-    )
-    ch2.pages.append(
-        ChapterPage()
         .add_block(BulletBlock(3, "Türbe Mimarisi", [
             "Karahanlı türbeleri genellikle tuğla malzemelidir; süslemelerde alçı (stuk) ve bazen çini kullanılır. "
             "Kare veya kareye yakın bir alt mekan üzerine oturan kubbe ana taslağı oluşturur.",
@@ -190,9 +187,6 @@ def get_pack() -> CoursePack:
             "<b>Kültürel Etkileşim:</b> Bir Türk devleti olmasına rağmen, yerine geçtikleri Samani devletinin "
             "etkisiyle Fars (İran) kültürü sosyal yaşamda oldukça etkili olmuştur.",
         ]))
-    )
-    ch3.pages.append(
-        ChapterPage()
         .add_table(ComparisonTable(
             "Cami ve Minare Mimarisi",
             ["Eser", "Özellik"],
@@ -204,6 +198,9 @@ def get_pack() -> CoursePack:
         .add_block(BulletBlock(2, "Saray Mimarisi (Sivil Mimari)", [
             "Gazneliler sivil mimaride, özellikle saray yapımında önemli eserler bırakmışlardır.",
         ]))
+    )
+    ch3.pages.append(
+        ChapterPage()
         .add_table(ComparisonTable(
             "Öne Çıkan Saray Yapıları",
             ["Eser", "Özellik"],
@@ -220,9 +217,6 @@ def get_pack() -> CoursePack:
             "<b>Türbeler:</b> Çok gelişmiş örnekleri yoktur; Sultan Mahmut ve Aslan Câzip türbeleri dönemin bilinen "
             "yegane mezar yapılarıdır.",
         ]))
-    )
-    ch3.pages.append(
-        ChapterPage()
         .add_summary("Gazneliler, Fars kültürünün güçlü etkisi altında; Leşkeri Bazar Camii, Sultan Mahmut III "
             "Minaresi ve özellikle Leşkergâh ile Sultan Mesut III saraylarıyla sivil mimaride öne çıkmıştır. "
             "Fresklerdeki Türk tipi betimlemeler, dönemin kültürel kimliğinin görsel izidir.")
@@ -258,9 +252,6 @@ def get_pack() -> CoursePack:
             FlowStep("Babürlüler", "Mimari zirve"),
             FlowStep("1858", "İngiliz sömürgesi"),
         ], caption="Hindistan'da Türk-İslam hakimiyetinin yaklaşık 9 asırlık seyri."))
-    )
-    ch4.pages.append(
-        ChapterPage()
         .add_table(ComparisonTable(
             "Önemli Eserler",
             ["Eser", "Tarih", "Not"],
@@ -274,6 +265,9 @@ def get_pack() -> CoursePack:
         .add_callout(Callout("insight", "Bölge İçi Süreklilik",
             "Hindistan'daki Türk mimarisi, Gaznelilerin başlattığı hakimiyetin devamıdır — bu yüzden Kutup Minar gibi "
             "erken eserlerde, bir önceki bölümde görülen <b>Gazneli minare geleneğinin</b> izleri sürülebilir."))
+    )
+    ch4.pages.append(
+        ChapterPage()
         .add_summary("Hindistan'da Türk mimarisi, Gaznelilerle başlayıp Delhi Türk Sultanlığı ve Babürlüler ile "
             "gelişerek 9 asır süren bir mirastır. Kutup Minar'dan Tac Mahal'e uzanan bu çizgi, Türk-İslam mimari "
             "geleneğinin coğrafi olarak en uzağa taşındığı ve en görkemli örneklerini verdiği hattır.")
@@ -308,9 +302,6 @@ def get_pack() -> CoursePack:
             "Büyük Selçuklular, Karahanlı ve Gazneli geleneklerini harmanlayarak 'Dört eyvanlı ve avlulu' cami "
             "tipini (Mescid-i Cuma) geliştirmiştir.",
         ]))
-    )
-    ch5.pages.append(
-        ChapterPage()
         .add_table(ComparisonTable(
             "Mescid-i Cuma Örnekleri",
             ["Eser", "Not"],
@@ -322,6 +313,9 @@ def get_pack() -> CoursePack:
         .add_callout(Callout("caution", "Süsleme Malzemeleri",
             "Ana malzeme tuğladır. <b>Çini</b>, <b>stuk</b> (alçı) süslemeler, tuğlaların alegorik dizilişi, "
             "<b>Kûfi</b> ve <b>Selçuklu Sülüsü</b> yazılar kullanılmıştır."))
+    )
+    ch5.pages.append(
+        ChapterPage()
         .add_block(BulletBlock(3, "Minare Mimarisi", [
             "Karahanlı ve Gazneli minarelerine göre daha ince ve zarif, yukarı doğru daralan silindirik yapılar "
             "inşa etmişlerdir. <b>Damgan Camii Minaresi</b> (1058), Tuğrul Bey zamanında yapılmış; mavi-firuze "
@@ -337,9 +331,6 @@ def get_pack() -> CoursePack:
                 ["Mümine Hatun (1186)", "Geç dönem kümbet örneğidir."],
             ]
         ))
-    )
-    ch5.pages.append(
-        ChapterPage()
         .add_block(BulletBlock(4, "Medrese ve Kervansaray", [
             "<b>Medrese:</b> Devlet memuru yetiştirmek ve Sünni İslam anlayışını yaymak amacıyla ilk olarak Tuğrul "
             "Bey zamanında Bağdat, Tus, İsfahan gibi şehirlerde başlatılmıştır; Hargird ve Rey medreselerinden "
@@ -374,9 +365,6 @@ def get_pack() -> CoursePack:
             "Üslubu'ndan bahsedilemez; Orta Asya geleneği, yerel malzemeler ve farklı kültürlerin (Ermeni, Gürcü, "
             "Bizans) etkileşimi söz konusudur.",
         ]))
-    )
-    ch6.pages.append(
-        ChapterPage()
         .add_table(ComparisonTable(
             "Danişmendliler (Sivas, Tokat, Kayseri, Malatya)",
             ["Eser", "Not"],

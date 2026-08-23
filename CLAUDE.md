@@ -35,12 +35,21 @@ vardır: `python build_kitap.py` (bkz. aşağıdaki "Birleşik Kitap" bölümü)
 |---|---|
 | Bitmiş (trim) ölçü | **175 × 250 mm** |
 | Taşma payı (bleed) | **3 mm** (her kenar) — render/MediaBox 181 × 256 mm |
-| Üst / alt kenar | 16 mm / 19 mm (alt, sayfa numarası payı dahil) |
-| İç (sırt/gutter) / dış kenar | 22 mm / 16 mm — **ayna simetrik** |
-| Metin alanı | 137 × 215 mm |
+| Üst / alt kenar | 11 mm / 19 mm (alt, sayfa numarası payı dahil) |
+| İç (sırt/gutter) / dış kenar | 14 mm / 9 mm — **ayna simetrik** |
+| Metin alanı | 152 × 220 mm |
+| Gövde punto | **7,9 pt** (eski 9,6 pt'nin 0,8229 katı) |
 
 Ayna simetri: TEK sayfalar (1, 3, 5…) sağ yapraktır, sırtı SOLDADIR; çift
-sayfalarda tersi. PUR Amerikan cilt için iç kenar dıştan 6 mm geniştir.
+sayfalarda tersi. PUR Amerikan cilt için iç kenar dıştan 5 mm geniştir.
+(DİKKAT: 14 mm sırt payı PUR cilt için sıkıdır — matbaa 15-18 mm isterse
+`MARGIN_INNER_MM`'i artırıp `tools/kalibre.py` + `tools/dengele.py --hepsi`
+zincirini tekrar çalıştırın.)
+
+`templates/style.css` içindeki tüm tipografi/boşluk/çizgi ölçüleri 2026
+Ağustos'unda tek seferde **0,8229 ile ölçeklendi** (gövde 9,6 → 7,9 pt);
+kapak sayfası ve sayfa geometrisi bu ölçeklemenin dışında bırakıldı. Yeni
+bir bileşen eklerken ölçüleri bu skalaya uydurun.
 
 **Tek kaynak `build.py`'nin başındaki sabitlerdir** (`TRIM_W_MM`, `TRIM_H_MM`,
 `BLEED_MM`, `MARGIN_*_MM`, `ODD_PAGE_GUTTER`). `page_geometry_css()` bunlardan
@@ -601,16 +610,16 @@ def get_pack() -> CoursePack:
 ## Sayfalama sabitleri (build.py)
 
 ```python
-GLOSSARY_PER_PAGE = 12     # sözlük sayfası başına kavram (2 sütun x 6 satır)
-QA_PER_PAGE = 3            # LEGACY
-DISTINCTIONS_PER_PAGE = 3  # LEGACY
-MATCHTABLE_PER_PAGE = 5    # LEGACY
-TEST_PER_PAGE_FIRST = 3    # ilk test sayfası (bilgi çubuğu + talimat kutusu var)
-TEST_PER_PAGE = 4          # test devam sayfaları
-ANSWER_PER_PAGE = 12       # cevap anahtarı sayfası başına çözüm
-TOC_ROWS_FIRST = 5         # İçindekiler ilk sayfası
-TOC_ROWS_REST = 6          # İçindekiler devam sayfaları
-OVERVIEW_PAGES = 2         # Genel Bakış SABİT iki sayfa
+GLOSSARY_PER_PAGE = 22     # sözlük sayfası başına kavram (2 sütun)
+QA_PER_PAGE = 12           # LEGACY
+DISTINCTIONS_PER_PAGE = 8  # LEGACY
+MATCHTABLE_PER_PAGE = 11   # LEGACY
+TEST_PER_PAGE_FIRST = 7    # ilk test sayfası (bilgi çubuğu + talimat kutusu var)
+TEST_PER_PAGE = 8          # test devam sayfaları
+ANSWER_PER_PAGE = 23       # cevap anahtarı sayfası başına çözüm (20 soru -> tek sayfa)
+TOC_ROWS_FIRST = 7         # İçindekiler ilk sayfası
+TOC_ROWS_REST = 8          # İçindekiler devam sayfaları
+OVERVIEW_PAGES = 1         # Genel Bakış TEK sayfa
 ```
 
 Bu değerler **175×250mm için `tools/kalibre.py` ile ÖLÇÜLDÜ**: her aday sayı
@@ -630,11 +639,12 @@ Test ve Cevap Anahtarı bölümleri **2 sütunlu** düzende render edilir
 `column-fill: balance`; her madde `break-inside: avoid` ile bir sütunda
 bölünmeden kalır).
 
-**İçindekiler ve Genel Bakış artık çok sayfalıdır.** 175×250mm'de İçindekiler
-satırları (alt başlıklar iki satıra sardığı için ~21-31mm) ve Genel Bakış'ın
-dört bloğu (214-264mm) tek sayfaya sığmıyor. İçindekiler `ctx.toc_pages`
-üzerinden sayfalanır; Genel Bakış sabit ikiye bölünür (1. sayfa hero + 6
-kart, 2. sayfa çalışma akışı + sınav notu). Sayfa numaraları
+**İçindekiler çok sayfalı olabilir; Genel Bakış tek sayfadır.** Küçültülmüş
+punto + genişletilmiş metin alanında Genel Bakış'ın dört bloğu (hero + 6 kart
++ çalışma akışı + sınav notu) tek sayfaya sığar (`OVERVIEW_PAGES = 1`); en
+yüklü ders olan Öğretim İlke ve Yöntemleri'nde ~%97 doluluk verir, yani
+marj dardır — Genel Bakış'a blok eklerseniz taşma denetimini mutlaka okuyun.
+İçindekiler `ctx.toc_pages` üzerinden sayfalanır. Sayfa numaraları
 `compute_page_numbers()` içinde buna göre hesaplanır — bir dersin ön
 sayfaları artık sabit 3 değil, `1 + toc_page_count(pack) + OVERVIEW_PAGES`
 tanedir.
