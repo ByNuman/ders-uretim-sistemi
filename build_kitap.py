@@ -41,10 +41,12 @@ from theme_engine import resolve_theme_css, generate_theme_vars_from_hex   # noq
 # 175x250mm'de "Sayfa Rehberi" 8 örneğiyle tek sayfaya sığmıyor (ölçüldü:
 # ~274mm / 215mm), bu yüzden 4+4 olarak iki sayfaya bölündü.
 FRONT_FIXED_PAGES = 5      # ana kapak + künye + önsöz + sayfa rehberi (2 sayfa)
-TOC_PER_PAGE = 11          # ana içindekilerde sayfa başına ders satırı
-                           # (küçültülmüş puntoda satır ~15mm + başlık bloğu
-                           #  ~42mm: 11 satır ~209mm < 220mm metin alanı;
-                           #  10 ders -> tek sayfa)
+TOC_PER_PAGE = 10          # ana içindekilerde sayfa başına ders satırı
+                           # (satır yüksekliği sabit değil: alt başlığı iki
+                           #  satıra saran dersler ~15mm yerine ~22mm tutuyor.
+                           #  11'de ölçüldü -> 11 derslik tek sayfa ~3mm taştı;
+                           #  10'da hepsi sığıyor. Artırmadan önce mutlaka
+                           #  build_kitap.py taşma çıktısını okuyun.)
 
 
 def toc_chunks(courses: list) -> list[list]:

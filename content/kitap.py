@@ -23,6 +23,7 @@ from content_model import BookPack
 COURSE_MODULES = [
     "content.tefsir2",
     "content.islam_tarihi_3",
+    "content.kelam_tarihi",
     "content.sanat_tarihi",
     "content.felsefe_tarihi_2",
     "content.cagdas_felsefe",
