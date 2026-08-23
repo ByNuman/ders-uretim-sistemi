@@ -40,14 +40,14 @@ def get_pack() -> CoursePack:
             "<b>Öğrenmeyi Etkileyen Değişkenler:</b> süreç temelde Öğrenci Nitelikleri, Öğretim Hizmeti ve Öğrenme Ürünleri olarak işler. Öğrenci nitelikleri ikiye ayrılır: <b>Bilişsel Giriş Davranışları (%50 Etkili)</b> — bilişsel alan düzeyi, hazırbulunuşluk ve öğrenme stilleri (örn: çarpma için toplamayı bilmek); <b>Duyuşsal Giriş Özellikleri (%25 Etkili)</b> — derse, öğretmene, okula karşı tutumlar, ilgi ve özgüven.",
             "<b>Öğretim Hizmetinin Niteliği (ÖÇFRE):</b> öğretim hizmeti Pekiştirme, İpucu, Dönüt ve Düzeltme, Etkin Katılım unsurlarından oluşur.",
         ]))
+    )
+    ch1.pages.append(
+        ChapterPage()
         .add_callout(Callout("caution", "Dikkat / Püf Noktası",
             "Tam öğrenme oldukça zaman alıcıdır ve bireysel farklar ihmal edilir. En büyük sınırlılığı, "
             "yavaş öğrenenlerin hızlı öğrenenleri engellemesi ve onları bekletmesidir. Ayrıca süreçte "
             "öğrenci-öğrenci etkileşimi yoktur; bu yüzden işbirlikli öğrenme ve tartışma gibi teknikler "
             "kullanılamaz."))
-    )
-    ch1.pages.append(
-        ChapterPage()
         .add_callout(Callout("insight", "Kritik Çıkarım",
             "Zeka, kişilik, yetenek gibi faktörler değiştirilemeyen faktörlerken; zaman, ortam, "
             "bilişsel/duyuşsal özellikler değiştirilebilir faktörlerdir."))
@@ -61,6 +61,9 @@ def get_pack() -> CoursePack:
             "Düzeltme (hatanın anında düzeltilerek en aza indirgenmesi), <b>B</b>ireysel Hız (her öğrenciye "
             "kendi hızında ilerleme fırsatı verilmesi — Tam Öğrenmeden ayıran en belirgin fark).",
         ]))
+    )
+    ch1.pages.append(
+        ChapterPage()
         .add_table(ComparisonTable(
             "Karşılaştırma: Tam Öğrenme vs. Programlı Öğrenme",
             ["Özellik", "Tam Öğrenme (Bloom)", "Programlı Öğretim (Skinner)"],
@@ -108,6 +111,9 @@ def get_pack() -> CoursePack:
             "bilgi işleyen hipotezlerdir. Daha çok Birincil Bilgi Kaynakları (öğrencinin kendi yaşantısıyla "
             "elde ettiği gözlem ve deneyimler) kullanılır.",
         ]))
+    )
+    ch1.pages.append(
+        ChapterPage()
         .add_table(ComparisonTable(
             "Yapılandırmacı Yaklaşım Türleri",
             ["Tür", "Açıklama"],
@@ -154,6 +160,9 @@ def get_pack() -> CoursePack:
             "yardımlaşır, öğrendiklerini paylaşır, birbirini destekler ve güdüler. Bu model öğrencilere çok "
             "yönlü ve empatik düşünme becerisi kazandırır.",
         ]))
+    )
+    ch2.pages.append(
+        ChapterPage()
         .add_callout(Callout("caution", "Dikkat / Püf Noktası",
             "İşbirlikli öğrenmede liderlik rolü ya da tek başına inisiyatif alma yoktur; liderlik paylaşılır. "
             "Bireysellik geri plandadır. Öğrencilerin grubun tümünün başarısına etki ettiklerini kavramalarına "
@@ -169,9 +178,6 @@ def get_pack() -> CoursePack:
                 ["Sorumluluk", "Rastgele ortaya çıkabilir.", "Bireysel sorumluluk ön plandadır."],
             ]
         ))
-    )
-    ch2.pages.append(
-        ChapterPage()
         .add_block(BulletBlock(2, "Aktif Öğrenme (Good)", [
             "Aktif öğrenme, öğrencinin dinlemekten çok derse katıldığı, karmaşık öğretimsel işlerle zihinsel "
             "yeteneklerini kullanmaya zorlandığı bir süreçtir.",
@@ -179,6 +185,9 @@ def get_pack() -> CoursePack:
             "öz düzenleme yapma fırsatları verilir. Aktif olma, hem süreç hem de sonuçla ilgilidir; okuma, "
             "yazma ve tartışma gibi etkinliklerle desteklenir, öğrencilerin tutum ve değerleri dikkate alınır.",
         ]))
+    )
+    ch2.pages.append(
+        ChapterPage()
         .add_block(BulletBlock(3, "Anlamlı Öğrenme (D. Ausubel)", [
             "Bireyin kavramlar arasındaki ilişkiyi fark etmesini içeren öğrenmedir. Öğretmen merkezlidir ve "
             "temel kavramların önce, ayrıntıların daha sonra öğretildiği tümdengelim yöntemi kullanılır.",
@@ -206,15 +215,15 @@ def get_pack() -> CoursePack:
             "Okulda etkili öğretimi gerçekleştirmek için öğretme işinin öğretmen tarafından yapıldığını "
             "savunan ve dört temel öğeden oluşan bir modeldir.",
         ]))
+    )
+    ch2.pages.append(
+        ChapterPage()
         .add_flow(FlowDiagram([
             FlowStep("Hedefler Saptanır"),
             FlowStep("Gerekli Giriş Davranışları Belirlenir"),
             FlowStep("Öğretme-Öğrenme Ortamı", "Seçilir ve Düzenlenir"),
             FlowStep("Değerlendirme Yapılır"),
         ], caption="Glasser'ın Temel Öğretme Modelinin Öğeleri (Akış Şeması)"))
-    )
-    ch2.pages.append(
-        ChapterPage()
         .add_callout(Callout("focus", "Sınavda Ana Ayrım — Gagne ile Glasser",
             "Gagne'nin modeli 8 aşamalı bir <b>öğrenme türleri hiyerarşisi</b> ve dersin işleniş sırasını "
             "tanımlarken; Glasser'ın modeli yalnızca 4 öğeden oluşan, öğretmenin hedef-giriş davranışı-ortam-"
@@ -251,6 +260,9 @@ def get_pack() -> CoursePack:
             "Değişim, Kendi Kendine Öğrenme, Araştırmacılık, Özdeğerlendirme, Sınıf Dışında Öğrenme ve "
             "Eğitimi Yönetme.",
         ]))
+    )
+    ch3.pages.append(
+        ChapterPage()
         .add_callout(Callout("insight", "Kritik Çıkarım",
             "Yaşam boyu öğrenme yaklaşımı, öğrenme-öğretme sürecine yepyeni bir boyut kazandırmış ve "
             "eğitim-öğretimi 'kurumsal/okul' yapısının dışına çıkartarak tüm hayata yaymıştır."))
@@ -265,9 +277,6 @@ def get_pack() -> CoursePack:
         .add_callout(Callout("caution", "Dikkat / Püf Noktası",
             "Beyin temelli öğrenmede öğrenme süreci doğrudan insan fizyolojisi ile ilgilidir. Bu modeldeki "
             "en altın kural şudur: <b>öğrenme teşvikle (destekle) artar, korku (kaygı) ile azalır.</b>"))
-    )
-    ch3.pages.append(
-        ChapterPage()
         .add_block(BulletBlock(3, "Çoklu Zeka Kuramı (H. Gardner)", [
             "Howard Gardner tarafından 1983 yılında geliştirilen ve geleneksel tek tip zeka anlayışını yıkan "
             "devrim niteliğinde bir kuramdır: <b>'Gardner'a göre zeka; problem çözme kapasitesi ya da değerli "
@@ -276,6 +285,9 @@ def get_pack() -> CoursePack:
             "(kaynaklara ulaşım şansı, kültürel, coğrafi, ailesel ve durumsal faktörler) rol oynar. Bireyler "
             "8 farklı zeka boyutu ile dünyaya gelirler ve her bireyde bu yetenekler az çok bulunur.",
         ]))
+    )
+    ch3.pages.append(
+        ChapterPage()
         .add_table(ComparisonTable(
             "Zeka Alanları ve Uygun Yöntemler",
             ["Zeka Alanı", "Özellik ve Uygun Yöntem"],
@@ -291,9 +303,6 @@ def get_pack() -> CoursePack:
                 ["Varoluşçu (Yeni Eklenen 9. Boyut)", "Varlığın başı ve sonuyla ilgilenen, 'Biz kimiz?', 'Neden ölürüz?' gibi evrensel sorulara cevap arayan zeka türüdür."],
             ]
         ))
-    )
-    ch3.pages.append(
-        ChapterPage()
         .add_block(BulletBlock(4, "Okulda Öğrenme Modeli (Carroll)", [
             "Carroll, 1963 yılındaki makalesinde; her öğrenciye ihtiyaç duyduğu ek zaman verildiğinde tüm "
             "öğrencilerin hedeflenen öğrenme düzeyine ulaşabileceğini savunmuştur.",
@@ -301,6 +310,9 @@ def get_pack() -> CoursePack:
             "belirleyici olan en temel değişken <b>zamandır</b>. Dört önemli değişkeni vardır: Kaliteli "
             "Öğretim, Yetenek, Fırsat ve Sebat.",
         ]))
+    )
+    ch3.pages.append(
+        ChapterPage()
         .add_callout(Callout("insight", "Kritik Çıkarım",
             "Carroll'un 'Okulda Öğrenme Modeli', kendisinden sonra gelen Bloom'un 'Tam Öğrenme Modeli'ne ve "
             "Slavin'in 'Etkili Öğretim Modeli'ne doğrudan esin kaynağı olmuştur."))
@@ -418,6 +430,9 @@ def get_pack() -> CoursePack:
             "Sınıfa getirilen örnek olayın tek bir çözümü olmamalıdır; çünkü amaç öğrencilerin "
             "farklı/alternatif çözümler üretmesidir. Kalabalık sınıflarda tüm sınıfın katılımı zor "
             "olduğundan, sınıf küçük gruplara bölünerek uygulanmalıdır."))
+    )
+    ch4.pages.append(
+        ChapterPage()
         .add_block(BulletBlock(5, "Gösterip Yaptırma (Demonstrasyon ve Uygulama)", [
             "Öğrenciye bir işin 'nasıl yapılacağının' önce gösterilip, sonra uygulatılmasıdır. Psiko-motor "
             "(devinişsel) becerilerin (örn: beden eğitimi dersinde nefes alma, tıp fakültesinde dikiş atma) "
@@ -426,9 +441,6 @@ def get_pack() -> CoursePack:
             "gösterilmesi ve açıklanması (Gösteri); 2. Aşama (Öğrenci Merkezli) — öğrencinin gözetim altında "
             "alıştırma ve uygulama yapması (Yaptırma).",
         ]))
-    )
-    ch4.pages.append(
-        ChapterPage()
         .add_callout(Callout("caution", "Dikkat / Püf Noktası",
             "Öğrenci uygulama yaparken yaptığı hatalar anında düzeltilmelidir ve bir beceri tam olarak "
             "anlaşılmadan kesinlikle diğerine geçilmemelidir. Yaparak-yaşayarak öğrenme temelli olduğu için "
@@ -449,6 +461,9 @@ def get_pack() -> CoursePack:
             "becerilerini kullanarak elde ettikleri yöntemdir. Yaparak-yaşayarak öğrenme temellidir ve "
             "problem çözme becerisini geliştirir.",
         ]))
+    )
+    ch4.pages.append(
+        ChapterPage()
         .add_table(ComparisonTable(
             "Öğretmen Merkezli vs. Öğrenci Merkezli Yöntemler",
             ["Yöntem", "Merkez / Odak Noktası", "Etki Düzeyi"],
@@ -496,6 +511,9 @@ def get_pack() -> CoursePack:
             "değişebilir ve yer değiştirebilirler. Kazanan ya da kaybedeni (jürisi) yoktur; önemli olan "
             "alternatif ve esnek düşünebilmektir.",
         ]))
+    )
+    ch5.pages.append(
+        ChapterPage()
         .add_block(BulletBlock(2, "Altı Şapkalı Düşünme (E. De Bono)", [
             "Öğrencilerin bir konuya çok farklı açılardan ve sistematik bakmalarını sağlayan, karar verme "
             "becerisini geliştiren bir tekniktir.",
@@ -512,13 +530,13 @@ def get_pack() -> CoursePack:
                 ["Mavi Şapka (Karar Verici / Serinkanlı)", "Tüm süreci toparlayan, sonucu belirleyen ve durumu kontrol eden şapkadır."],
             ]
         ))
-    )
-    ch5.pages.append(
-        ChapterPage()
         .add_block(BulletBlock(3, "Altı Ayakkabılı Uygulama (E. De Bono)", [
             "Bireyin olaylara belirli bir davranış tarzına takılmadan yaklaşmasını ve esnek uygulama "
             "biçimleri geliştirmesini sağlar.",
         ]))
+    )
+    ch5.pages.append(
+        ChapterPage()
         .add_table(ComparisonTable(
             "Altı Ayakkabılı Uygulama",
             ["Ayakkabı", "Temsil Ettiği"],
@@ -541,6 +559,9 @@ def get_pack() -> CoursePack:
             "koymayı öğrendikleri tekniktir. Çekingen öğrencilerin derse katılımını sağlar ve güdülenmeyi "
             "artırır.",
         ]))
+    )
+    ch5.pages.append(
+        ChapterPage()
         .add_block(BulletBlock(5, "Beyin Fırtınası", [
             "Yaratıcı düşüncelerin ortaya çıkarılması amacıyla, eleştiri ve yargılamanın kesinlikle yasak "
             "olduğu, fikirlerin niteliğinden çok niceliğinin (sayısının) önemli olduğu tekniktir. Üç şekilde "
@@ -548,9 +569,6 @@ def get_pack() -> CoursePack:
             "esinlenmesi), <b>Fikir Bağlantısı Kurma</b> (dikenlerden cırt cırt bantların icadı), "
             "<b>Zarardan Kâr Çıkarma</b> (beklemiş biradan hayvan yemi yapmak).",
         ]))
-    )
-    ch5.pages.append(
-        ChapterPage()
         .add_block(BulletBlock(6, "Konuşma Halkası", [
             "Öğrencilerin bir öyküdeki kişinin (kahramanın) yerine kendilerini koyarak çember şeklinde "
             "oturdukları tekniktir. Temel amaç empati kurmayı sağlamak ve duygularla düşünceleri birbirinden "
@@ -567,6 +585,9 @@ def get_pack() -> CoursePack:
             FlowStep("Dersin Yeniden Düzenlenmesi"),
             FlowStep("Mikro Dersin Tekrar Uygulanması", "ve Kaydedilmesi"),
         ], caption="Mikro Öğretim Uygulama Basamakları"))
+    )
+    ch5.pages.append(
+        ChapterPage()
         .add_table(ComparisonTable(
             "Karıştırılan Teknikler",
             ["Karıştırılan Çift", "Temel Farklılıklar (Püf Noktası)"],
@@ -576,9 +597,6 @@ def get_pack() -> CoursePack:
                 ["Sokrat Tartışması ↔ Sokrat Semineri", "Sokrat Tartışması; ironi ve doğurtmaca aşamalarından oluşan, öğrencilerin yanlış bildiklerinden şüphe duymasını sağlayıp sorularla içlerindeki doğruyu buldurma (tümdengelim) tekniğidir. Sokrat Semineri ise ağır bir metnin/makalenin derse getirilip incelenmesine ve eleştirel tartışılmasına dayanır."],
             ]
         ))
-    )
-    ch5.pages.append(
-        ChapterPage()
         .add_block(BulletBlock(8, "Diğer Öğretim Teknikleri ve Yaklaşımları", [
             "<b>Bilişsel Çıraklık:</b> öğrencinin bir 'uzmanın' (usta) gözetiminde bir işe başladığı ve "
             "zamanla uzmanın desteğini yavaş yavaş çektiği öğretim sürecidir. Tarihimizdeki 'Ahilik' teşkilatı "
@@ -598,6 +616,9 @@ def get_pack() -> CoursePack:
             "konuya hakim üst sınıftan bir öğrenciden, bir stajyer öğretmenden veya bir etüt öğretmeninden "
             "(Tutor / Özel Öğretmen) birebir özel destek alması esasına dayanır.",
         ]))
+    )
+    ch5.pages.append(
+        ChapterPage()
         .add_callout(Callout("insight", "Kritik Çıkarım",
             "Öğretim teknikleri içerisinde 'bireysel hız' ön plana çıktığında Programlı Öğretim veya Keller "
             "Planı aranmalı; öğrenme engellerini ortadan kaldırmak için birebir destek vurgulandığında ise "
@@ -636,6 +657,9 @@ def get_pack() -> CoursePack:
             FlowStep("Aydınlanma"),
             FlowStep("Değerlendirme"),
         ], caption="Yaratıcı Düşünmenin Aşamaları"))
+    )
+    ch6.pages.append(
+        ChapterPage()
         .add_block(BulletBlock(2, "Yaratıcı Düşünmenin Özellikleri ve Yolları", [
             "<b>Temel Özellikleri:</b> Esnek Düşünme (farklı yollar düşünebilme ve bunları deneme), Orijinal "
             "Düşünme (ortaya atılan yolun yeni ve mevcutlardan farklı olması), Akılcı Düşünme (zihinsel "
@@ -649,9 +673,6 @@ def get_pack() -> CoursePack:
         .add_callout(Callout("insight", "Kritik Çıkarım",
             "Yaratıcı düşünme, Bloom taksonomisinin sentez düzeyine denk gelir. Yeni bir ürün, yeni bir "
             "fikir veya orijinal bir sentez oluşturmayı temel alır."))
-    )
-    ch6.pages.append(
-        ChapterPage()
         .add_block(BulletBlock(3, "Eleştirel Düşünme", [
             "Sorgulayan bir yaklaşımla olayları ve durumları ele alma, irdeleyici bir bakış açısıyla yorum "
             "yapma ve karar verme becerilerini içerir. Olayları olduğu gibi kabul etmez, kanıt arar.",
@@ -666,6 +687,9 @@ def get_pack() -> CoursePack:
                 ["İşlem Türü", "Birleştirici, sözel", "Ayırıcı, görsel"],
             ]
         ))
+    )
+    ch6.pages.append(
+        ChapterPage()
         .add_block(BulletBlock(4, "Yansıtıcı Düşünme", [
             "İlerlemeci eğitim yaklaşımına dayanan ve öğrenciyi merkeze alan bir düşünme yoludur. Öğrencinin "
             "düşünerek ve araştırarak öğreneceği bilgi üzerinde durmasına olanak sağlar. Yapılandırmacılık, "
@@ -685,9 +709,6 @@ def get_pack() -> CoursePack:
             "tek tek ayırarak incelemek); parça-bütün ilişkisini yorumlamayı gerektiren yap-bozlar (puzzle) "
             "yapmak; 'İki resim arasındaki 8 farkı bulun' tarzı detaycı etkinlikler uygulamak.",
         ]))
-    )
-    ch6.pages.append(
-        ChapterPage()
         .add_block(BulletBlock(6, "Metabilişsel Düşünme (Üstbiliş)", [
             "Bilişsel psikoloji alanına 1970'li yıllarda John Flavell'in çalışmalarıyla girmiş olan en üst "
             "düzey düşünme becerilerinden biridir. En kısa tanımıyla kişinin 'kendi düşünme süreçlerinin "
@@ -696,6 +717,9 @@ def get_pack() -> CoursePack:
             "alır ve daha nitelikli bir öğrenme için zihinsel süreçlerini yeniden düzenleyerek en etkili "
             "biçimde kullanır.",
         ]))
+    )
+    ch6.pages.append(
+        ChapterPage()
         .add_callout(Callout("caution", "Dikkat / Püf Noktası",
             "Metabilişsel (üstbilişsel) düşünmede öğrencinin odaklandığı şey dışarıdaki ders konusu değil, "
             "bizzat kendi zihnidir. Kısacası öğrencinin 'Ben en iyi nasıl öğreniyorum?' sorusunun cevabını "

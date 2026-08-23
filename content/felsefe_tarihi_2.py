@@ -151,14 +151,14 @@ def get_pack() -> CoursePack:
             "Felsefi düşüncelerinin şekillenmesinde <b>Montesquieu, Immanuel Kant ve David Hume</b>'un önemli "
             "etkileri olmuştur.",
         ]))
+    )
+    ch1.pages.append(
+        ChapterPage()
         .add_block(BulletBlock(2, "Sosyolojinin Doğuşu ve Pozitif Felsefe", [
             "Comte, sosyoloji biliminin isim babasıdır; 'Sosyal Fizik' adını verdiği bu alanın bağımsız bir "
             "bilim olarak ortaya çıkmasını sağlamıştır.",
             "Felsefi sisteminin mottosu: <b>'İlke olarak aşk, temel olarak düzen, amaç olarak ilerleme.'</b>",
         ]))
-    )
-    ch1.pages.append(
-        ChapterPage(continue_tag="Üç Hal Yasası ve İnsanlık Dini")
         .add_flow(FlowDiagram([
             FlowStep("Teolojik Aşama", "Açıklamalar Tanrı/tanrısal güçlerle yapılır"),
             FlowStep("Metafizik Aşama", "Soyut kavramlarla (hak, hukuk, eşitlik) açıklanır"),
@@ -201,6 +201,9 @@ def get_pack() -> CoursePack:
         ChapterPage()
         .add_terms(ch2.key_terms)
         .add_person(SCHOPENHAUER)
+    )
+    ch2.pages.append(
+        ChapterPage()
         .add_block(BulletBlock(1, "Hayatı ve Felsefesinin Temeli", [
             "1788 yılında doğmuş, felsefesinin merkezine insanın içsel arzularını ve 'irade' kavramını "
             "yerleştirmiştir.",
@@ -212,9 +215,6 @@ def get_pack() -> CoursePack:
             "Gerçekçi olmayan beklentilerin asıl kaynağı, insanların içindeki aşırı mutluluk arzusudur — bu "
             "yüzden çok mutsuz olmanın en güvenilir yolu, mutlu olmayı istemektir.",
         ]))
-    )
-    ch2.pages.append(
-        ChapterPage(continue_tag="Yalnızlıktan Nietzsche'ye Geçiş")
         .add_flow(FlowDiagram([
             FlowStep("Aşırı Arzu", "Karşılanması güç beklentiler"),
             FlowStep("Acı ve Mutsuzluk", "Beklenti karşılanmayınca doğan sonuç"),
@@ -230,6 +230,9 @@ def get_pack() -> CoursePack:
         .add_callout(Callout("focus", "Kritik Odak: İsteme ve Tasarım Olarak Dünya",
             "Schopenhauer'un başyapıtı; mutluluğun kendi başına var olan pozitif bir durum değil, yalnızca "
             "<b>'acı ve ızdırabın yokluğu'</b> olduğunu savunur."))
+    )
+    ch2.pages.append(
+        ChapterPage()
         .add_terms([
             KeyTerm("Nihilizm (Hiççilik)", "Hayatın, ahlakın, bilginin ve değerlerin nesnel bir temeli veya içsel bir anlamı olmadığını savunan felsefi görüş."),
             KeyTerm("Sürü İnsanı", "Kendi kararlarını alamayan, yönetilmek için sürekli bir lidere veya otoriteye ihtiyaç duyan itaatkâr insan tipi."),
@@ -244,15 +247,15 @@ def get_pack() -> CoursePack:
             "eserlerine ilham vermiştir.",
             "1889'da Torino'da yaşadığı zihinsel çöküşle akıl hastanesine kaldırılmış, 1900'de vefat etmiştir.",
         ]))
-    )
-    ch2.pages.append(
-        ChapterPage(continue_tag="Güç İstenci ve Tanrı'nın Ölümü")
         .add_block(BulletBlock(2, "Felsefi Yıkım: Eleştiri ve Din Karşıtlığı", [
             "Felsefesinin kalbinde 'eleştiri' yatar; Kant, Hegel ve Schopenhauer'ın yanı sıra Avrupa kültürünü "
             "ve Katolik Hristiyanlığını sertçe eleştirir.",
             "Yeryüzündeki tüm dinlerin ve politik görüşlerin insanoğlunun özgürce gelişmesini engellediğini, bu "
             "yüzden yıkılması gerektiğini savunur.",
         ]))
+    )
+    ch2.pages.append(
+        ChapterPage()
         .add_block(BulletBlock(3, "Güç İstenci ve Mutluluk Anlayışı", [
             "Nietzsche'ye göre her canlı sadece var olmak değil, güçlü olmak da ister; mutluluk pasif bir "
             "hazda değil, güçtedir. Güç istenci herkes için geçerlidir: <b>filozof</b> hakikatin peşinde "
@@ -293,6 +296,9 @@ def get_pack() -> CoursePack:
         ChapterPage()
         .add_terms(ch3.key_terms)
         .add_person_row([BENTHAM, MILL])
+    )
+    ch3.pages.append(
+        ChapterPage()
         .add_block(BulletBlock(1, "Jeremy Bentham: Klasik Faydacılık ve Toplumsal Hukuk", [
             "1748–1832 yıllarında yaşamış İngiliz filozof, hukukçu ve sosyal reformcudur; Faydacılık "
             "felsefesinin kurucusu kabul edilir.",
@@ -301,9 +307,6 @@ def get_pack() -> CoursePack:
             "Yasaların tek amacının toplumda en yüksek faydayı sağlamak olduğunu, cezaların intikam değil "
             "suçun topluma verdiği zarara orantılı olması gerektiğini savunur.",
         ]))
-    )
-    ch3.pages.append(
-        ChapterPage(continue_tag="Mill'in Liberal Faydacılığı ve Karşılaştırma")
         .add_block(BulletBlock(2, "John Stuart Mill: Özgürlükçü (Liberal) Faydacılık", [
             "1806–1873 yıllarında yaşamış İngiliz filozof, ekonomist ve liberal düşüncenin en büyük "
             "öncülerinden biridir.",
@@ -324,6 +327,9 @@ def get_pack() -> CoursePack:
             "Mill'e göre bireyin özgürlüğünün tek sınırı <b>'başkalarına zarar vermemek'</b>tir; "
             "<b>Kadınların Boyunduruk Altında</b> adlı eserinde ise toplumsal cinsiyet eşitliğini ateşli bir "
             "şekilde savunmuştur."))
+    )
+    ch3.pages.append(
+        ChapterPage()
         .add_summary("Jeremy Bentham, eylemlerin ahlaki ve hukuki değerini toplumun çoğunluğuna sağladığı "
             "matematiksel 'haz/fayda' hesabı üzerine inşa ederken; halefi John Stuart Mill bu görüşü revize "
             "ederek zihinsel hazları bedensel hazlardan üstün tutmuş ve faydacılığı bireysel özgürlükleri "
@@ -353,6 +359,9 @@ def get_pack() -> CoursePack:
             "ayırır. Ahlak açısından neyin doğru ya da yanlış kabul edileceği doğrudan toplumsal 'alt "
             "yapı'nın bir ürünüdür — bu yüzden felsefesi 'Diyalektik Materyalizm' olarak adlandırılır.",
         ]))
+    )
+    ch4.pages.append(
+        ChapterPage()
         .add_table(ComparisonTable(
             "Alt Yapının İç Hiyerarşisi",
             ["Katman", "İçerik"],
@@ -362,9 +371,6 @@ def get_pack() -> CoursePack:
                 ["Üst Yapı (Toplumsal Bilinç)", "Toplumun düşünüş tarzı, politik kurumları, yasaları, dini, ahlakı, sanatı ve felsefesi."],
             ]
         ))
-    )
-    ch4.pages.append(
-        ChapterPage(continue_tag="Sınıf Çatışması ve Komünist Manifesto")
         .add_block(BulletBlock(2, "Sınıf Çatışması ve Yabancılaşma", [
             "İçinde bulunulan dönem, Burjuvazi (Kapitalistler) ile Proletarya (İşçiler) arasındaki büyük bir "
             "sınıf çatışması dönemidir. İnsanın bilinci çalışma koşulları tarafından belirlenir: <b>'Bana ne "
@@ -382,6 +388,9 @@ def get_pack() -> CoursePack:
             "Marx, yakın çalışma arkadaşı Friedrich Engels ile birlikte <b>Komünist Manifesto</b>'yu "
             "yayımlamıştır. Fikirleri doğrultusunda gelişen hareket ilerleyen dönemde iki ana kola "
             "ayrılmıştır: <b>Sosyal Demokrasi</b> ve <b>Leninizm</b>."))
+    )
+    ch4.pages.append(
+        ChapterPage()
         .add_summary("Karl Marx, tarihi alt yapı (ekonomi) ve üst yapı (kurumlar) arasındaki çatışma olarak "
             "yorumlamış; kapitalizmin işçiyi kendi emeğine yabancılaştırdığını savunarak, proletarya "
             "diktatörlüğü aracılığıyla üretim araçlarının halka geçeceği sınıfsız bir komünist düzen hedefini "
@@ -412,6 +421,9 @@ def get_pack() -> CoursePack:
             "5 yıl süren bir dünya turuna çıkmış, Güney Amerika'nın haritasını çıkarmış ve özellikle Galapagos "
             "adalarında kritik çalışmalar yapmıştır.",
         ]))
+    )
+    ch5.pages.append(
+        ChapterPage()
         .add_block(BulletBlock(2, "Doğal Seçilim ve Evrimin Kanıtları", [
             "Teorisi iki temel tez üzerine kuruludur: biyolojik evrimin varlığı ve bu evrimin 'Doğal Seçilim' "
             "yoluyla gerçekleştiği.",
@@ -421,9 +433,6 @@ def get_pack() -> CoursePack:
             "Doğal seçilimin nasıl işlediğini kavraması, Thomas Malthus'un 'Nüfus İlkesi Üzerine Bir Deneme' "
             "adlı kitabını okumasıyla mümkün olmuştur.",
         ]))
-    )
-    ch5.pages.append(
-        ChapterPage(continue_tag="Sigmund Freud ve Psikanaliz")
         .add_person(FREUD)
         .add_block(BulletBlock(3, "Freud ve Ruh Arkeolojisi", [
             "1856'da doğan Freud, davranışlarımızın her zaman aklımız tarafından değil, çoğu zaman 'akıl dışı "
@@ -436,6 +445,9 @@ def get_pack() -> CoursePack:
             FlowStep("Ego", "Gerçeklik İlkesi — haz ilkesini dengeler"),
             FlowStep("Süperego", "Üst Ben — ahlaki beklentileri içselleştirir"),
         ], caption="Freud'un Zihin Modeli: İnsan Zihninin Katmanları ve Çatışma"))
+    )
+    ch5.pages.append(
+        ChapterPage()
         .add_table(ComparisonTable(
             "Freud'un Mekansal Zihin Metaforu",
             ["Mekân", "Karşılığı"],
@@ -474,6 +486,9 @@ def get_pack() -> CoursePack:
         ChapterPage()
         .add_terms(ch6.key_terms)
         .add_person(RUSSELL)
+    )
+    ch6.pages.append(
+        ChapterPage()
         .add_table(ComparisonTable(
             "İki Ana Gelenek: Çağdaş Felsefenin İki Kolu",
             ["Gelenek", "Odak"],
@@ -490,9 +505,6 @@ def get_pack() -> CoursePack:
             "Savaş karşıtı duruşuyla 'Bertrand Russell Barış Vakfı'nı kurmuş; insan hakları ve özgür düşünce "
             "üzerine yazıları nedeniyle Nobel Edebiyat Ödülü'nü kazanmıştır.",
         ]))
-    )
-    ch6.pages.append(
-        ChapterPage(continue_tag="Mantık, Dil Analizi ve Din Eleştirisi")
         .add_block(BulletBlock(2, "Temel Teorileri ve Felsefi Katkıları", [
             "<b>Matematik ve Mantık:</b> Kendi adıyla bilinen 'Russell Paradoksu'nu geliştirmiş; Whitehead ile "
             "kaleme aldığı <b>Principia Mathematica</b> ile matematiği tamamen mantıksal ilkelerden türetmeye "
@@ -506,6 +518,9 @@ def get_pack() -> CoursePack:
             FlowStep("Mantıksal Analiz"),
             FlowStep("Kesin Bilgiye Ulaşma"),
         ], caption="Russell'ın Bilgi Teorisi (Epistemoloji) Akış Şeması"))
+    )
+    ch6.pages.append(
+        ChapterPage()
         .add_callout(Callout("caution", "Din ve Siyaset Eleştirisi",
             "Bir ateist olan Russell, <b>'Neden Hristiyan Değilim'</b> adlı kitabında Tanrı'nın varlığına dair "
             "delilleri çürütmeye çalışmış; dinin akla değil 'korkuya' dayandığını ve ilerlemeye engel "
@@ -534,6 +549,9 @@ def get_pack() -> CoursePack:
         ChapterPage()
         .add_terms(ch7.key_terms)
         .add_person(KIERKEGAARD)
+    )
+    ch7.pages.append(
+        ChapterPage()
         .add_block(BulletBlock(1, "Nesnel ve Öznel Doğrular", [
             "Kierkegaard'a göre inanmak ve sorgulamak birbirine düşman iki eylemdir. <b>Nesnel doğrular</b> "
             "herkesçe kabul edilen dışsal gerçeklerdir (ör. 2×2=4); ancak insan ruhunu doyurma noktasında "
@@ -550,9 +568,6 @@ def get_pack() -> CoursePack:
                 ["Dindarlar", "Dini öznel bir doğru olarak kabul eder; inanç onlar için içsel, tutkulu bir yaşantıdır."],
             ]
         ))
-    )
-    ch7.pages.append(
-        ChapterPage(continue_tag="Varoluşun Aşamaları ve İman Şövalyesi")
         .add_flow(FlowDiagram([
             FlowStep("Estetik Aşama", "Haz arayışı; beraberinde can sıkıntısı gelir"),
             FlowStep("Etik Aşama", "Akılla 'doğru-yanlış' (ahlaki görev) ayrımı"),
@@ -566,6 +581,9 @@ def get_pack() -> CoursePack:
         .add_callout(Callout("insight", "Kritik Odak: İman Şövalyesi",
             "Aklın sınırlarına ve içindeki şüpheye rağmen inanmaya devam eden birey, Kierkegaard'a göre en "
             "üstün ve gerçek dindarlık formu olan <b>'İman Şövalyesi'</b> mertebesine ulaşır."))
+    )
+    ch7.pages.append(
+        ChapterPage()
         .add_terms([
             KeyTerm("Dasein (Orada-Varlık)", "Heidegger'e göre insanın dünyadaki bulunuş hali ve kendi varlığını anlayıp anlamlandırabilme kapasitesi."),
             KeyTerm("Kötü Niyet", "Sartre'ın felsefesinde, insanın kendi özgürlüğünden ve bu özgürlüğün getirdiği ağır sorumluluktan kaçma eğilimi."),
@@ -579,10 +597,10 @@ def get_pack() -> CoursePack:
             "Fenomenoloji, varoluşçuluk, hermeneutik, yapısalcılık ve eleştirel teori gibi akımlar bu dönemin "
             "belirleyici unsurlarıdır.",
         ]))
+        .add_person_row([HUSSERL, HEIDEGGER])
     )
     ch7.pages.append(
-        ChapterPage(continue_tag="Fenomenoloji ve Varoluşçuluk: Husserl'den Camus'ye")
-        .add_person_row([HUSSERL, HEIDEGGER])
+        ChapterPage()
         .add_block(BulletBlock(4, "Fenomenoloji: Bilincin Özüne Dönüş", [
             "Husserl tarafından geliştirilen fenomenolojinin temel görevi, nesnelerin bilince nasıl "
             "göründüğünü (deneyimin özünü) incelemektir. Felsefenin kesin bilgiye ulaşabilmesi için "
@@ -605,7 +623,7 @@ def get_pack() -> CoursePack:
         ]))
     )
     ch7.pages.append(
-        ChapterPage(continue_tag="Camus ve Absürdizm")
+        ChapterPage()
         .add_block(BulletBlock(7, "Camus: Uyumsuzluk ve Başkaldırı", [
             "Camus, varoluşçuluğa 'absürdizm' (uyumsuzluk) kavramını katmıştır: insanın derin anlam arayışı "
             "ile dünyanın ona verdiği anlamsız sessizlik arasında kesin bir uyumsuzluk vardır ve işte bu "

@@ -150,6 +150,9 @@ def get_pack() -> CoursePack:
         ChapterPage()
         .add_terms(ch1.key_terms)
         .add_person(COMTE)
+    )
+    ch1.pages.append(
+        ChapterPage()
         .add_block(BulletBlock(1, "Hayatı ve Entelektüel Kökleri", [
             "Katolik bir ailede yetişmiş; 14 yaşında kiliseden ayrılmış, bu ailesinin büyük tepkisini çekmiştir.",
             "Politeknik Okulu'nda (École Polytechnique) okumuş; pozitivizmin kurucusu sayılan Saint-Simon ile "
@@ -162,9 +165,6 @@ def get_pack() -> CoursePack:
             "Öğretmenin ham dikte notlarında Comte'un doğum yılı yanlışlıkla '1989 – Fransa' olarak "
             "geçmişti; bu, Comte'un 1857'de öldüğü bilgisiyle çelişir (1989 kronolojik olarak imkânsızdır). "
             "Doğrusu <b>1798'dir</b> ve bu kitapta düzeltilmiş haliyle kullanılmıştır."))
-    )
-    ch1.pages.append(
-        ChapterPage(continue_tag="Üç Hal Yasası, İnsanlık Dini ve Schopenhauer")
         .add_flow(FlowDiagram([
             FlowStep("Teolojik Aşama", "Her şey Tanrı/tanrısal güçlerle açıklanır"),
             FlowStep("Metafizik Aşama", "Tanrılar devre dışıdır; hak, hukuk, eşitlik gibi soyut kavramlarla açıklanır"),
@@ -176,13 +176,13 @@ def get_pack() -> CoursePack:
             "Bu dinin ibadethaneleri üniversiteler, din adamları ise bilim insanlarıdır; Yüce Varlık, Büyük "
             "Fetiş ve Büyük Ortam bu dinin sembolik unsurlarıdır.",
         ]))
+    )
+    ch1.pages.append(
+        ChapterPage()
         .add_callout(Callout("insight", "Kritik Odak: Comte'un 'Dini' Neyi Kastediyor?",
             "Comte'un 'din' derken kastettiği tanrı inancı değil, bilimi merkeze alan ahlaki/toplumsal bir "
             "örgütlenme biçimidir — sınavlarda bu ayrım sıkça karıştırılır."))
         .add_person(SCHOPENHAUER)
-    )
-    ch1.pages.append(
-        ChapterPage(continue_tag="Schopenhauer: İrade ve Kötümserlik")
         .add_block(BulletBlock(3, "İrade, Acı ve Negatif Hedonizm", [
             "Felsefesinin temelini insanın içsel arzuları ve iradesi oluşturur: <b>'Çok mutsuz olmanın en "
             "güvenilir yolu, mutlu olmayı istememektir.'</b>",
@@ -199,6 +199,9 @@ def get_pack() -> CoursePack:
             "Yalnızlık her insanın temel bir ihtiyacıdır; mutluluk, kendini keşfetmek ve acıdan kaçınmakla "
             "mümkündür.",
         ]))
+    )
+    ch1.pages.append(
+        ChapterPage()
         .add_table(ComparisonTable(
             "Karşılaştırma: Comte ve Schopenhauer",
             ["Ölçüt", "Auguste Comte", "Arthur Schopenhauer"],
@@ -240,7 +243,7 @@ def get_pack() -> CoursePack:
         ]))
     )
     ch2.pages.append(
-        ChapterPage(continue_tag="Darwin'in Kanıtları")
+        ChapterPage()
         .add_callout(Callout("caution", "Notlardaki Bir Hata: Beagle Seferi ve Soy Karışıklığı",
             "Ham notlarda Beagle seferinin yaş sırası belirsizdi ('22 yaşında İngiltere'ye dönmüş' gibi "
             "yazılmıştı); doğrusu Darwin <b>22 yaşında yola çıkmış, 5 yıl sonra dönmüştür</b>. Ayrıca "
@@ -257,9 +260,6 @@ def get_pack() -> CoursePack:
             "seçilime ilham kaynağı olmuş; Thomas Malthus'un <b>Nüfus İlkesi Üzerine Bir Deneme</b> adlı "
             "eseri Darwin'e evrimin nasıl gerçekleştiğine dair açıklayıcı bir çerçeve sunmuştur.",
         ]))
-    )
-    ch2.pages.append(
-        ChapterPage(continue_tag="Sigmund Freud ve Psikanaliz")
         .add_person(FREUD)
         .add_block(BulletBlock(3, "Zihnin Yapısı", [
             "İnsanların ihtiyaçları/içgüdüleriyle çevrenin dayattıkları arasında bir gerilim olduğunu savunur; "
@@ -269,6 +269,9 @@ def get_pack() -> CoursePack:
             "ilkesi</b>, haz ilkesini dengelemeye başlar; çevrenin ahlaki beklentileri içimizde yer edip "
             "<b>süperego</b>yu (üst-ben) oluşturur.",
         ]))
+    )
+    ch2.pages.append(
+        ChapterPage()
         .add_callout(Callout("caution", "Notlardaki Bir Hata: İd ile Haz İlkesi",
             "Ham notlarda \"'O' ya da Haz ilkesi\" ifadesi İd (O) ile haz ilkesini eş anlamlıymış gibi "
             "sunuyordu; doğrusu <b>haz ilkesi, İd'in çalışma prensibidir, İd'in kendisi değildir</b> — bu "
@@ -281,9 +284,6 @@ def get_pack() -> CoursePack:
                 ["Koridor", "Bilinçdışı — bastırılmaya çalışılan düşünceler; geçişi 'yansıtma' denen savunma mekanizması kontrol eder."],
             ]
         ))
-    )
-    ch2.pages.append(
-        ChapterPage(continue_tag="Serbest Çağrışım ve Karşılaştırma")
         .add_block(BulletBlock(4, "Serbest Çağrışım ve Travma", [
             "İnsan bir konuyu ne kadar çok unutmak isterse, o konuyu o kadar çok düşünür (bastırma "
             "paradoksu) — Freud bu yüzden <b>serbest çağrışım</b> yöntemini geliştirmiştir.",
@@ -298,6 +298,9 @@ def get_pack() -> CoursePack:
                 ["Döneme etkisi", "Kutsal kitaplardaki 'türler değişmez' görüşünü sarsar.", "İnsanın kendi aklına tam hakim olduğu görüşünü sarsar."],
             ]
         ))
+    )
+    ch2.pages.append(
+        ChapterPage()
         .add_summary("Darwin, türlerin doğal seçilim yoluyla ortak bir atadan evrildiğini göstererek insanın "
             "doğadaki konumunu; Freud ise davranışlarımızın büyük ölçüde bilinçdışı, akıl dışı dürtülerce "
             "yönetildiğini göstererek insanın kendi aklına hakimiyeti konusundaki güvenini sarsmıştır.")
@@ -327,6 +330,9 @@ def get_pack() -> CoursePack:
             "insan deneyimini, anlamı, dili ve toplumu daha derinlemesine ele alan yaklaşımlar (fenomenoloji, "
             "varoluşçuluk, hermeneutik, yapısalcılık, postyapısalcılık gibi) bu dönemde gelişmiştir.",
         ]))
+    )
+    ch3.pages.append(
+        ChapterPage()
         .add_table(ComparisonTable(
             "Karşılaştırma: Analitik Felsefe – Kıta Felsefesi",
             ["Ölçüt", "Analitik Felsefe", "Kıta Felsefesi"],
@@ -337,9 +343,6 @@ def get_pack() -> CoursePack:
                 ["İçerdiği akımlar", "Mantıksal atomculuk, dil felsefesi.", "Fenomenoloji, varoluşçuluk, hermeneutik, postyapısalcılık."],
             ]
         ))
-    )
-    ch3.pages.append(
-        ChapterPage(continue_tag="Bertrand Russell'ın Hayatı")
         .add_person(RUSSELL)
         .add_block(BulletBlock(2, "Hayatı ve Aktivist Kişiliği", [
             "İngiliz, hümanist bir filozoftur: <b>'Düşüncelerim için ölmeyi göze almam, çünkü yanılıyor "
@@ -350,14 +353,14 @@ def get_pack() -> CoursePack:
             "Bertrand Russell Barış Vakfı'nı ve Atlantik Vakfı'nı kurmuş; ABD'nin Vietnam'a saldırısına karşı "
             "çıkarak Uluslararası Savaş Suçları Mahkemesi'ni toplamıştır.",
         ]))
+    )
+    ch3.pages.append(
+        ChapterPage()
         .add_callout(Callout("caution", "Notlardaki Bir Hata: İki Ayrı Ödül",
             "Ham notlarda '1949'da... liyakat nişanı almış... nedeniyle Nobel Edebiyat Ödülü'nü almış' "
             "yazıyordu; bu, iki ayrı ödülü tek bir olay gibi sunuyordu. Doğrusu: Russell <b>1949'da Order of "
             "Merit</b> (Liyakat Nişanı), <b>1950'de ise</b> insan hakları ve özgür düşünce üzerine yazdığı "
             "yazıları nedeniyle <b>Nobel Edebiyat Ödülü'nü</b> ayrı ayrı kazanmıştır."))
-    )
-    ch3.pages.append(
-        ChapterPage(continue_tag="Russell'ın Felsefi Katkıları")
         .add_block(BulletBlock(3, "Russell'ın Felsefesinin Temel Başlıkları", [
             "<b>Mantıksal atomculuk:</b> dil ve dünya arasında yapısal bir benzerlik vardır. 'Bir insanın neyi "
             "kastettiğini anlamak için, neyi söylediğine değil, nasıl söylediğine bak.'",
@@ -414,7 +417,7 @@ def get_pack() -> CoursePack:
         ))
     )
     ch4.pages.append(
-        ChapterPage(continue_tag="İman Şövalyesi'ne Giden Üç Aşama")
+        ChapterPage()
         .add_flow(FlowDiagram([
             FlowStep("Estetik Aşama", "Haz arayışı; beraberinde can sıkıntısı gelir"),
             FlowStep("Etik Aşama", "Eylemleri doğru-yanlış diye ayırma"),
@@ -439,6 +442,9 @@ def get_pack() -> CoursePack:
             "Dindar bir insan inancına karşı şüphe duymalıdır — Kierkegaard'a göre asıl dindarlık, şüpheye "
             "rağmen inanmaya devam etmektir. Bu, sınav sorularında en çok karıştırılan noktadır: dindarlık, "
             "şüphenin yokluğu değil, <b>şüpheye rağmen sürdürülen inançtır.</b>"))
+    )
+    ch4.pages.append(
+        ChapterPage()
         .add_summary("Kierkegaard, doğruyu nesnel ve öznel olarak ikiye ayırarak inancın öznel bir doğru "
             "olduğunu savunur; insanın gerçek dindarlığa (iman şövalyeliğine) ulaşması için estetik, etik ve "
             "dinsel aşamalardan geçip son aşamada aklı bir kenara bırakarak 'inanç sıçraması' yapması "
@@ -463,15 +469,15 @@ def get_pack() -> CoursePack:
         ChapterPage()
         .add_terms(ch5.key_terms)
         .add_person_row([HUSSERL, HEIDEGGER])
+    )
+    ch5.pages.append(
+        ChapterPage()
         .add_block(BulletBlock(1, "Husserl: Bilincin Deneyimi", [
             "Fenomenoloji, Husserl tarafından geliştirilmiştir. Felsefenin görevi, nesnelerin bilince nasıl "
             "göründüğünü, yani deneyimin özünü incelemektir. <b>Fenomenolojik indirgeme</b> adlı yöntem: "
             "önyargılardan sıyrılarak yalnızca bilincin deneyimine odaklanmak — felsefe kesin bilgiye ancak "
             "bu yolla ulaşır.",
         ]))
-    )
-    ch5.pages.append(
-        ChapterPage(continue_tag="Heidegger: Dasein ve Varlık Sorusu")
         .add_block(BulletBlock(2, "Heidegger: Varlık Sorusu ve Dasein", [
             "Husserl'in öğrencisi olan Heidegger, fenomenolojiyi varlık sorusunu merkeze alarak yeniden "
             "şekillendirmiştir. İnsan, dünyada 'orada-varlık' (<b>Dasein</b>) olarak bulunur: kendi varlığına "
@@ -490,7 +496,7 @@ def get_pack() -> CoursePack:
         ))
     )
     ch5.pages.append(
-        ChapterPage(continue_tag="Varoluşçuluk: Sartre ve Camus")
+        ChapterPage()
         .add_person_row([SARTRE, CAMUS])
         .add_block(BulletBlock(3, "Sartre: Özgürlük ve Kötü Niyet", [
             "Fransız filozoftur. <b>'İnsan önce var olur, sonra kendi özünü kendi eylemleriyle oluşturur.'</b> "
@@ -505,6 +511,9 @@ def get_pack() -> CoursePack:
             "Bütün bu absürtlüğe rağmen insan hayatı anlamlandırmaya çalışmalı, yaşamı seçmelidir: <b>Sisifos "
             "Miti</b> — anlam olmasa bile mücadele devam eder.",
         ]))
+    )
+    ch5.pages.append(
+        ChapterPage()
         .add_table(ComparisonTable(
             "Karşılaştırma: Sartre – Camus",
             ["Ölçüt", "Jean-Paul Sartre", "Albert Camus"],
@@ -540,6 +549,9 @@ def get_pack() -> CoursePack:
         ChapterPage()
         .add_terms(ch6.key_terms)
         .add_person(NIETZSCHE)
+    )
+    ch6.pages.append(
+        ChapterPage()
         .add_block(BulletBlock(1, "Hayatı ve Entelektüel Dönüşümü", [
             "Ona göre yeryüzündeki bütün dinler ve politik görüşler insanoğlunun özgür gelişmesini engeller; "
             "bu yüzden hepsi yıkılmalıdır. 13 yaşındayken kötülük sorunu üzerine düşünmeye başlamıştır: "
@@ -558,9 +570,6 @@ def get_pack() -> CoursePack:
             "atın kırbaçlandığını görünce atın boynuna sarılıp 'Seni anlıyorum' demiş ve orada bayılmıştır. "
             "Gözünü bir akıl hastanesinde açmış, delirmiş ve 1900'de ölmüştür.",
         ]))
-    )
-    ch6.pages.append(
-        ChapterPage(continue_tag="Eleştiri, İnsan Tipleri ve Güç İstenci")
         .add_block(BulletBlock(3, "Eleştiri ve Üç İnsan Tipi", [
             "Felsefesinin özü eleştiridir — Kant'ı, Hegel'i, Schopenhauer'i, Katolik Hristiyanlığı, Avrupa "
             "kültürünü ve yürürlükteki değerleri eleştirir. Felsefesinin baş kahramanı insandır: insan bir "
@@ -571,6 +580,9 @@ def get_pack() -> CoursePack:
             FlowStep("Özgür İnsan", "Sürüden ayrılmış, dünyayı kendi gözleriyle görmek ister"),
             FlowStep("Trajik İnsan", "Geçmişini tüm yönleriyle kabul edip yaşamı olumlar"),
         ], caption="Nietzsche'ye Göre İnsan Tipleri"))
+    )
+    ch6.pages.append(
+        ChapterPage()
         .add_block(BulletBlock(4, "Güç İstenci ve Üstinsan", [
             "Yaşamda özgür olmanın, hiçbir şeye boyun eğmemenin tek yolu güç istemidir. Mutluluk hazda değil "
             "güçtedir — güç istemi herkeste bulunur: filozof ve bilim insanı için hakikatin izindedir, "
@@ -615,6 +627,9 @@ def get_pack() -> CoursePack:
         ChapterPage()
         .add_terms(ch7.key_terms)
         .add_person_row([BENTHAM, MILL])
+    )
+    ch7.pages.append(
+        ChapterPage()
         .add_block(BulletBlock(1, "Jeremy Bentham: Klasik Faydacılık", [
             "İngiliz filozof, hukukçu ve sosyal reformcudur; faydacılık felsefesinin kurucusudur. <b>En büyük "
             "mutluluk ilkesi:</b> en çok sayıda insan için en büyük mutluluğu sağlamak.",
@@ -623,9 +638,6 @@ def get_pack() -> CoursePack:
             "suçun topluma verdiği zarara göre şekillenmelidir. <b>Panoptikon</b> hapishane tasarımıyla "
             "tanınır.",
         ]))
-    )
-    ch7.pages.append(
-        ChapterPage(continue_tag="Mill'in Liberal Faydacılığı ve Karşılaştırma")
         .add_block(BulletBlock(2, "John Stuart Mill: Liberal Faydacılık", [
             "İngiliz filozof, ekonomist ve siyasetçidir; liberal düşüncenin öncülerindendir, Bentham'ın "
             "düşüncelerini geliştirmiştir. Bentham'dan farklı olarak hazlar arasında niteliksel bir ayrım "
@@ -648,7 +660,7 @@ def get_pack() -> CoursePack:
             "özgürlüğü de faydacı çerçeveye eklemiştir.")
     )
     ch7.pages.append(
-        ChapterPage(continue_tag="Karl Marx ve Tarihsel Maddecilik")
+        ChapterPage()
         .add_person(MARX)
         .add_block(BulletBlock(3, "Alt Yapı ve Üst Yapı", [
             "Marx, toplumda iki temel yapı olduğunu söyler: <b>alt yapı</b>, toplumdaki maddi, ekonomik ve "
@@ -666,9 +678,6 @@ def get_pack() -> CoursePack:
                 ["Üretici Güçler", "İnsanların sahip olduğu araç, gereç, aletler, makineler."],
             ]
         ))
-    )
-    ch7.pages.append(
-        ChapterPage(continue_tag="Sınıf Çatışması ve Komünist Manifesto")
         .add_block(BulletBlock(4, "Sınıf Çatışması ve Yabancılaşma", [
             "Marx'ın döneminde burjuvazi (kapitalistler) ile proletarya (işçiler) arasında bir çatışma vardır: "
             "'Bana ne iş yaptığını söyle, sana kim olduğunu söyleyeyim.' Nasıl çalıştığımız bilincimizi, "
@@ -676,6 +685,9 @@ def get_pack() -> CoursePack:
             "İşçi, başkası adına çalışarak kendi emeğine ve kendine <b>yabancılaşır</b>. Marx'a göre emek "
             "halkın kendisine aittir — bu düzende emeğe yabancılaşma yoktur.",
         ]))
+    )
+    ch7.pages.append(
+        ChapterPage()
         .add_block(BulletBlock(5, "Komünist Manifesto ve Proletarya Diktatörlüğü", [
             "Friedrich Engels ile birlikte <b>Komünist Manifesto</b>'yu yayımlamıştır. Avrupa'da bir "
             "'komünizm hayaleti' dolaşmaktadır; komünistler toplum düzenini zorla devirmeyi hedefler: işçi "

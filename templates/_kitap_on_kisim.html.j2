@@ -168,6 +168,15 @@
       </div>
     </div>
 
+  </div>
+  {{ bfooter(book, fm.guide) }}
+</section>
+
+{# Rehberin ikinci yarısı: 175x250mm'de 8 örnek tek sayfaya sığmıyor.
+   Sayfa sayısı build_kitap.py'deki FRONT_FIXED_PAGES ile birebir tutmalı. #}
+<section class="page body-page kitap">
+  {{ bband(book, "Sayfa Rehberi · Devam") }}
+  <div class="guide-grid">
     <div class="guide-item">
       <div class="guide-cap">Bölüm Özeti<span>Her bölümün sonundaki toparlama. Hızlı tekrarda tek başına okunabilir.</span></div>
       <div class="guide-demo">
@@ -220,7 +229,7 @@
   {% if book.guide_note %}
   <div class="imprint-note" style="margin-top:6mm;">{{ book.guide_note | safe }}</div>
   {% endif %}
-  {{ bfooter(book, fm.guide) }}
+  {{ bfooter(book, fm.guide + 1) }}
 </section>
 
 {# ---------------- 5. ANA İÇİNDEKİLER ---------------- #}

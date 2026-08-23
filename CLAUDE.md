@@ -27,14 +27,75 @@ oraya yapınca her iki çıktı birden düzelir.)
 Ayrıca tüm dersleri **tek bir cilt** halinde birleştiren ikinci bir çıktı
 vardır: `python build_kitap.py` (bkz. aşağıdaki "Birleşik Kitap" bölümü).
 
+## Sayfa boyutu, taşma payı ve kenar boşlukları (BASKI GEOMETRİSİ)
+
+Çıktı **A4 DEĞİLDİR**. Kitap kapağıyla eşleşen ölçü:
+
+| | |
+|---|---|
+| Bitmiş (trim) ölçü | **175 × 250 mm** |
+| Taşma payı (bleed) | **3 mm** (her kenar) — render/MediaBox 181 × 256 mm |
+| Üst / alt kenar | 16 mm / 19 mm (alt, sayfa numarası payı dahil) |
+| İç (sırt/gutter) / dış kenar | 22 mm / 16 mm — **ayna simetrik** |
+| Metin alanı | 137 × 215 mm |
+
+Ayna simetri: TEK sayfalar (1, 3, 5…) sağ yapraktır, sırtı SOLDADIR; çift
+sayfalarda tersi. PUR Amerikan cilt için iç kenar dıştan 6 mm geniştir.
+
+**Tek kaynak `build.py`'nin başındaki sabitlerdir** (`TRIM_W_MM`, `TRIM_H_MM`,
+`BLEED_MM`, `MARGIN_*_MM`, `ODD_PAGE_GUTTER`). `page_geometry_css()` bunlardan
+CSS değişkenlerini üretip `style.css`'in sonuna ekler; `style.css`'teki aynı
+adlı `:root` değerleri yalnızca varsayılandır. Ölçüyü değiştirecekseniz
+SADECE build.py'yi düzenleyin — sonra mutlaka:
+
+```bash
+python tools/kalibre.py        # sözlük/test/cevap sabitlerini yeniden ölçer
+python tools/dengele.py --hepsi   # bölüm sayfalarını yeni ölçüye göre dağıtır
+```
+
+Sırtın hangi tarafta olduğunu değiştirmek için tek satır yeter:
+`ODD_PAGE_GUTTER = "right"` (sağdan sola açılan cilt için).
+
+Bleed GEREKLİDİR: hem kapak gradyanı hem gövde sayfalarının `--paper` zemin
+tonu tam sayfayı kaplar (full-bleed). `pdfx.set_print_boxes()` PDF'e
+CropBox/BleedBox = 181×256 mm, **TrimBox = 175×250 mm** yazar; matbaa kesim
+yerini TrimBox'tan okur. (ArtBox bilerek yazılmaz — PDF/X bir sayfada
+TrimBox VEYA ArtBox ister, ikisini birden değil.)
+
+## Otomatik PDF/X-4 CMYK dönüşümü
+
+`build.py` ve `build_kitap.py`, PDF'i üretip yer imlerini ekledikten hemen
+sonra `pdfx.convert_or_warn()` çağırır: çıktı Ghostscript ile **RGB'den
+PDF/X-4 (DeviceCMYK)**'ya çevrilir. Ara RGB dosya geçici klasörde kalır ve
+silinir — kullanıcının elindeki `output/<slug>.pdf` doğrudan CMYK'dır.
+
+* **Ghostscript kurulu değilse build DURMAZ**: işletim sistemine göre kurulum
+  komutunu içeren net bir uyarı basılır ve dosya RGB bırakılır
+  (macOS `brew install ghostscript` · Ubuntu `sudo apt install ghostscript` ·
+  Windows ghostscript.com installer). Kurulu ama PATH'te değilse tam yolu
+  `DERS_GS` ortam değişkenine yazın.
+* **ICC çıktı profili**: `assets/icc/ISOcoated_v2_eci.icc` (FOGRA39) varsa o
+  kullanılır; yoksa Ghostscript'in genel `default_cmyk.icc`'sine düşülür ve
+  uyarı basılır. Profil eci.org'dan lisans onaylı indirilir, bkz.
+  `assets/icc/README.md`. Farklı bir yol için `DERS_ICC` ortam değişkeni.
+* Dönüşüm sonrası doğrulanır: sayfa sayısı korunuyor mu, çıktıda RGB nesne
+  kaldı mı, TrimBox duruyor mu, XMP'de PDF/X-4 kimliği var mı. Sayfa sayısı
+  değişirse dönüşüm iptal edilir ve RGB dosya bırakılır.
+
 ## Dizin yapısı
 
 ```
 ders_sistemi/
 ├── content_model.py       # Veri şeması (dataclass'lar) — API referansı aşağıda
-├── build.py                # TEK DERS: HTML üret → PDF'e render et → küçült → bookmark ekle
+├── build.py                # TEK DERS: HTML üret → PDF render → küçült → bookmark → kutular → CMYK
 ├── build_kitap.py          # BİRLEŞİK KİTAP: tüm dersleri tek ciltte birleştirir
+├── pdfx.py                 # BASKI ÖNCESİ: TrimBox/BleedBox + Ghostscript ile PDF/X-4 CMYK
 ├── theme_engine.py         # Sınırsız renk teması motoru (tek hex'ten tam tema üretir)
+├── tools/
+│   ├── olcum.py            # Her bloğun GERÇEK yüksekliğini (mm) Chromium'da ölçer
+│   ├── dengele.py          # Ölçüme göre ChapterPage bölünmelerini yeniden dağıtır
+│   └── kalibre.py          # Sözlük/Test/Cevap sayfa başına öğe sabitlerini kalibre eder
+├── assets/icc/             # FOGRA39 ("ISO Coated v2") ICC profili buraya konur (bkz. README)
 ├── kaynaklar/
 │   ├── ders_ozetleri/        # Görsel PDF sisteminin girdisi (bkz. Adım 0) — bu dosyadaki süreç bunu kullanır
 │   │   ├── sosyoloji-ozet.pdf
@@ -184,8 +245,9 @@ cd ders_sistemi && python3 build.py content.<ders_slug>
 Bu tek komut şunları otomatik yapar: HTML üretir → tutarlılık denetimi
 (`validate()`: bölüm numaraları ardışık mı, sözlük referansları geçerli mi,
 tekrar eden terim var mı) → Playwright ile PDF'e render eder → **her sayfanın
-gerçek render yüksekliğini A4 sınırıyla karşılaştırır** → PDF'e gerçek
-bookmark/outline ekler.
+gerçek render yüksekliğini 181×256mm sınırıyla karşılaştırır** → PDF'e gerçek
+bookmark/outline ekler → TrimBox/BleedBox yazar → Ghostscript ile PDF/X-4
+CMYK'ya çevirir → **toplam sayfa sayısını ve bitmiş ölçüyü konsola basar.**
 
 ### 5. Taşma çıktısını oku — bu adım ASLA atlanmaz
 Build çıktısı ya şunu verir:
@@ -197,10 +259,14 @@ ya da:
 [TAŞMA UYARISI] N sayfa A4 sınırını aşıyor -- içerik kesiliyor olabilir:
     - Sayfa (fiziksel sıra) X: ~Ymm taşma
 ```
-Taşma varsa PDF'i sayfa numarasına göre PNG'ye çevirip (`pdftoppm -png -r 100
--f X -l X output/<slug>.pdf output/preview/pgX`) görme aracıyla incele, hangi
-`ChapterPage`'in aşırı yüklü olduğunu belirle, o sayfanın içeriğini iki (gerekirse
-üç) `ChapterPage`'e böl, yeniden derle. "✓" görene kadar tekrarla. Asla taşma
+Taşma varsa **önce `python tools/dengele.py content.<slug>` çalıştır** — bu araç
+her bloğun gerçek yüksekliğini Chromium'da ölçer ve `ChapterPage`
+bölünmelerini taşmayacak EN AZ sayfaya, boşluğu sona iterek yeniden dağıtır
+(blokların içine ve sırasına dokunmaz, içerik uydurmaz). `--kuru` ile önce
+sadece raporlatabilirsin. Elle karar vermen gerekirse PDF'i sayfa numarasına
+göre PNG'ye çevirip (`pdftoppm -png -r 100 -f X -l X output/<slug>.pdf
+output/preview/pgX`) görme aracıyla incele, aşırı yüklü `ChapterPage`'i ikiye
+(gerekirse üçe) böl, yeniden derle. "✓" görene kadar tekrarla. Asla taşma
 uyarısını görmezden gelip devam etme — bu, üretilen PDF'in sessizce içerik
 kaybettiği anlamına gelir.
 
@@ -237,6 +303,12 @@ taşmadığı anlamına gelir. Bir sayfanın içeriği erken bitip altında büy
 alan kalması da ayrı bir kalite sorunudur (kağıt israfı, dağınık okuma
 deneyimi). Bu yüzden HER ders build edildikten sonra (taşma denetiminin hemen
 ardından, adım 6'daki görsel kontrolle birlikte) şunu yap:
+
+**Bu adımın otomatik hali `tools/dengele.py`'dir** — önce onu çalıştır, elle
+düzeltmeyi yalnızca onun ulaşamadığı yerlerde yap. `tools/olcum.py` de her
+sayfanın doluluk oranını ve içindeki blokların mm cinsinden yüksekliğini
+tablo halinde basar; "hangi bloğu taşısam?" sorusunu tahminle değil ölçümle
+cevaplamak için kullan.
 
 **HEDEF: %90-95 doluluk.** Bir bölümün/testin/cevap anahtarının **DEVAM
 sayfaları** — yani o bölümün/section'ın `ChapterPage`/sayfa listesinde İLK
@@ -529,28 +601,43 @@ def get_pack() -> CoursePack:
 ## Sayfalama sabitleri (build.py)
 
 ```python
-GLOSSARY_PER_PAGE = 18     # sözlük sayfası başına kavram (2 sütun x 9 satır)
-QA_PER_PAGE = 10           # LEGACY — soru-cevap sayfası başına madde
-DISTINCTIONS_PER_PAGE = 6  # LEGACY — ayrım kartı sayfası başına
-MATCHTABLE_PER_PAGE = 9    # LEGACY — eşleştirme tablosu sayfası başına
-TEST_PER_PAGE = 6          # test sayfası başına soru (2 sütunlu düzen, 5 seçenekli MCQ)
-ANSWER_PER_PAGE = 16       # cevap anahtarı sayfası başına çözüm (2 sütunlu düzen)
+GLOSSARY_PER_PAGE = 12     # sözlük sayfası başına kavram (2 sütun x 6 satır)
+QA_PER_PAGE = 3            # LEGACY
+DISTINCTIONS_PER_PAGE = 3  # LEGACY
+MATCHTABLE_PER_PAGE = 5    # LEGACY
+TEST_PER_PAGE_FIRST = 3    # ilk test sayfası (bilgi çubuğu + talimat kutusu var)
+TEST_PER_PAGE = 4          # test devam sayfaları
+ANSWER_PER_PAGE = 12       # cevap anahtarı sayfası başına çözüm
+TOC_ROWS_FIRST = 5         # İçindekiler ilk sayfası
+TOC_ROWS_REST = 6          # İçindekiler devam sayfaları
+OVERVIEW_PAGES = 2         # Genel Bakış SABİT iki sayfa
 ```
-Test ve Cevap Anahtarı bölümleri artık **2 sütunlu** düzende render edilir
+
+Bu değerler **175×250mm için `tools/kalibre.py` ile ÖLÇÜLDÜ**: her aday sayı
+10 dersin hepsinde render edilip taşma denetiminden geçirildi, taşmayan en
+büyük değer alındı. Tahminle değiştirmeyin — sayfa boyutu değişirse
+`python tools/kalibre.py` çalıştırıp bloğu yenileyin.
+
+Bölme işini `paginate_capped()` yapar, düz `paginate()` değil: önce gereken
+en az sayfa sayısını bulur, sonra öğeleri **dengeli** dağıtır. Böylece 30
+kavram `12+12+6` yerine `10+10+10` olur — son sayfa yarı boş kalmaz. Tek
+istisna İçindekiler'dir (`balanced=False`): bir kitabın içindekiler sayfası
+dolu başlayıp kısa bir taşmayla biter, ortadan ikiye bölünmüş iki yarım
+sayfa yanlış görünür.
+
+Test ve Cevap Anahtarı bölümleri **2 sütunlu** düzende render edilir
 (`templates/style.css` içinde `.tq-list`/`.ans-list` → `column-count: 2`,
 `column-fill: balance`; her madde `break-inside: avoid` ile bir sütunda
-bölünmeden kalır). Bu sayılar, tanım uzunluğu ortalama olduğunda güvenlik
-paylıdır. Bir ders alışılmadık uzun soru/cevap metinleri kullanıyorsa yine de
-`[TAŞMA UYARISI]` seni uyarır — o durumda sabiti küçültme, bunun yerine
-görsel olarak sayfanın gerçekten sığıp sığmadığını kontrol et.
-`TEST_PER_PAGE=6`, ilk test sayfasında (bilgi çubuğu + talimat kutusu
-yüzünden daha az yer var) taşmayı önlemek için TÜM test sayfalarına
-uygulanan tek bir sabittir — bu yüzden devam sayfalarında biraz boş alan
-kalması normaldir (7 denendiğinde bazı derslerde ilk sayfa taştı, bkz.
-"Bilinen tuzaklar" #7). Sözlüğün son sayfası kavram sayısı %20'nin altında
-kalacak kadar seyrekse (örn. 20 kavram → 18+2), ders içeriğinden gerçek,
-atlanmış birkaç kavram (önemli bir tarih, kişi, savaş adı vb.) daha
-ekleyerek dengele — bu hem daha iyi görünür hem sözlüğü zenginleştirir.
+bölünmeden kalır).
+
+**İçindekiler ve Genel Bakış artık çok sayfalıdır.** 175×250mm'de İçindekiler
+satırları (alt başlıklar iki satıra sardığı için ~21-31mm) ve Genel Bakış'ın
+dört bloğu (214-264mm) tek sayfaya sığmıyor. İçindekiler `ctx.toc_pages`
+üzerinden sayfalanır; Genel Bakış sabit ikiye bölünür (1. sayfa hero + 6
+kart, 2. sayfa çalışma akışı + sınav notu). Sayfa numaraları
+`compute_page_numbers()` içinde buna göre hesaplanır — bir dersin ön
+sayfaları artık sabit 3 değil, `1 + toc_page_count(pack) + OVERVIEW_PAGES`
+tanedir.
 
 ## Birleşik Kitap (`build_kitap.py`)
 
@@ -721,6 +808,45 @@ Bunlar `templates/style.css` içinde zaten düzeltilmiş durumda — sadece
     içindeki assert derhal patlar (harita sayfası ile toplam uyuşmaz) — bu
     kasıtlıdır, sessiz kaymaya izin verme.
 
+13. **Ghostscript'te `-dPDFX` PDF/X-3 kipidir, PDF/X-4 değil**: bu bayrak
+    `CompatibilityLevel`'ı zorla 1.3'e çeker ve saydamlığı düzleştirir.
+    Ölçüldü: aynı ders `-dPDFX` ile 23.7 MB / PDF 1.3 / ~5 dk, bayraksız
+    (`-dCompatibilityLevel=1.6` + PDFX_def.ps'teki `GTS_PDFXVersion` +
+    OutputIntent) 3.9 MB / PDF 1.6 / 22 sn. `pdfx.py` bilerek `-dPDFX`
+    KULLANMAZ; geri eklerseniz dosya şişer ve kapak gradyanları rasterleşir.
+
+14. **Ghostscript'in varsayılan görsel ayarları kapak gradyanını 22 dpi'a
+    düşürüyordu**: `pdfwrite`'ın downsample varsayılanları Chromium'un gömdüğü
+    tam sayfa rasterleri eziyor. `pdfx.py` bu yüzden `-dDownsample*Images=false`
+    ve `-d*ImageFilter=/FlateEncode` veriyor (kayıpsız). Bu satırları silmeyin.
+
+15. **PyMuPDF'in `set_xml_metadata()`'sı Ghostscript çıktısında sessizce
+    düşüyordu**: bellekte görünüyor, `save()` sonrası dosyada yok. PDF/X-4
+    kimliği (XMP `pdfxid:GTS_PDFXVersion`) bu yüzden pypdf ile yazılıyor
+    (`pdfx.write_pdfx_xmp`) ve hemen ardından dosyadan okunarak DOĞRULANIYOR.
+    pypdf varsayılan olarak `%PDF-1.3` başlığı yazdığı için
+    `writer.pdf_header = reader.pdf_header` satırı şart.
+
+16. **`page.pdf()`'e width/height vermek yerine `preferCSSPageSize: true`**:
+    elle ölçü verildiğinde Chromium sayfayı ~0.35mm büyütüp içeriği 0.26mm
+    sağa kaydırıyordu. `@page` kuralından okunduğunda içerik tam sol-üst
+    köşeye oturuyor; `pdfx.set_print_boxes()` kutuları levhanın SOL-ÜST
+    köşesinden ölçtüğü için TrimBox tam 175×250mm çıkıyor. (Chromium levhayı
+    yine ~0.02-0.12mm büyük üretir; MediaBox bu yüzden BleedBox'tan birkaç
+    yüzde mm büyüktür — bu normaldir, MediaBox'a dokunulmaz.)
+
+17. **Dar sayfada flex sütunlarında uzun kelimeler taşıyor**: 175mm'de 5
+    adımlı akış şemasında sütun ~22mm'ye düşüyor ve "Varoluşçuluğa" gibi
+    kelimeler kutunun dışına sarkıyordu (flex öğesi min-content'in altına
+    inemez). `.ov-flow-step` ve `.flowdiag .fstep` bu yüzden
+    `min-width: 0; overflow-wrap: break-word;` taşır — kaldırmayın.
+
+18. **`add_ayat()` başlığı artık opsiyoneldir**: uzun bir ayet grubu (Tefsir
+    II'de 279mm'ye kadar) tek sayfaya sığmadığında `tools/dengele.py` grubu
+    Ayah kartları arasından bölüyor; devam parçası `add_ayat(None, [...])`
+    olarak basılıyor ve şablondaki `{% if title %}` koruması sayesinde başlık
+    TEKRAR EDİLMİYOR (uydurma "devamı" başlığı üretilmiyor).
+
 ## Tasarım sistemi özeti (referans amaçlı — değiştirmen gerekmemeli)
 
 - Gövde fontu DejaVu Sans, başlıklar DejaVu Serif (kitap/akademik his).
@@ -746,8 +872,16 @@ Bunlar `templates/style.css` içinde zaten düzeltilmiş durumda — sadece
 ## Hızlı komut özeti
 
 ```bash
-# Tek dersi derle
+# Tek dersi derle (PDF/X-4 CMYK çıktı dahil)
 cd ders_sistemi && python3 build.py content.<slug>
+
+# Sayfa doluluğunu ölç / bölüm sayfalarını yeniden dağıt / sabitleri kalibre et
+python tools/olcum.py content.<slug>
+python tools/dengele.py content.<slug>     # --kuru = sadece raporla
+python tools/kalibre.py                    # sayfa boyutu değiştiyse
+
+# Ghostscript + ICC profili teşhisi
+python pdfx.py
 
 # TÜM dersleri tek kitap halinde derle (content/kitap.py'deki sıraya göre)
 python build_kitap.py
@@ -782,8 +916,10 @@ python3 theme_engine.py
 - [ ] 20 soruluk `test_questions` + eşleşen `answer_key_items` yazdım
       (LEGACY `distinctions`/`match_table`/`qa_items` DEĞİL)
 - [ ] `python3 build.py content.<slug>` çalıştırdım
-- [ ] "[TAŞMA UYARISI]" çıkmayana kadar sayfa böldüm (ya da TEST_PER_PAGE
-      taşıyorsa soru sayısını/sayfa dağılımını) ve yeniden derledim
+- [ ] "[TAŞMA UYARISI]" çıkmayana kadar `tools/dengele.py` çalıştırıp
+      yeniden derledim (gerekirse elle sayfa böldüm)
+- [ ] Konsoldaki "[SONUÇ] Bitmiş (trim) ölçü : 175 x 250 mm" satırını ve
+      PDF/X-4 CMYK dönüşümünün "✓" verdiğini gördüm
 - [ ] Kapak (yeni renk doğru mu?) + içindekiler + genel bakış + her bölüm
       ilk sayfası + en az bir tablo sayfası + sözlük son sayfası + test
       son sayfası + cevap anahtarı son sayfası görsel kontrol ettim

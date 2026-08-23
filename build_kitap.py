@@ -7,7 +7,7 @@ Kullanım:
     python build_kitap.py content.kitap  # (aynısı, açıkça)
 
 content/kitap.py'de listelenen derslerin hepsini TEK bir HTML'e dizip tek
-seferde A4 PDF'e render eder. build.py ile aynı şablon gövdesini
+seferde 175x250mm (+3mm bleed) PDF/X-4 CMYK dosyaya render eder. build.py ile aynı şablon gövdesini
 (_ders_govde.html.j2) ve aynı sayfalama fonksiyonlarını kullanır; tek fark,
 her derse bir SAYFA OFFSET'i verilmesidir:
 
@@ -38,9 +38,11 @@ from theme_engine import resolve_theme_css, generate_theme_vars_from_hex   # noq
 
 
 # --- Ön kısım sayfa düzeni ---------------------------------------------------
-FRONT_FIXED_PAGES = 4      # ana kapak + künye + önsöz + sayfa rehberi
-TOC_PER_PAGE = 11          # ana içindekilerde sayfa başına ders satırı
-                           # (10 ders -> tek sayfa; 14 ders -> dengeli 7+7)
+# 175x250mm'de "Sayfa Rehberi" 8 örneğiyle tek sayfaya sığmıyor (ölçüldü:
+# ~274mm / 215mm), bu yüzden 4+4 olarak iki sayfaya bölündü.
+FRONT_FIXED_PAGES = 5      # ana kapak + künye + önsöz + sayfa rehberi (2 sayfa)
+TOC_PER_PAGE = 6           # ana içindekilerde sayfa başına ders satırı
+                           # (satır ~24mm; 10 ders -> dengeli 5+5)
 
 
 def toc_chunks(courses: list) -> list[list]:
@@ -128,7 +130,8 @@ def build_front_matter(book, courses: list[dict], fm_pages: int) -> dict:
     chunks = toc_chunks(courses)
     fm = {
         "cover": 1, "imprint": 2, "preface": 3, "guide": 4,
-        "toc": 5, "map": 5 + len(chunks),
+        # rehber FRONT_FIXED_PAGES-3 sayfa tutar (şu an 2: s.4 ve s.5)
+        "toc": FRONT_FIXED_PAGES + 1, "map": FRONT_FIXED_PAGES + 1 + len(chunks),
         "toc_chunks": chunks,
         "total": fm_pages,
         "stats": {
@@ -229,7 +232,7 @@ def verify_page_numbers(courses: list[dict], pdf_path: Path, fm: dict):
 
 def build_book(module_name: str = "content.kitap"):
     book = importlib.import_module(module_name).get_book()
-    css = (B.TEMPLATES / "style.css").read_text(encoding="utf-8")
+    css = B.load_css()
 
     fm_pages = front_matter_page_count(len(book.course_modules))
     courses = collect_courses(book, offset=fm_pages, css=css)
@@ -264,9 +267,11 @@ def build_book(module_name: str = "content.kitap"):
     B.optimize_pdf(pdf_path)
     verify_page_numbers(courses, pdf_path, fm)
     n = add_book_bookmarks(pdf_path, courses, fm)
+    B.finalize_for_print(pdf_path, B.strip_tags(book.title))
     size_mb = pdf_path.stat().st_size / 1024 / 1024
     print(f"[kitap] Yer imi ağacı: {n} girdi ({len(courses)} ders düğümü + alt başlıklar)")
     print(f"[kitap] PDF üretildi: {pdf_path} ({size_mb:.1f} MB)")
+    B.report_page_count(pdf_path)
     return pdf_path
 
 

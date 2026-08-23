@@ -148,6 +148,9 @@ def get_pack() -> CoursePack:
             "<b>Yassıçimen (Erzincan):</b> Hârezmşâhların, Selçuklu ve Eyyubî ittifak ordusuna karşı varlık "
             "yokluk mücadelesi verip yıkıma sürüklendiği ovadır.",
         ]))
+    )
+    ch1.pages.append(
+        ChapterPage()
         .add_person(ANUSTEGIN)
         .add_block(BulletBlock(2, "Köken, Kuruluş ve Hânedanlar", [
             "Hârezm bölgesine hâkim olan veya burayı idare eden yöneticilere <b>\"Hârezmşâh\"</b> unvanı "
@@ -157,9 +160,6 @@ def get_pack() -> CoursePack:
             "Devletin fiilî kuruluşu <b>1097</b>'de, Selçuklu Sultanı Berkyaruk zamanında Anûştegin'in oğlu "
             "<b>Kutbeddîn Muhammed</b>'in Hârezmşâh tayin edilmesiyle gerçekleşmiştir.",
         ]))
-    )
-    ch1.pages.append(
-        ChapterPage()
         .add_table(ComparisonTable(
             "Hârezmşâh Unvanını Taşıyan Dört Dönem",
             ["Hânedan", "Dönemi ve Niteliği"],
@@ -170,6 +170,9 @@ def get_pack() -> CoursePack:
                 ["Hârezmşâhlar Devleti", "1097–1231; İslam tarihine damga vuran asıl hânedan."],
             ]
         ))
+    )
+    ch1.pages.append(
+        ChapterPage()
         .add_person(ATSIZ)
         .add_block(BulletBlock(3, "Siyasi Gelişim: Atsız ve İl-Arslan Dönemleri", [
             "Atsız'ın Cend ve Mangışlak'ı ele geçirip nüfuzunu artırması, Sultan Sencer'in <b>1138</b>'de "
@@ -210,6 +213,9 @@ def get_pack() -> CoursePack:
             "<b>1194:</b> Tekiş'in Irak Selçuklularını ortadan kaldırması.",
             "<b>1218:</b> Otrar Faciası. — <b>1230:</b> Ahlat kuşatması ve Yassıçimen bozgunu.",
         ]))
+    )
+    ch1.pages.append(
+        ChapterPage()
         .add_table(ComparisonTable(
             "Medeniyet ve Kurumlar: Hârezmşâh İdarî, Askerî ve Adlî Teşkilatı",
             ["Kurum / Makam", "Görev ve Açıklaması"],
@@ -222,9 +228,6 @@ def get_pack() -> CoursePack:
                 ["Örfî Mahkemeler", "Asayişi bozanları ve kanunlara itaat etmeyenleri cezalandıran dünyevi mahkemeler."],
             ]
         ))
-    )
-    ch1.pages.append(
-        ChapterPage()
         .add_block(BulletBlock(6, "İlim, Kültür ve Tasavvuf Hayatı", [
             "XII. yüzyılda Hârezm'de ilim ve sanat büyük bir gelişme göstermiş; başkent <b>Gürgenç</b> ve Merv, "
             "Horasan'ın büyük şehirleriyle boy ölçüşecek seviyeye gelmiştir.",
@@ -235,6 +238,9 @@ def get_pack() -> CoursePack:
             "<b>Mimari:</b> Moğol fırtınası yüzünden günümüze yalnızca Aksaray-ding kümbeti ile Gürgenç'teki "
             "Fahreddîn Râzî ve Sultan Tekiş kümbetleri kalabilmiştir.",
         ]))
+    )
+    ch1.pages.append(
+        ChapterPage()
         .add_callout(Callout("insight", "Kritik Çıkarım",
             "Hârezmşâhlar, İslam dünyası ile Orta Asya stepleri arasında güçlü bir kültürel, ticari ve askerî "
             "<b>kalkan (tampon)</b> vazifesi görmüşlerdir. Ancak Sultan Alâeddin'in diplomatik kibri ve "
@@ -278,6 +284,9 @@ def get_pack() -> CoursePack:
             "hiç boşalmayan yaşlı kadına \"Ana, dolu!\" denmesiyle adın türediğine inanılır — Anadolu'nun "
             "şefkat, bereket ve misafirperver bir <b>ana</b> figürüyle özdeşleştirilmesidir.",
         ]))
+    )
+    ch2.pages.append(
+        ChapterPage()
         .add_block(BulletBlock(2, "Arap-İslam Fetihleri Dönemi", [
             "Müslümanların Anadolu'ya gelişi Selçuklulardan yüzyıllar önce başlamıştır. Emevîler döneminde hızlı "
             "İslamlaştırma yerini <b>yıpratma savaşlarına</b> bırakmış; sert iklim ve coğrafyayı aşmak için "
@@ -287,9 +296,6 @@ def get_pack() -> CoursePack:
             "Ancak Abbâsîler bölgeyi yalnızca askerî harekât sahası olarak kullanmış, kalıcı bir <b>iskân "
             "(yerleşim)</b> politikası gütmedikleri için tam bir İslamlaşma sağlanamamıştır.",
         ]))
-    )
-    ch2.pages.append(
-        ChapterPage()
         .add_block(BulletBlock(3, "Zaman Çizelgesi: Anadolu'ya Yönelik İslam ve Türk Akınları", [
             "<b>634–636:</b> Hz. Ömer dönemi Ecnâdeyn ve Yermük zaferleriyle Suriye/Filistin fethedilmiş, "
             "Bizans Toros Dağları'nın gerisine püskürtülerek doğal sınır oluşturulmuştur.",
@@ -304,6 +310,9 @@ def get_pack() -> CoursePack:
             "<b>1071:</b> <b>Malazgirt Meydan Muharebesi</b> ve Anadolu kapılarının Türklere kesin olarak açılması.",
         ]))
         .add_person(CAGRI_BEY)
+    )
+    ch2.pages.append(
+        ChapterPage()
         .add_callout(Callout("focus", "Dikkat / Püf Noktası: Çağrı Bey'in Raporu ve Vur-Kaç Taktiği",
             "Türklerin Anadolu'ya sistemli yönelişindeki en önemli kırılma, 1018'deki uzun soluklu keşif "
             "seferidir. Ağır zırhlı Bizans piyadeleri karşısında mobil atlı okçuların <b>vur-kaç</b> taktikleri "
@@ -348,15 +357,15 @@ def get_pack() -> CoursePack:
             "harap şehirleri yeniden imar etmiş, kervansaraylar kurarak ticareti ve tarımı (pamuk, pirinç) "
             "canlandırmışlardır.",
         ]))
+    )
+    ch2.pages.append(
+        ChapterPage()
         .add_flow(FlowDiagram([
             FlowStep("Muhaceret", "Moğol istilasından kaçan Türk-Müslüman kitleler sığınır"),
             FlowStep("Alp + Gazâ Sentezi", "Savaşçı 'alp' ruhu mücahit anlayışıyla birleşir"),
             FlowStep("Derviş Diplomasisi", "Sıcak sosyal-ticari ilişkiler, kiliselerin camiye dönüşü"),
             FlowStep("Kalıcı İslamlaşma", "Adil vergi sistemi Hristiyan ahaliyi entegre eder"),
         ], caption="İslamlaşma Dinamiği: Kılıçtan Çok İskân, Ticaret ve Tasavvuf"))
-    )
-    ch2.pages.append(
-        ChapterPage()
         .add_table(ComparisonTable(
             "Manevi Fatihler: Anadolu'nun Dinî ve Sosyal Mimarları",
             ["Zümre", "Akademik / Kavramsal Açıklama"],
@@ -373,6 +382,9 @@ def get_pack() -> CoursePack:
             "adaleti sağlaması, dervişlerin tekke/zaviyeler üzerinden inşa ettiği sosyal rehabilitasyon ve "
             "Bizans'ın ağır vergilerinden bunalan yerli halkın hoşgörülü Selçuklu sistemine gösterdiği uyum "
             "sayesinde kalıcı bir medeniyet inşası gerçekleşmiştir."))
+    )
+    ch2.pages.append(
+        ChapterPage()
         .add_summary("Anadolu, Grekçe \"doğu\" anlamındaki Anatole'den adını alan bir Bizans temasından, "
             "Emevî-Abbâsî akınlarıyla tanışıp Çağrı Bey'in 1018 raporu ve 1071 Malazgirt zaferiyle Türklere "
             "açılmıştır. Malazgirt sonrası kılıç hakkı olarak dağıtılan iktâlarla kurulan Birinci Beylikler, "
@@ -399,6 +411,9 @@ def get_pack() -> CoursePack:
         ChapterPage()
         .add_terms(ch3.key_terms)
         .add_person_row([ZENGI, SELAHADDIN])
+    )
+    ch3.pages.append(
+        ChapterPage()
         .add_block(BulletBlock(1, "Coğrafi ve Tarihsel Bağlam: Zengîler ve Eyyûbîler Mirası", [
             "Orta Doğu (Mısır, Suriye ve Cezîre) coğrafyasında Haçlılar ve Moğollara karşı İslam dünyasını "
             "savunan Türk-İslam devletleri, birbirinin içinden doğan <b>kesintisiz bir tarihsel silsile</b> "
@@ -409,9 +424,6 @@ def get_pack() -> CoursePack:
             "<b>Eyyûbîler (1171–1462):</b> Aile kökeni Arap-Kürt-Türk karışımı olsa da, <b>yönetim şekli ve "
             "komuta kadrosu bakımından tam bir Türk devleti</b> niteliğindedir.",
         ]))
-    )
-    ch3.pages.append(
-        ChapterPage()
         .add_callout(Callout("focus", "Dikkat / Püf Noktası: Hıttin Savaşı (1187)",
             "Eyyûbîler tarihinin en önemli kırılma noktası, Selâhaddin Eyyûbî'nin Haçlı ordusunu büyük bir "
             "bozguna uğrattığı <b>Hıttin Savaşı</b>'dır. I. Haçlı Seferi (1099) ile kaybedilen <b>Kudüs</b>, "
@@ -431,6 +443,9 @@ def get_pack() -> CoursePack:
             FlowStep("Şecerüddürr", "Tahta bir kadın sultan çıkarılır"),
             FlowStep("Aybek ve Yeni Çağ", "Şecerüddürr saltanattan feragat eder, Memlükler Çağı başlar"),
         ], caption="İktidar Değişimi (1250): Eyyûbî Yönetiminin Sonu"))
+    )
+    ch3.pages.append(
+        ChapterPage()
         .add_table(ComparisonTable(
             "Memlük Devletinin İki Dönemi",
             ["Dönem", "İsim ve Etimolojik Kökeni", "Etnik Yapı"],
@@ -444,9 +459,6 @@ def get_pack() -> CoursePack:
             "<b>uygulanmamış</b>; orduda yetişen ve gücü elinde bulunduran <b>\"en güçlü emîrler\"</b> arasından "
             "çıkan kişiler sultan olmuştur."))
         .add_person(BAYBARS)
-    )
-    ch3.pages.append(
-        ChapterPage()
         .add_block(BulletBlock(3, "İslam Dünyasının Kaderini Değiştiren Üç Başarı", [
             "<b>Moğol İlerleyişinin Durdurulması (1260):</b> Komutan <b>Kutuz</b> idaresindeki Memlük ordusu, "
             "<b>Aynicâlût Savaşı</b>'nda Moğollara tarihî bir mağlubiyet yaşatarak onların Orta Doğu'daki "
@@ -457,6 +469,9 @@ def get_pack() -> CoursePack:
             "<b>Haçlı Varlığının Kesin Sonu (1291):</b> Sultan <b>el-Melikü'l-Eşref Halîl</b>, Akkâ kalesini ele "
             "geçirerek bölgedeki iki asırlık Haçlı işgaline tamamen son vermiştir.",
         ]))
+    )
+    ch3.pages.append(
+        ChapterPage()
         .add_block(BulletBlock(4, "Zaman Çizelgesi: Zengîlerden Memlüklere Kritik Olaylar", [
             "<b>1144:</b> İmâdüddin Zengî'nin Urfa'yı Haçlılardan geri alması.",
             "<b>1171:</b> Şîrkûh ve Selâhaddin Eyyûbî'nin Mısır'daki Fâtımî hilafetine son vermesi.",
@@ -512,10 +527,10 @@ def get_pack() -> CoursePack:
             FlowStep("Açık Kapı", "Hindistan mülteci kitlelere kapılarını açar"),
             FlowStep("Kültürel Sıçrama", "Türk/Müslüman nüfus ve birikim muazzam artar"),
         ], caption="Demografik Dönüşüm: Felaketin Avantaja Çevrilmesi"))
-        .add_person(AYBEG)
     )
     ch4.pages.append(
         ChapterPage()
+        .add_person(AYBEG)
         .add_block(BulletBlock(2, "Delhi Sultanlığı (1206–1526): Türk Hâkimiyetinin Kökleşmesi", [
             "Gûrluların Hindistan'daki fetihlerinin ardından bölgedeki kontrolü sağlayan Kutbeddîn Aybeg, "
             "1206'da Delhi merkezli bağımsız bir devletin temellerini atmış; bu sultanlık üç asırdan uzun süre "
@@ -527,6 +542,9 @@ def get_pack() -> CoursePack:
             "dünyasının en önemli ilim ve kültür merkezlerinden biri hâline getirilmiştir.",
         ]))
         .add_person(BABUR)
+    )
+    ch4.pages.append(
+        ChapterPage()
         .add_block(BulletBlock(3, "Bâbürlüler İmparatorluğu (1526–1858): İhtişamın Zirvesi", [
             "<b>Zirve Dönemleri:</b> İmparatorluk, bilhassa mimariye büyük önem veren <b>Şah Cihan</b> ve "
             "sınırları en uç noktalara taşıyan oğlu <b>Evrengzib (Âlemgîr)</b> dönemlerinde altın çağını "
@@ -591,6 +609,9 @@ def get_pack() -> CoursePack:
             "<b>Bağdat:</b> 1258'de Hülâgû tarafından yerle bir edilerek 500 yıllık Sünnî Abbâsî hilafetinin sona "
             "erdirildiği, nehirlerinden günlerce mürekkep aktığı söylenen ilim başkenti.",
         ]))
+    )
+    ch5.pages.append(
+        ChapterPage()
         .add_block(BulletBlock(2, "Kavramsal Kökler: \"Moğol\" mu, \"Tatar\" mı?", [
             "Başlangıçta hem Moğol hem Türk toplulukları arasında <b>ayrı birer boy adı</b> olan \"Tatar\" "
             "(Orhon yazıtlarında Otuz Tatar, Tokuz Tatar), Çinliler tarafından Moğolca konuşan tüm boyları "
@@ -605,9 +626,6 @@ def get_pack() -> CoursePack:
             FlowStep("Türk Çoğunluk", "İmparatorluk nüfusunun çoğunluğu Kıpçak ve Uygur Türkleridir"),
             FlowStep("Türk Kimliği", "Moğollar bu kitlede erir; 'Tatar' bir Türk boyunun adı olur"),
         ], caption="\"Tatar\" Kimliğinin Türkleşmesi: Bir İsmin Sahip Değiştirmesi"))
-    )
-    ch5.pages.append(
-        ChapterPage()
         .add_table(ComparisonTable(
             "Karşılaştırmalı Tablo: Türkler ve Moğollar",
             ["Özellik", "Türkler", "Moğollar"],
@@ -618,6 +636,9 @@ def get_pack() -> CoursePack:
                 ["Ortak Bozkır Kültürü", "Atlı göçebe yaşam, çadır kültürü, onluk askerî sistem ortaktır.", "Aynı unsurlara ek olarak binlerce ortak askerî/siyasi kelime (kağan, kurultay, ulus) mevcuttur."],
             ]
         ))
+    )
+    ch5.pages.append(
+        ChapterPage()
         .add_person(CENGIZ)
         .add_block(BulletBlock(3, "Kuruluş ve Cihan Devleti Telakkisi", [
             "Moğollar, Temuçin'den önce kendi aralarında sürekli rekabet hâlinde olan <b>Naymanlar, Kereyitler, "
@@ -666,10 +687,10 @@ def get_pack() -> CoursePack:
             "Ancak <b>Mengü Han</b>'ın 1259'da ölümünden sonra çıkan taht kavgası (Kubilay - Arık Böke) merkezî "
             "otoriteyi parçalamış ve imparatorluk devasa <b>dört bağımsız hanlığa</b> bölünmüştür.",
         ]))
-        .add_person(HULAGU)
     )
     ch5.pages.append(
         ChapterPage()
+        .add_person(HULAGU)
         .add_table(ComparisonTable(
             "Cengiz Han Sonrası Dört Büyük Hanlık",
             ["Hanlık (Kuruluş)", "Bölge ve Etkin Lider", "Temel Özellik ve Yıkılış"],
@@ -689,6 +710,9 @@ def get_pack() -> CoursePack:
             "Ortadoğu'daki liderliği <b>1260 Aynicâlût</b> Savaşı'nda Moğolları durduran Mısır'daki "
             "<b>Memlüklere</b> kaydırmıştır.",
         ]))
+    )
+    ch5.pages.append(
+        ChapterPage()
         .add_callout(Callout("focus", "Dikkat / Püf Noktası: Pax Mongolica",
             "Başlangıçta yıkım getiren Moğollar (özellikle <b>Altın Orda ve İlhanlılar</b>) zamanla İslam'ı "
             "kabul ettiler. Kurdukları asayiş ağı sayesinde Asya ile Avrupa arasında doğu-batı ticareti (İpek "
@@ -709,15 +733,15 @@ def get_pack() -> CoursePack:
             "<b>Devlet Teşkilatında İzler:</b> \"Kurultay\", \"ulus\", \"yasak\" gibi Moğolca kelimeler ve idarî "
             "gelenekler Anadolu beyliklerine miras kaldı.",
         ]))
-    )
-    ch5.pages.append(
-        ChapterPage()
         .add_callout(Callout("insight", "Kritik Çıkarım",
             "Moğol istilası, Orta Çağ İslam dünyası için bir <b>kıyamet senaryosu</b> olarak başlamış; asırlık "
             "ilim merkezlerini ve Abbâsî hilafetini yok etmiştir. Ancak bu büyük yıkım, devasa Türkmen "
             "göçlerini Anadolu'ya iterek buranın ebedî bir Türk yurdu olmasına sebep olmuş ve Moğolların da "
             "zamanla Türkleşip İslamlaşmasıyla <b>\"Pax Mongolica\"</b> (Moğol Barışı) denilen küresel ticaret "
             "ve kültür entegrasyonu çağını başlatmıştır."))
+    )
+    ch5.pages.append(
+        ChapterPage()
         .add_summary("Onon ve Kerulen kıyılarındaki dağınık boyları 1206 Kurultayı'nda birleştiren Temuçin, "
             "onlu askerî sistem, Muhafız Tümeni, Cengiz Yasası ve Uygur bürokrasisiyle bir cihan imparatorluğu "
             "kurmuş; Tangut, Çin, Karahitay, Hârezm ve Kalka seferleriyle dünyanın haritasını değiştirmiştir. "

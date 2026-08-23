@@ -6,7 +6,9 @@ Kullanım:
     python3 build.py content.psikoloji
 
 CoursePack nesnesini alır -> Jinja2 ile HTML üretir -> Playwright/Chromium
-ile A4 PDF'e render eder. Çıktı: output/<slug>.pdf ve (denetim için) .html
+ile 175x250mm (+3mm bleed) PDF'e render eder -> sayfa kutularını (TrimBox)
+yazar -> Ghostscript ile PDF/X-4 CMYK'ya çevirir.
+Çıktı: output/<slug>.pdf (CMYK, baskıya hazır) ve (denetim için) .html
 """
 
 import sys
@@ -20,11 +22,94 @@ if hasattr(sys.stdout, "reconfigure"):
     sys.stderr.reconfigure(encoding="utf-8")
 
 from theme_engine import resolve_theme_css
+import pdfx
 
 ROOT = Path(__file__).parent
 TEMPLATES = ROOT / "templates"
 OUTPUT = ROOT / "output"
 OUTPUT.mkdir(exist_ok=True)
+
+
+# =============================================================================
+# BASKI GEOMETRİSİ — TEK KAYNAK
+# =============================================================================
+# Sayfa ölçüsü, taşma payı ve kenar boşluklarının TANIMLANDIĞI tek yer burasıdır.
+# style.css içindeki aynı adlı :root değişkenleri yalnızca varsayılandır;
+# page_geometry_css() bu sabitlerden üretilen bloğu CSS'in SONUNA ekleyerek
+# onları ezer. Böylece "CSS'te 175mm ama Chromium'a 210mm verilmiş" türü
+# sessiz uyumsuzluk yapısal olarak imkânsızdır.
+
+TRIM_W_MM = 175.0          # bitmiş (kesilmiş) sayfa genişliği
+TRIM_H_MM = 250.0          # bitmiş (kesilmiş) sayfa yüksekliği
+BLEED_MM = 3.0             # taşma payı (her kenar) — full-bleed zeminler için
+
+MARGIN_TOP_MM = 16.0
+MARGIN_BOTTOM_MM = 19.0    # sayfa numarası payı dahil
+MARGIN_INNER_MM = 22.0     # sırt/gutter tarafı — PUR Amerikan cilt payı
+MARGIN_OUTER_MM = 16.0
+
+# Ayna simetri yönü. Standart kitap ciltlemesinde TEK (1, 3, 5...) sayfa sağ
+# yapraktır, dolayısıyla sırtı SOLDA kalır -> "left".  Ciltçiniz tersini
+# istiyorsa tek kelimeyi "right" yapmak yeterlidir, başka hiçbir yeri
+# değiştirmeye gerek yoktur.
+ODD_PAGE_GUTTER = "left"
+
+# Fiziksel render ölçüsü (bleed box) — Chromium'a verilen ve PDF MediaBox'ı
+# olan boyut. Trim kutusu bunun 3mm içindedir (bkz. set_print_boxes()).
+PAGE_W_MM = TRIM_W_MM + 2 * BLEED_MM
+PAGE_H_MM = TRIM_H_MM + 2 * BLEED_MM
+
+
+def _mm(v: float) -> str:
+    return f"{v:g}mm"
+
+
+def page_geometry_css() -> str:
+    """style.css'in sonuna eklenen, yukarıdaki sabitlerden türetilmiş geometri
+    bloğu. Tek/çift sayfa ayna simetrisi burada kurulur: tüm .page'ler <body>'nin
+    doğrudan <section> çocukları olduğu için :nth-of-type() sırası PDF'teki
+    fiziksel sayfa sırasıyla birebir aynıdır."""
+    inner_side = "left" if ODD_PAGE_GUTTER == "left" else "right"
+    outer_side = "right" if inner_side == "left" else "left"
+    return f"""
+/* ===== build.py tarafından üretildi — elle düzenlemeyin ===================
+   Trim {_mm(TRIM_W_MM)} x {_mm(TRIM_H_MM)} · bleed {_mm(BLEED_MM)} ·
+   kenarlar: üst {_mm(MARGIN_TOP_MM)} / alt {_mm(MARGIN_BOTTOM_MM)} /
+   iç {_mm(MARGIN_INNER_MM)} / dış {_mm(MARGIN_OUTER_MM)} ·
+   tek sayfa sırtı: {ODD_PAGE_GUTTER}
+   ========================================================================= */
+@page {{ size: {_mm(PAGE_W_MM)} {_mm(PAGE_H_MM)}; margin: 0; }}
+:root {{
+  --trim-w: {_mm(TRIM_W_MM)};
+  --trim-h: {_mm(TRIM_H_MM)};
+  --bleed: {_mm(BLEED_MM)};
+  --page-w: {_mm(PAGE_W_MM)};
+  --page-h: {_mm(PAGE_H_MM)};
+  --mg-top: {_mm(MARGIN_TOP_MM)};
+  --mg-bottom: {_mm(MARGIN_BOTTOM_MM)};
+  --mg-inner: {_mm(MARGIN_INNER_MM)};
+  --mg-outer: {_mm(MARGIN_OUTER_MM)};
+  --pad-top: {_mm(BLEED_MM + MARGIN_TOP_MM)};
+  --pad-bottom: {_mm(BLEED_MM + MARGIN_BOTTOM_MM)};
+  --pad-inner: {_mm(BLEED_MM + MARGIN_INNER_MM)};
+  --pad-outer: {_mm(BLEED_MM + MARGIN_OUTER_MM)};
+}}
+/* Ayna simetri — tek sayfada sırt {inner_side}, çift sayfada {outer_side} */
+body > section.page:nth-of-type(odd) {{
+  --pad-{inner_side}: var(--pad-inner);
+  --pad-{outer_side}: var(--pad-outer);
+}}
+body > section.page:nth-of-type(even) {{
+  --pad-{inner_side}: var(--pad-outer);
+  --pad-{outer_side}: var(--pad-inner);
+}}
+"""
+
+
+def load_css() -> str:
+    """style.css + build.py'den türetilen geometri bloğu. Tek ders ve kitap
+    build'i AYNI fonksiyonu kullanır."""
+    return (TEMPLATES / "style.css").read_text(encoding="utf-8") + page_geometry_css()
 
 
 def strip_tags(s: str) -> str:
@@ -49,8 +134,57 @@ def paginate(items: list, per_page: int) -> list[list]:
     """Herhangi bir listeyi (sözlük, soru-cevap, kontrol listesi ...) sabit
     boyutlu sayfalara böler. Önceki sistemin tespit edilen en ciddi kusuru
     -- taşan içeriğin sayfa dışında sessizce kaybolması -- bu fonksiyonla
-    yapısal olarak imkansız hale gelir: her öğe mutlaka bir sayfaya girer."""
+    yapısal olarak imkansız hale gelir: her öğe mutlaka bir sayfaya girer.
+
+    NOT: Doğrudan kullanmayın; paginate_capped() bunun DENGELİ sürümüdür ve
+    üretimde o kullanılır. Bu fonksiyon geriye dönük uyumluluk için durur."""
     return [items[i:i + per_page] for i in range(0, len(items), per_page)] or [[]]
+
+
+def paginate_capped(items: list, first_cap: int, rest_cap: int | None = None,
+                    balanced: bool = True) -> list[list]:
+    """Kapasite sınırını aşmadan, öğeleri sayfalara DENGELİ dağıtır.
+
+    Düz paginate() "doldur, kalanı son sayfaya at" mantığıyla çalışır: 30
+    kavram / 12 = 12+12+6, yani son sayfa yarı boş kalır. Bu sürüm önce
+    gereken en az sayfa sayısını bulur (ilk sayfanın kapasitesi ayrı olabilir --
+    testin ilk sayfasında bilgi çubuğu ve talimat kutusu da vardır), sonra
+    öğeleri oransal doluluğa göre dağıtır: 30 kavram -> 10+10+10.
+
+    Sayfa sayısı düz paginate() ile aynı ya da ondan azdır; hiçbir sayfa
+    kapasitesini aşmaz, dolayısıyla taşma riski artmaz.
+
+    balanced=False: dengelemez, ilk sayfayı DOLDURUP kalanı sonrakine taşır.
+    İçindekiler için bu doğru davranıştır -- okuyucu listeyi baştan aşağı
+    okur, bir kitabın içindekiler sayfası dolu başlayıp kısa bir taşmayla
+    biter; ortadan ikiye bölünmüş yarım dolu iki sayfa yanlış görünür."""
+    rest_cap = first_cap if rest_cap is None else rest_cap
+    n = len(items)
+    if n == 0:
+        return [[]]
+    pages = 1
+    while first_cap + (pages - 1) * rest_cap < n:
+        pages += 1
+    caps = [first_cap] + [rest_cap] * (pages - 1)
+    if not balanced:
+        out, k = [], 0
+        for c in caps:
+            out.append(items[k:k + c])
+            k += c
+            if k >= n:
+                break
+        return [chunk for chunk in out if chunk] or [[]]
+    counts = [0] * pages
+    for _ in range(n):
+        # kapasitesi dolmamış sayfalar arasında ORANSAL olarak en boş olana ekle
+        cand = [i for i in range(pages) if counts[i] < caps[i]]
+        best = min(cand, key=lambda i: (counts[i] / caps[i], i))
+        counts[best] += 1
+    out, k = [], 0
+    for c in counts:
+        out.append(items[k:k + c])
+        k += c
+    return out
 
 
 def compute_page_numbers(pack, offset: int = 0) -> dict:
@@ -68,19 +202,23 @@ def compute_page_numbers(pack, offset: int = 0) -> dict:
       total                        -> dersin toplam sayfa sayısı (offset zinciri için)
     """
     n = offset + 1
-    starts = {"cover": n, "toc": n + 1, "overview": n + 2, "chapters": n + 3}
-    n += 3
+    starts = {"cover": n}
+    n += 1
+    starts["toc"] = n
+    n += toc_page_count(pack)
+    starts["overview"] = n
+    n += OVERVIEW_PAGES
+    starts["chapters"] = n
     for ch in pack.chapters:
         starts[ch.number] = n
         n += ch.page_count()
-    glossary_pages_count = len(paginate(pack.glossary, GLOSSARY_PER_PAGE))
     starts["glossary"] = n
-    n += glossary_pages_count
+    n += len(paginate_capped(pack.glossary, GLOSSARY_PER_PAGE))
     if pack.test_questions:
         starts["test"] = n
-        n += len(paginate(pack.test_questions, TEST_PER_PAGE))
+        n += len(paginate_capped(pack.test_questions, TEST_PER_PAGE_FIRST, TEST_PER_PAGE))
         starts["answer_key"] = n
-        n += len(paginate(pack.answer_key_items, ANSWER_PER_PAGE))
+        n += len(paginate_capped(pack.answer_key_items, ANSWER_PER_PAGE))
     else:
         starts["exam"] = n
         n += exam_page_count(pack)
@@ -89,38 +227,91 @@ def compute_page_numbers(pack, offset: int = 0) -> dict:
     return starts
 
 
+def toc_rows(pack, page_starts: dict) -> list[dict]:
+    """İçindekiler satırları -- bölümler + sözlük + test. Şablon bunları elle
+    dizmek yerine buradan alır ki sayfalara bölünebilsinler."""
+    rows = [{"num": str(ch.number), "alt": False, "anchor": f"ch-{ch.number}",
+             "title": ch.title, "sub": ch.subtitle, "page": page_starts[ch.number]}
+            for ch in pack.chapters]
+    rows.append({"num": "A", "alt": True, "anchor": "glossary",
+                 "title": "Anahtar Kavramlar Sözlüğü",
+                 "sub": f"Tanımlı ve bağlamlandırılmış {pack.concept_count()} kavram",
+                 "page": page_starts["glossary"]})
+    if pack.test_questions:
+        rows.append({"num": "B", "alt": True, "anchor": "exam", "title": pack.test_title,
+                     "sub": f"{len(pack.test_questions)} soruluk çoktan seçmeli test "
+                            "ve çözümlü cevap anahtarı",
+                     "page": page_starts["test"]})
+    else:
+        rows.append({"num": "B", "alt": True, "anchor": "exam", "title": "Sınav Hazırlık",
+                     "sub": "Karıştırılan ayrımlar, eşleştirmeler ve son kontrol",
+                     "page": page_starts["exam"]})
+    return rows
+
+
+def toc_page_count(pack) -> int:
+    """İçindekiler kaç fiziksel sayfa tutar? page_starts'tan ÖNCE bilinmeli,
+    o yüzden sadece satır SAYISINA bakar (satır içeriğine değil)."""
+    n = len(pack.chapters) + 2
+    return len(paginate_capped(list(range(n)), TOC_ROWS_FIRST, TOC_ROWS_REST,
+                               balanced=False))
+
+
 def course_context(pack, offset: int = 0, prefix: str = "", pagecls: str = "") -> dict:
     """_ders_govde.html.j2 makrosunun ihtiyaç duyduğu her şeyi tek sözlükte
     toplar. Tek ders build'i ve kitap build'i AYNI fonksiyonu kullanır --
     sayfalama mantığının iki yerde ayrışması böylece imkansız olur."""
+    page_starts = compute_page_numbers(pack, offset)
     return {
-        "page_starts": compute_page_numbers(pack, offset),
-        "glossary_pages": paginate(pack.glossary, GLOSSARY_PER_PAGE),
-        "qa_pages": paginate(pack.qa_items, QA_PER_PAGE),
-        "distinctions_pages": paginate(pack.distinctions, DISTINCTIONS_PER_PAGE),
-        "matchtable_pages": paginate(pack.match_table, MATCHTABLE_PER_PAGE),
-        "test_pages": paginate(pack.test_questions, TEST_PER_PAGE),
-        "answer_pages": paginate(pack.answer_key_items, ANSWER_PER_PAGE),
+        "page_starts": page_starts,
+        "toc_pages": paginate_capped(toc_rows(pack, page_starts),
+                                     TOC_ROWS_FIRST, TOC_ROWS_REST, balanced=False),
+        "glossary_pages": paginate_capped(pack.glossary, GLOSSARY_PER_PAGE),
+        "qa_pages": paginate_capped(pack.qa_items, QA_PER_PAGE),
+        "distinctions_pages": paginate_capped(pack.distinctions, DISTINCTIONS_PER_PAGE),
+        "matchtable_pages": paginate_capped(pack.match_table, MATCHTABLE_PER_PAGE),
+        "test_pages": paginate_capped(pack.test_questions, TEST_PER_PAGE_FIRST, TEST_PER_PAGE),
+        "answer_pages": paginate_capped(pack.answer_key_items, ANSWER_PER_PAGE),
         "prefix": prefix,
         "pagecls": pagecls,
     }
 
 
-GLOSSARY_PER_PAGE = 18     # 2 sütun x 9 satır -- değişken tanım uzunluğuna karşı güvenlik paylı
-QA_PER_PAGE = 10
-DISTINCTIONS_PER_PAGE = 6
-MATCHTABLE_PER_PAGE = 9
-TEST_PER_PAGE = 6          # sayfa başına soru (2 sütunlu düzen, 5 seçenekli MCQ, ilk sayfada bilgi çubuğu+talimat da var — güvenlik paylı)
-ANSWER_PER_PAGE = 16       # sayfa başına çözümlü cevap (2 sütunlu düzen)
+# --- Sayfalama kapasiteleri ---------------------------------------------------
+# 175x250mm sayfa için tools/kalibre.py ile ÖLÇÜLDÜ: her aday değer 10 dersin
+# hepsinde render edilip taşma denetimine sokuldu, taşmayan en büyük değer
+# alındı. Sayfa boyutunu değiştirirseniz `python tools/kalibre.py` çalıştırıp
+# bu bloğu yenileyin -- tahminle değiştirmeyin.
+GLOSSARY_PER_PAGE = 12     # 2 sütun x 6 satır
+QA_PER_PAGE = 3            # LEGACY
+DISTINCTIONS_PER_PAGE = 3  # LEGACY
+MATCHTABLE_PER_PAGE = 5    # LEGACY
+TEST_PER_PAGE_FIRST = 3    # ilk test sayfasında bilgi çubuğu + talimat kutusu da var
+TEST_PER_PAGE = 4          # devam sayfalarında (2 sütunlu düzen, 5 seçenekli MCQ)
+ANSWER_PER_PAGE = 12       # sayfa başına çözümlü cevap (2 sütunlu düzen)
+
+# İçindekiler satırı, 137mm'lik metin genişliğinde alt başlığı iki satıra
+# sardığı için A4'tekinden (~18mm) yüksek (~25mm). İlk sayfada ayrıca
+# kicker+başlık+lede var, bu yüzden kapasitesi ayrı.
+# En yüksek satır 30.8mm ölçüldü (uzun alt başlıklı ders); ilk sayfada
+# 160mm, devam sayfasında 202mm boş yer var -> 5 ve 6 satır her derste güvenli.
+TOC_ROWS_FIRST = 5
+TOC_ROWS_REST = 6
+
+# Genel Bakış 175x250mm'de tek sayfaya sığmıyor (ölçüldü: 214-264mm / 215mm).
+# SABİT olarak ikiye bölünür: 1. sayfa hero + 6 kart, 2. sayfa akış + not.
+# Ölçüye göre değil yapıya göre bölmek bilinçli: sayfa numaraları render'dan
+# ÖNCE hesaplanabilir olmalı (bkz. compute_page_numbers).
+OVERVIEW_PAGES = 2
 
 
 def exam_page_count(pack) -> int:
     """Sınav Hazırlık bölümünün toplam fiziksel sayfa sayısı (Son Tekrar artık
     ayrı bir bölüm değil, bu sayının içinde otomatik olarak yer alır).
     Yapı: [distinctions+matchtable ana sayfa] + [devam sayfaları] + [QA sayfaları]."""
-    dpages = paginate(pack.distinctions, DISTINCTIONS_PER_PAGE)
-    mpages = paginate(pack.match_table, MATCHTABLE_PER_PAGE)
-    qpages = paginate(pack.qa_items, QA_PER_PAGE)
+    dpages = paginate_capped(pack.distinctions, DISTINCTIONS_PER_PAGE)
+    mpages = paginate_capped(pack.match_table, MATCHTABLE_PER_PAGE)
+    qpages = paginate_capped(pack.qa_items, QA_PER_PAGE)
     n = 1  # ana sayfa (distinctions[0] + matchtable[0])
     n += max(0, len(dpages) - 1)
     n += max(0, len(mpages) - 1)
@@ -135,7 +326,7 @@ def build(module_name: str):
     ctx = course_context(pack)
     page_starts = ctx["page_starts"]
 
-    css = (TEMPLATES / "style.css").read_text(encoding="utf-8")
+    css = load_css()
     theme_override_css = resolve_theme_css(pack.theme_color)
     env = Environment(loader=FileSystemLoader(str(TEMPLATES)))
     template = env.get_template("master.html.j2")
@@ -157,8 +348,34 @@ def build(module_name: str):
     render_pdf(html_path, pdf_path, expected_pages=page_starts["end"])
     optimize_pdf(pdf_path)
     add_bookmarks(pdf_path, pack, page_starts)
+    finalize_for_print(pdf_path, strip_tags(pack.title))
     print(f"[build] PDF üretildi: {pdf_path}")
+    report_page_count(pdf_path)
     return pdf_path
+
+
+def finalize_for_print(pdf_path: Path, title: str):
+    """Baskı öncesi son iki adım: sayfa kutularını (TrimBox/BleedBox) yaz ve
+    Ghostscript ile PDF/X-4 CMYK'ya çevir. Ghostscript yoksa build durmaz --
+    net bir kurulum uyarısı basılır ve dosya RGB kalır."""
+    pdfx.set_print_boxes(pdf_path, TRIM_W_MM, TRIM_H_MM, BLEED_MM)
+    pdfx.convert_or_warn(pdf_path, title, TRIM_W_MM, TRIM_H_MM, BLEED_MM)
+
+
+def report_page_count(pdf_path: Path):
+    """Build'in son satırı: gerçek toplam sayfa sayısı + bitmiş sayfa ölçüsü.
+    Sayfa boyutu değiştiğinde içerik yeniden aktığı için bu sayı takip
+    edilmesi gereken asıl çıktıdır."""
+    from pypdf import PdfReader
+    n = len(PdfReader(str(pdf_path)).pages)
+    boxes = pdfx.read_boxes(pdf_path)
+    print("=" * 66)
+    print(f"[SONUÇ] Toplam sayfa: {n}")
+    print(f"[SONUÇ] Bitmiş (trim) ölçü : {boxes['trimbox'][0]:g} x {boxes['trimbox'][1]:g} mm")
+    print(f"[SONUÇ] Bleed dahil ölçü   : {boxes['bleedbox'][0]:g} x {boxes['bleedbox'][1]:g} mm "
+          f"(levha/MediaBox {boxes['mediabox'][0]:g} x {boxes['mediabox'][1]:g} mm)")
+    print("=" * 66)
+    return n
 
 
 def add_bookmarks(pdf_path: Path, pack, page_starts: dict):
@@ -276,16 +493,17 @@ const {{ chromium }} = require('playwright');
   const page = await browser.newPage();
   await page.goto('file:///{html_path.resolve().as_posix()}', {{ waitUntil: 'networkidle' }});
 
-  // --- TAŞMA DENETİMİ: her .page 297mm'lik A4 yüksekliğini fiziksel olarak
-  // aşıyor mu? Aşıyorsa içerik sessizce kesilir (önceki sistemin kör noktası) --
-  // burada bunu build zamanında YAKALARIZ, PDF üretildikten sonra keşfetmeyiz.
+  // --- TAŞMA DENETİMİ: her .page render yüksekliğini (trim + 2*bleed)
+  // fiziksel olarak aşıyor mu? Aşıyorsa içerik sessizce kesilir (önceki
+  // sistemin kör noktası) -- burada bunu build zamanında YAKALARIZ.
   const overflow = await page.evaluate(() => {{
+    const PAGE_H_MM = {PAGE_H_MM};
     const mmToPx = document.querySelector('.page').getBoundingClientRect().height
-                   / 297; // 1mm kaç px render edildi
+                   / PAGE_H_MM; // 1mm kaç px render edildi
     const pages = Array.from(document.querySelectorAll('.page'));
     const bad = [];
     pages.forEach((p, i) => {{
-      const limit = 297 * mmToPx;
+      const limit = PAGE_H_MM * mmToPx;
       if (p.scrollHeight > limit + 2) {{  // 2px tolerans
         bad.push({{ index: i + 1, overflowMm: Math.round((p.scrollHeight - limit) / mmToPx * 10) / 10 }});
       }}
@@ -294,18 +512,25 @@ const {{ chromium }} = require('playwright');
   }});
   console.log('__OVERFLOW__' + JSON.stringify(overflow));
 
+  // preferCSSPageSize: sayfa ölçüsü CSS'teki @page kuralından okunur.
+  // width/height'ı elle vermekten DAHA DOĞRU sonuç verir: Chromium elle
+  // verilen ölçüde sayfayı ~0.35mm büyütüp içeriği 0.26mm sağa kaydırıyordu;
+  // @page ile içerik tam sol-üst köşeye oturuyor (set_print_boxes() TrimBox'ı
+  // buna göre hesaplıyor).
   await page.pdf({{
     path: '{pdf_path.resolve().as_posix()}',
-    width: '210mm', height: '297mm',
-    printBackground: true,
-    margin: {{ top: '0', bottom: '0', left: '0', right: '0' }}
+    preferCSSPageSize: true,
+    printBackground: true
   }});
   await browser.close();
 }})();
 """
     tmp_js = OUTPUT / "_render.js"
     tmp_js.write_text(script, encoding="utf-8")
-    result = subprocess.run(["node", str(tmp_js)], capture_output=True, text=True)
+    # encoding açıkça verilmeli: Windows varsayılanı (cp1254) node'un
+    # UTF-8 hata çıktısını çözemeyip build'i asıl hatayı göstermeden düşürüyor.
+    result = subprocess.run(["node", str(tmp_js)], capture_output=True, text=True,
+                            encoding="utf-8", errors="replace")
     if result.returncode != 0:
         print("[HATA] PDF render başarısız:")
         print(result.stdout)
@@ -319,11 +544,11 @@ const {{ chromium }} = require('playwright');
             bad = _json.loads(line[len("__OVERFLOW__"):])
             overflow = bad
             if bad:
-                print(f"[TAŞMA UYARISI] {len(bad)} sayfa A4 sınırını aşıyor -- içerik kesiliyor olabilir:")
+                print(f"[TAŞMA UYARISI] {len(bad)} sayfa {PAGE_W_MM:g}x{PAGE_H_MM:g}mm sınırını aşıyor -- içerik kesiliyor olabilir:")
                 for b in bad:
                     print(f"    - Sayfa (fiziksel sıra) {b['index']}: ~{b['overflowMm']}mm taşma")
             else:
-                print("[build] Taşma denetimi: tüm sayfalar A4 sınırları içinde. ✓")
+                print(f"[build] Taşma denetimi: tüm sayfalar {PAGE_W_MM:g}x{PAGE_H_MM:g}mm sınırları içinde. ✓")
     return overflow   # kitap build'i taşan sayfayı hangi dersin olduğuna çevirmek için kullanır
 
 

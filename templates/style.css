@@ -1,14 +1,43 @@
 /* ============================================================
    DERS ÜRETİM SİSTEMİ — Görsel Tasarım Sistemi v2
-   A4, print-ready, tema-parametrik.
+   175x250mm trim (PUR Amerikan cilt), 3mm bleed, print-ready,
+   tema-parametrik.
    Sistem fontlarına dayanır: gövde DejaVu Sans, başlıklar DejaVu Serif
    (kitap/akademik karakter için) — harici font çağrısı yok, bu yüzden
    her ortamda birebir aynı render garantidir.
    ============================================================ */
 
-@page { size: A4; margin: 0; }
+/* --- SAYFA GEOMETRİSİ ---------------------------------------------------
+   DİKKAT: aşağıdaki değerler yalnızca VARSAYILAN'dır. Gerçek kaynak
+   build.py içindeki TRIM_W_MM / TRIM_H_MM / BLEED_MM / MARGIN_*_MM
+   sabitleridir; build.py bu blogun aynısını page_geometry_css() ile
+   üretip style.css'in SONUNA ekler ve buradakileri ezer. Boyut
+   değiştirecekseniz build.py'yi düzenleyin, burayı değil. */
+@page { size: 181mm 256mm; margin: 0; }
 
 :root {
+  /* Bitmiş (kesilmiş) sayfa ölçüsü */
+  --trim-w: 175mm;
+  --trim-h: 250mm;
+  /* Taşma payı: tam sayfa zemin rengi / kapak gradyanı kenardan taşsın */
+  --bleed: 3mm;
+  /* Fiziksel render ölçüsü = trim + her iki yandan bleed */
+  --page-w: 181mm;
+  --page-h: 256mm;
+  /* Kenar boşlukları — TRIM kenarından ölçülür */
+  --mg-top: 16mm;
+  --mg-bottom: 19mm;    /* sayfa numarası payı dahil */
+  --mg-inner: 22mm;     /* sırt/gutter tarafı — PUR cilt payı */
+  --mg-outer: 16mm;
+  /* Render kutusunun (bleed box) kenarından ölçülen gerçek padding'ler */
+  --pad-top: 19mm;
+  --pad-bottom: 22mm;
+  --pad-inner: 25mm;
+  --pad-outer: 19mm;
+  /* Ayna simetri: sayfa tekliği/çiftliğine göre aşağıda yeniden atanır */
+  --pad-left: var(--pad-inner);
+  --pad-right: var(--pad-outer);
+
   /* --- Nötr paleti (tüm temalarda sabit) --- */
   --ink:        #14161b;
   --ink-soft:   #464b5b;
@@ -95,8 +124,8 @@ em { font-style: italic; }
 
 .page {
   position: relative;
-  width: 210mm;
-  height: 297mm;
+  width: var(--page-w);
+  height: var(--page-h);
   overflow: hidden;
   background: var(--paper);
   page-break-after: always;
@@ -126,7 +155,7 @@ em { font-style: italic; }
     radial-gradient(circle at 85% 6%, rgba(255,255,255,0.14), transparent 38%),
     radial-gradient(ellipse 70% 45% at 18% 100%, rgba(0,0,0,0.35), transparent 60%),
     linear-gradient(152deg, var(--cover-grad-1) 0%, var(--cover-grad-2) 62%, var(--cover-grad-3) 100%);
-  padding: 20mm 18mm;
+  padding: var(--pad-top) var(--pad-right) var(--pad-bottom) var(--pad-left);
   justify-content: space-between;
 }
 /* ince nokta dokusu -- kumaş/kağıt hissi */
@@ -141,16 +170,16 @@ em { font-style: italic; }
 /* iç çerçeve -- "cilt" hissi */
 .cover::after {
   content: "";
-  position: absolute; inset: 7mm;
+  position: absolute; inset: calc(var(--bleed) + 7mm);
   border: 1px solid rgba(255,255,255,0.20);
   pointer-events: none;
 }
 .cover-corner { position:absolute; width:7mm; height:7mm; pointer-events:none; }
 .cover-corner::before, .cover-corner::after { content:""; position:absolute; background: rgba(255,255,255,0.55); }
-.cover-corner.tl { top:7mm; left:7mm; }
-.cover-corner.tr { top:7mm; right:7mm; transform: scaleX(-1); }
-.cover-corner.bl { bottom:7mm; left:7mm; transform: scaleY(-1); }
-.cover-corner.br { bottom:7mm; right:7mm; transform: scale(-1,-1); }
+.cover-corner.tl { top:calc(var(--bleed) + 7mm); left:calc(var(--bleed) + 7mm); }
+.cover-corner.tr { top:calc(var(--bleed) + 7mm); right:calc(var(--bleed) + 7mm); transform: scaleX(-1); }
+.cover-corner.bl { bottom:calc(var(--bleed) + 7mm); left:calc(var(--bleed) + 7mm); transform: scaleY(-1); }
+.cover-corner.br { bottom:calc(var(--bleed) + 7mm); right:calc(var(--bleed) + 7mm); transform: scale(-1,-1); }
 .cover-corner::before { top:-1px; left:-1px; width:4.5mm; height:1.4px; }
 .cover-corner::after { top:-1px; left:-1px; width:1.4px; height:4.5mm; }
 .cover-inner { position:relative; z-index:2; display:flex; flex-direction:column; height:100%; justify-content:space-between; }
@@ -245,7 +274,7 @@ em { font-style: italic; }
 }
 
 /* ================= SAYFA GÖVDESİ (kapak-dışı tüm sayfalar) ================= */
-.body-page { padding: 15mm 16mm 13mm; }
+.body-page { padding: var(--pad-top) var(--pad-right) var(--pad-bottom) var(--pad-left); }
 
 .pageband {
   display:flex; justify-content:space-between; align-items:center;
@@ -261,7 +290,7 @@ em { font-style: italic; }
 .pageband .pageband-course { color: var(--accent-dark); font-weight:700; }
 
 .footer {
-  position: absolute; bottom: 9mm; left: 16mm; right:16mm;
+  position: absolute; bottom: calc(var(--bleed) + 9mm); left: var(--pad-left); right: var(--pad-right);
   display:flex; justify-content:space-between; align-items:center;
   font-size: 7.5pt; color: var(--ink-faint); font-weight:600;
   border-top: 1px solid var(--line);
@@ -326,6 +355,11 @@ em { font-style: italic; }
 .ov-flow-step {
   flex:1; background: linear-gradient(160deg, var(--accent-tint), var(--paper)); border: 1px solid var(--line);
   border-radius: 9px; padding: 4.2mm 3.6mm; text-align:center; box-shadow: var(--shadow-sm);
+  /* Dar sayfada (5 adımda sütun ~22mm) uzun tek kelimeler kutuyu taşırıyordu:
+     flex öğesi min-content'in altına inemez, bu yüzden min-width:0 + kelime
+     kırma şart. Yoksa "Varoluşçuluğa" gibi kelimeler kart kenarından taşar. */
+  min-width: 0;
+  overflow-wrap: break-word;
 }
 .ov-flow-step b { display:block; font-size: 8.9pt; color: var(--accent-dark); margin-bottom: 1mm; font-family:"DejaVu Serif",serif; }
 .ov-flow-step span { font-size: 8.2pt; color: var(--ink-soft); }
@@ -428,6 +462,7 @@ em { font-style: italic; }
 .flowdiag .fstep {
   flex:1; background: var(--paper); border: 1px solid var(--line); border-top: 3px solid var(--accent);
   border-radius: 8px; padding: 3.6mm 3mm; text-align:center; box-shadow: var(--shadow-sm);
+  min-width: 0; overflow-wrap: break-word;    /* bkz. .ov-flow-step notu */
 }
 .flowdiag .fstep-title { font-size: 8.5pt; font-weight:700; color: var(--ink); margin-bottom: 1mm; font-family:"DejaVu Serif",serif; }
 .flowdiag .fstep-text { font-size: 7.6pt; color: var(--ink-faint); line-height:1.35; }

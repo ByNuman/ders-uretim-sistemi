@@ -123,8 +123,11 @@
 </div>
 {% endmacro %}
 
+{# title boş/None ise başlık basılmaz: uzun bir ayet grubu sayfaya sığmayıp
+   ikiye bölündüğünde devam parçası başlığı TEKRAR etmesin diye (bkz.
+   tools/dengele.py). Dolu başlıkta davranış eskisiyle birebir aynıdır. #}
 {% macro render_ayat(title, ayat) %}
-<div class="ayat-section-title">{{ title }}</div>
+{% if title %}<div class="ayat-section-title">{{ title }}</div>{% endif %}
 {% for a in ayat %}
 <div class="ayah-card">
   <div class="ayah-ref">{{ a.reference }}</div>
@@ -226,46 +229,39 @@
 </section>
 
 {# ============================================================
-   2. İÇİNDEKİLER
+   2. İÇİNDEKİLER — 175x250mm'de satırlar tek sayfaya sığmayabildiği için
+   ctx.toc_pages üzerinden sayfalanır (build.py: TOC_ROWS_FIRST/REST).
    ============================================================ #}
+{% set toc_pageno = namespace(n=ctx.page_starts["toc"]) %}
+{% for trows in ctx.toc_pages %}
 <section class="page body-page{{ ctx.pagecls }}">
-  <div class="pageband"><div>{{ pack.title }}</div><div class="pageband-course">{{ pack.course_code }}</div></div>
+  <div class="pageband"><div>{{ pack.title }}</div><div class="pageband-course">{{ pack.course_code if loop.first else "İçindekiler · Devam" }}</div></div>
+  {% if loop.first %}
   <div class="toc-kicker">Kitap Planı</div>
   <div class="toc-title">İçindekiler</div>
   <div class="toc-lede">{{ pack.subtitle }} — bölüm bölüm takip edilecek çalışma haritası.</div>
+  {% endif %}
   <div class="toc-list">
-    {% for ch in pack.chapters %}
-    <a class="toc-row" href="#{{ ctx.prefix }}ch-{{ ch.number }}">
-      <div class="toc-num">{{ ch.number }}</div>
+    {% for row in trows %}
+    <a class="toc-row" href="#{{ ctx.prefix }}{{ row.anchor }}">
+      <div class="toc-num{{ " alt" if row.alt }}">{{ row.num }}</div>
       <div class="toc-body">
-        <div class="toc-heading">{{ ch.title }}</div>
-        <div class="toc-sub">{{ ch.subtitle }}</div>
+        <div class="toc-heading">{{ row.title }}</div>
+        <div class="toc-sub">{{ row.sub }}</div>
       </div>
-      <div class="toc-page">s.{{ ctx.page_starts[ch.number] }}</div>
+      <div class="toc-page">s.{{ row.page }}</div>
     </a>
     {% endfor %}
-    <a class="toc-row" href="#{{ ctx.prefix }}glossary">
-      <div class="toc-num alt">A</div>
-      <div class="toc-body">
-        <div class="toc-heading">Anahtar Kavramlar Sözlüğü</div>
-        <div class="toc-sub">Tanımlı ve bağlamlandırılmış {{ pack.concept_count() }} kavram</div>
-      </div>
-      <div class="toc-page">s.{{ ctx.page_starts["glossary"] }}</div>
-    </a>
-    <a class="toc-row" href="#{{ ctx.prefix }}exam">
-      <div class="toc-num alt">B</div>
-      <div class="toc-body">
-        <div class="toc-heading">{% if pack.test_questions %}{{ pack.test_title }}{% else %}Sınav Hazırlık{% endif %}</div>
-        <div class="toc-sub">{% if pack.test_questions %}{{ pack.test_questions|length }} soruluk çoktan seçmeli test ve çözümlü cevap anahtarı{% else %}Karıştırılan ayrımlar, eşleştirmeler ve son kontrol{% endif %}</div>
-      </div>
-      <div class="toc-page">s.{{ ctx.page_starts["test"] if pack.test_questions else ctx.page_starts["exam"] }}</div>
-    </a>
   </div>
-  {{ footer(pack, ctx.page_starts["toc"]) }}
+  {{ footer(pack, toc_pageno.n) }}
 </section>
+{% set toc_pageno.n = toc_pageno.n + 1 %}
+{% endfor %}
 
 {# ============================================================
-   3. GENEL BAKIŞ
+   3. GENEL BAKIŞ — iki sabit sayfa (build.py: OVERVIEW_PAGES).
+   1. sayfa: hero + 6 kart · 2. sayfa: çalışma akışı + sınav notu.
+   175x250mm'de dördü birden tek sayfaya sığmıyor (ölçüldü: 214-264mm).
    ============================================================ #}
 <section class="page body-page{{ ctx.pagecls }}">
   <div class="pageband"><div>{{ pack.title }}</div><div class="pageband-course">{{ pack.course_code }}</div></div>
@@ -283,7 +279,14 @@
     {% endfor %}
   </div>
 
+  {{ footer(pack, ctx.page_starts["overview"]) }}
+</section>
+
+<section class="page body-page{{ ctx.pagecls }}">
+  <div class="pageband"><div>{{ pack.title }}</div><div class="pageband-course">Genel Bakış · Devam</div></div>
+
   {% if pack.overview_flow %}
+  <div class="section-kicker">Çalışma Akışı</div>
   <div class="ov-flow">
     {% for step in pack.overview_flow %}
     {% if not loop.first %}<div class="ov-flow-arrow">{{ arrow_svg() }}</div>{% endif %}
@@ -299,7 +302,7 @@
   </div>
   {% endif %}
 
-  {{ footer(pack, ctx.page_starts["overview"]) }}
+  {{ footer(pack, ctx.page_starts["overview"] + 1) }}
 </section>
 
 {# ============================================================
@@ -308,7 +311,11 @@
 {% set pageno = namespace(n=ctx.page_starts["chapters"]) %}
 {% for ch in pack.chapters %}
   {% for page in ch.pages %}
-  <section class="page body-page{{ ctx.pagecls }}"{% if loop.first %} id="{{ ctx.prefix }}ch-{{ ch.number }}"{% endif %}>
+  {# data-ch/data-cp ve aşağıdaki <!--item--> yorumları SADECE ölçüm içindir
+     (tools/olcum.py bir bölümün hangi bloğunun kaç mm yer kapladığını
+     buradan okur). Yorum düğümlerinin ve data-* niteliklerinin render'a
+     hiçbir etkisi yoktur; sayfa dengeleme yaparken silmeyin. #}
+  <section class="page body-page{{ ctx.pagecls }}" data-ch="{{ ch.number }}" data-cp="{{ loop.index0 }}"{% if loop.first %} id="{{ ctx.prefix }}ch-{{ ch.number }}"{% endif %}>
     <div class="pageband"><div>{{ pack.title }}</div><div class="pageband-course">Bölüm {{ ch.number }}</div></div>
 
     {% if loop.first %}
@@ -319,7 +326,7 @@
       </div>
     {% endif %}
 
-    {% for kind, data in page.items %}{{ render_item(kind, data) }}{% endfor %}
+    {% for kind, data in page.items %}<!--item {{ loop.index0 }} {{ kind }}-->{{ render_item(kind, data) }}{% endfor %}
 
     {{ footer(pack, pageno.n) }}
   </section>

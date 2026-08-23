@@ -47,6 +47,9 @@ def get_pack() -> CoursePack:
         .add_callout(Callout("route", "Bölümün Rotası",
             "Önce gelişimin biyolojik ve fonksiyonel yönlerini ayırıp <b>5 temel ilkesini</b> kuruyoruz; ardından psikanalitik geleneğin iki büyük kuramcısı "
             "<b>Freud</b> ve <b>Erikson</b>'ın evrelerini karşılaştırmalı işliyoruz."))
+    )
+    ch1.pages.append(
+        ChapterPage()
         .add_block(BulletBlock(1, "Büyüme ve Gelişme Arasındaki Fark", [
             "<b>Büyüme:</b> Çocuğun boyunun uzaması, kilonun artması gibi niceliksel/fiziksel değişimdir. Beyin hücresi sayısının artmayıp hacimce büyümesi de buna örnektir.",
             "<b>Gelişme:</b> Kemiklerin sadece uzaması değil, yapısının değişip sertleşmesi; çocuğun bedenen büyümesi değil duygularını kontrol edip uyumlu davranması gelişmedir.",
@@ -59,10 +62,10 @@ def get_pack() -> CoursePack:
             "Gelişimde denge vardır.",
             "Gelişim, art arda görülen düzenli bir süreçtir.",
         ], subtitle="Sınavda maddeler halinde sorulabilir."))
+        .add_person_row([FREUD, ERIKSON])
     )
     ch1.pages.append(
-        ChapterPage(continue_tag="Psikanalitik Gelişim Kuramları: Freud & Erikson")
-        .add_person_row([FREUD, ERIKSON])
+        ChapterPage()
         .add_table(ComparisonTable(
             "Paralel Okuma: Freud'un Psikoseksüel Dönemleri ile Erikson'un Psikososyal Evreleri",
             ["Yaklaşık Yaş", "Freud — Psikoseksüel Dönem", "Erikson — Psikososyal Kriz"],
@@ -82,6 +85,9 @@ def get_pack() -> CoursePack:
         .add_callout(Callout("caution", "Dikkat / Ayırt Etme",
             "Freud <b>haz</b> ve <b>cinsellik</b> odaklıyken, Erikson <b>sosyal ilişkiler</b> ve <b>krizler</b> odaklıdır. "
             "Freud'un dönemleri 18 yaşında biter; Erikson'un evreleri yaşam boyu (65 yaş sonrasına kadar) sürer."))
+    )
+    ch1.pages.append(
+        ChapterPage()
         .add_summary("Gelişim; büyümeyi de kapsayan, döllenmeden ölüme uzanan yönlü bir süreçtir. Freud bu süreci "
             "beş psikoseksüel döneme, Erikson ise sekiz psikososyal krize ayırarak açıklamıştır — ikisi de kişiliğin "
             "erken yaşlarda temellenip yaşam boyu şekillendiğini savunur.")
@@ -115,6 +121,9 @@ def get_pack() -> CoursePack:
             FlowStep("Blastula", "İçi boş hücre küresi"),
             FlowStep("Gastrula", "Üç tabaka oluşumu"),
         ], caption="Hücresel gelişim evreleri, döllenmeden itibaren sırayla."))
+    )
+    ch2.pages.append(
+        ChapterPage()
         .add_block(BulletBlock(2, "Doğum Sonrası Motor Gelişim", [
             "<b>3. Ay:</b> Nesnelere ulaşma.", "<b>7. Ay:</b> Desteksiz oturma.",
             "<b>10. Ay:</b> Emekleme.", "<b>15. Ay:</b> Tek başına yürüme.",
@@ -124,9 +133,6 @@ def get_pack() -> CoursePack:
             "<b>Gülümseme:</b> Önce 'Refleks Gülümseme' (2. ay, uykuda), sonra 'Sosyal Gülümseme' görülür.",
             "<b>Öfke:</b> 1,5–3 yaş arasında zirve yapar. Nedenleri arasında oturağa zorla oturtulma, yüz yıkanması, oyuncağın alınması sayılabilir.",
         ]))
-    )
-    ch2.pages.append(
-        ChapterPage(continue_tag="Çocukluk Dönemi: Sosyalleşme Davranışları")
         .add_table(ComparisonTable(
             "Çocuğun Sosyalleşirken Sergilediği Tipik Davranış Kalıpları",
             ["Davranış", "Tanımı / Zirve Noktası", "Not"],
@@ -138,6 +144,9 @@ def get_pack() -> CoursePack:
                 ["Oyun", "Çocuğun işidir; terapötik değeri saldırganlığı boşaltmak, eğitimsel değeri kural/kavram öğretmektir.", "Hem duygusal hem bilişsel işlev görür."],
             ]
         ))
+    )
+    ch2.pages.append(
+        ChapterPage()
         .add_callout(Callout("focus", "Kritik Odak: Okul Başarısını Etkileyenler",
             "Okul başarısını üç grup etken belirler: <b>bireysel nedenler</b> (zeka), <b>öğretim sistemi</b> (ezberci sistem kötü etkiler) "
             "ve <b>aile/öğretmen tutumları</b>."))
@@ -168,6 +177,9 @@ def get_pack() -> CoursePack:
             "<b>Temel sorunlar:</b> Kimlik arayışı, bedeni beğenmeme, güvensizlik ve otoriteyle çatışma.",
             "<b>Sosyal olgunlaşma:</b> Ergenliğin başında çok sayıda geçici arkadaş ve ailenin hiçe sayılması görülürken; sonunda az sayıda derin dostluk ve ailenin fikrinin önemsenmesi görülür.",
         ]))
+    )
+    ch3.pages.append(
+        ChapterPage()
         .add_table(ComparisonTable(
             "Ergenlik Kişilik Tipleri",
             ["Tip", "Tanım"],
@@ -178,9 +190,6 @@ def get_pack() -> CoursePack:
                 ["Psikopat Eğilimli", "Toplumu umursamayan, zarar veren tip."],
             ]
         ))
-    )
-    ch3.pages.append(
-        ChapterPage(continue_tag="Ahlaki Gelişim Kuramları: Piaget & Kohlberg")
         .add_table(ComparisonTable(
             "Piaget'in Ahlaki Gelişim Evreleri",
             ["Evre", "Özellik", "Örnek"],
@@ -189,6 +198,9 @@ def get_pack() -> CoursePack:
                 ["Otonom (Özerk) — 11 yaş üstü", "Kurallar esnektir; niyet önemlidir.", "Kazara kıran suçsuz görülebilir."],
             ]
         ))
+    )
+    ch3.pages.append(
+        ChapterPage()
         .add_table(ComparisonTable(
             "Kohlberg'in Ahlaki Gelişim Düzeyleri",
             ["Düzey", "Aşama", "Açıklama"],
@@ -211,7 +223,7 @@ def get_pack() -> CoursePack:
         ]))
     )
     ch3.pages.append(
-        ChapterPage(continue_tag="Yetişkinlik, Yaşlılık ve Ölüm Psikolojisi")
+        ChapterPage()
         .add_flow(FlowDiagram([
             FlowStep("İnkâr", "'Bu ben olamam'"),
             FlowStep("Öfke", "'Neden ben?'"),
@@ -250,7 +262,7 @@ def get_pack() -> CoursePack:
             "farklı bir hedefe (yer değiştirme) veya üretken bir alana (yüceltme)."))
     )
     ch4.pages.append(
-        ChapterPage(continue_tag="On Savunma Mekanizması — Tam Liste")
+        ChapterPage()
         .add_table(ComparisonTable(
             "On Savunma Mekanizması",
             ["Mekanizma", "Tanım", "Tipik Örnek"],
@@ -301,6 +313,9 @@ def get_pack() -> CoursePack:
                 ["Histeri", "İlgi çekmek için fiziksel hastalık taklidi yapma (ör. psikolojik felç)."],
             ]
         ))
+    )
+    ch5.pages.append(
+        ChapterPage()
         .add_table(ComparisonTable(
             "Psikozlar — Ağır Bozukluklar",
             ["Tip", "Belirti"],
@@ -312,9 +327,6 @@ def get_pack() -> CoursePack:
                 ["Mani-Depresif (İki Uçlu)", "Bir dönem aşırı neşe (mani), bir dönem derin üzüntü (depresyon)."],
             ]
         ))
-    )
-    ch5.pages.append(
-        ChapterPage(continue_tag="Kişilik Kuramları")
         .add_block(BulletBlock(1, "Temel Tanımlar", [
             "<b>Persona:</b> Maske demektir.",
             "<b>Mizaç (Huy):</b> Biyolojiktir, doğuştan gelir, değişmez (ör. çabuk kızmak).",
@@ -329,6 +341,9 @@ def get_pack() -> CoursePack:
                 ["Jung", "İçe dönük ve Dışa dönük."],
             ]
         ))
+    )
+    ch5.pages.append(
+        ChapterPage()
         .add_info_cards("Freud'un Psikanalitik Kişilik Yapısı", [
             InfoCard("İd (Altben)", "İlkeldir, haz ilkesiyle çalışır — 'Hemen istiyorum' der.", "1"),
             InfoCard("Ego (Ben)", "Mantıklıdır, gerçeklik ilkesiyle çalışır — İd ile Süperego'yu uzlaştırır.", "2"),
