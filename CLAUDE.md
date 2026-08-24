@@ -62,8 +62,8 @@ Hiçbir script'in varsayılan dönemi YOKTUR ve sen de varsayma:
 │   ├── <DERS ADI>/                     #   tekil ders (.pdf + .html)
 │   └── <kitap-slug>.pdf                #   birleşik kitap (KÖKTE — tek bir derse ait değil)
 ├── src/                                # <ders_slug>.py içerik modülleri + kitap.py
-├── calisma_rehberleri/                 # ÇIKTI: ders-anlatim skill'i Mod 2
-└── ders_anlatimlari/                   # ÇIKTI: ders-anlatim skill'i Mod 1
+├── calisma_rehberleri/<DERS ADI>/      # ÇIKTI: ders-anlatim skill'i Mod 2
+└── ders_anlatimlari/<DERS ADI>/        # ÇIKTI: ders-anlatim skill'i Mod 1
 ```
 
 `<sinif>` ∈ {2, 3} · `<donem>` ∈ {1, 2} · `<sinav>` ∈ {vize, final} —
@@ -93,6 +93,9 @@ alt klasörün içine konur.** Örnek tam yol:
 
 `build.py` bu alt klasörü **otomatik oluşturur** (yoksa) ve çıktıyı oraya
 yazar; bu davranış TÜM sınıf/dönem/sınav kombinasyonlarında geçerlidir.
+Aynı kural `ders-anlatim` skill'inin çıktı klasörleri (`ders_anlatimlari/`,
+`calisma_rehberleri/`) için de geçerlidir — bkz.
+`.claude/skills/ders-anlatim/SKILL.md`.
 Klasör adı `CoursePack.ders_klasoru` alanından okunur — bkz. aşağıdaki
 "`ders_klasoru`" başlığı. Tek istisna birleşik kitaptır: tek bir derse ait
 olmadığı için `gorsel_ders_notlari/` **köküne** yazılır.
@@ -124,6 +127,7 @@ ders klasörüyle eşleşmemesine yol açar. **Yeni derste her zaman doldurun.**
 | Birleşik kitap tanımı | `<dönem>/src/kitap.py` |
 | **Üretilmiş görsel ders notu (tekil)** | `<dönem>/gorsel_ders_notlari/<DERS ADI>/` |
 | **Üretilmiş birleşik kitap** | `<dönem>/gorsel_ders_notlari/` (kökte) |
+| ders-anlatim skill'i çıktıları | `<dönem>/ders_anlatimlari/<DERS ADI>/` (Mod 1) · `<dönem>/calisma_rehberleri/<DERS ADI>/` (Mod 2) |
 
 > Eski `ders_ozetleri/` klasörü KALKTI — adı `özetlenmiş_dersler` ile
 > karışıyordu. Tüm çıktılar artık `gorsel_ders_notlari/` altındadır.
@@ -298,8 +302,8 @@ ders-uretim-sistemi/
         │   └── özetlenmiş_dersler/<DERS ADI>/ # ARA:   yazılı özet
         ├── src/                   # ders modülleri + kitap.py (bu dönemin)
         ├── gorsel_ders_notlari/   # ÇIKTI: <DERS ADI>/<slug>.pdf + .html
-        ├── calisma_rehberleri/    # ÇIKTI: ders-anlatim Mod 2
-        └── ders_anlatimlari/      # ÇIKTI: ders-anlatim Mod 1
+        ├── calisma_rehberleri/<DERS ADI>/  # ÇIKTI: ders-anlatim Mod 2
+        └── ders_anlatimlari/<DERS ADI>/    # ÇIKTI: ders-anlatim Mod 1
 ```
 
 Şu an **yalnızca `2-sinif/2-donem/final/` doludur** (11 ders); diğer 7 dönem

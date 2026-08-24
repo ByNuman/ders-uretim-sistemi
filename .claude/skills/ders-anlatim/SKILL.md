@@ -1,6 +1,6 @@
 ---
 name: ders-anlatim
-description: Bir ders kaynağını (<dönem>/kaynaklar/ders_kaynaklari/) ya da öğretmenin dağınık/eksik dikte notlarını (<dönem>/kaynaklar/ogretmen_notlari/) fihristleyip bölüm bölüm, otomatik ve kesintisiz şekilde derinlemesine anlatır veya toparlar. Kullanıcı bir ders adı verip "anlat", "işle" veya "notlarımı toparla/düzenle" dediğinde devreye girer. Görsel PDF ders notu kitabı sisteminden bağımsızdır.
+description: Bir ders kaynağını (<dönem>/kaynaklar/ders_kaynaklari/<DERS ADI>/) ya da öğretmenin dağınık/eksik dikte notlarını (<dönem>/kaynaklar/ogretmen_notlari/<DERS ADI>/) fihristleyip bölüm bölüm, otomatik ve kesintisiz şekilde derinlemesine anlatır veya toparlar. Kullanıcı bir ders adı verip "anlat", "işle" veya "notlarımı toparla/düzenle" dediğinde devreye girer. Görsel PDF ders notu kitabı sisteminden bağımsızdır.
 ---
 
 # Ders Anlatım Otomasyonu
@@ -20,15 +20,19 @@ Proje artık dosyaları sınav dönemine göre ayrı ağaçlarda tutar. Bu skill
 │   ├── ders_kaynaklari/<DERS ADI>/     # Mod 1 girdisi: tam ders metinleri
 │   ├── ogretmen_notlari/<DERS ADI>/    # Mod 2 girdisi: dağınık/dikte öğretmen notları
 │   └── özetlenmiş_dersler/<DERS ADI>/  # yazılı özetler (BU SKILL'E AİT DEĞİL)
-├── ders_anlatimlari/        # Mod 1 çıktısı: <ders adı>.pdf
-├── calisma_rehberleri/      # Mod 2 çıktısı: <ders adı>.pdf
+├── ders_anlatimlari/<DERS ADI>/     # Mod 1 çıktısı: <ders adı>.pdf
+├── calisma_rehberleri/<DERS ADI>/   # Mod 2 çıktısı: <ders adı>.pdf
 ├── src/                     # görsel PDF sisteminin ders modülleri (BU SKILL'E AİT DEĞİL)
 └── gorsel_ders_notlari/     # görsel PDF sisteminin ÇIKTISI (BU SKILL'E AİT DEĞİL)
 ```
 
 `<sinif>` ∈ {2, 3} · `<donem>` ∈ {1, 2} · `<sinav>` ∈ {vize, final}. Sekiz dönem klasörünün hepsi hazırdır.
 
+**`<DERS ADI>` alt klasörü zorunludur** (bkz. CLAUDE.md "KRİTİK KURAL 3"): bu projede hem girdi hem çıktı dosyaları doğrudan klasör köküne değil, dersin adını taşıyan bir alt klasörün içine konur. Ders adı, `kaynaklar/` altındaki klasör adıyla **birebir aynı** yazılır (ders programındaki BÜYÜK HARFLİ tam ad, ör. `SİSTEMATİK KELAM I`). Çıktı klasörü yoksa oluşturulur.
+
 Girdi ve çıktı HER ZAMAN aynı dönemin ağacındadır — bir dönemin kaynağından üretilen anlatımı başka bir döneme yazma.
+
+**Bu skill `özetlenmiş_dersler/` klasörüne DOKUNMAZ.** O klasör, görsel PDF sisteminin (build.py) girdisi olan yazılı özetlere aittir; bu skill'in ürettiği anlatım/rehber PDF'leri ondan ayrıdır ve kendi çıktı klasörlerine yazılır.
 
 `.calisma/` adında gizli bir çalışma klasörü de kullanılır (bkz. "PDF Üretimi" bölümü) — bunu elle oluşturman gerekmez, sistem otomatik yönetir.
 
@@ -61,7 +65,7 @@ Bunu önlemek için:
 
 Anlatım/toparlama tamamlandıktan sonra, biriken taslak doğrudan işlenmiş bir PDF'e dönüştürülür — ara `.md` dosyası çıktı klasörlerinde **bırakılmaz**, sadece PDF kalır.
 
-**Taslak akışı:** Bölüm bölüm üretilen içerik, nihai çıktı klasörlerine değil gizli bir çalışma dosyasına yazılır: `.calisma/<ders adı>.md`. Bu hem kesintiye dayanıklılığı sağlar (yarıda kalırsa buradan devam edilir) hem de PDF'e çevrilmeden önceki ham içeriktir. Tüm bölümler bitince bu taslaktan PDF üretilir; ardından taslak ve varsa ara `.docx` dosyası silinir.
+**Taslak akışı:** Bölüm bölüm üretilen içerik, nihai çıktı klasörlerine değil gizli bir çalışma dosyasına yazılır: **proje kökündeki** `.calisma/<ders adı>.md` (dönem ağacının içine değil — geçici dosya, `.gitignore`'da). Bu hem kesintiye dayanıklılığı sağlar (yarıda kalırsa buradan devam edilir) hem de PDF'e çevrilmeden önceki ham içeriktir. Tüm bölümler bitince bu taslaktan PDF üretilir; ardından taslak ve varsa ara `.docx` dosyası silinir.
 
 **Görsel stil (kullanıcının paylaştığı referans PDF'e göre belirlendi):**
 - Sayfa: A4, tek sütun, renk/tema yok (siyah-beyaz, sade akademik görünüm)
@@ -76,7 +80,7 @@ Anlatım/toparlama tamamlandıktan sonra, biriken taslak doğrudan işlenmiş bi
 
 **Teknik yöntem:** `python-docx` ile yukarıdaki stile uygun bir `.docx` oluştur, ardından `docx2pdf` paketiyle (Windows'ta Word'ü COM üzerinden kullanarak) PDF'e çevir. Bu yöntem, referans PDF'in zaten Word ile üretilmiş olmasından dolayı emoji ve fontların birebir aynı görünmesini garanti eder — özellikle emoji ikonları (🔑 ⚠️ 💡) düz PDF kütüphaneleriyle (reportlab, fpdf2 vb.) doğru render edilemeyebilir, Word/docx2pdf yolu bunu bypass eder. Gerekli paketler kurulu değilse `pip install python-docx docx2pdf --break-system-packages` ile kur. Word veya `docx2pdf` çalışmazsa yedek yöntem olarak `soffice --headless --convert-to pdf` (LibreOffice) kullanılabilir.
 
-Nihai `.pdf` dosyası ilgili dönemin çıktı klasörüne (`<D>/ders_anlatimlari/` veya `<D>/calisma_rehberleri/`) `<ders adı>.pdf` adıyla kaydedilir; ara `.docx` ve `.calisma/` içindeki taslak silinir.
+Nihai `.pdf` dosyası ilgili dönemin çıktı klasöründe **dersin kendi alt klasörüne** (`<D>/ders_anlatimlari/<DERS ADI>/` veya `<D>/calisma_rehberleri/<DERS ADI>/`) `<ders adı>.pdf` adıyla kaydedilir; klasör yoksa oluşturulur. Ara `.docx` ve `.calisma/` içindeki taslak silinir.
 
 ---
 
@@ -105,7 +109,7 @@ Metnin ana başlıklarından "Konu Omurgası" (fihrist) çıkar, `.calisma/<ders
 Fihristteki her bölümü sırayla işle, `.calisma/<ders adı>.md` taslağına ekleye ekleye ilerle; bölüm bitince otomatik olarak sıradakine geç.
 
 ### 4. Çıktı
-Tüm bölümler bitince taslağı "PDF Üretimi" bölümündeki stile göre `<D>/ders_anlatimlari/<ders adı>.pdf` dosyasına dönüştür; taslağı ve ara dosyaları sil.
+Tüm bölümler bitince taslağı "PDF Üretimi" bölümündeki stile göre `<D>/ders_anlatimlari/<DERS ADI>/<ders adı>.pdf` dosyasına dönüştür (klasör yoksa oluştur); taslağı ve ara dosyaları sil.
 
 ### Mod 1 Temel Kuralları
 
@@ -148,7 +152,7 @@ Dağınık notlardan mantıklı bir "Konu Omurgası" kur — notların orijinal 
 Fihristteki her bölümü sırayla düzenle/tamamla, `.calisma/<ders adı>.md` taslağına ekleye ekleye ilerle; bölüm bitince otomatik olarak sıradakine geç.
 
 ### 4. Çıktı
-Tüm bölümler bitince taslağı "PDF Üretimi" bölümündeki stile göre `<D>/calisma_rehberleri/<ders adı>.pdf` dosyasına dönüştür; taslağı ve ara dosyaları sil.
+Tüm bölümler bitince taslağı "PDF Üretimi" bölümündeki stile göre `<D>/calisma_rehberleri/<DERS ADI>/<ders adı>.pdf` dosyasına dönüştür (klasör yoksa oluştur); taslağı ve ara dosyaları sil.
 
 ### Mod 2 Temel Kuralları
 
