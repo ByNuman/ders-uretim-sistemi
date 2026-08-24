@@ -136,7 +136,7 @@ ders klasörüyle eşleşmemesine yol açar. **Yeni derste her zaman doldurun.**
 
 ```
 build.py · build_kitap.py · donem.py · content_model.py · theme_engine.py
-pdfx.py · arabic_reshape.py · templates/ · tools/ · fonts/ · assets/
+pdfx.py · renk_uretici.py · arabic_reshape.py · templates/ · tools/ · fonts/ · assets/
 ```
 
 Bu dosyalar TÜM dönemler tarafından paylaşılır. `templates/style.css` veya
@@ -280,6 +280,7 @@ ders-uretim-sistemi/
 ├── build_kitap.py          # BİRLEŞİK KİTAP: bir dönemin tüm derslerini tek ciltte birleştirir
 ├── pdfx.py                 # BASKI ÖNCESİ: TrimBox/BleedBox + Ghostscript ile PDF/X-4 CMYK
 ├── theme_engine.py         # Sınırsız renk teması motoru (tek hex'ten tam tema üretir)
+├── renk_uretici.py         # DERSE ÖZEL VURGU RENGİ — build.py + ders-anlatim skill'inin ORTAK kaynağı
 ├── tools/
 │   ├── olcum.py            # Her bloğun GERÇEK yüksekliğini (mm) Chromium'da ölçer
 │   ├── dengele.py          # Ölçüme göre ChapterPage bölünmelerini yeniden dağıtır

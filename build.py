@@ -32,6 +32,7 @@ if hasattr(sys.stdout, "reconfigure"):
     sys.stderr.reconfigure(encoding="utf-8")
 
 from theme_engine import resolve_theme_css
+from renk_uretici import pack_rengi
 import pdfx
 import donem as donem_mod
 
@@ -435,6 +436,14 @@ def build(module_name: str, d: "donem_mod.Donem | None" = None):
 
     css = load_css()
     theme_override_css = resolve_theme_css(pack.theme_color)
+
+    # Dersin EFEKTİF vurgu rengi. ders-anlatim skill'i de aynı değeri
+    # renk_uretici.ders_rengi(<DERS ADI>) ile okur — bir dersin rengi hangi
+    # sistemle üretilirse üretilsin aynı kalmalı (bkz. renk_uretici.py).
+    _vurgu = pack_rengi(pack)
+    _vurgu_kaynak = "theme_color" if pack.theme_color else f"theme-{pack.theme}"
+    print(f"[build] Ders vurgu rengi: {_vurgu}  ({_vurgu_kaynak})")
+
     env = Environment(loader=FileSystemLoader(str(TEMPLATES)))
     template = env.get_template("master.html.j2")
     html = template.render(
