@@ -7,13 +7,17 @@ Kullanım:
 
 Sınıf/dönem/sınav VARSAYILAN DEĞİLDİR: verilmezse sorulur (bkz. donem.py).
 Ders modülü, seçilen dönemin src/ klasöründen okunur; çıktı aynı dönemin
-ders_ozetleri/ klasörüne yazılır.
+gorsel_ders_notlari/<DERS ADI>/ klasörüne yazılır.
 
 CoursePack nesnesini alır -> Jinja2 ile HTML üretir -> Playwright/Chromium
 ile 175x250mm (+3mm bleed) PDF'e render eder -> sayfa kutularını (TrimBox)
 yazar -> Ghostscript ile PDF/X-4 CMYK'ya çevirir.
-Çıktı: <sinif>-sinif/<donem>-donem/<sinav>/ders_ozetleri/<slug>.pdf
+Çıktı: <sinif>-sinif/<donem>-donem/<sinav>/gorsel_ders_notlari/<DERS ADI>/<slug>.pdf
 (CMYK, baskıya hazır) ve (denetim için) aynı klasörde .html
+
+<DERS ADI> klasörü CoursePack.ders_klasoru alanından gelir ve yoksa
+otomatik oluşturulur. Bu kural TÜM sınıf/dönem/sınav kombinasyonlarında
+geçerlidir.
 """
 
 import sys
@@ -49,12 +53,36 @@ def set_donem(d: "donem_mod.Donem") -> "donem_mod.Donem":
     """
     global DONEM, OUTPUT
     DONEM = d.ensure().activate()
-    OUTPUT = d.ders_ozetleri
+    OUTPUT = d.gorsel_ders_notlari
     return d
 
 
+def ders_klasoru_of(pack) -> str:
+    """Bir dersin klasör adı: CoursePack.ders_klasoru, yoksa başlık slug'ı.
+
+    Yeni derslerde ders_klasoru'nu HER ZAMAN doldurun (ders programındaki
+    büyük harfli tam ad); slug'a düşmek yalnızca geriye dönük uyumluluk
+    içindir ve klasör adının dönem ağacındaki diğer isimlerle eşleşmemesine
+    yol açar.
+    """
+    ad = (getattr(pack, "ders_klasoru", "") or "").strip()
+    return ad or slugify(pack.title)
+
+
+def course_out_dir(pack) -> Path:
+    """Bu dersin görsel ders notu çıktı klasörü (yoksa oluşturulur):
+    <dönem>/gorsel_ders_notlari/<DERS ADI>/"""
+    if DONEM is None:
+        out_dir()      # dönem seçilmediyse net hatayla durur
+    return DONEM.ders_cikti_dizini(ders_klasoru_of(pack))
+
+
 def out_dir() -> Path:
-    """Aktif dönemin çıktı klasörü. Dönem seçilmediyse net bir hatayla durur."""
+    """Aktif dönemin çıktı KÖKÜ (gorsel_ders_notlari/).
+
+    Tekil ders dosyaları buraya değil, course_out_dir() ile dersin kendi alt
+    klasörüne yazılır; burası birleşik kitabın ve geçici render/ölçüm
+    dosyalarının yeridir. Dönem seçilmediyse net bir hatayla durur."""
     if OUTPUT is None:
         raise SystemExit(
             "[hata] Önce sınav dönemi seçilmeli.\n"
@@ -414,8 +442,10 @@ def build(module_name: str, d: "donem_mod.Donem | None" = None):
     )
 
     slug = slugify(pack.title)
-    html_path = out_dir() / f"{slug}.html"
-    pdf_path = out_dir() / f"{slug}.pdf"
+    ders_dir = course_out_dir(pack)
+    html_path = ders_dir / f"{slug}.html"
+    pdf_path = ders_dir / f"{slug}.pdf"
+    print(f"[build] Ders klasörü: {ders_dir}")
     html_path.write_text(html, encoding="utf-8")
     print(f"[build] HTML yazıldı: {html_path}")
 

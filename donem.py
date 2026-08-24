@@ -5,12 +5,20 @@ DERS ÜRETİM SİSTEMİ — donem.py  (SINIF / DÖNEM / SINAV ÇÖZÜMLEYİCİ)
 Proje artık dosyaları sınav dönemine göre ayrı ağaçlarda tutar:
 
     <sinif>-sinif/<donem>-donem/<sinav>/
-        kaynaklar/ders_kaynaklari/   # ham ders metinleri / özet PDF'leri (GİRDİ)
-        kaynaklar/ogretmen_notlari/  # ham dikte notları (GİRDİ)
-        src/                         # <ders_slug>.py içerik modülleri + kitap.py
-        ders_ozetleri/               # build.py / build_kitap.py ÇIKTISI (.pdf + .html)
-        calisma_rehberleri/          # ders-anlatim skill'i Mod 2 çıktısı
-        ders_anlatimlari/            # ders-anlatim skill'i Mod 1 çıktısı
+        kaynaklar/
+            ders_kaynaklari/<DERS ADI>/     # GİRDİ: ham ders metni
+            ogretmen_notlari/<DERS ADI>/    # GİRDİ: ham dikte notu
+            özetlenmiş_dersler/<DERS ADI>/  # ARA:   bunlardan çıkarılan YAZILI özet
+        gorsel_ders_notlari/                # ÇIKTI: build.py'nin kitap formatındaki PDF'i
+            <DERS ADI>/                     #        tekil ders (.pdf + .html)
+            <kitap>.pdf                     #        birleşik kitap (dersi olmadığı için kökte)
+        src/                                # <ders_slug>.py içerik modülleri + kitap.py
+        calisma_rehberleri/                 # ders-anlatim skill'i Mod 2 çıktısı
+        ders_anlatimlari/                   # ders-anlatim skill'i Mod 1 çıktısı
+
+Üretim zinciri:
+    ders_kaynaklari/ + ogretmen_notlari/  ->  özetlenmiş_dersler/  ->  gorsel_ders_notlari/
+          (ham girdi)                          (yazılı özet)            (kitap formatı)
 
 Bu modül, bütün build/ölçüm scriptlerinin AYNI şekilde dönem seçmesini sağlar.
 VARSAYILAN DÖNEM YOKTUR: parametre verilmezse kullanıcıya sorulur, sorulamıyorsa
@@ -42,10 +50,11 @@ SINAVLAR = ("vize", "final")
 
 # Bir dönem klasörünün alt yapısı — iskeleti kurarken de bu liste kullanılır.
 ALT_KLASORLER = (
-    "kaynaklar/ders_kaynaklari",
-    "kaynaklar/ogretmen_notlari",
+    "kaynaklar/ders_kaynaklari",      # GİRDİ  — ham ders metni      (ders adı alt klasörü)
+    "kaynaklar/ogretmen_notlari",     # GİRDİ  — ham dikte notu      (ders adı alt klasörü)
+    "kaynaklar/özetlenmiş_dersler",   # ARA    — yazılı özet         (ders adı alt klasörü)
+    "gorsel_ders_notlari",            # ÇIKTI  — build.py kitap PDF  (ders adı alt klasörü)
     "src",
-    "ders_ozetleri",
     "calisma_rehberleri",
     "ders_anlatimlari",
 )
@@ -69,9 +78,14 @@ class Donem:
         return self.root / "src"
 
     @property
-    def ders_ozetleri(self) -> Path:
-        """build.py / build_kitap.py ÇIKTI klasörü (.pdf + .html)."""
-        return self.root / "ders_ozetleri"
+    def gorsel_ders_notlari(self) -> Path:
+        """build.py / build_kitap.py ÇIKTI kökü.
+
+        Tekil ders PDF'leri buranın <DERS ADI>/ alt klasörüne yazılır
+        (bkz. ders_cikti_dizini); birleşik kitap tek bir derse ait olmadığı
+        için doğrudan bu klasörün köküne yazılır.
+        """
+        return self.root / "gorsel_ders_notlari"
 
     @property
     def ders_kaynaklari(self) -> Path:
@@ -80,6 +94,32 @@ class Donem:
     @property
     def ogretmen_notlari(self) -> Path:
         return self.root / "kaynaklar" / "ogretmen_notlari"
+
+    @property
+    def ozetlenmis_dersler(self) -> Path:
+        """ders_kaynaklari/ + ogretmen_notlari/ içeriğinden çıkarılan YAZILI
+        özetler. Görsel ders notu ÜRETİLMEZ burada — bu klasör build.py'nin
+        girdisidir, çıktısı değil."""
+        return self.root / "kaynaklar" / "özetlenmiş_dersler"
+
+    def ders_cikti_dizini(self, ders_klasoru: str) -> Path:
+        """Bir dersin görsel ders notu çıktı klasörü; yoksa oluşturulur.
+
+        `ders_klasoru`, CoursePack.ders_klasoru alanından gelir (ders
+        programındaki BÜYÜK HARFLİ tam ad, ör. "KELÂM TARİHİ"). Bu kural TÜM
+        sınıf/dönem/sınav kombinasyonlarında geçerlidir.
+        """
+        p = self.gorsel_ders_notlari / ders_klasoru
+        p.mkdir(parents=True, exist_ok=True)
+        return p
+
+    def ders_kaynak_dizini(self, ders_klasoru: str) -> Path:
+        """Bir dersin ham kaynak klasörü (girdi)."""
+        return self.ders_kaynaklari / ders_klasoru
+
+    def ders_ozet_dizini(self, ders_klasoru: str) -> Path:
+        """Bir dersin yazılı özet klasörü (build.py'nin girdisi)."""
+        return self.ozetlenmis_dersler / ders_klasoru
 
     @property
     def calisma_rehberleri(self) -> Path:

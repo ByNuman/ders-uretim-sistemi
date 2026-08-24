@@ -17,12 +17,13 @@ Proje artık dosyaları sınav dönemine göre ayrı ağaçlarda tutar. Bu skill
 ```
 <sinif>-sinif/<donem>-donem/<sinav>/          # <D> diye anacağız
 ├── kaynaklar/
-│   ├── ders_kaynaklari/     # Mod 1 girdisi: tam ders metinleri
-│   └── ogretmen_notlari/    # Mod 2 girdisi: dağınık/dikte öğretmen notları
+│   ├── ders_kaynaklari/<DERS ADI>/     # Mod 1 girdisi: tam ders metinleri
+│   ├── ogretmen_notlari/<DERS ADI>/    # Mod 2 girdisi: dağınık/dikte öğretmen notları
+│   └── özetlenmiş_dersler/<DERS ADI>/  # yazılı özetler (BU SKILL'E AİT DEĞİL)
 ├── ders_anlatimlari/        # Mod 1 çıktısı: <ders adı>.pdf
 ├── calisma_rehberleri/      # Mod 2 çıktısı: <ders adı>.pdf
 ├── src/                     # görsel PDF sisteminin ders modülleri (BU SKILL'E AİT DEĞİL)
-└── ders_ozetleri/           # görsel PDF sisteminin ÇIKTISI (BU SKILL'E AİT DEĞİL)
+└── gorsel_ders_notlari/     # görsel PDF sisteminin ÇIKTISI (BU SKILL'E AİT DEĞİL)
 ```
 
 `<sinif>` ∈ {2, 3} · `<donem>` ∈ {1, 2} · `<sinav>` ∈ {vize, final}. Sekiz dönem klasörünün hepsi hazırdır.
@@ -35,8 +36,11 @@ Girdi ve çıktı HER ZAMAN aynı dönemin ağacındadır — bir dönemin kayna
 
 Kullanıcı sadece ders adını verir (örn. "Modern Felsefe Tarihi'ni anlat" veya "Hadis Usulü notlarımı toparla"). Sistem dosyanın hangi klasörde bulunduğuna bakarak modu otomatik seçer:
 
-- `<D>/kaynaklar/ders_kaynaklari/` içindeyse → **Mod 1**
-- `<D>/kaynaklar/ogretmen_notlari/` içindeyse → **Mod 2**
+- `<D>/kaynaklar/ders_kaynaklari/<DERS ADI>/` içindeyse → **Mod 1**
+- `<D>/kaynaklar/ogretmen_notlari/<DERS ADI>/` içindeyse → **Mod 2**
+
+Her iki girdi klasöründe de dosyalar doğrudan kökte değil, dersin adını
+taşıyan bir alt klasörün içindedir.
 
 Dosyayı ararken YALNIZCA kullanıcının belirttiği dönemin klasörlerine bak; bulunamazsa diğer dönemleri taramak yerine kullanıcıya sor.
 

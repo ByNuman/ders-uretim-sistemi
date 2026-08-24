@@ -858,6 +858,7 @@ def get_pack() -> CoursePack:
     ]
 
     return CoursePack(
+        ders_klasoru="İSLAM TARİHİ III",
         course_code="İSL. TARİHİ III",
         title='İslam Tarihi<span class="accent-word"> III</span>',
         subtitle="Hârezmşâhlardan Moğol İstilasına: Türk-İslam Devletleri",

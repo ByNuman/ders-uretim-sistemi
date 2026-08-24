@@ -11,7 +11,8 @@ Kural:
   TAMAMEN AYRI, birbirini tetiklemeyen iki iştir.
 - Bir ders için "işle", "anlat", "görsel not hazırla" gibi bir istek
   geldiğinde, sonucu sadece o dersin kendi PDF'i olarak üret ve
-  ilgili sınav döneminin `ders_ozetleri/` klasörüne koy. Birleştirme
+  ilgili sınav döneminin `gorsel_ders_notlari/<DERS ADI>/` klasörüne koy.
+  Birleştirme
   scriptine (merge/combine script) DOKUNMA.
 - Birleşik kitaba bir dersin eklenmesi/çıkarılması/yeniden sıralanması
   SADECE kullanıcı açıkça "birleşik kitaba ekle", "kitabı güncelle",
@@ -49,36 +50,83 @@ Hiçbir script'in varsayılan dönemi YOKTUR ve sen de varsayma:
 - Aynı ders adı farklı dönemlerde ayrı ayrı bulunabilir ve bunlar birbirinden
   TAMAMEN bağımsızdır (ayrı `src/`, ayrı çıktı, ayrı birleşik kitap).
 
-## Klasör yapısı: sınıf / dönem / sınav
+## Klasör yapısı: sınıf / dönem / sınav / DERS
 
 ```
 <sinif>-sinif/<donem>-donem/<sinav>/
 ├── kaynaklar/
-│   ├── ders_kaynaklari/     # GİRDİ: ham ders metinleri / özet PDF'leri
-│   └── ogretmen_notlari/    # GİRDİ: öğretmenin dağınık dikte notları
-├── src/                     # <ders_slug>.py içerik modülleri + kitap.py
-├── ders_ozetleri/           # ÇIKTI: build.py / build_kitap.py -> .pdf + .html
-├── calisma_rehberleri/      # ÇIKTI: ders-anlatim skill'i Mod 2
-└── ders_anlatimlari/        # ÇIKTI: ders-anlatim skill'i Mod 1
+│   ├── ders_kaynaklari/<DERS ADI>/     # GİRDİ: ham ders metni / kaynak PDF
+│   ├── ogretmen_notlari/<DERS ADI>/    # GİRDİ: öğretmenin dağınık dikte notu
+│   └── özetlenmiş_dersler/<DERS ADI>/  # ARA:   yukarıdakilerden çıkarılan YAZILI özet
+├── gorsel_ders_notlari/                # ÇIKTI: build.py / build_kitap.py
+│   ├── <DERS ADI>/                     #   tekil ders (.pdf + .html)
+│   └── <kitap-slug>.pdf                #   birleşik kitap (KÖKTE — tek bir derse ait değil)
+├── src/                                # <ders_slug>.py içerik modülleri + kitap.py
+├── calisma_rehberleri/                 # ÇIKTI: ders-anlatim skill'i Mod 2
+└── ders_anlatimlari/                   # ÇIKTI: ders-anlatim skill'i Mod 1
 ```
 
 `<sinif>` ∈ {2, 3} · `<donem>` ∈ {1, 2} · `<sinav>` ∈ {vize, final} —
-şu an 8 dönem klasörünün hepsi mevcut (çoğu boş, `.gitkeep` ile tutuluyor).
+8 dönem klasörünün hepsi mevcut (boşlar `.gitkeep` ile tutuluyor).
 
-**İsimlendirmeye dikkat:** `ders_ozetleri/` bu yapıda **üretilmiş çıktıyı**
-tutar (ham kaynağı değil). Ham ders özetleri `kaynaklar/ders_kaynaklari/`
-içindedir. Eski yapıdaki `kaynaklar/ders_ozetleri/` klasörü kalktı.
+### KRİTİK KURAL 3: Üretim zinciri ve `<DERS ADI>` alt klasörü
+
+```
+ders_kaynaklari/ + ogretmen_notlari/  ->  özetlenmiş_dersler/  ->  gorsel_ders_notlari/
+      (ham girdi)                          (yazılı özet)            (kitap formatı, build.py)
+```
+
+Bu üç aşama **ayrı şeylerdir, birbirinin yerine geçmez**:
+
+* `özetlenmiş_dersler/` = ham kaynağın/öğretmen notunun **yazılı** özeti.
+  build.py'nin ÇIKTISI DEĞİL, GİRDİSİDİR.
+* `gorsel_ders_notlari/` = build.py'nin ürettiği **kitap formatındaki** görsel
+  ders notu PDF'i. Tek gerçek çıktı klasörü budur.
+
+**Her üç klasörde de dosyalar doğrudan köke DEĞİL, dersin adını taşıyan bir
+alt klasörün içine konur.** Örnek tam yol:
+
+```
+3-sinif/1-donem/final/kaynaklar/özetlenmiş_dersler/SİSTEMATİK KELAM I/sistematik-kelam-1-ozet.pdf
+3-sinif/1-donem/final/gorsel_ders_notlari/SİSTEMATİK KELAM I/sistematik-kelam-i.pdf
+```
+
+`build.py` bu alt klasörü **otomatik oluşturur** (yoksa) ve çıktıyı oraya
+yazar; bu davranış TÜM sınıf/dönem/sınav kombinasyonlarında geçerlidir.
+Klasör adı `CoursePack.ders_klasoru` alanından okunur — bkz. aşağıdaki
+"`ders_klasoru`" başlığı. Tek istisna birleşik kitaptır: tek bir derse ait
+olmadığı için `gorsel_ders_notlari/` **köküne** yazılır.
+
+### `ders_klasoru` — her yeni derste ZORUNLU
+
+`CoursePack`'e ders programındaki **BÜYÜK HARFLİ tam adı** yazın:
+
+```python
+return CoursePack(
+    ders_klasoru="SİSTEMATİK KELAM I",   # <- klasör adı; kaynaklar/ altındakiyle BİREBİR aynı olmalı
+    course_code="SİST. KELAM I",
+    ...
+)
+```
+
+Boş bırakılırsa build.py başlık slug'ına düşer (`kelâm-tarihi/` gibi) — bu
+sadece geriye dönük uyumluluk içindir ve klasör adının `kaynaklar/` altındaki
+ders klasörüyle eşleşmemesine yol açar. **Yeni derste her zaman doldurun.**
 
 ### Neyin nerede olduğu
 
 | Ne | Nerede |
 |---|---|
-| Ham ders özeti / ders metni (girdi) | `<dönem>/kaynaklar/ders_kaynaklari/` |
-| Öğretmenin ham dikte notu (girdi) | `<dönem>/kaynaklar/ogretmen_notlari/` |
+| Ham ders metni / kaynak PDF (girdi) | `<dönem>/kaynaklar/ders_kaynaklari/<DERS ADI>/` |
+| Öğretmenin ham dikte notu (girdi) | `<dönem>/kaynaklar/ogretmen_notlari/<DERS ADI>/` |
+| Yazılı özet (ara ürün, build.py'nin girdisi) | `<dönem>/kaynaklar/özetlenmiş_dersler/<DERS ADI>/` |
 | Dersin Python içerik modülü | `<dönem>/src/<ders_slug>.py` |
 | Birleşik kitap tanımı | `<dönem>/src/kitap.py` |
-| Üretilmiş ders PDF/HTML | `<dönem>/ders_ozetleri/` |
-| Üretilmiş birleşik kitap | `<dönem>/ders_ozetleri/` |
+| **Üretilmiş görsel ders notu (tekil)** | `<dönem>/gorsel_ders_notlari/<DERS ADI>/` |
+| **Üretilmiş birleşik kitap** | `<dönem>/gorsel_ders_notlari/` (kökte) |
+
+> Eski `ders_ozetleri/` klasörü KALKTI — adı `özetlenmiş_dersler` ile
+> karışıyordu. Tüm çıktılar artık `gorsel_ders_notlari/` altındadır.
 
 ### Kökte kalan paylaşılan altyapı (döneme ait DEĞİL, asla kopyalanmaz)
 
@@ -200,7 +248,8 @@ TrimBox VEYA ArtBox ister, ikisini birden değil.)
 `build.py` ve `build_kitap.py`, PDF'i üretip yer imlerini ekledikten hemen
 sonra `pdfx.convert_or_warn()` çağırır: çıktı Ghostscript ile **RGB'den
 PDF/X-4 (DeviceCMYK)**'ya çevrilir. Ara RGB dosya geçici klasörde kalır ve
-silinir — kullanıcının elindeki `<D>/ders_ozetleri/<slug>.pdf` doğrudan CMYK'dır.
+silinir — kullanıcının elindeki
+`<D>/gorsel_ders_notlari/<DERS ADI>/<slug>.pdf` doğrudan CMYK'dır.
 
 * **Ghostscript kurulu değilse build DURMAZ**: işletim sistemine göre kurulum
   komutunu içeren net bir uyarı basılır ve dosya RGB bırakılır
@@ -244,10 +293,11 @@ ders-uretim-sistemi/
 ├── 2-sinif/{1,2}-donem/{vize,final}/
 └── 3-sinif/{1,2}-donem/{vize,final}/
         ├── kaynaklar/
-        │   ├── ders_kaynaklari/   # GİRDİ: ham ders özetleri / ders metinleri
-        │   └── ogretmen_notlari/  # GİRDİ: öğretmenin ham dikte notları
+        │   ├── ders_kaynaklari/<DERS ADI>/    # GİRDİ: ham ders metni
+        │   ├── ogretmen_notlari/<DERS ADI>/   # GİRDİ: ham dikte notu
+        │   └── özetlenmiş_dersler/<DERS ADI>/ # ARA:   yazılı özet
         ├── src/                   # ders modülleri + kitap.py (bu dönemin)
-        ├── ders_ozetleri/         # ÇIKTI: <slug>.pdf + <slug>.html
+        ├── gorsel_ders_notlari/   # ÇIKTI: <DERS ADI>/<slug>.pdf + .html
         ├── calisma_rehberleri/    # ÇIKTI: ders-anlatim Mod 2
         └── ders_anlatimlari/      # ÇIKTI: ders-anlatim Mod 1
 ```
@@ -303,8 +353,9 @@ Kullanıcı bir dosya eklemeden sadece bir ders adı söylerse (ör. "sosyoloji
 dersini işle"), önce PDF/metin eklenip eklenmediğini kontrol et; eklenmediyse
 **kullanıcıya sormadan önce** o dönemin girdi klasörlerini tara:
 ```bash
-ls "<D>/kaynaklar/ders_kaynaklari/"
+ls "<D>/kaynaklar/ders_kaynaklari/"       # ders adı alt klasörleri
 ls "<D>/kaynaklar/ogretmen_notlari/"
+ls "<D>/kaynaklar/özetlenmiş_dersler/"    # varsa hazır yazılı özet
 ```
 Ders adıyla eşleşen (esnek eşleştir — büyük/küçük harf, Türkçe karakter,
 "-özet"/"-ozet" gibi ekleri göz ardı ederek) bir dosya varsa onu kaynak
@@ -423,8 +474,9 @@ her bloğun gerçek yüksekliğini Chromium'da ölçer ve `ChapterPage`
 bölünmelerini taşmayacak EN AZ sayfaya, boşluğu sona iterek yeniden dağıtır
 (blokların içine ve sırasına dokunmaz, içerik uydurmaz). `--kuru` ile önce
 sadece raporlatabilirsin. Elle karar vermen gerekirse PDF'i sayfa numarasına
-göre PNG'ye çevirip (`pdftoppm -png -r 100 -f X -l X "<D>/ders_ozetleri/<slug>.pdf"
-"<D>/ders_ozetleri/preview/pgX"`) görme aracıyla incele, aşırı yüklü `ChapterPage`'i ikiye
+göre PNG'ye çevirip (`pdftoppm -png -r 100 -f X -l X
+"<D>/gorsel_ders_notlari/<DERS ADI>/<slug>.pdf" "<D>/gorsel_ders_notlari/preview/pgX"`)
+görme aracıyla incele, aşırı yüklü `ChapterPage`'i ikiye
 (gerekirse üçe) böl, yeniden derle. "✓" görene kadar tekrarla. Asla taşma
 uyarısını görmezden gelip devam etme — bu, üretilen PDF'in sessizce içerik
 kaybettiği anlamına gelir.
@@ -529,7 +581,7 @@ bir israf noktasına çevirmeyen) değişiklikleri kalıcı yap.
 ```bash
 python3 -c "
 from pypdf import PdfReader
-r = PdfReader('<D>/ders_ozetleri/<slug>.pdf')
+r = PdfReader('<D>/gorsel_ders_notlari/<DERS ADI>/<slug>.pdf')
 for it in r.outline:
     print(it.title, '->', r.get_destination_page_number(it)+1)
 annots = r.pages[1].get('/Annots')
@@ -647,7 +699,8 @@ from content_model import (
   `'Sosyoloji<span class="accent-word">ye</span> Giriş'` — bir kelimenin
   bir kısmını altın renkte vurgulamak için), `subtitle`, `description`,
   `theme`, `icon_text`, `chapters`, `glossary`. Opsiyonel ama HER ZAMAN
-  doldurulması gereken: `theme_color` (bkz. "Renk Teması" bölümü),
+  doldurulması gereken: `ders_klasoru` (çıktı klasörünün adı — bkz.
+  "KRİTİK KURAL 3"), `theme_color` (bkz. "Renk Teması" bölümü),
   `test_title`, `test_subtitle`, `test_instructions`, `test_questions`
   (20 soru önerilir), `answer_key_intro`, `answer_key_items`,
   `overview_lead`, `overview_cards` (tam 6 eleman — 3x2 grid), `overview_flow`
@@ -746,6 +799,7 @@ def get_pack() -> CoursePack:
     ]
 
     return CoursePack(
+        ders_klasoru="SİSTEMATİK KELAM I",   # klasör adı — kaynaklar/ altındakiyle birebir
         course_code="...", title="...", subtitle="...", description="...",
         theme="forest", theme_color="#0F5148", icon_text="...",
         chapters=chapters, glossary=glossary,
@@ -1052,15 +1106,15 @@ python pdfx.py
 python build_kitap.py --sinif X --donem Y --sinav Z
 
 # Belirli sayfaları PNG'ye çevirip incele
-pdftoppm -png -r 100 -f <ilk> -l <son> "<D>/ders_ozetleri/<slug>.pdf" "<D>/ders_ozetleri/preview/pg"
+pdftoppm -png -r 100 -f <ilk> -l <son> "<D>/gorsel_ders_notlari/<DERS ADI>/<slug>.pdf" "<D>/gorsel_ders_notlari/preview/pg"
 
 # Tüm sayfaları çevir
-pdftoppm -png -r 100 "<D>/ders_ozetleri/<slug>.pdf" "<D>/ders_ozetleri/preview/pg"
+pdftoppm -png -r 100 "<D>/gorsel_ders_notlari/<DERS ADI>/<slug>.pdf" "<D>/gorsel_ders_notlari/preview/pg"
 
 # Bookmark/link doğrulaması
 python3 -c "
 from pypdf import PdfReader
-r = PdfReader('<D>/ders_ozetleri/<slug>.pdf')
+r = PdfReader('<D>/gorsel_ders_notlari/<DERS ADI>/<slug>.pdf')
 for it in r.outline: print(it.title, '->', r.get_destination_page_number(it)+1)
 "
 
@@ -1081,6 +1135,8 @@ python3 theme_engine.py
       Latin `icon_text` verdim
 - [ ] `<D>/src/<slug>.py` yazdım, `content_model.py` API'sine birebir uydum
       (başındaki `sys.path` satırı `parents[4]` olmalı)
+- [ ] `ders_klasoru=` alanını doldurdum ve `kaynaklar/` altındaki ders
+      klasörü adıyla BİREBİR aynı yazdım
 - [ ] 20 soruluk `test_questions` + eşleşen `answer_key_items` yazdım
       (LEGACY `distinctions`/`match_table`/`qa_items` DEĞİL)
 - [ ] `python build.py <slug> --sinif X --donem Y --sinav Z` çalıştırdım
@@ -1103,4 +1159,6 @@ python3 theme_engine.py
       çıplak adıyla ekledim ve `python build_kitap.py --sinif X --donem Y --sinav Z`
       ile o dönemin birleşik kitabını yeniden derledim; taşma,
       sayfa zinciri ve render doğrulamalarının hepsi "✓" verdi
+- [ ] Çıktının `<D>/gorsel_ders_notlari/<DERS ADI>/` altına düştüğünü
+      konsoldaki "[build] Ders klasörü:" satırından doğruladım
 - [ ] PDF'i kullanıcıya sundum

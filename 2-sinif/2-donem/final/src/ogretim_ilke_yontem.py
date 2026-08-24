@@ -841,6 +841,7 @@ def get_pack() -> CoursePack:
     ]
 
     return CoursePack(
+        ders_klasoru="ÖĞRETİM İLKE VE YÖNTEMLERİ",
         course_code="İLKE & YÖNTEM",
         title='Öğretim <span class="accent-word">İlke</span> ve Yöntemleri',
         subtitle="Öğrenme Kuramlarından Öğretim Yöntem, Teknik ve Düşünme Biçimlerine Final Özeti",

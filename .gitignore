@@ -1,9 +1,9 @@
 node_modules/
 __pycache__/
 *.pyc
-**/ders_ozetleri/preview/
-**/ders_ozetleri/_render.js
-**/ders_ozetleri/_olcum*.html
-**/ders_ozetleri/_kal*.html
-**/ders_ozetleri/_olcum.js
-**/ders_ozetleri/_kal.js
+**/gorsel_ders_notlari/preview/
+**/gorsel_ders_notlari/_render.js
+**/gorsel_ders_notlari/_olcum*.html
+**/gorsel_ders_notlari/_kal*.html
+**/gorsel_ders_notlari/_olcum.js
+**/gorsel_ders_notlari/_kal.js

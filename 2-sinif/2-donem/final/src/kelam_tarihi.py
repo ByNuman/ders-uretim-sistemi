@@ -1277,6 +1277,7 @@ def get_pack() -> CoursePack:
     ]
 
     return CoursePack(
+        ders_klasoru="KELÂM TARİHİ",
         course_code="KELÂM TARİHİ",
         title='Kelâm<span class="accent-word"> Tarihi</span>',
         subtitle="Mu'tezile'den Eş'arîliğe ve Mâtürîdîliğe: İslâm Düşüncesinde Akıl-Nakil Mücadelesi",

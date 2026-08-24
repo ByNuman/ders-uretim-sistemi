@@ -558,6 +558,7 @@ def get_pack() -> CoursePack:
     ]
 
     return CoursePack(
+        ders_klasoru="SOSYOLOJİ",
         course_code="SOSYOLOJİ",
         title='Sosyoloji<span class="accent-word">ye</span> Giriş',
         subtitle="Kültür, Toplumsallaşma, Değişme ve Statü-Rol Kuramlarına Bütüncül Bakış",

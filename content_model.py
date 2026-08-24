@@ -274,6 +274,12 @@ class CoursePack:
     test_questions: list[TestQuestion] = field(default_factory=list)
     answer_key_intro: str = "Her sorunun doğru cevabı ve kısa gerekçesi aşağıda yer almaktadır."
     answer_key_items: list[AnswerItem] = field(default_factory=list)
+    # --- Çıktı klasörü ---
+    # Bu dersin, dönem ağacındaki klasör adı (kaynaklar/ders_kaynaklari/<ders_klasoru>/,
+    # kaynaklar/özetlenmiş_dersler/<ders_klasoru>/, gorsel_ders_notlari/<ders_klasoru>/).
+    # Ders programındaki BÜYÜK HARFLİ tam ad yazılır, ör. "KELÂM TARİHİ".
+    # Boş bırakılırsa build.py başlıktan türetilen slug'a düşer (geriye dönük uyumluluk).
+    ders_klasoru: str = ""
 
     # --- Otomatik hesaplanan istatistikler (elle yazılmaz) ---
     def chapter_count(self) -> int:

@@ -757,6 +757,7 @@ def get_pack() -> CoursePack:
     ]
 
     return CoursePack(
+        ders_klasoru="MODERN FELSEFE TARİHİ",
         course_code="FELSEFE TAR. II",
         title='Modern Felsefe<span class="accent-word"> Tarihi</span>',
         subtitle="Pozitivizmden Varoluşçuluğa: 19. ve 20. Yüzyıl Düşünce Akımları",

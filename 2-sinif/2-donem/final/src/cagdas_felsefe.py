@@ -816,6 +816,7 @@ def get_pack() -> CoursePack:
     ]
 
     return CoursePack(
+        ders_klasoru="ÇAĞDAŞ FELSEFE",
         course_code="ÇAĞD. FELSEFE",
         title='Çağdaş <span class="accent-word">Felsefe</span>',
         subtitle="Öğretmen Notlarıyla Pozitivizmden Varoluşçuluğa 20. Yüzyıl Düşünce Akımları",

@@ -7,8 +7,10 @@ Kullanım:
 
 Sınıf/dönem/sınav VARSAYILAN DEĞİLDİR: verilmezse sorulur (bkz. donem.py).
 Kitap tanımı, seçilen dönemin src/kitap.py dosyasından okunur; çıktı aynı
-dönemin ders_ozetleri/ klasörüne yazılır. Yani her sınav dönemi KENDİ
-birleşik kitabına sahiptir, dönemler birbirine karışmaz.
+dönemin gorsel_ders_notlari/ klasörünün KÖKÜNE yazılır (tekil dersler o
+klasörün <DERS ADI>/ alt klasörlerine yazılır; birleşik kitap tek bir derse
+ait olmadığı için kökte durur). Yani her sınav dönemi KENDİ birleşik
+kitabına sahiptir, dönemler birbirine karışmaz.
 
 src/kitap.py'de listelenen derslerin hepsini TEK bir HTML'e dizip tek
 seferde 175x250mm (+3mm bleed) PDF/X-4 CMYK dosyaya render eder. build.py ile aynı şablon gövdesini

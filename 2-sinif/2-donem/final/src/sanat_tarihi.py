@@ -481,6 +481,7 @@ def get_pack() -> CoursePack:
     ]
 
     return CoursePack(
+        ders_klasoru="TÜRK İSLAM SANAT TARİHİ",
         course_code="SANAT TARİHİ",
         title='Türk <span class="accent-word">İslam</span> Sanat Tarihi',
         subtitle="Orta Asya'dan Anadolu'ya Türk-İslam Mimarisinin Kuruluş Yılları",

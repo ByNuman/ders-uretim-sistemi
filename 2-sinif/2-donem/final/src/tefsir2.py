@@ -956,6 +956,7 @@ def get_pack() -> CoursePack:
     ]
 
     return CoursePack(
+        ders_klasoru="TEFSİR II",
         course_code="TEFSİR II",
         title='Tefsir <span class="accent-word">II</span>',
         subtitle="Kur'ân'da Ahlâk, Adalet, Özgürlük ve Namaz — Final Özeti",

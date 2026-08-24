@@ -577,6 +577,7 @@ def get_pack() -> CoursePack:
     ]
 
     return CoursePack(
+        ders_klasoru="TÜRK DİLİ VE EDEBİYATI",
         course_code="EDEBİYAT 5-6-8",
         title='Türk Dili ve Edebiyat<span class="accent-word">a</span> Final Kampı',
         subtitle="Edebiyat 5, 6 ve 8 Derslerinin Sınavlık Kavram, Eşleştirme ve Kurallarına Bütüncül Bakış",

@@ -447,6 +447,7 @@ def get_pack() -> CoursePack:
     ]
 
     return CoursePack(
+        ders_klasoru="ÖĞRETİM TEKNOLOJİLERİ",
         course_code="ÖĞR. TEKNOLOJİLERİ",
         title='Öğretim <span class="accent-word">Teknolojileri</span>',
         subtitle="Materyal Tasarımından Kavram Öğretimine Bütüncül Bakış",

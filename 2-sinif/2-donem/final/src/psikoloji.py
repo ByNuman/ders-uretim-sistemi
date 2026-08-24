@@ -455,6 +455,7 @@ def get_pack() -> CoursePack:
     ]
 
     return CoursePack(
+        ders_klasoru="PSİKOLOJİ",
         course_code="PSİKOLOJİ",
         title='Psikoloji<span class="accent-word">ye</span> Giriş',
         subtitle="Gelişim Psikolojisi, Kişilik Kuramları ve Ruhsal Bozukluklara Temel Bakış",
