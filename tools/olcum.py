@@ -13,23 +13,26 @@ sayfaya taşırsam %90-95 doluluk çıkar?" sorusunu tahminle değil ÖLÇÜMLE
 cevaplamak için vardır (bkz. CLAUDE.md adım 6b).
 
 Kullanım:
-    python tools/olcum.py content.psikoloji            # özet tablo
-    python tools/olcum.py content.psikoloji --json     # ham JSON
-    python tools/olcum.py --hepsi                      # content/kitap.py'deki tüm dersler
+    python tools/olcum.py psikoloji --sinif 2 --donem 2 --sinav final
+    python tools/olcum.py psikoloji --json --sinif 2 --donem 2 --sinav final
+    python tools/olcum.py --hepsi --sinif 2 --donem 2 --sinav final
+    python tools/olcum.py --hepsi                      # o dönemin src/kitap.py'sindeki tüm dersler
 
 Ölçüm, şablondaki `<!--item N kind-->` yorum düğümlerine dayanır — bunlar
 `_ders_govde.html.j2` içinde bölüm sayfası döngüsünde üretilir ve render'ı
 etkilemez.
 """
 
-import importlib
 import json
 import subprocess
 import sys
+import argparse
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
+
+import donem as donem_mod   # noqa: E402
 
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8")
@@ -93,7 +96,7 @@ const {{ chromium }} = require('playwright');
 
 def render_html(module_name: str) -> tuple[Path, object]:
     """build.py ile BİREBİR aynı HTML'i üretir (aynı css + aynı ctx)."""
-    pack = importlib.import_module(module_name).get_pack()
+    pack = B.DONEM.import_ders(module_name).get_pack()
     ctx = B.course_context(pack)
     env = Environment(loader=FileSystemLoader(str(B.TEMPLATES)))
     html = env.get_template("master.html.j2").render(
@@ -138,13 +141,24 @@ def summary(module_name: str, data: list[dict]) -> None:
 
 
 def main():
-    args = [a for a in sys.argv[1:]]
-    as_json = "--json" in args
-    args = [a for a in args if not a.startswith("--")]
-    if "--hepsi" in sys.argv:
-        modules = importlib.import_module("content.kitap").get_book().course_modules
+    ap = argparse.ArgumentParser(prog="tools/olcum.py")
+    ap.add_argument("dersler", nargs="*", help="ölçülecek ders modülleri")
+    ap.add_argument("--json", action="store_true", help="ham JSON bas")
+    ap.add_argument("--hepsi", action="store_true",
+                    help="dönemin kitap.py'sindeki tüm dersleri ölç")
+    donem_mod.add_args(ap)
+    a = ap.parse_args()
+
+    d = donem_mod.resolve(a)
+    B.set_donem(d)
+    print(f"[olcum] Dönem: {d}  ({d.etiket})")
+    as_json = a.json
+    if a.hepsi:
+        modules = d.import_ders("kitap").get_book().course_modules
+    elif a.dersler:
+        modules = a.dersler
     else:
-        modules = args or ["content.psikoloji"]
+        raise SystemExit("[hata] ölçülecek ders verilmedi (ya da --hepsi kullanın)")
     allout = {}
     for m in modules:
         data = measure(m)

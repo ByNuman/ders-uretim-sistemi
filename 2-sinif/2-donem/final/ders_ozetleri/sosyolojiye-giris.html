@@ -1,0 +1,3010 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<title>Sosyoloji<span class="accent-word">ye</span> Giriş</title>
+<style>/* ============================================================
+   DERS ÜRETİM SİSTEMİ — Görsel Tasarım Sistemi v2
+   175x250mm trim (PUR Amerikan cilt), 3mm bleed, print-ready,
+   tema-parametrik.
+   Sistem fontlarına dayanır: gövde DejaVu Sans, başlıklar DejaVu Serif
+   (kitap/akademik karakter için) — harici font çağrısı yok, bu yüzden
+   her ortamda birebir aynı render garantidir.
+   ============================================================ */
+
+/* --- SAYFA GEOMETRİSİ ---------------------------------------------------
+   DİKKAT: aşağıdaki değerler yalnızca VARSAYILAN'dır. Gerçek kaynak
+   build.py içindeki TRIM_W_MM / TRIM_H_MM / BLEED_MM / MARGIN_*_MM
+   sabitleridir; build.py bu blogun aynısını page_geometry_css() ile
+   üretip style.css'in SONUNA ekler ve buradakileri ezer. Boyut
+   değiştirecekseniz build.py'yi düzenleyin, burayı değil. */
+@page { size: 181mm 256mm; margin: 0; }
+
+:root {
+  /* Bitmiş (kesilmiş) sayfa ölçüsü */
+  --trim-w: 175mm;
+  --trim-h: 250mm;
+  /* Taşma payı: tam sayfa zemin rengi / kapak gradyanı kenardan taşsın */
+  --bleed: 3mm;
+  /* Fiziksel render ölçüsü = trim + her iki yandan bleed */
+  --page-w: 181mm;
+  --page-h: 256mm;
+  /* Kenar boşlukları — TRIM kenarından ölçülür */
+  --mg-top: 11mm;
+  --mg-bottom: 19mm;    /* sayfa numarası payı dahil */
+  --mg-inner: 14mm;     /* sırt/gutter tarafı — PUR cilt payı */
+  --mg-outer: 9mm;
+  /* Render kutusunun (bleed box) kenarından ölçülen gerçek padding'ler */
+  --pad-top: 14mm;
+  --pad-bottom: 22mm;
+  --pad-inner: 17mm;
+  --pad-outer: 12mm;
+  /* Ayna simetri: sayfa tekliği/çiftliğine göre aşağıda yeniden atanır */
+  --pad-left: var(--pad-inner);
+  --pad-right: var(--pad-outer);
+
+  /* --- Nötr paleti (tüm temalarda sabit) --- */
+  --ink:        #14161b;
+  --ink-soft:   #464b5b;
+  --ink-faint:  #5c6270;   /* WCAG AA: beyaz üzerinde 6.1:1 -- eski #7d8394 (3.79:1) yerine */
+  --paper:      #ffffff;   /* build.py / .theme-XXXX bunu tema tonuna çeker */
+  --paper-tint: #f7f7f9;
+  --line:       #e3e4ea;
+  --line-soft:  #edeef2;
+  --shadow-sm:  0 0.82px 1.65px rgba(20,22,30,0.05), 0 0.82px 0.82px rgba(20,22,30,0.04);
+  --shadow-md:  0 2.47px 8.23px rgba(20,22,30,0.07), 0 0.82px 2.47px rgba(20,22,30,0.06);
+  --shadow-lg:  0 8.23px 24.69px rgba(15,17,30,0.16), 0 2.47px 6.58px rgba(15,17,30,0.10);
+
+  /* --- Sabit semantik renkler (callout tipleri; tema fark etmez) --- */
+  --focus-bg:   #fff8e8;
+  --focus-line: #e8b83f;
+  --focus-ink:  #6b4f04;
+
+  --caution-bg:   #eef4ff;
+  --caution-line: #6f8fd6;
+  --caution-ink:  #1f3d78;
+
+  --insight-bg:   #0d1830;
+  --insight-ink:  #ffffff;
+  --insight-accent: #e3c37c;
+
+  --route-bg:   #f2f0ff;
+  --route-line: #8a78e0;
+  --route-ink:  #40337f;
+
+  /* --- Tema değişkenleri: aşağıdaki .theme-XXXX sınıfları bunları ezer --- */
+  --accent:       #3a4fb0;
+  --accent-dark:  #232f6e;
+  --accent-soft:  #eef0fc;
+  --accent-tint:  #f5f6fd;
+  --cover-grad-1: #171d42;
+  --cover-grad-2: #3a4fb0;
+  --cover-grad-3: #4a5fc7;
+  --gold:         #d9b25c;
+  --gold-ink:     #6b5310;   /* açık zeminlerde gold yerine kullanılan okunur koyu ton */
+}
+
+/* ---------- Tema paletleri ----------
+   Her paper tonu kasıtlı çok hafiftir (L≈98%) — beyazdan ayırt edilir ama
+   metin kontrastını bozmaz; --line de aynı ton ailesinden seçilmiştir. */
+.theme-indigo {
+  --accent: #3a4fb0; --accent-dark: #232f6e; --accent-soft: #eef0fc; --accent-tint: #f5f6fd;
+  --cover-grad-1: #12163a; --cover-grad-2: #33449e; --cover-grad-3: #5468d4; --gold: #dfba68; --gold-ink: #6b5310;
+  --paper: #fbfbfe; --paper-tint: #f3f4fb; --line: #e2e3f0; --line-soft: #ececf6;
+}
+.theme-burgundy {
+  --accent: #8c2a3c; --accent-dark: #5c1522; --accent-soft: #fbeef0; --accent-tint: #fdf6f6;
+  --cover-grad-1: #31090f; --cover-grad-2: #7a2433; --cover-grad-3: #a8394c; --gold: #d1ab5c; --gold-ink: #6b4f10;
+  --paper: #fefbfa; --paper-tint: #fcf4f3; --line: #f0dfdd; --line-soft: #f6ecea;
+}
+.theme-forest {
+  --accent: #14665a; --accent-dark: #0b3e37; --accent-soft: #e9f5f2; --accent-tint: #f4faf9;
+  --cover-grad-1: #041a15; --cover-grad-2: #0f5049; --cover-grad-3: #1c8272; --gold: #d3bd76; --gold-ink: #6b5710;
+  --paper: #fafefd; --paper-tint: #f2faf8; --line: #dcefe9; --line-soft: #e9f5f1;
+}
+.theme-slate {
+  --accent: #3d5568; --accent-dark: #24333f; --accent-soft: #edf2f5; --accent-tint: #f6f9fa;
+  --cover-grad-1: #0e161d; --cover-grad-2: #324556; --cover-grad-3: #52738c; --gold: #d0b476; --gold-ink: #6b5510;
+  --paper: #fafcfd; --paper-tint: #f2f6f8; --line: #e0e8ec; --line-soft: #edf2f4;
+}
+.theme-plum {
+  --accent: #6a3b8c; --accent-dark: #3f2255; --accent-soft: #f4eef9; --accent-tint: #faf7fc;
+  --cover-grad-1: #1c0d2e; --cover-grad-2: #59317a; --cover-grad-3: #8552ac; --gold: #d5b168; --gold-ink: #6b4f10;
+  --paper: #fdfaff; --paper-tint: #f7f2fb; --line: #eae0f2; --line-soft: #f2ebf8;
+}
+
+/* ---------- Reset & font sistemi ---------- */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  font-family: "DejaVu Sans", "Liberation Sans", Arial, sans-serif;
+  color: var(--ink);
+  font-size: 7.9pt;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+strong, b { font-weight: 700; }
+em { font-style: italic; }
+
+.serif { font-family: "DejaVu Serif", "Liberation Serif", Georgia, serif; }
+
+.page {
+  position: relative;
+  width: var(--page-w);
+  height: var(--page-h);
+  overflow: hidden;
+  background: var(--paper);
+  page-break-after: always;
+  break-after: page;
+  display: flex;
+  flex-direction: column;
+}
+.page:last-child { page-break-after: auto; }
+
+/* zemin dokusu: çok hafif nokta matrisi -- kağıt/kumaş hissi verir, metni etkilemez */
+.body-page::before {
+  content: "";
+  position: absolute; inset: 0;
+  background-image: radial-gradient(circle, rgba(20,22,30,0.05) 0.6px, transparent 0.6px);
+  background-size: 3.6mm 3.6mm;
+  opacity: 0.55;
+  pointer-events: none;
+  z-index: 0;
+}
+.body-page > * { position: relative; z-index: 1; flex-shrink: 0; }
+
+/* ================= KAPAK — çok katmanlı, dokulu, amblemli ================= */
+.cover {
+  color: #fff;
+  position: relative;
+  background:
+    radial-gradient(circle at 85% 6%, rgba(255,255,255,0.14), transparent 38%),
+    radial-gradient(ellipse 70% 45% at 18% 100%, rgba(0,0,0,0.35), transparent 60%),
+    linear-gradient(152deg, var(--cover-grad-1) 0%, var(--cover-grad-2) 62%, var(--cover-grad-3) 100%);
+  padding: var(--pad-top) var(--pad-right) var(--pad-bottom) var(--pad-left);
+  justify-content: space-between;
+}
+/* ince nokta dokusu -- kumaş/kağıt hissi */
+.cover::before {
+  content: "";
+  position: absolute; inset: 0;
+  background-image: radial-gradient(circle, rgba(255,255,255,0.10) 0.7px, transparent 0.7px);
+  background-size: 4.2mm 4.2mm;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+}
+/* iç çerçeve -- "cilt" hissi */
+.cover::after {
+  content: "";
+  position: absolute; inset: calc(var(--bleed) + 7mm);
+  border: 1px solid rgba(255,255,255,0.20);
+  pointer-events: none;
+}
+.cover-corner { position:absolute; width:7mm; height:7mm; pointer-events:none; }
+.cover-corner::before, .cover-corner::after { content:""; position:absolute; background: rgba(255,255,255,0.55); }
+.cover-corner.tl { top:calc(var(--bleed) + 7mm); left:calc(var(--bleed) + 7mm); }
+.cover-corner.tr { top:calc(var(--bleed) + 7mm); right:calc(var(--bleed) + 7mm); transform: scaleX(-1); }
+.cover-corner.bl { bottom:calc(var(--bleed) + 7mm); left:calc(var(--bleed) + 7mm); transform: scaleY(-1); }
+.cover-corner.br { bottom:calc(var(--bleed) + 7mm); right:calc(var(--bleed) + 7mm); transform: scale(-1,-1); }
+.cover-corner::before { top:-1px; left:-1px; width:4.5mm; height:1.4px; }
+.cover-corner::after { top:-1px; left:-1px; width:1.4px; height:4.5mm; }
+.cover-inner { position:relative; z-index:2; display:flex; flex-direction:column; height:100%; justify-content:space-between; }
+
+.cover-top { display:flex; justify-content: space-between; align-items:flex-start; flex-shrink: 0; }
+.cover-kicker {
+  display:inline-block;
+  font-size: 7.4pt; letter-spacing: 2px; font-weight:700; text-transform:uppercase;
+  border: 1px solid rgba(255,255,255,0.4);
+  border-radius: 999px;
+  padding: 5.5px 15px;
+  color: rgba(255,255,255,0.95);
+  background: rgba(255,255,255,0.06);
+}
+
+/* Amblem: çok katmanlı halka + iç dolgu + minik saat-noktaları + mühür dokusu */
+.cover-emblem { position:relative; width: 32mm; height:32mm; }
+.cover-emblem .ring-outer {
+  position:absolute; inset:0; border-radius:50%;
+  border: 1px solid rgba(255,255,255,0.32);
+}
+.cover-emblem .ring-outer::before {
+  content:""; position:absolute; inset:-2.6mm; border-radius:50%;
+  border: 1px solid rgba(255,255,255,0.14);
+}
+.cover-emblem .ring-mid {
+  position:absolute; inset:3.4mm; border-radius:50%;
+  border: 1px solid rgba(255,255,255,0.24);
+  background: repeating-conic-gradient(rgba(255,255,255,0.12) 0deg 0.7deg, transparent 0.7deg 9deg);
+}
+.cover-emblem .ring-inner {
+  position:absolute; inset:7.2mm; border-radius:50%;
+  background: radial-gradient(circle at 32% 28%, rgba(255,255,255,0.28), rgba(255,255,255,0.03) 72%);
+  border: 1px solid rgba(255,255,255,0.45);
+  display:flex; align-items:center; justify-content:center;
+  box-shadow: inset 0 1px 5px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.06);
+}
+.cover-emblem .ring-inner span {
+  font-family: "DejaVu Serif", serif; font-size: 13.5pt; font-weight:700; color: var(--gold);
+  text-shadow: 0 1px 3px rgba(0,0,0,0.35);
+}
+.cover-emblem .tick {
+  position:absolute; width:1.4px; height:2.6mm; background: rgba(255,255,255,0.6);
+  left: 50%; top: -1.3mm; transform-origin: 50% 17mm;
+}
+.cover-emblem .tick.major { height: 3.6mm; background: var(--gold); opacity:0.85; }
+
+.cover-mid { flex: 1; display:flex; flex-direction:column; justify-content:flex-end; padding-bottom: 8mm; position:relative; }
+.cover-motif {
+  position:absolute; left:-3mm; bottom: 32mm;
+  font-family: "DejaVu Serif", serif;
+  font-size: 150pt; font-weight:700; color: rgba(255,255,255,0.075);
+  letter-spacing: -6px; line-height:1; z-index:0;
+  text-shadow: 0 0 40px rgba(255,255,255,0.04);
+}
+.cover-code { font-size: 8.6pt; letter-spacing:2.4px; color: var(--gold); font-weight:700; margin-bottom: 4.5mm; text-transform:uppercase; position:relative; }
+.cover-code::before { content:"—  "; color: rgba(255,255,255,0.5); }
+.cover-title {
+  font-family: "DejaVu Serif", "Liberation Serif", Georgia, serif;
+  font-size: 34pt; font-weight:700; line-height:1.08; letter-spacing: -0.3px;
+  position:relative; text-shadow: 0 2px 18px rgba(0,0,0,0.25);
+}
+.cover-title .accent-word { color: var(--gold); }
+.cover-subtitle { font-size: 13pt; font-weight:400; color: rgba(255,255,255,0.9); margin-top:5mm; max-width: 148mm; line-height:1.45; position:relative; }
+.cover-rule { width: 28mm; height:2.6px; background: linear-gradient(90deg, var(--gold), rgba(255,255,255,0.15)); margin: 7mm 0 6mm; border-radius:2px; position:relative; }
+.cover-desc { font-size: 9.7pt; color: rgba(255,255,255,0.82); max-width: 132mm; line-height:1.68; position:relative; }
+
+.cover-bottom { position:relative; flex-shrink: 0; }
+.cover-stats { display:flex; gap: 5mm; margin-bottom: 7mm; }
+.cover-stat {
+  flex:1;
+  border: 1px solid rgba(255,255,255,0.24);
+  border-top: 1px solid rgba(255,255,255,0.55);
+  border-radius: 9px;
+  padding: 4.2mm 5mm;
+  font-size: 8.4pt; font-weight:700; letter-spacing:.3px;
+  color: rgba(255,255,255,0.95);
+  background: linear-gradient(165deg, rgba(255,255,255,0.13), rgba(255,255,255,0.02) 60%);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.22), inset 0 1px 0 rgba(255,255,255,0.08);
+  position: relative; overflow: hidden;
+}
+.cover-stat::before {
+  content:""; position:absolute; top:0; left:0; right:0; height:1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent);
+}
+.cover-stat b { display:block; font-family:"DejaVu Serif",serif; font-size: 14pt; color: var(--gold); font-weight:700; margin-bottom:1.3mm; }
+.cover-foot {
+  display:flex; justify-content:space-between; align-items:center;
+  border-top: 1px solid rgba(255,255,255,0.25);
+  padding-top: 4mm;
+  font-size: 7.7pt; letter-spacing:1.2px; text-transform:uppercase; color: rgba(255,255,255,0.75);
+}
+
+/* ================= SAYFA GÖVDESİ (kapak-dışı tüm sayfalar) ================= */
+.body-page { padding: var(--pad-top) var(--pad-right) var(--pad-bottom) var(--pad-left); }
+
+.pageband {
+  display:flex; justify-content:space-between; align-items:center;
+  font-size: 6.09pt; letter-spacing: 0.99px; text-transform:uppercase; font-weight:700;
+  color: var(--ink-faint);
+  padding-bottom: 1.93mm; margin-bottom: 3.85mm;
+  border-bottom: 1.65px solid var(--accent);
+  position:relative;
+}
+.pageband::after {
+  content:""; position:absolute; left:0; bottom:-1.65px; width: 13.17mm; height:1.65px; background: var(--gold);
+}
+.pageband .pageband-course { color: var(--accent-dark); font-weight:700; }
+
+.footer {
+  position: absolute; bottom: calc(var(--bleed) + 9mm); left: var(--pad-left); right: var(--pad-right);
+  display:flex; justify-content:space-between; align-items:center;
+  font-size: 6.17pt; color: var(--ink-faint); font-weight:600;
+  border-top: 0.82px solid var(--line);
+  padding-top: 1.67mm;
+}
+.footer .fnum {
+  font-weight:700; color: #fff; background: var(--accent);
+  padding: 0.64px 4.49px; border-radius: 999px; font-size: 6.25pt;
+}
+
+/* ---------- İçindekiler ---------- */
+.toc-kicker { font-size: 6.58pt; letter-spacing:1.48px; font-weight:700; color: var(--accent); text-transform:uppercase; }
+.toc-title { font-family:"DejaVu Serif",serif; font-size: 20.57pt; font-weight:700; margin-top: 1.65mm; color: var(--ink); }
+.toc-lede { font-size: 7.9pt; color: var(--ink-soft); margin-top:2.47mm; max-width: 150mm; line-height:1.6; }
+.toc-list { margin-top: 6.58mm; display:flex; flex-direction:column; gap: 0; }
+.toc-row {
+  display:flex; align-items:center; gap: 4.11mm;
+  padding: 3.79mm 2.47mm;
+  border-bottom: 0.82px solid var(--line-soft);
+  border-radius: 4.94px;
+  text-decoration: none; color: inherit;
+}
+.toc-row:first-child { border-top: 0.82px solid var(--line-soft); }
+.toc-num {
+  flex: 0 0 auto;
+  width: 7.74mm; height:7.74mm; border-radius:50%;
+  background: var(--accent-soft); color: var(--accent-dark);
+  font-weight:700; font-size: 7.9pt; font-family:"DejaVu Serif",serif;
+  display:flex; align-items:center; justify-content:center;
+  box-shadow: var(--shadow-sm);
+}
+.toc-num.alt { background: var(--accent-dark); color:#fff; }
+.toc-body { flex: 1 1 auto; }
+.toc-heading { font-size: 8.89pt; font-weight:700; color: var(--ink); }
+.toc-sub { font-size: 6.99pt; color: var(--ink-faint); margin-top: 0.66mm; }
+.toc-page { flex: 0 0 auto; font-size: 7.57pt; font-weight:700; color: var(--accent); background: var(--accent-tint); padding: 1.32mm 2.47mm; border-radius: 4.94px; }
+
+/* ---------- Genel Bakış ---------- */
+.ov-hero {
+  background: linear-gradient(125deg, var(--accent-dark), var(--accent) 88%);
+  color: #fff; border-radius: 9.88px;
+  padding: 5.35mm 6.17mm; margin-top:1.65mm;
+  font-size: 7.98pt; line-height:1.6;
+  box-shadow: var(--shadow-md);
+  position:relative; overflow:hidden;
+}
+.ov-hero::after {
+  content:""; position:absolute; right:-8.23mm; top:-14.81mm; width:37.85mm; height:37.85mm; border-radius:50%;
+  border: 0.82px solid rgba(255,255,255,0.15);
+}
+.ov-hero b { color: var(--gold); }
+.ov-grid { display:grid; grid-template-columns: repeat(3, 1fr); gap: 3.46mm; margin-top: 4.94mm; }
+.ov-card {
+  border: 0.82px solid var(--line); border-radius: 7.41px; padding: 3.79mm 4.11mm;
+  background: var(--paper); box-shadow: var(--shadow-sm);
+  border-top: 2.14px solid var(--accent);
+}
+.ov-card-title { font-size: 7.82pt; font-weight:700; color: var(--accent-dark); margin-bottom:1.48mm; font-family:"DejaVu Serif",serif; }
+.ov-card-text { font-size: 6.99pt; color: var(--ink-soft); line-height:1.5; }
+
+.ov-flow { display:flex; align-items:stretch; gap: 0; margin-top: 4.94mm; }
+.ov-flow-step {
+  flex:1; background: linear-gradient(160deg, var(--accent-tint), var(--paper)); border: 0.82px solid var(--line);
+  border-radius: 7.41px; padding: 3.46mm 2.96mm; text-align:center; box-shadow: var(--shadow-sm);
+  /* Dar sayfada (5 adımda sütun ~22mm) uzun tek kelimeler kutuyu taşırıyordu:
+     flex öğesi min-content'in altına inemez, bu yüzden min-width:0 + kelime
+     kırma şart. Yoksa "Varoluşçuluğa" gibi kelimeler kart kenarından taşar. */
+  min-width: 0;
+  overflow-wrap: break-word;
+}
+.ov-flow-step b { display:block; font-size: 7.32pt; color: var(--accent-dark); margin-bottom: 0.82mm; font-family:"DejaVu Serif",serif; }
+.ov-flow-step span { font-size: 6.75pt; color: var(--ink-soft); }
+.ov-flow-arrow { flex: 0 0 5.76mm; display:flex; align-items:center; justify-content:center; color: var(--accent); }
+
+/* ================= BÖLÜM BANNER ================= */
+.chbanner {
+  background: linear-gradient(128deg, var(--accent-dark), var(--accent) 85%);
+  color:#fff; border-radius: 9.88px;
+  padding: 5.76mm 6.99mm; position:relative; overflow:hidden;
+  box-shadow: var(--shadow-lg);
+}
+.chbanner::before {
+  content:"";
+  position:absolute; inset:0;
+  background-image: radial-gradient(circle, rgba(255,255,255,0.12) 0.6px, transparent 0.6px);
+  background-size: 3.6mm 3.6mm; mix-blend-mode: overlay;
+}
+.chbanner::after {
+  content:""; position:absolute; right:-13.17mm; top:-13.17mm; width:46.08mm; height:46.08mm;
+  border-radius:50%; border: 0.82px solid rgba(255,255,255,0.22);
+}
+.chbanner-deco { position:absolute; right:8.23mm; bottom:-6.58mm; font-family:"DejaVu Serif",serif; font-size:49.38pt; font-weight:700; color: rgba(255,255,255,0.08); }
+.chbanner-kicker { font-size: 6.42pt; letter-spacing:1.65px; font-weight:700; text-transform:uppercase; color: var(--gold); position:relative; }
+.chbanner-title { font-family:"DejaVu Serif",serif; font-size: 16.46pt; font-weight:700; margin-top: 1.48mm; line-height:1.15; position:relative; }
+.chbanner-subtitle { font-size: 7.49pt; color: rgba(255,255,255,0.88); margin-top: 1.81mm; max-width: 150mm; line-height:1.5; position:relative; }
+
+/* ---------- 4'lü anahtar terim grid'i ---------- */
+.terms-grid { display:grid; grid-template-columns: 1fr 1fr; gap: 2.8mm; margin-top: 4.53mm; }
+.term-box {
+  border: 0.82px solid var(--line); border-left: 2.88px solid var(--accent);
+  border-radius: 5.76px; padding: 2.8mm 3.46mm; background: var(--paper);
+  box-shadow: var(--shadow-sm);
+}
+.term-box .term-name { font-size: 7.65pt; font-weight:700; color: var(--accent-dark); margin-bottom: 0.91mm; font-family:"DejaVu Serif",serif; }
+.term-box .term-def { font-size: 6.83pt; color: var(--ink-soft); line-height:1.45; }
+
+/* ---------- Kişi kartı ---------- */
+.person-card {
+  display:flex; gap: 3.46mm; align-items:flex-start;
+  margin-top: 4.53mm; padding: 3.46mm 4.11mm;
+  background: linear-gradient(155deg, var(--accent-tint), var(--paper));
+  border: 0.82px solid var(--line); border-radius: 7.41px;
+  box-shadow: var(--shadow-sm);
+}
+.person-avatar {
+  flex: 0 0 auto; width: 11.11mm; height:11.11mm; border-radius:50%;
+  background: linear-gradient(150deg, var(--accent), var(--accent-dark));
+  color:#fff; font-weight:700; font-size: 8.64pt; font-family:"DejaVu Serif",serif;
+  display:flex; align-items:center; justify-content:center;
+  box-shadow: var(--shadow-sm);
+}
+.person-name { font-size: 8.72pt; font-weight:700; color: var(--ink); font-family:"DejaVu Serif",serif; }
+.person-tag { font-size: 6.34pt; letter-spacing:.4.94px; text-transform:uppercase; font-weight:700; color: var(--accent-dark); margin: 0.58mm 0 1.4mm; }
+.person-bio { font-size: 6.83pt; color: var(--ink-soft); line-height:1.5; }
+.person-row { display:flex; gap: 4.94mm; margin-top:4.53mm; }
+.person-row .person-card { flex:1; margin-top:0; }
+
+/* ---------- Numaralı içerik blokları ---------- */
+.block { margin-top: 4.77mm; }
+.block-head { display:flex; align-items:baseline; gap: 2.3mm; margin-bottom: 2.14mm; }
+.block-num {
+  flex:0 0 auto; width: 5.27mm; height:5.27mm; border-radius:50%;
+  background: var(--accent-dark); color:#fff; font-size: 6.5pt; font-weight:700;
+  display:flex; align-items:center; justify-content:center; box-shadow: var(--shadow-sm);
+}
+.block-title { font-size: 8.89pt; font-weight:700; color: var(--ink); font-family:"DejaVu Serif",serif; }
+.block-subtitle { font-size: 6.75pt; color: var(--ink-faint); margin-top: -0.99mm; margin-bottom:1.65mm; margin-left: 7.57mm; font-style:italic; }
+.block ul { margin-left: 7.57mm; }
+.block li { font-size: 7.32pt; color: var(--ink-soft); margin-bottom: 1.4mm; line-height:1.5; list-style: none; position:relative; }
+.block li::before { content:"–"; position:absolute; left:-3.46mm; color: var(--accent); font-weight:700; }
+.block li b, .block li strong { color: var(--ink); font-weight:700; }
+
+/* ---------- Callout kutuları (gerçek SVG ikonlarla) ---------- */
+.callout { border-radius: 7.41px; padding: 3.13mm 3.95mm; margin-top: 4.28mm; display:flex; gap: 2.8mm; box-shadow: var(--shadow-sm); }
+.callout-icon { flex:0 0 auto; width: 5.76mm; height:5.76mm; border-radius:50%; display:flex; align-items:center; justify-content:center; }
+.callout-icon svg { width: 3.13mm; height:3.13mm; }
+.callout-title { font-size: 6.99pt; font-weight:700; text-transform:uppercase; letter-spacing:.4.11px; margin-bottom: 0.91mm; }
+.callout-text { font-size: 7.16pt; line-height:1.5; }
+
+.callout.focus { background: var(--focus-bg); border: 0.82px solid #eecf8a; }
+.callout.focus .callout-icon { background:#f0dba0; color: var(--focus-ink); }
+.callout.focus .callout-title, .callout.focus .callout-text { color: var(--focus-ink); }
+
+.callout.caution { background: var(--caution-bg); border: 0.82px solid #b9cdf2; }
+.callout.caution .callout-icon { background:#c3d3f5; color: var(--caution-ink); }
+.callout.caution .callout-title, .callout.caution .callout-text { color: var(--caution-ink); }
+
+.callout.insight { background: var(--insight-bg); border: 0.82px solid #1c2c4d; }
+.callout.insight .callout-icon { background: rgba(255,255,255,0.16); color: var(--insight-accent); }
+.callout.insight .callout-title { color: var(--insight-accent); }
+.callout.insight .callout-text { color: rgba(255,255,255,0.94); }
+
+.callout.route { background: var(--route-bg); border: 0.82px solid #c9bcf2; }
+.callout.route .callout-icon { background:#d6cdf5; color: var(--route-ink); }
+.callout.route .callout-title, .callout.route .callout-text { color: var(--route-ink); }
+
+/* ---------- Akış / süreç diyagramı ---------- */
+.flowdiag { display:flex; align-items:stretch; gap:0; margin-top: 4.77mm; }
+.flowdiag .fstep {
+  flex:1; background: var(--paper); border: 0.82px solid var(--line); border-top: 2.47px solid var(--accent);
+  border-radius: 6.58px; padding: 2.96mm 2.47mm; text-align:center; box-shadow: var(--shadow-sm);
+  min-width: 0; overflow-wrap: break-word;    /* bkz. .ov-flow-step notu */
+}
+.flowdiag .fstep-title { font-size: 6.99pt; font-weight:700; color: var(--ink); margin-bottom: 0.82mm; font-family:"DejaVu Serif",serif; }
+.flowdiag .fstep-text { font-size: 6.25pt; color: var(--ink-faint); line-height:1.35; }
+.flowdiag .farrow { flex: 0 0 5.35mm; display:flex; align-items:center; justify-content:center; color: var(--accent); }
+.flowdiag .farrow svg { width:3.29mm; height:3.29mm; }
+.flow-caption { font-size: 6.34pt; color: var(--ink-faint); margin-top: 1.48mm; font-style: italic; }
+
+/* ---------- Karşılaştırma tablosu ---------- */
+.ctable-wrap { margin-top: 4.77mm; }
+.ctable-caption { font-size: 7.16pt; font-weight:700; color: var(--accent-dark); margin-bottom: 1.81mm; font-family:"DejaVu Serif",serif; }
+table.ctable { width:100%; border-collapse: collapse; border-radius: 5.76px; overflow:hidden; box-shadow: var(--shadow-sm); }
+table.ctable th {
+  background: linear-gradient(120deg, var(--accent-dark), var(--accent));
+  color:#fff; font-size: 6.67pt; text-align:left;
+  padding: 2.3mm 2.96mm; font-weight:700; letter-spacing:.1.65px;
+}
+table.ctable td {
+  font-size: 6.75pt; color: var(--ink-soft); padding: 2.3mm 2.96mm;
+  border-bottom: 0.82px solid var(--line-soft); vertical-align: top; line-height:1.4;
+}
+table.ctable tr:nth-child(even) td { background: var(--accent-tint); }
+table.ctable td:first-child { font-weight:700; color: var(--ink); }
+
+/* ---------- Bilgi kartları (küçük istatistik grid) ---------- */
+.info-grid { display:grid; grid-template-columns: repeat(3, 1fr); gap: 2.8mm; margin-top: 4.77mm; }
+.info-card { border: 0.82px solid var(--line); border-radius:6.58px; padding: 2.8mm 3.13mm; position:relative; background: var(--paper); box-shadow: var(--shadow-sm); }
+.info-card .badge {
+  position:absolute; top:2.14mm; right:2.3mm; width: 4.44mm; height:4.44mm; border-radius:50%;
+  background: var(--accent-soft); color: var(--accent-dark);
+  font-size: 6.58pt; font-weight:700; font-family:"DejaVu Serif",serif;
+  display:flex; align-items:center; justify-content:center;
+}
+.info-card .ic-title { font-size: 6.99pt; font-weight:700; color: var(--ink); margin-bottom: 0.91mm; padding-right: 4.94mm; font-family:"DejaVu Serif",serif; }
+.info-card .ic-text { font-size: 6.5pt; color: var(--ink-soft); line-height:1.4; }
+
+/* ---------- Bölüm özeti ---------- */
+.chsummary {
+  margin-top: 5.1mm; background: linear-gradient(120deg, var(--accent-dark), var(--accent) 130%); color:#fff; border-radius: 7.41px;
+  padding: 3.62mm 4.28mm; font-size: 7.24pt; line-height:1.55; box-shadow: var(--shadow-md);
+}
+.chsummary b { color: var(--gold); text-transform:uppercase; font-size:6.34pt; letter-spacing:.4.94px; display:block; margin-bottom:1.23mm; }
+
+/* ---------- Ayet-i Kerime kartları (Arapça orijinal + meal + etimoloji) ---------- */
+.ayat-section-title { font-size: 7.08pt; font-weight:700; color: var(--accent-dark); margin-bottom: 1.81mm; margin-top: 4.77mm; font-family:"DejaVu Serif",serif; }
+.ayah-card {
+  border: 0.82px solid var(--line); border-left: 2.88px solid var(--gold);
+  border-radius: 6.58px; padding: 3.29mm 3.79mm; margin-top: 2.63mm;
+  background: linear-gradient(160deg, var(--accent-tint), var(--paper));
+  box-shadow: var(--shadow-sm);
+}
+.ayah-ref {
+  font-size: 6.25pt; font-weight:700; letter-spacing:.3.29px; text-transform:uppercase;
+  color: var(--gold-ink); margin-bottom: 1.65mm;
+}
+.ayah-arabic {
+  direction: rtl; text-align: right; unicode-bidi: isolate;
+  font-family: "DejaVu Sans", sans-serif;
+  font-size: 12.34pt; line-height: 2; color: var(--ink);
+  margin-bottom: 2.14mm; word-spacing: 1.23px;
+}
+.ayah-meal { font-size: 6.99pt; color: var(--ink-soft); line-height:1.5; font-style:italic; }
+.ayah-meal::before { content: "" ; }
+.ayah-etym { font-size: 6.58pt; color: var(--ink-faint); line-height:1.4; margin-top: 1.48mm; padding-top: 1.48mm; border-top: 0.82px solid var(--line-soft); }
+
+/* ================= SÖZLÜK ================= */
+.gloss-grid { display:grid; grid-template-columns: 1fr 1fr; gap: 2.63mm 4.53mm; margin-top: 4.94mm; }
+.gloss-item { border-bottom: 0.82px solid var(--line-soft); padding-bottom: 2.3mm; }
+.gloss-term { font-size: 7.49pt; font-weight:700; color: var(--accent-dark); font-family:"DejaVu Serif",serif; }
+.gloss-def { font-size: 6.75pt; color: var(--ink-soft); line-height:1.42; margin-top: 0.74mm; }
+.gloss-ref { font-size: 6.01pt; color: var(--ink-faint); margin-top: 0.74mm; font-style:italic; }
+
+/* ================= SINAV HAZIRLIK ================= */
+.dist-grid { display:grid; grid-template-columns: 1fr 1fr; gap: 2.96mm; margin-top: 4.28mm; }
+.dist-card { border: 0.82px solid var(--line); border-radius: 7.41px; padding: 3.13mm 3.62mm; background: var(--paper); box-shadow: var(--shadow-sm); }
+.dist-title { font-size: 7.32pt; font-weight:700; color: var(--accent-dark); margin-bottom:1.23mm; font-family:"DejaVu Serif",serif; }
+.dist-vs { color: var(--gold-ink); font-weight:700; }
+.dist-text { font-size: 6.75pt; color: var(--ink-soft); line-height:1.48; }
+
+.match-table-wrap { margin-top: 4.94mm; }
+table.matchtable { width:100%; border-collapse:collapse; box-shadow: var(--shadow-sm); }
+table.matchtable th { background: linear-gradient(120deg, var(--accent-dark), var(--accent)); color:#fff; font-size:6.5pt; padding:2.14mm 2.63mm; text-align:left; }
+table.matchtable td { font-size: 6.67pt; padding: 1.98mm 2.63mm; border-bottom:0.82px solid var(--line-soft); color: var(--ink-soft); }
+table.matchtable td:first-child { font-weight:700; color:var(--ink); }
+table.matchtable tr:nth-child(even) td { background: var(--accent-tint); }
+
+.qa-grid { display:grid; grid-template-columns: 1fr 1fr; gap: 2.63mm 4.94mm; margin-top: 4.94mm; }
+.qa-item { font-size: 6.83pt; border-left: 2.06px solid var(--accent-soft); padding-left: 2.47mm; }
+.qa-q { font-weight:700; color: var(--ink); margin-bottom: 0.74mm; }
+.qa-a { color: var(--accent-dark); }
+
+.checklist { margin-top: 4.94mm; display:grid; grid-template-columns: 1fr 1fr; gap: 1.98mm 4.94mm; }
+.check-item { display:flex; align-items:flex-start; gap: 1.98mm; font-size: 6.83pt; color: var(--ink-soft); }
+.check-box { flex:0 0 auto; width:3.13mm; height:3.13mm; border: 1.23px solid var(--accent); border-radius: 2.47px; margin-top: 0.49mm; }
+
+.section-kicker { font-size: 6.5pt; letter-spacing:1.48px; font-weight:700; color: var(--accent); text-transform:uppercase; }
+.section-title { font-family:"DejaVu Serif",serif; font-size: 17.28pt; font-weight:700; margin-top: 1.65mm; color: var(--ink); }
+.section-lede { font-size: 7.41pt; color: var(--ink-soft); margin-top: 2.14mm; }
+
+/* ================= TEST (20 Soruluk Değerlendirme) ================= */
+.test-chip-row { display:flex; gap: 2.8mm; margin-top: 4.53mm; }
+.test-chip {
+  flex:1; text-align:center; background: var(--accent-tint); border: 0.82px solid var(--line);
+  border-radius: 6.58px; padding: 2.47mm 1.65mm;
+}
+.test-chip b { display:block; font-family:"DejaVu Serif",serif; font-size: 10.29pt; color: var(--accent-dark); }
+.test-chip span { font-size: 5.76pt; font-weight:700; letter-spacing:.3.29px; text-transform:uppercase; color: var(--ink-faint); }
+.test-instructions {
+  margin-top: 3.29mm; background: var(--caution-bg); border: 0.82px solid #b9cdf2; color: var(--caution-ink);
+  border-radius: 6.58px; padding: 2.47mm 3.29mm; font-size: 6.91pt; line-height:1.5;
+}
+.tq-list { margin-top: 4.94mm; column-count: 2; column-gap: 6.58mm; column-fill: balance; }
+.tq { break-inside: avoid; -webkit-column-break-inside: avoid; margin-bottom: 4.53mm; }
+.tq-head { display:flex; align-items:flex-start; gap: 2.3mm; margin-bottom: 1.81mm; }
+.tq-num {
+  flex:0 0 auto; width: 5.27mm; height:5.27mm; border-radius:4.94px;
+  background: var(--accent-dark); color:#fff; font-size: 6.91pt; font-weight:700;
+  display:flex; align-items:center; justify-content:center; box-shadow: var(--shadow-sm); font-family:"DejaVu Serif",serif;
+}
+.tq-stem { font-size: 7.49pt; font-weight:700; color: var(--ink); line-height:1.4; padding-top:0.33mm; }
+.tq-options { margin-left: 7.57mm; display:flex; flex-direction:column; gap: 1.32mm; }
+.tq-options li { list-style:none; display:flex; gap: 1.98mm; align-items:flex-start; font-size: 7.08pt; color: var(--ink-soft); line-height:1.4; }
+.opt-letter {
+  flex:0 0 auto; width:3.79mm; height:3.79mm; border-radius:50%; border: 1.07px solid var(--accent);
+  color: var(--accent-dark); font-size: 5.6pt; font-weight:700;
+  display:flex; align-items:center; justify-content:center; margin-top: 0.16mm;
+}
+
+/* ================= CEVAP ANAHTARI VE ÇÖZÜMLER ================= */
+.ans-list { margin-top: 4.94mm; column-count: 2; column-gap: 6.58mm; column-fill: balance; }
+.ans-item { display:flex; gap: 2.47mm; break-inside: avoid; -webkit-column-break-inside: avoid; margin-bottom: 2.3mm; }
+.ans-num {
+  flex:0 0 auto; width: 5.27mm; height:5.27mm; border-radius:4.94px;
+  background: var(--accent-soft); color: var(--accent-dark); font-size: 6.91pt; font-weight:700;
+  display:flex; align-items:center; justify-content:center; font-family:"DejaVu Serif",serif; border: 0.82px solid var(--line);
+}
+.ans-correct {
+  display:inline-block; background:#e7f5ec; color:#1e7e42; font-weight:700; font-size:6.25pt;
+  letter-spacing:.2.47px; padding: 0.82mm 2.14mm; border-radius:999px; margin-bottom: 0.99mm;
+}
+.ans-explain { font-size: 6.99pt; color: var(--ink-soft); line-height:1.45; }
+.ans-explain b { color: var(--ink); }
+
+/* çok-sayfa: bölüm içi devam sayfası başlığı */
+.chcontinue { display:flex; align-items:flex-start; gap: 2.63mm; margin-bottom: 4.53mm; }
+.chcontinue .tag {
+  flex: 0 0 auto; margin-top: 0.49mm;
+  font-size: 6.17pt; font-weight:700; letter-spacing:.4.94px; text-transform:uppercase;
+  background: var(--accent-dark); color: #fff; padding: 1.48mm 2.8mm; border-radius: 999px;
+}
+.chcontinue .cctitle { font-family:"DejaVu Serif",serif; font-size: 11.52pt; font-weight:700; color: var(--ink); line-height:1.25; }
+
+/* ============================================================
+   KİTAP ÖN KISMI (build_kitap.py — ana kapak, künye, önsöz,
+   sayfa rehberi, ana içindekiler, ders haritası)
+   Sadece birleşik kitapta kullanılır; tek ders çıktısını etkilemez.
+   ============================================================ */
+
+/* --- Künye --- */
+.imprint-grid { margin-top: 5.76mm; border-top: 0.82px solid var(--line); }
+.imprint-row { display:flex; gap: 4.94mm; padding: 2.8mm 0.82mm; border-bottom: 0.82px solid var(--line-soft); }
+.imprint-label {
+  flex: 0 0 34.56mm; font-size: 6.58pt; font-weight:700; letter-spacing:0.91px;
+  text-transform:uppercase; color: var(--ink-faint);
+}
+.imprint-value { flex:1; font-size: 7.74pt; color: var(--ink); line-height:1.5; }
+.imprint-value b { color: var(--accent-dark); }
+.imprint-note {
+  margin-top: 5.76mm; font-size: 7.24pt; color: var(--ink-soft); line-height:1.6;
+  border-left: 2.14px solid var(--accent); padding: 0.82mm 0 0.82mm 4.11mm;
+}
+
+/* --- Önsöz --- */
+.pref-grid { display:grid; grid-template-columns: repeat(2, 1fr); gap: 4.11mm; margin-top: 5.76mm; }
+.pref-card {
+  border: 0.82px solid var(--line); border-top: 2.14px solid var(--accent);
+  border-radius: 7.41px; padding: 4.11mm 4.44mm; background: var(--paper); box-shadow: var(--shadow-sm);
+}
+.pref-card-title {
+  font-family:"DejaVu Serif",serif; font-size: 8.56pt; font-weight:700;
+  color: var(--accent-dark); margin-bottom: 1.98mm;
+}
+.pref-card-text { font-size: 7.24pt; color: var(--ink-soft); line-height:1.58; }
+.pref-card-text b { color: var(--ink); }
+
+/* --- Sayfa rehberi (legend) --- */
+.guide-grid { display:grid; grid-template-columns: repeat(2, 1fr); gap: 4.11mm 4.94mm; margin-top: 4.94mm; }
+.guide-item { display:flex; flex-direction:column; gap: 1.81mm; }
+.guide-cap {
+  font-size: 6.58pt; font-weight:700; letter-spacing:.7.41px; text-transform:uppercase;
+  color: var(--accent-dark);
+}
+.guide-cap span { display:block; text-transform:none; letter-spacing:0; font-weight:400; font-size:6.75pt; color: var(--ink-soft); margin-top:0.66mm; line-height:1.45; }
+.guide-demo { border: 0.82px dashed var(--line); border-radius: 6.58px; padding: 2.47mm; background: var(--paper-tint); }
+.guide-demo .callout { margin: 0; }
+.guide-demo .term-box { margin: 0; }
+.guide-demo .chsummary { margin: 0; }
+
+/* --- Ana içindekiler (ders listesi) --- */
+.btoc-list { margin-top: 4.94mm; display:flex; flex-direction:column; }
+.btoc-row {
+  display:flex; align-items:center; gap: 3.7mm;
+  padding: 3.29mm 2.47mm; border-bottom: 0.82px solid var(--line-soft);
+  text-decoration:none; color: inherit; border-radius: 4.94px;
+}
+.btoc-row:first-child { border-top: 0.82px solid var(--line-soft); }
+.btoc-chip {
+  flex: 0 0 auto; width: 8.64mm; height: 8.64mm; border-radius: 6.58px;
+  display:flex; align-items:center; justify-content:center;
+  font-family:"DejaVu Serif",serif; font-weight:700; font-size: 9.05pt; color:#fff;
+  box-shadow: var(--shadow-sm);
+}
+.btoc-body { flex: 1 1 auto; min-width: 0; }
+.btoc-name { font-size: 9.05pt; font-weight:700; color: var(--ink); }
+.btoc-sub { font-size: 6.83pt; color: var(--ink-faint); margin-top: 0.66mm; }
+.btoc-meta { flex: 0 0 auto; font-size: 6.42pt; color: var(--ink-faint); text-align:right; line-height:1.5; }
+.btoc-range {
+  flex: 0 0 auto; font-size: 7.57pt; font-weight:700; color: #fff;
+  padding: 1.48mm 2.63mm; border-radius: 4.94px; min-width: 20mm; text-align:center;
+}
+
+/* --- Ders haritası (sırt görünümü) --- */
+.map-note { font-size: 7.24pt; color: var(--ink-soft); line-height:1.6; margin-top: 2.47mm; }
+.map-list { margin-top: 5.76mm; display:flex; flex-direction:column; gap: 2.63mm; }
+.map-row { display:flex; align-items:center; gap: 3.29mm; }
+.map-name { flex: 0 0 42.79mm; font-size: 7.24pt; font-weight:700; color: var(--ink); }
+.map-track { flex: 1 1 auto; height: 5.43mm; background: var(--paper-tint); border: 0.82px solid var(--line); border-radius: 999px; overflow:hidden; }
+.map-fill { height: 100%; border-radius: 999px; display:flex; align-items:center; justify-content:flex-end; padding-right: 1.98mm; }
+.map-fill span { font-size: 6.09pt; font-weight:700; color: #fff; }
+.map-range { flex: 0 0 19.75mm; text-align:right; font-size: 6.75pt; font-weight:700; color: var(--ink-faint); }
+
+/* ===== build.py tarafından üretildi — elle düzenlemeyin ===================
+   Trim 175mm x 250mm · bleed 3mm ·
+   kenarlar: üst 11mm / alt 19mm /
+   iç 14mm / dış 9mm ·
+   tek sayfa sırtı: left
+   ========================================================================= */
+@page { size: 181mm 256mm; margin: 0; }
+:root {
+  --trim-w: 175mm;
+  --trim-h: 250mm;
+  --bleed: 3mm;
+  --page-w: 181mm;
+  --page-h: 256mm;
+  --mg-top: 11mm;
+  --mg-bottom: 19mm;
+  --mg-inner: 14mm;
+  --mg-outer: 9mm;
+  --pad-top: 14mm;
+  --pad-bottom: 22mm;
+  --pad-inner: 17mm;
+  --pad-outer: 12mm;
+}
+/* Ayna simetri — tek sayfada sırt left, çift sayfada right */
+body > section.page:nth-of-type(odd) {
+  --pad-left: var(--pad-inner);
+  --pad-right: var(--pad-outer);
+}
+body > section.page:nth-of-type(even) {
+  --pad-left: var(--pad-outer);
+  --pad-right: var(--pad-inner);
+}
+</style>
+
+</head>
+<body class="theme-forest">
+
+
+
+<section class="page cover" id="cover">
+  <div class="cover-corner tl"></div>
+  <div class="cover-corner tr"></div>
+  <div class="cover-corner bl"></div>
+  <div class="cover-corner br"></div>
+  <div class="cover-top">
+    <div class="cover-kicker">Görsel Ders Notu Kitabı · Final Özeti</div>
+    <div class="cover-emblem">
+      <div class="ring-outer"></div>
+      <div class="ring-mid"></div>
+      
+      <div class="tick major" style="transform: translateX(-50%) rotate(0deg);"></div>
+      
+      <div class="tick" style="transform: translateX(-50%) rotate(30deg);"></div>
+      
+      <div class="tick" style="transform: translateX(-50%) rotate(60deg);"></div>
+      
+      <div class="tick major" style="transform: translateX(-50%) rotate(90deg);"></div>
+      
+      <div class="tick" style="transform: translateX(-50%) rotate(120deg);"></div>
+      
+      <div class="tick" style="transform: translateX(-50%) rotate(150deg);"></div>
+      
+      <div class="tick major" style="transform: translateX(-50%) rotate(180deg);"></div>
+      
+      <div class="tick" style="transform: translateX(-50%) rotate(210deg);"></div>
+      
+      <div class="tick" style="transform: translateX(-50%) rotate(240deg);"></div>
+      
+      <div class="tick major" style="transform: translateX(-50%) rotate(270deg);"></div>
+      
+      <div class="tick" style="transform: translateX(-50%) rotate(300deg);"></div>
+      
+      <div class="tick" style="transform: translateX(-50%) rotate(330deg);"></div>
+      
+      <div class="ring-inner"><span>S</span></div>
+    </div>
+  </div>
+  <div class="cover-mid">
+    <div class="cover-motif">S</div>
+    <div class="cover-code">SOSYOLOJİ</div>
+    <div class="cover-title">Sosyoloji<span class="accent-word">ye</span> Giriş</div>
+    <div class="cover-subtitle">Kültür, Toplumsallaşma, Değişme ve Statü-Rol Kuramlarına Bütüncül Bakış</div>
+    <div class="cover-rule"></div>
+    <div class="cover-desc">Kültürün tanımından toplumsallaşma süreçlerine, davranış kalıplarından toplumsal değişme kuramlarına; modernizm-postmodernizm karşıtlığından statü ve rol kavramlarına uzanan final sınavı özeti.</div>
+  </div>
+  <div class="cover-bottom">
+    <div class="cover-stats">
+      <div class="cover-stat"><b>6</b>Bölüm</div>
+      <div class="cover-stat"><b>33</b>Anahtar Kavram</div>
+      <div class="cover-stat"><b>Final</b>Sınav Hazırlık</div>
+    </div>
+    <div class="cover-foot">
+      <div>Ders Notu Serisi</div>
+      <div>6 Bölüm · Final Sınavı Hazırlığı</div>
+    </div>
+  </div>
+</section>
+
+
+
+
+<section class="page body-page">
+  <div class="pageband"><div>Sosyoloji<span class="accent-word">ye</span> Giriş</div><div class="pageband-course">SOSYOLOJİ</div></div>
+  
+  <div class="toc-kicker">Kitap Planı</div>
+  <div class="toc-title">İçindekiler</div>
+  <div class="toc-lede">Kültür, Toplumsallaşma, Değişme ve Statü-Rol Kuramlarına Bütüncül Bakış — bölüm bölüm takip edilecek çalışma haritası.</div>
+  
+  <div class="toc-list">
+    
+    <a class="toc-row" href="#ch-1">
+      <div class="toc-num">1</div>
+      <div class="toc-body">
+        <div class="toc-heading">Kültür</div>
+        <div class="toc-sub">Tanımından işlevlerine, kavramlarından değişim süreçlerine bütüncül bakış</div>
+      </div>
+      <div class="toc-page">s.5</div>
+    </a>
+    
+    <a class="toc-row" href="#ch-2">
+      <div class="toc-num">2</div>
+      <div class="toc-body">
+        <div class="toc-heading">Toplumsallaşma ve Davranış Kalıpları</div>
+        <div class="toc-sub">Bireyin toplumsal bir varlığa dönüşümünden, toplumun ortak davranış örüntülerine</div>
+      </div>
+      <div class="toc-page">s.7</div>
+    </a>
+    
+    <a class="toc-row" href="#ch-3">
+      <div class="toc-num">3</div>
+      <div class="toc-body">
+        <div class="toc-heading">Toplumsal Değişme</div>
+        <div class="toc-sub">Tanımından kuramlarına, geleneksel toplumdan sanayi toplumuna geçişin dinamikleri</div>
+      </div>
+      <div class="toc-page">s.10</div>
+    </a>
+    
+    <a class="toc-row" href="#ch-4">
+      <div class="toc-num">4</div>
+      <div class="toc-body">
+        <div class="toc-heading">Modernizm ve Postmodernizm</div>
+        <div class="toc-sub">Akılcılaşmadan simülasyona: iki çağın karşıt paradigmaları</div>
+      </div>
+      <div class="toc-page">s.12</div>
+    </a>
+    
+    <a class="toc-row" href="#ch-5">
+      <div class="toc-num">5</div>
+      <div class="toc-body">
+        <div class="toc-heading">Toplumsal Statü</div>
+        <div class="toc-sub">Bireyin toplumdaki konumunu belirleyen verilmiş ve kazanılmış ölçütler</div>
+      </div>
+      <div class="toc-page">s.14</div>
+    </a>
+    
+    <a class="toc-row" href="#ch-6">
+      <div class="toc-num">6</div>
+      <div class="toc-body">
+        <div class="toc-heading">Toplumsal Rol</div>
+        <div class="toc-sub">Statünün davranışa dökülmüş hali: edinme biçimleri, kavramlar ve yaptırımlar</div>
+      </div>
+      <div class="toc-page">s.16</div>
+    </a>
+    
+    <a class="toc-row" href="#glossary">
+      <div class="toc-num alt">A</div>
+      <div class="toc-body">
+        <div class="toc-heading">Anahtar Kavramlar Sözlüğü</div>
+        <div class="toc-sub">Tanımlı ve bağlamlandırılmış 33 kavram</div>
+      </div>
+      <div class="toc-page">s.18</div>
+    </a>
+    
+  </div>
+  
+<div class="footer">
+  <div>Sosyoloji<span class="accent-word">ye</span> Giriş</div>
+  <div class="fnum">2</div>
+</div>
+
+</section>
+
+
+<section class="page body-page">
+  <div class="pageband"><div>Sosyoloji<span class="accent-word">ye</span> Giriş</div><div class="pageband-course">İçindekiler · Devam</div></div>
+  
+  <div class="toc-list">
+    
+    <a class="toc-row" href="#exam">
+      <div class="toc-num alt">B</div>
+      <div class="toc-body">
+        <div class="toc-heading">Genel Değerlendirme Testi</div>
+        <div class="toc-sub">20 soruluk çoktan seçmeli test ve çözümlü cevap anahtarı</div>
+      </div>
+      <div class="toc-page">s.20</div>
+    </a>
+    
+  </div>
+  
+<div class="footer">
+  <div>Sosyoloji<span class="accent-word">ye</span> Giriş</div>
+  <div class="fnum">3</div>
+</div>
+
+</section>
+
+
+
+
+<section class="page body-page">
+  <div class="pageband"><div>Sosyoloji<span class="accent-word">ye</span> Giriş</div><div class="pageband-course">SOSYOLOJİ</div></div>
+  <div class="toc-kicker">Dersin Büyük Resmi</div>
+  <div class="toc-title">Genel Bakış</div>
+
+  <div class="ov-hero">Bu ders; bireyin <b>kültürle biçimlenmesinden</b> toplumun yapısal <b>değişimine</b>, gündelik hayattaki <b>statü ve rollere</b> uzanan sosyolojik bakış açısının temel araçlarını bir bütün olarak sunar.</div>
+
+  <div class="ov-grid">
+    
+    <div class="ov-card">
+      <div class="ov-card-title">Kültür</div>
+      <div class="ov-card-text">Tanımı, 5 temel özelliği, ögeleri ve kültürel süreçler.</div>
+    </div>
+    
+    <div class="ov-card">
+      <div class="ov-card-title">Toplumsallaşma</div>
+      <div class="ov-card-text">Bireyin toplumsal varlığa dönüşümü ve davranış kalıpları.</div>
+    </div>
+    
+    <div class="ov-card">
+      <div class="ov-card-title">Toplumsal Değişme</div>
+      <div class="ov-card-text">Değişmenin dinamikleri, kuramları ve sanayileşme süreci.</div>
+    </div>
+    
+    <div class="ov-card">
+      <div class="ov-card-title">Modernizm / Postmodernizm</div>
+      <div class="ov-card-text">Akılcılaşmadan simülasyona iki karşıt paradigma.</div>
+    </div>
+    
+    <div class="ov-card">
+      <div class="ov-card-title">Toplumsal Statü</div>
+      <div class="ov-card-text">Verilmiş ve kazanılmış statülerin belirleyicileri.</div>
+    </div>
+    
+    <div class="ov-card">
+      <div class="ov-card-title">Toplumsal Rol</div>
+      <div class="ov-card-text">Statünün davranışa dökülmüş hali ve rol kavramları.</div>
+    </div>
+    
+  </div>
+
+  
+  <div class="section-kicker" style="margin-top:3.5mm;">Çalışma Akışı</div>
+  <div class="ov-flow">
+    
+    
+    <div class="ov-flow-step"><b>Kültür</b><span>Tanım ve süreçler</span></div>
+    
+    <div class="ov-flow-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="19" y2="12"/><polyline points="13 6 19 12 13 18"/></svg></div>
+    <div class="ov-flow-step"><b>Birey & Toplum</b><span>Toplumsallaşma / kalıplar</span></div>
+    
+    <div class="ov-flow-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="19" y2="12"/><polyline points="13 6 19 12 13 18"/></svg></div>
+    <div class="ov-flow-step"><b>Yapısal Değişim</b><span>Değişme / modernizm</span></div>
+    
+    <div class="ov-flow-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="19" y2="12"/><polyline points="13 6 19 12 13 18"/></svg></div>
+    <div class="ov-flow-step"><b>Statü & Rol</b><span>Konum ve eylem</span></div>
+    
+  </div>
+  
+
+  
+  <div class="callout caution" style="margin-top:3.5mm;">
+    <div class="callout-icon">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.5"/><line x1="12" y1="11" x2="12" y2="16.5"/><circle cx="12" cy="7.5" r="0.6" fill="currentColor" stroke="none"/></svg>
+
+</div>
+    <div><div class="callout-title">Sınavda Ana Ayrım</div><div class="callout-text">Sınavda en çok karıştırılan yer, <b>Statü ile Rol</b> ayrımıdır: statü bireyin toplumdaki konumu, rol ise o konumun gerektirdiği eylemdir — 'nerede olunduğu' ile 'ne yapıldığı' birbirine karıştırılmamalıdır.</div></div>
+  </div>
+  
+
+  
+<div class="footer">
+  <div>Sosyoloji<span class="accent-word">ye</span> Giriş</div>
+  <div class="fnum">4</div>
+</div>
+
+</section>
+
+
+
+
+  
+  
+  <section class="page body-page" data-ch="1" data-cp="0" id="ch-1">
+    <div class="pageband"><div>Sosyoloji<span class="accent-word">ye</span> Giriş</div><div class="pageband-course">Bölüm 1</div></div>
+
+    
+      <div class="chbanner">
+        <div class="chbanner-kicker">1. Bölüm</div>
+        <div class="chbanner-title">Kültür</div>
+        <div class="chbanner-subtitle">Tanımından işlevlerine, kavramlarından değişim süreçlerine bütüncül bakış</div>
+      </div>
+    
+
+    <!--item 0 terms-->
+  
+<div class="terms-grid">
+  
+  <div class="term-box">
+    <div class="term-name">Kültür</div>
+    <div class="term-def">Bir toplumun üyesi olan insanın kazandığı bilgi, inanç, sanat, ahlak, hukuk ve gelenekleri içeren karmaşık bütün.</div>
+  </div>
+  
+  <div class="term-box">
+    <div class="term-name">Kültürel Gecikme</div>
+    <div class="term-def">Ogburn'e göre maddi kültürün (teknoloji) hızlı, manevi kültürün (değerler) yavaş değişmesinden doğan uyumsuzluk.</div>
+  </div>
+  
+  <div class="term-box">
+    <div class="term-name">Etnosentrizm</div>
+    <div class="term-def">Kişinin kendi kültürünü merkeze alıp diğer kültürleri bu ölçütle yargılamasıdır.</div>
+  </div>
+  
+  <div class="term-box">
+    <div class="term-name">Kültürel Relativizm</div>
+    <div class="term-def">Bir kültürü kendi yapısı ve değerleri içinde, yargılamadan anlamaya çalışma tutumu.</div>
+  </div>
+  
+</div>
+
+  
+<!--item 1 person-->
+  
+<div class="person-card">
+  <div class="person-avatar">EB</div>
+  <div>
+    <div class="person-name">Edward B. Tylor</div>
+    <div class="person-tag">1832–1917 · Kültür Antropolojisinin Kurucu İsmi</div>
+    <div class="person-bio"><b>İlkel Kültür</b> adlı eserinde kültürün rastgele değil doğal yasalara bağlı olduğunu ve biyolojik değil <b>sosyal yolla</b> (toplum içinde yaşayarak) kazanıldığını savunmuştur.</div>
+  </div>
+</div>
+
+  
+<!--item 2 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">1</div>
+    <div class="block-title">Kültürün Tanımı ve Doğası</div>
+  </div>
+  
+  <ul>
+    <li>Kültür; bilimsel veya estetik anlamının ötesinde, sosyolojik olarak toplumun üyesi olan insanın kazandığı bilgi, inanç, sanat, ahlak, hukuk ve geleneklerin karmaşık bütünüdür.</li>
+  </ul>
+</div>
+
+  
+<!--item 3 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">2</div>
+    <div class="block-title">Kültürün 5 Temel Özelliği</div>
+  </div>
+  
+  <ul>
+    <li><b>Her Şeyi Kapsayıcıdır:</b> Toplumun paylaştığı maddi/manevi tüm ögelerin toplamıdır; kültürsüz toplum düşünülemez.</li><li><b>Öğrenilir:</b> Doğuştan gelmez — bilinçli öğretim, gözlem ve birikimsellikle kazanılır.</li><li><b>Simgeseldir:</b> Dil, kültürün taşıyıcısıdır; nesnelere anlam yükleme (simgeleştirme) yeteneğiyle başlar.</li><li><b>Paylaşılır:</b> Bireysel değil toplumsaldır; grupça ortaklaşa yaratılır.</li><li><b>Örüntülüdür:</b> Gelişigüzel değil, 'çekirdek değerler' etrafında bütünleşmiş bir sistemdir.</li>
+  </ul>
+</div>
+
+  
+<!--item 4 callout-->
+  
+<div class="callout focus">
+  <div class="callout-icon">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.5"/><line x1="12" y1="7.5" x2="12" y2="13"/><circle cx="12" cy="16.5" r="0.6" fill="currentColor" stroke="none"/></svg>
+
+</div>
+  <div>
+    <div class="callout-title">Kritik Odak: Fichter'e Göre Kültürün İşlevleri</div>
+    <div class="callout-text">Toplumsal davranışları düzenler ve bütünleştirir · toplumsal dayanışmayı sağlar · toplumun kimliği olur · değerleri yorumlar · kişiliğin oluşmasında başat faktördür.</div>
+  </div>
+</div>
+
+  
+
+
+    
+<div class="footer">
+  <div>Sosyoloji<span class="accent-word">ye</span> Giriş</div>
+  <div class="fnum">5</div>
+</div>
+
+  </section>
+  
+  
+  
+  <section class="page body-page" data-ch="1" data-cp="1">
+    <div class="pageband"><div>Sosyoloji<span class="accent-word">ye</span> Giriş</div><div class="pageband-course">Bölüm 1</div></div>
+
+    
+
+    <!--item 0 table-->
+  
+<div class="ctable-wrap">
+  <div class="ctable-caption">Kültürün Ögeleri ve Kültürel Gecikme</div>
+  <table class="ctable">
+    <thead><tr><th>Kavram</th><th>Açıklama</th></tr></thead>
+    <tbody>
+      
+      <tr><td>Maddi Ögeler</td><td>Teknoloji, binalar, araç-gereçler gibi fiziksel nesneler.</td></tr>
+      
+      <tr><td>Manevi Ögeler</td><td>Değerler, inançlar, kurallar, gelenek ve görenekler.</td></tr>
+      
+      <tr><td>Kültürel Gecikme (Ogburn)</td><td>Maddi kültür hızlı, manevi kültür yavaş değişir — bu fark uyumsuzluk yaratır.</td></tr>
+      
+    </tbody>
+  </table>
+</div>
+
+  
+<!--item 1 table-->
+  
+<div class="ctable-wrap">
+  <div class="ctable-caption">Kültürel Kavramlar</div>
+  <table class="ctable">
+    <thead><tr><th>Kavram</th><th>Açıklama</th></tr></thead>
+    <tbody>
+      
+      <tr><td>Kültürel Evrensellik</td><td>Her toplumda aile, hukuk, ahlak gibi yapısal kurumlar vardır; içerikleri değişir.</td></tr>
+      
+      <tr><td>Etnosentrizm (Bizmerkezcilik)</td><td>Kendi kültürünü merkeze alıp diğerlerini yargılama (ör. boğa güreşini vahşet görmek).</td></tr>
+      
+      <tr><td>Kültürel Relativizm</td><td>Bir kültürü kendi değerleri içinde, yargılamadan anlama çabası.</td></tr>
+      
+      <tr><td>Alt Kültür / Karşıt Kültür</td><td>Alt kültür egemen kültürden kısmen farklılaşır; karşıt kültür normları reddeder.</td></tr>
+      
+      <tr><td>İdeal vs. Gerçek Kültür</td><td>İdeal 'olması gereken' kurallar, gerçek ise 'fiilen uygulanan'dır.</td></tr>
+      
+      <tr><td>Yüksek vs. Popüler Kültür</td><td>Yüksek kültür seçkinlere (güzel sanatlar), popüler kültür halk kitlelerine hitap eder.</td></tr>
+      
+    </tbody>
+  </table>
+</div>
+
+  
+<!--item 2 table-->
+  
+<div class="ctable-wrap">
+  <div class="ctable-caption">Kültürel Süreçler</div>
+  <table class="ctable">
+    <thead><tr><th>Süreç</th><th>Açıklama</th></tr></thead>
+    <tbody>
+      
+      <tr><td>Kültürleme (Enkültürasyon)</td><td>Bireyin doğuştan ölüme kadar kültürü öğrenmesi, eğitilmesi.</td></tr>
+      
+      <tr><td>Kültürleşme (Akkültürasyon)</td><td>Farklı kültürlerin etkileşimiyle her ikisinin de değişmesi.</td></tr>
+      
+      <tr><td>Kültürlenme (Kültürasyon)</td><td>Etkileşim sonucu, asıl kültürlerde olmayan yeni bir sentezin oluşması (ör. gecekondu kültürü).</td></tr>
+      
+      <tr><td>Kültürel Yayılma (Difüzyon)</td><td>Kültür ögelerinin bir toplumdan diğerine geçmesi.</td></tr>
+      
+      <tr><td>Kültür Şoku</td><td>Başka bir kültüre giren bireyin yaşadığı uyum sıkıntısı.</td></tr>
+      
+    </tbody>
+  </table>
+</div>
+
+  
+<!--item 3 summary-->
+  
+<div class="chsummary"><b>Bölüm Özeti</b>Kültür, öğrenilen, paylaşılan ve örüntülü bir bütündür; maddi ve manevi ögelerden oluşur. Maddi kültürün manevi kültürden hızlı değişmesi 'kültürel gecikme' yaratır. Etnosentrizm ile kültürel relativizm, bir kültürü değerlendirirken alınabilecek iki karşıt tutumdur.</div>
+
+  
+
+
+    
+<div class="footer">
+  <div>Sosyoloji<span class="accent-word">ye</span> Giriş</div>
+  <div class="fnum">6</div>
+</div>
+
+  </section>
+  
+  
+
+  
+  
+  <section class="page body-page" data-ch="2" data-cp="0" id="ch-2">
+    <div class="pageband"><div>Sosyoloji<span class="accent-word">ye</span> Giriş</div><div class="pageband-course">Bölüm 2</div></div>
+
+    
+      <div class="chbanner">
+        <div class="chbanner-kicker">2. Bölüm</div>
+        <div class="chbanner-title">Toplumsallaşma ve Davranış Kalıpları</div>
+        <div class="chbanner-subtitle">Bireyin toplumsal bir varlığa dönüşümünden, toplumun ortak davranış örüntülerine</div>
+      </div>
+    
+
+    <!--item 0 terms-->
+  
+<div class="terms-grid">
+  
+  <div class="term-box">
+    <div class="term-name">Toplumsallaşma</div>
+    <div class="term-def">Bireyin toplumun kural ve değerlerini öğrenerek biyolojik varlıktan toplumsal varlığa dönüşme süreci.</div>
+  </div>
+  
+  <div class="term-box">
+    <div class="term-name">Yeniden Toplumsallaşma</div>
+    <div class="term-def">Bireyin değer ve davranışlarını temelden değiştirmesi (ör. evlilikten dulluğa geçiş).</div>
+  </div>
+  
+  <div class="term-box">
+    <div class="term-name">Davranış Kalıbı</div>
+    <div class="term-def">Toplumda genelleşmiş, düzenlilik kazanmış, yinelenen düşünüş ve eylem biçimi.</div>
+  </div>
+  
+  <div class="term-box">
+    <div class="term-name">Propaganda</div>
+    <div class="term-def">Fikirleri tek taraflı olarak benimsetmeyi ve 'kabul ettirmeyi' amaçlayan yapay etkileme aracı.</div>
+  </div>
+  
+</div>
+
+  
+<!--item 1 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">1</div>
+    <div class="block-title">Toplumsallaşmanın Tanımı ve Amaçları</div>
+  </div>
+  
+  <ul>
+    <li>Bireyin toplumun kurallarını ve değerlerini öğrenerek biyolojik bir varlıktan toplumsal bir varlığa dönüşmesi, kişilik ve benlik kazanması sürecidir. Doğumla başlar, ölüme kadar sürer.</li><li><b>Amaçlar:</b> Temel davranışları öğretmek, özlemler oluşturmak, toplumsal rolleri öğretmek, kimlik kazandırmak ve toplumun sürekliliğini sağlamak.</li>
+  </ul>
+</div>
+
+  
+<!--item 2 table-->
+  
+<div class="ctable-wrap">
+  <div class="ctable-caption">Toplumsallaşma Tipleri</div>
+  <table class="ctable">
+    <thead><tr><th>Tip</th><th>Açıklama</th></tr></thead>
+    <tbody>
+      
+      <tr><td>Başarılı Toplumsallaşma</td><td>Birey davranışları ayırt edebilir, ödül-ceza sistemiyle eğitilir, bunalımları yönetilebilir.</td></tr>
+      
+      <tr><td>Başarısız Toplumsallaşma</td><td>Kuralların öğrenilememesi/çelişkili aktarılması sonucu sapkın (patolojik) davranışlar gelişir.</td></tr>
+      
+    </tbody>
+  </table>
+</div>
+
+  
+<!--item 3 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">2</div>
+    <div class="block-title">Toplumsallaşma Araçları</div>
+  </div>
+  
+  <ul>
+    <li><b>Aile:</b> İlk ve en etkili araçtır; duygusal boyutu benlik oluşumunda kritiktir.</li><li><b>Arkadaş Grupları:</b> Aileden farklı olarak eşitlikçidir; çocuğa bağımsız bir kimlik alanı sağlar.</li><li><b>Okul:</b> Resmi, örgütlü, otorite ve disiplin içerir; öğretmen profesyonel bir modeldir.</li><li><b>Kitle İletişim Araçları:</b> Dünya görüşünü etkiler, rol modelleri sunar (TV vb.).</li>
+  </ul>
+</div>
+
+  
+<!--item 4 callout-->
+  
+<div class="callout caution">
+  <div class="callout-icon">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.5"/><line x1="12" y1="11" x2="12" y2="16.5"/><circle cx="12" cy="7.5" r="0.6" fill="currentColor" stroke="none"/></svg>
+
+</div>
+  <div>
+    <div class="callout-title">Dikkat: Toplumsallaşma Çocuklukla Bitmez</div>
+    <div class="callout-text">Askerlik, evlilik gibi yeni rollerle yetişkinler de değişir. Bireyin değer ve davranışlarını temelden değiştirmesine <b>Yeniden Toplumsallaşma (Resocialization)</b> denir.</div>
+  </div>
+</div>
+
+  
+
+
+    
+<div class="footer">
+  <div>Sosyoloji<span class="accent-word">ye</span> Giriş</div>
+  <div class="fnum">7</div>
+</div>
+
+  </section>
+  
+  
+  
+  <section class="page body-page" data-ch="2" data-cp="1">
+    <div class="pageband"><div>Sosyoloji<span class="accent-word">ye</span> Giriş</div><div class="pageband-course">Bölüm 2</div></div>
+
+    
+
+    <!--item 0 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">3</div>
+    <div class="block-title">Davranış Kalıplarının Tanımı</div>
+  </div>
+  
+  <ul>
+    <li>Toplumda genelleşmiş, düzenlilik kazanmış, yinelenen düşünüş ve eylem biçimleridir; bireysel değil toplumsaldır. Birey bunları düşünmeden otomatik yapar ('Herkes öyle yaptığı için').</li><li>Biyolojik değil öğrenilmiştir — acıkmak biyolojik, domuz eti yememek kültürel bir kalıptır. Üç boyutu vardır: Toplumsal Yaptırım (baskı), Toplumsal Değer (önem) ve Genellik (yaygınlık).</li>
+  </ul>
+</div>
+
+  
+<!--item 1 table-->
+  
+<div class="ctable-wrap">
+  <div class="ctable-caption">Dışsal ve İçsel Davranış Kalıpları</div>
+  <table class="ctable">
+    <thead><tr><th>Tür</th><th>Açıklama</th></tr></thead>
+    <tbody>
+      
+      <tr><td>Dışsal — Yüksek Baskılı</td><td>Gözlemlenebilir eylemler; uymamak şiddetli tepki görür (ör. adam öldürme).</td></tr>
+      
+      <tr><td>Dışsal — Düşük Baskılı</td><td>Gözlemlenebilir ama hafif yaptırımlı eylemler (ör. nezaket kuralları).</td></tr>
+      
+      <tr><td>İçsel Davranış Kalıpları</td><td>Düşünce ve inanç biçimleridir, doğrudan gözlenemez; dışsaldan daha süreklidir.</td></tr>
+      
+    </tbody>
+  </table>
+</div>
+
+  
+<!--item 2 table-->
+  
+<div class="ctable-wrap">
+  <div class="ctable-caption">Tan'ın İçsel Davranış Kalıpları Sınıflandırması (1981)</div>
+  <table class="ctable">
+    <thead><tr><th>Kalıp</th><th>Açıklama</th></tr></thead>
+    <tbody>
+      
+      <tr><td>Toplumsal İnançlar</td><td>Bilgi (doğrulanabilir), İman (doğrulanamaz, ör. melek), Kanaat (geleceğe dair özel inanç).</td></tr>
+      
+      <tr><td>Toplumsal Tutumlar</td><td>Eyleme hazır olma durumu.</td></tr>
+      
+      <tr><td>Toplumsal İdealler</td><td>'Olması gereken' — doğru-yanlış ölçütü.</td></tr>
+      
+      <tr><td>Toplumsal Tercihler</td><td>Arzu edilen, beğenilen şeyler.</td></tr>
+      
+    </tbody>
+  </table>
+</div>
+
+  
+<!--item 3 table-->
+  
+<div class="ctable-wrap">
+  <div class="ctable-caption">Davranış Kalıplarının Sonuçları ve Değiştirme Yolları</div>
+  <table class="ctable">
+    <thead><tr><th>Kavram</th><th>Açıklama</th></tr></thead>
+    <tbody>
+      
+      <tr><td>Moda</td><td>Onaylanan geçici değişikliklerdir; hem topluma uyma hem farklılaşma ihtiyacını karşılar.</td></tr>
+      
+      <tr><td>İdeoloji</td><td>Bir rejimin ilkeleri/toplumun dünya görüşüdür; doğruluğundan çok kabul edilmesi önemlidir.</td></tr>
+      
+      <tr><td>Kamuoyu</td><td>Halkın bir kesiminin belli bir konudaki görüşüdür (tüm nüfusun görüşü değildir).</td></tr>
+      
+      <tr><td>Propaganda</td><td>Fikirleri tek taraflı benimsetmeye çalışan yapay etkileme; 'kabul ettirmeyi' amaçlar.</td></tr>
+      
+      <tr><td>Reklam</td><td>Ticari etkinliktir; tercih ve arzu yaratarak satın aldırmayı hedefler.</td></tr>
+      
+    </tbody>
+  </table>
+</div>
+
+  
+
+
+    
+<div class="footer">
+  <div>Sosyoloji<span class="accent-word">ye</span> Giriş</div>
+  <div class="fnum">8</div>
+</div>
+
+  </section>
+  
+  
+  
+  <section class="page body-page" data-ch="2" data-cp="2">
+    <div class="pageband"><div>Sosyoloji<span class="accent-word">ye</span> Giriş</div><div class="pageband-course">Bölüm 2</div></div>
+
+    
+
+    <!--item 0 summary-->
+  
+<div class="chsummary"><b>Bölüm Özeti</b>Toplumsallaşma, bireyi biyolojik varlıktan toplumsal varlığa dönüştüren yaşam boyu bir süreçtir; aile, akran grubu, okul ve medya bu sürecin başlıca araçlarıdır. Davranış kalıpları ise toplumun ortaklaşa ürettiği, bireyin sorgulamadan uyduğu yinelenen eylem ve düşünüş biçimleridir.</div>
+
+  
+
+
+    
+<div class="footer">
+  <div>Sosyoloji<span class="accent-word">ye</span> Giriş</div>
+  <div class="fnum">9</div>
+</div>
+
+  </section>
+  
+  
+
+  
+  
+  <section class="page body-page" data-ch="3" data-cp="0" id="ch-3">
+    <div class="pageband"><div>Sosyoloji<span class="accent-word">ye</span> Giriş</div><div class="pageband-course">Bölüm 3</div></div>
+
+    
+      <div class="chbanner">
+        <div class="chbanner-kicker">3. Bölüm</div>
+        <div class="chbanner-title">Toplumsal Değişme</div>
+        <div class="chbanner-subtitle">Tanımından kuramlarına, geleneksel toplumdan sanayi toplumuna geçişin dinamikleri</div>
+      </div>
+    
+
+    <!--item 0 terms-->
+  
+<div class="terms-grid">
+  
+  <div class="term-box">
+    <div class="term-name">Toplumsal Değişme</div>
+    <div class="term-def">Toplumun yapısında, ilişkiler ağında ve kurumlarında meydana gelen, değer yargısı içermeyen farklılaşma.</div>
+  </div>
+  
+  <div class="term-box">
+    <div class="term-name">Sosyo-kültürel Değişme</div>
+    <div class="term-def">Toplumsal (yapı) ve kültürel (değerler) değişmenin iç içe geçmiş halinin ortak adı.</div>
+  </div>
+  
+  <div class="term-box">
+    <div class="term-name">Evrimci Kuram</div>
+    <div class="term-def">Toplumsal değişmeyi tarihsel birikim ve ilerleme olarak açıklayan yaklaşım (Comte, Durkheim).</div>
+  </div>
+  
+  <div class="term-box">
+    <div class="term-name">Çatışma Yaklaşımı</div>
+    <div class="term-def">Çatışmanın kaçınılmaz olduğunu ve değişimin itici gücü olduğunu savunan yaklaşım (Dahrendorf).</div>
+  </div>
+  
+</div>
+
+  
+<!--item 1 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">1</div>
+    <div class="block-title">Tanım ve Temel Dinamikler</div>
+  </div>
+  
+  <ul>
+    <li>Toplumun yapısında, ilişkiler ağında ve kurumlarında meydana gelen farklılaşmadır. Hiçbir toplum statik değildir. İki temel dinamiği vardır: <b>Teknoloji</b> (insan-doğa çelişkisi) ve <b>İdeoloji</b> (insan-insan çelişkisi).</li>
+  </ul>
+</div>
+
+  
+<!--item 2 table-->
+  
+<div class="ctable-wrap">
+  <div class="ctable-caption">Toplumsal Değişme ile Karıştırılan Kavramlar</div>
+  <table class="ctable">
+    <thead><tr><th>Kavram</th><th>Fark</th></tr></thead>
+    <tbody>
+      
+      <tr><td>Gelişme</td><td>Olumlu yönde katedilen mesafedir; değer yargısı içerir.</td></tr>
+      
+      <tr><td>Kalkınma / Büyüme</td><td>Genellikle ekonomik ve ölçülebilir değişimdir.</td></tr>
+      
+      <tr><td>Modernleşme</td><td>Az gelişmişlerin gelişmişlere yetişmesi, batılılaşmadır.</td></tr>
+      
+      <tr><td>Evrim</td><td>Çok uzun süreli değişimlerin tümüdür.</td></tr>
+      
+    </tbody>
+  </table>
+</div>
+
+  
+<!--item 3 callout-->
+  
+<div class="callout insight">
+  <div class="callout-icon">
+<svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 1.5 L14.6 9 L22 9 L15.9 13.6 L18.2 21 L12 16.6 L5.8 21 L8.1 13.6 L2 9 L9.4 9 Z"/></svg>
+
+</div>
+  <div>
+    <div class="callout-title">Ortak Payda</div>
+    <div class="callout-text">Toplumsal değişme bu dört kavramın hepsini kapsayan, <b>nesnel</b> (iyi/kötü yargısı içermeyen) bir çatı kavramdır — Gelişme, Kalkınma, Modernleşme ve Evrim onun özel görünümleridir.</div>
+  </div>
+</div>
+
+  
+<!--item 4 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">2</div>
+    <div class="block-title">Değişmenin Ögeleri ve Faktörleri</div>
+  </div>
+  
+  <ul>
+    <li>Değişimin üç temel ögesi: <b>İnsan, Zaman ve Mekân</b> (fiziksel ortam).</li><li><b>Faktörler:</b> Demografik (nüfus), Coğrafi (afetler), Teknolojik (doğanın denetimi), Kültürel (tutumlar), Toplumsal Çevre (savaşlar).</li><li><b>Kaynaklar:</b> İç kaynaklar (iç göç, keşifler) ve dış kaynaklar (planlı fetihler veya plansız etkileşimler).</li>
+  </ul>
+</div>
+
+  
+
+
+    
+<div class="footer">
+  <div>Sosyoloji<span class="accent-word">ye</span> Giriş</div>
+  <div class="fnum">10</div>
+</div>
+
+  </section>
+  
+  
+  
+  <section class="page body-page" data-ch="3" data-cp="1">
+    <div class="pageband"><div>Sosyoloji<span class="accent-word">ye</span> Giriş</div><div class="pageband-course">Bölüm 3</div></div>
+
+    
+
+    <!--item 0 table-->
+  
+<div class="ctable-wrap">
+  <div class="ctable-caption">Toplumsal Değişme Kuramları</div>
+  <table class="ctable">
+    <thead><tr><th>Ölçek</th><th>Yaklaşım</th><th>Temsilciler</th></tr></thead>
+    <tbody>
+      
+      <tr><td>Büyük Boy (Tarihsel)</td><td>Evrimci: tarihsel birikim ve ilerleme.</td><td>Comte, Durkheim</td></tr>
+      
+      <tr><td>Büyük Boy (Tarihsel)</td><td>Diyalektik: zıtlıkların çatışmasıyla doğan yeni.</td><td>Marx</td></tr>
+      
+      <tr><td>Büyük Boy (Tarihsel)</td><td>Organizmacı: toplumlar doğar, büyür, ölür.</td><td>İbni Haldun</td></tr>
+      
+      <tr><td>Orta Boy (Ulusal)</td><td>Yapısal Fonksiyonel: toplum ahenkli bir bütündür.</td><td>Parsons</td></tr>
+      
+      <tr><td>Orta Boy (Ulusal)</td><td>Çatışma Yaklaşımı: çatışma değişimin itici gücüdür.</td><td>Dahrendorf</td></tr>
+      
+      <tr><td>Küçük Boy</td><td>Sosyal psikoloji odaklı değişim.</td><td>—</td></tr>
+      
+    </tbody>
+  </table>
+</div>
+
+  
+<!--item 1 table-->
+  
+<div class="ctable-wrap">
+  <div class="ctable-caption">Gelenekselden Sanayi Toplumuna Geçiş</div>
+  <table class="ctable">
+    <thead><tr><th>Alan</th><th>Dönüşüm</th></tr></thead>
+    <tbody>
+      
+      <tr><td>Nüfus</td><td>Hızla artıp sonra dengeye girmiştir.</td></tr>
+      
+      <tr><td>Aile</td><td>Geniş aileden çekirdek aileye geçilmiştir.</td></tr>
+      
+      <tr><td>Eğitim</td><td>Laik, bilimsel ve okul sistemine dayalı hale gelmiştir.</td></tr>
+      
+      <tr><td>Ekonomi</td><td>Tarımdan sanayi ve hizmetlere geçilmiştir.</td></tr>
+      
+      <tr><td>Siyaset</td><td>Geleneksel otoriteden 'Yasal Otorite'ye geçilmiştir (Weber).</td></tr>
+      
+      <tr><td>Tabakalaşma</td><td>'Atfedilen statü' yerine 'Kazanılmış statü' önem kazanmıştır.</td></tr>
+      
+    </tbody>
+  </table>
+</div>
+
+  
+<!--item 2 summary-->
+  
+<div class="chsummary"><b>Bölüm Özeti</b>Toplumsal değişme, gelişme-kalkınma-modernleşme-evrim gibi kavramları kapsayan nesnel bir çatı kavramdır; insan, zaman ve mekân ekseninde gerçekleşir. Evrimci, diyalektik ve çatışmacı kuramlar bu değişimi farklı açılardan açıklarken, sanayileşme aile, eğitim, ekonomi ve tabakalaşmayı kökten dönüştürmüştür.</div>
+
+  
+
+
+    
+<div class="footer">
+  <div>Sosyoloji<span class="accent-word">ye</span> Giriş</div>
+  <div class="fnum">11</div>
+</div>
+
+  </section>
+  
+  
+
+  
+  
+  <section class="page body-page" data-ch="4" data-cp="0" id="ch-4">
+    <div class="pageband"><div>Sosyoloji<span class="accent-word">ye</span> Giriş</div><div class="pageband-course">Bölüm 4</div></div>
+
+    
+      <div class="chbanner">
+        <div class="chbanner-kicker">4. Bölüm</div>
+        <div class="chbanner-title">Modernizm ve Postmodernizm</div>
+        <div class="chbanner-subtitle">Akılcılaşmadan simülasyona: iki çağın karşıt paradigmaları</div>
+      </div>
+    
+
+    <!--item 0 terms-->
+  
+<div class="terms-grid">
+  
+  <div class="term-box">
+    <div class="term-name">Modernlik</div>
+    <div class="term-def">'Hemen şimdi' kökünden gelir; 17. yüzyılda eski toplum tipinden kopuşu, akılcılaşma ve uzmanlaşmayı ifade eder.</div>
+  </div>
+  
+  <div class="term-box">
+    <div class="term-name">Postmodernizm</div>
+    <div class="term-def">Lyotard'a göre (1979) modernliğin kesinlik ve evrensellik iddialarına karşı çıkan, belirsizliği ve çoğulculuğu savunan yaklaşım.</div>
+  </div>
+  
+  <div class="term-box">
+    <div class="term-name">Simülasyon</div>
+    <div class="term-def">Baudrillard'a göre gerçeğin yerini imajların alması; artık ekonomik/politik gerçeklik değil, kültürel ürünler ve imajlar vardır.</div>
+  </div>
+  
+  <div class="term-box">
+    <div class="term-name">Eklektisizm</div>
+    <div class="term-def">Postmodern düşüncede parçalanmışlık ilkesi ve seçmecilik — farklı unsurların bir arada, hiyerarşisiz kullanılması.</div>
+  </div>
+  
+</div>
+
+  
+<!--item 1 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">1</div>
+    <div class="block-title">Modernleşme</div>
+  </div>
+  
+  <ul>
+    <li><b>Modernlik Nedir?</b> 'Modernus' (hemen şimdi) kökünden gelir; eski toplum tipinden kopuşu (17. yy) ifade eder — farklılaşma, uzmanlaşma, bilim ve teknolojinin başat olduğu yaşamdır.</li><li><b>Temel Nitelikleri:</b> Akılcılaşma (dünyanın akılla yönetilmesi), Ayrışma (din-devlet ayrımı), Özgürlük ve Öznelleştirme.</li>
+  </ul>
+</div>
+
+  
+<!--item 2 info_cards-->
+  
+<div class="block-subtitle" style="margin-left:0; font-weight:700; color:var(--ink); font-size:8.6pt; margin-top:5.5mm; margin-bottom:2mm;">Modernliğin Öncü Kuramcıları</div>
+<div class="info-grid">
+  
+  <div class="info-card">
+    <div class="badge">1</div>
+    <div class="ic-title">Karl Marx</div>
+    <div class="ic-text">Kapitalizm çözümlemesiyle modernliğin ekonomik boyutunu açıklar.</div>
+  </div>
+  
+  <div class="info-card">
+    <div class="badge">2</div>
+    <div class="ic-title">Émile Durkheim</div>
+    <div class="ic-text">İş bölümü kavramıyla toplumsal dayanışmanın dönüşümünü inceler.</div>
+  </div>
+  
+  <div class="info-card">
+    <div class="badge">3</div>
+    <div class="ic-title">Max Weber</div>
+    <div class="ic-text">Akılcılık ve bürokrasi kavramlarıyla modern kurumsallaşmayı çözümler.</div>
+  </div>
+  
+</div>
+
+  
+<!--item 3 table-->
+  
+<div class="ctable-wrap">
+  <div class="ctable-caption">Modernliğin Boyutları (Tekeli)</div>
+  <table class="ctable">
+    <thead><tr><th>Boyut</th><th>İçerik</th></tr></thead>
+    <tbody>
+      
+      <tr><td>Ekonomik</td><td>Kapitalizm.</td></tr>
+      
+      <tr><td>Bilgi</td><td>Nesnel bilim.</td></tr>
+      
+      <tr><td>Birey</td><td>Aklıyla kendini yöneten özne.</td></tr>
+      
+      <tr><td>Kurumsal</td><td>Ulus devlet, demokrasi.</td></tr>
+      
+    </tbody>
+  </table>
+</div>
+
+  
+
+
+    
+<div class="footer">
+  <div>Sosyoloji<span class="accent-word">ye</span> Giriş</div>
+  <div class="fnum">12</div>
+</div>
+
+  </section>
+  
+  
+  
+  <section class="page body-page" data-ch="4" data-cp="1">
+    <div class="pageband"><div>Sosyoloji<span class="accent-word">ye</span> Giriş</div><div class="pageband-course">Bölüm 4</div></div>
+
+    
+
+    <!--item 0 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">2</div>
+    <div class="block-title">Postmodernizm</div>
+  </div>
+  
+  <ul>
+    <li><b>Nedir?</b> Modernizmin sonrası veya ötesidir (Lyotard, 1979); modernliğin kesinlik, evrensellik gibi parametrelerine karşı çıkar, belirsizliği, farklılığı ve çoğulculuğu savunur.</li><li><b>Belirsizlik ve Yerellik:</b> Evrenselliği reddeder. <b>Çoğulculuk:</b> Kültürler arası üstünlük yoktur. <b>'Her Şey Gider':</b> Ne üretilirse tüketilir. <b>Simülasyon:</b> Gerçeğin yerini imajlar alır (Baudrillard). <b>Eklektisizm:</b> Parçalanmışlık ve seçmecilik.</li>
+  </ul>
+</div>
+
+  
+<!--item 1 callout-->
+  
+<div class="callout insight">
+  <div class="callout-icon">
+<svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 1.5 L14.6 9 L22 9 L15.9 13.6 L18.2 21 L12 16.6 L5.8 21 L8.1 13.6 L2 9 L9.4 9 Z"/></svg>
+
+</div>
+  <div>
+    <div class="callout-title">Baudrillard'ın Tezi</div>
+    <div class="callout-text">Postmodern dönemde artık ekonomik veya politik bir gerçeklik yoktur; yalnızca <b>kültürel ürünler ve imajlar</b> vardır. Dönüşüm; üretimden tüketime, emekten bilgiye, bilimsellikten simülasyona doğrudur.</div>
+  </div>
+</div>
+
+  
+<!--item 2 summary-->
+  
+<div class="chsummary"><b>Bölüm Özeti</b>Modernizm; akılcılaşma, ayrışma ve özgürleşme ekseninde 17. yüzyılda başlayan bir kopuştur ve Marx, Durkheim, Weber gibi kuramcılarca ekonomik-toplumsal-kurumsal boyutlarıyla çözümlenmiştir. Postmodernizm ise bu kesinlik iddialarına karşı çıkarak belirsizliği, çoğulculuğu ve simülasyonu öne çıkarır.</div>
+
+  
+
+
+    
+<div class="footer">
+  <div>Sosyoloji<span class="accent-word">ye</span> Giriş</div>
+  <div class="fnum">13</div>
+</div>
+
+  </section>
+  
+  
+
+  
+  
+  <section class="page body-page" data-ch="5" data-cp="0" id="ch-5">
+    <div class="pageband"><div>Sosyoloji<span class="accent-word">ye</span> Giriş</div><div class="pageband-course">Bölüm 5</div></div>
+
+    
+      <div class="chbanner">
+        <div class="chbanner-kicker">5. Bölüm</div>
+        <div class="chbanner-title">Toplumsal Statü</div>
+        <div class="chbanner-subtitle">Bireyin toplumdaki konumunu belirleyen verilmiş ve kazanılmış ölçütler</div>
+      </div>
+    
+
+    <!--item 0 terms-->
+  
+<div class="terms-grid">
+  
+  <div class="term-box">
+    <div class="term-name">Statü</div>
+    <div class="term-def">Bireyin içinde yaşadığı grupta işgal ettiği konum (mevki); başkalarının statüleriyle ilişkilendiğinde anlam kazanır.</div>
+  </div>
+  
+  <div class="term-box">
+    <div class="term-name">Statüsel Saygınlık</div>
+    <div class="term-def">Bireyin işgal ettiği konuma toplumun genel olarak verdiği değer.</div>
+  </div>
+  
+  <div class="term-box">
+    <div class="term-name">Verilmiş (Ascribed) Statü</div>
+    <div class="term-def">Bireyin kendi çabası dışında, genellikle doğumla kazandığı statü türü.</div>
+  </div>
+  
+  <div class="term-box">
+    <div class="term-name">Kazanılmış (Achieved) Statü</div>
+    <div class="term-def">Kişinin kendi yetenek, eğitim ve çabasıyla elde ettiği statü türü.</div>
+  </div>
+  
+</div>
+
+  
+<!--item 1 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">1</div>
+    <div class="block-title">Tanım ve Mahiyeti</div>
+  </div>
+  
+  <ul>
+    <li>Toplum rastgele bir insan yığını değildir; her bireyin grupta işgal ettiği bir konuma <b>statü</b> denir.</li><li><b>İlişkisel Nitelik:</b> Bir statü tek başına değil, ancak başka kişilerin statüleriyle karşılaştırıldığında anlam kazanır — bu ilişki statülerin kendisi arasında değil, onları taşıyan insanlar arasındadır.</li>
+  </ul>
+</div>
+
+  
+<!--item 2 table-->
+  
+<div class="ctable-wrap">
+  <div class="ctable-caption">Statü ile Saygınlık (Prestij) Ayrımı</div>
+  <table class="ctable">
+    <thead><tr><th>Kavram</th><th>Açıklama</th><th>Örnek</th></tr></thead>
+    <tbody>
+      
+      <tr><td>Statüsel Saygınlık</td><td>Bireyin işgal ettiği konuma toplumun genel olarak verdiği değerdir.</td><td>Doktorluk mesleğinin toplumdaki genel itibarı.</td></tr>
+      
+      <tr><td>Kişisel Saygınlık</td><td>Bireyin statünün gereklerini ne kadar başarıyla yerine getirdiğiyle ilgilidir.</td><td>Alkol bağımlısı bir doktor kişisel saygınlığını yitirebilir; işini iyi yapan bir temizlik işçisi yüksek kişisel saygınlık kazanabilir.</td></tr>
+      
+    </tbody>
+  </table>
+</div>
+
+  
+<!--item 3 table-->
+  
+<div class="ctable-wrap">
+  <div class="ctable-caption">Verilmiş (Ascribed) Statünün Belirleyicileri</div>
+  <table class="ctable">
+    <thead><tr><th>Faktör</th><th>Açıklama</th></tr></thead>
+    <tbody>
+      
+      <tr><td>Soy Bağı</td><td>Ailenin şöhreti, etnik kökeni veya bir yerde ikamet süresi.</td></tr>
+      
+      <tr><td>Yaş</td><td>Belirli toplumsal davranışların (seçme/seçilme gibi) sınırlarını çizer.</td></tr>
+      
+      <tr><td>Cinsiyet</td><td>Evrensel bir faktördür; değeri tarihsel süreçte değişebilir.</td></tr>
+      
+      <tr><td>Biyolojik Nitelikler</td><td>Irk, fiziksel görünüm, zekâ veya engellilik gibi doğuştan gelen özellikler.</td></tr>
+      
+    </tbody>
+  </table>
+</div>
+
+  
+
+
+    
+<div class="footer">
+  <div>Sosyoloji<span class="accent-word">ye</span> Giriş</div>
+  <div class="fnum">14</div>
+</div>
+
+  </section>
+  
+  
+  
+  <section class="page body-page" data-ch="5" data-cp="1">
+    <div class="pageband"><div>Sosyoloji<span class="accent-word">ye</span> Giriş</div><div class="pageband-course">Bölüm 5</div></div>
+
+    
+
+    <!--item 0 table-->
+  
+<div class="ctable-wrap">
+  <div class="ctable-caption">Kazanılmış (Achieved) Statünün Belirleyicileri</div>
+  <table class="ctable">
+    <thead><tr><th>Faktör</th><th>Açıklama</th></tr></thead>
+    <tbody>
+      
+      <tr><td>Servet</td><td>Nesnel ve sayılabilir bir ölçüttür; miktarı kadar kaynağı da önemlidir.</td></tr>
+      
+      <tr><td>Eğitim</td><td>Süresi, derecesi ve diplomanın alındığı kurumun prestiji statüyü belirler.</td></tr>
+      
+      <tr><td>Meslek</td><td>İş bölümü sonucu ortaya çıkar; zihinsel meslekler kas gücüne dayalı olanlara göre daha yüksek statü sağlar.</td></tr>
+      
+    </tbody>
+  </table>
+</div>
+
+  
+<!--item 1 callout-->
+  
+<div class="callout caution">
+  <div class="callout-icon">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.5"/><line x1="12" y1="11" x2="12" y2="16.5"/><circle cx="12" cy="7.5" r="0.6" fill="currentColor" stroke="none"/></svg>
+
+</div>
+  <div>
+    <div class="callout-title">Dikkat / Sınav Ayrımı</div>
+    <div class="callout-text">Geleneksel toplumlarda <b>Verilmiş</b> statüler, çağdaş sanayi toplumlarında ise <b>Kazanılmış</b> statüler daha ön plandadır.</div>
+  </div>
+</div>
+
+  
+<!--item 2 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">2</div>
+    <div class="block-title">Anahtar Statü ve Statü Aktarımı</div>
+  </div>
+  
+  <ul>
+    <li><b>Anahtar Statü (Master Status):</b> Bireyin sahip olduğu statülerden birinin diğerlerine baskın çıkarak kimliğini ve toplumdaki yerini belirlemesidir — genellikle toplumdaki en baskın kuruma göre şekillenir (ör. ekonomi öncelikli toplumlarda kişinin mesleği).</li><li><b>Statü Aktarımı:</b> Bir statünün saygınlığının, o statüye sahip kişi üzerinden yakınlarına geçmesidir. Geleneksel yapıda aile reisi ailenin dış temsilcisidir; kadın ve çocuklar onun statüsüne göre değerlendirilir.</li>
+  </ul>
+</div>
+
+  
+<!--item 3 summary-->
+  
+<div class="chsummary"><b>Bölüm Özeti</b>Statü, bireyin toplumdaki konumudur ve ancak başka statülerle ilişkilendiğinde anlam kazanır. Verilmiş statüler doğuştan (soy, yaş, cinsiyet), kazanılmış statüler ise çabayla (servet, eğitim, meslek) elde edilir; anahtar statü bunlardan kimliği en çok belirleyenidir.</div>
+
+  
+
+
+    
+<div class="footer">
+  <div>Sosyoloji<span class="accent-word">ye</span> Giriş</div>
+  <div class="fnum">15</div>
+</div>
+
+  </section>
+  
+  
+
+  
+  
+  <section class="page body-page" data-ch="6" data-cp="0" id="ch-6">
+    <div class="pageband"><div>Sosyoloji<span class="accent-word">ye</span> Giriş</div><div class="pageband-course">Bölüm 6</div></div>
+
+    
+      <div class="chbanner">
+        <div class="chbanner-kicker">6. Bölüm</div>
+        <div class="chbanner-title">Toplumsal Rol</div>
+        <div class="chbanner-subtitle">Statünün davranışa dökülmüş hali: edinme biçimleri, kavramlar ve yaptırımlar</div>
+      </div>
+    
+
+    <!--item 0 terms-->
+  
+<div class="terms-grid">
+  
+  <div class="term-box">
+    <div class="term-name">Toplumsal Rol</div>
+    <div class="term-def">Belirli bir statünün gerektirdiği görevleri yapma, hak ve ayrıcalıkları kullanma biçimi.</div>
+  </div>
+  
+  <div class="term-box">
+    <div class="term-name">Rol Takımı (Role Set)</div>
+    <div class="term-def">Bir kişinin tek bir statüye bağlı olarak yerine getirmesi gereken birden fazla rolün tümü.</div>
+  </div>
+  
+  <div class="term-box">
+    <div class="term-name">Rol Çatışması</div>
+    <div class="term-def">Kişinin sahip olduğu bir rolün başka bir gruptaki rolüyle uyumsuz olması.</div>
+  </div>
+  
+  <div class="term-box">
+    <div class="term-name">Anahtar Rol</div>
+    <div class="term-def">Bireyin rolleri arasında en önemli olanı; genellikle anahtar statüyle paraleldir.</div>
+  </div>
+  
+</div>
+
+  
+<!--item 1 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">1</div>
+    <div class="block-title">Tanım ve Statü-Rol İlişkisi</div>
+  </div>
+  
+  <ul>
+    <li>Toplumsal rol, statünün davranışa dökülmüş, dinamik halidir. Statü 'nerede olunduğunu', rol ise 'ne yapıldığını' gösterir.</li><li><b>Hak ve Görev Dengesi:</b> Roller karşılıklıdır; birinin hakkı diğerinin görevidir (Kral-Uyruk, Anne-Çocuk, Vekil-Seçmen gibi).</li><li>Roller toplumun sunduğu 'hazır reçeteler' gibidir; ancak bireyler kendi yorumlarını katarak oynar — bu yüzden aynı rolü farklı kişiler farklı biçimde canlandırır.</li>
+  </ul>
+</div>
+
+  
+<!--item 2 table-->
+  
+<div class="ctable-wrap">
+  <div class="ctable-caption">Rollerin Edinilme Biçimleri</div>
+  <table class="ctable">
+    <thead><tr><th>Biçim</th><th>Açıklama</th><th>Örnek</th></tr></thead>
+    <tbody>
+      
+      <tr><td>Tahsis Etme (Allocation)</td><td>Rolün kişiye dışarıdan, otomatik olarak verilmesi.</td><td>Evlat veya teyze olmak.</td></tr>
+      
+      <tr><td>Üstlenme (Assumption)</td><td>Bireyin kendi iradesi ve gönüllülüğüyle bir rolü alması.</td><td>Bir meslek seçmek veya evlenmek.</td></tr>
+      
+    </tbody>
+  </table>
+</div>
+
+  
+
+
+    
+<div class="footer">
+  <div>Sosyoloji<span class="accent-word">ye</span> Giriş</div>
+  <div class="fnum">16</div>
+</div>
+
+  </section>
+  
+  
+  
+  <section class="page body-page" data-ch="6" data-cp="1">
+    <div class="pageband"><div>Sosyoloji<span class="accent-word">ye</span> Giriş</div><div class="pageband-course">Bölüm 6</div></div>
+
+    
+
+    <!--item 0 table-->
+  
+<div class="ctable-wrap">
+  <div class="ctable-caption">Rol Kavramları ve Terimleri</div>
+  <table class="ctable">
+    <thead><tr><th>Kavram</th><th>Açıklama</th></tr></thead>
+    <tbody>
+      
+      <tr><td>Rol Takımı</td><td>Bir statüye bağlı yerine getirilmesi gereken tüm rollerin toplamı (ör. profesörün ders + araştırma + danışmanlık rolleri).</td></tr>
+      
+      <tr><td>Rol Beklentileri</td><td>Bir konuma dair toplumun beklediği standart davranış kalıpları.</td></tr>
+      
+      <tr><td>Rol Çatışması</td><td>Bir rolün başka bir gruptaki rolle uyumsuz olması (ör. iyi baba – iyi öğretmen çatışması).</td></tr>
+      
+      <tr><td>Roller Arası Pekiştirme</td><td>Farklı rollerin çatışmak yerine birbirini desteklemesi (ör. avukatın hitabetinin siyasetçiliğini güçlendirmesi).</td></tr>
+      
+      <tr><td>Anahtar Rol</td><td>Bireyin rolleri arasında en önemli olanı; genellikle anahtar statüyle paraleldir.</td></tr>
+      
+      <tr><td>Genel Rol</td><td>Bireyin oynadığı tüm rollerin toplam bileşimi.</td></tr>
+      
+      <tr><td>Rol Uzmanlaşması</td><td>Bireyin bir statüdeki rollerden bazılarına özel ilgi gösterip diğerlerini ihmal etmesi; kişiye doyum sağlar.</td></tr>
+      
+    </tbody>
+  </table>
+</div>
+
+  
+<!--item 1 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">2</div>
+    <div class="block-title">Rolün İçeriği</div>
+  </div>
+  
+  <ul>
+    <li>Bir rol yalnızca eylemleri değil, o role uygun düşünce ve tutumları da (ör. bir öğretmen gibi düşünmeyi) kapsar.</li>
+  </ul>
+</div>
+
+  
+<!--item 2 callout-->
+  
+<div class="callout route">
+  <div class="callout-icon">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.5"/><polygon points="15.5 8.5 13.2 13.2 8.5 15.5 10.8 10.8 15.5 8.5" fill="currentColor" stroke="none"/></svg>
+
+</div>
+  <div>
+    <div class="callout-title">Bölüm İçi Bağlantı</div>
+    <div class="callout-text">Statü ile Rol arasındaki fark sınavda en sık sorulan ayrımlardan biridir: <b>Statü konumdur, Rol o konumun gerektirdiği eylemdir.</b> Bir kişinin anahtar statüsü genellikle onun anahtar rolüyle örtüşür.</div>
+  </div>
+</div>
+
+  
+<!--item 3 table-->
+  
+<div class="ctable-wrap">
+  <div class="ctable-caption">Toplumun Rol Davranışlarını Yargılama Kategorileri</div>
+  <table class="ctable">
+    <thead><tr><th>Kategori</th><th>Açıklama</th><th>Örnek</th></tr></thead>
+    <tbody>
+      
+      <tr><td>Beklenen Davranış (Zorunlu)</td><td>Rolün gerçekleşmesi için şarttır; yapılmazsa rol oynanmış sayılmaz.</td><td>Öğrencinin derse girmesi, sınava katılması.</td></tr>
+      
+      <tr><td>İzin Verilen Davranış (Esnek)</td><td>Toplumun katı kural koymadığı alandır.</td><td>Öğrencinin seçmeli ders alabilmesi.</td></tr>
+      
+      <tr><td>Yasaklanan Davranış (Cezalı)</td><td>Toplumun ceza uyguladığı davranışlardır.</td><td>Öğrencinin okul eşyasına zarar vermesi.</td></tr>
+      
+    </tbody>
+  </table>
+</div>
+
+  
+<!--item 4 summary-->
+  
+<div class="chsummary"><b>Bölüm Özeti</b>Toplumsal rol, statünün somutlaşmış, edimsel halidir; tahsis etme veya üstlenme yoluyla kazanılır. Rol takımı, rol çatışması ve anahtar rol gibi kavramlar bireyin çoklu rollerini analiz etmeyi sağlar; toplum ise rol davranışlarını beklenen, izin verilen ve yasaklanan olmak üzere üç kategoride yargılar.</div>
+
+  
+
+
+    
+<div class="footer">
+  <div>Sosyoloji<span class="accent-word">ye</span> Giriş</div>
+  <div class="fnum">17</div>
+</div>
+
+  </section>
+  
+  
+
+
+
+
+
+<section class="page body-page" id="glossary">
+  <div class="pageband"><div>Sosyoloji<span class="accent-word">ye</span> Giriş</div><div class="pageband-course">Genel Tekrar</div></div>
+  
+    <div class="section-kicker">Genel Tekrar</div>
+    <div class="section-title">Anahtar Kavramlar Sözlüğü</div>
+    <div class="section-lede">Her kavram, kısa tanımı ve geldiği bölümle birlikte listelenmiştir — hızlı tekrar ve eşleştirme için.</div>
+  
+  <div class="gloss-grid">
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Kültür</div>
+      <div class="gloss-def">Toplum üyesinin kazandığı bilgi, inanç, sanat, ahlak, hukuk ve geleneklerin bütünü.</div>
+      <div class="gloss-ref">Kültür · 1. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Kültürel Gecikme</div>
+      <div class="gloss-def">Maddi kültürün hızlı, manevi kültürün yavaş değişmesinden doğan uyumsuzluk.</div>
+      <div class="gloss-ref">Ogburn · 1. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Etnosentrizm</div>
+      <div class="gloss-def">Kendi kültürünü merkeze alıp diğerlerini yargılama.</div>
+      <div class="gloss-ref">Kültürel Kavramlar · 1. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Kültürel Relativizm</div>
+      <div class="gloss-def">Bir kültürü kendi değerleri içinde, yargılamadan anlama.</div>
+      <div class="gloss-ref">Kültürel Kavramlar · 1. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Alt Kültür</div>
+      <div class="gloss-def">Egemen kültürden kısmen farklılaşan gruplar.</div>
+      <div class="gloss-ref">Kültürel Kavramlar · 1. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Karşıt Kültür</div>
+      <div class="gloss-def">Toplumun normlarını reddeden, ters düşen kültür.</div>
+      <div class="gloss-ref">Kültürel Kavramlar · 1. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Enkültürasyon</div>
+      <div class="gloss-def">Bireyin doğuştan ölüme kadar kültürü öğrenmesi.</div>
+      <div class="gloss-ref">Kültürel Süreçler · 1. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Akkültürasyon</div>
+      <div class="gloss-def">Farklı kültürlerin etkileşimiyle her ikisinin de değişmesi.</div>
+      <div class="gloss-ref">Kültürel Süreçler · 1. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Kültür Şoku</div>
+      <div class="gloss-def">Başka kültüre giren bireyin yaşadığı uyum sıkıntısı.</div>
+      <div class="gloss-ref">Kültürel Süreçler · 1. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Toplumsallaşma</div>
+      <div class="gloss-def">Bireyin biyolojik varlıktan toplumsal varlığa dönüşme süreci.</div>
+      <div class="gloss-ref">Toplumsallaşma · 2. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Yeniden Toplumsallaşma</div>
+      <div class="gloss-def">Bireyin değer ve davranışlarını temelden değiştirmesi.</div>
+      <div class="gloss-ref">Toplumsallaşma · 2. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Davranış Kalıbı</div>
+      <div class="gloss-def">Toplumda genelleşmiş, yinelenen düşünüş ve eylem biçimi.</div>
+      <div class="gloss-ref">Davranış Kalıpları · 2. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Moda</div>
+      <div class="gloss-def">Onaylanan geçici değişiklikler; uyma ve farklılaşma ihtiyacını birlikte karşılar.</div>
+      <div class="gloss-ref">Davranış Kalıpları · 2. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">İdeoloji</div>
+      <div class="gloss-def">Bir rejimin ilkeleri veya toplumun dünya görüşü.</div>
+      <div class="gloss-ref">Davranış Kalıpları · 2. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Propaganda</div>
+      <div class="gloss-def">Fikirleri tek taraflı benimsetmeye çalışan yapay etkileme.</div>
+      <div class="gloss-ref">Davranış Kalıpları · 2. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Toplumsal Değişme</div>
+      <div class="gloss-def">Toplumun yapı, ilişki ve kurumlarındaki nesnel farklılaşma.</div>
+      <div class="gloss-ref">Toplumsal Değişme · 3. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Evrimci Kuram</div>
+      <div class="gloss-def">Değişmeyi tarihsel birikim ve ilerleme olarak açıklar.</div>
+      <div class="gloss-ref">Comte, Durkheim · 3. Bölüm</div>
+    </div>
+    
+  </div>
+  
+<div class="footer">
+  <div>Sosyoloji<span class="accent-word">ye</span> Giriş</div>
+  <div class="fnum">18</div>
+</div>
+
+</section>
+
+
+<section class="page body-page">
+  <div class="pageband"><div>Sosyoloji<span class="accent-word">ye</span> Giriş</div><div class="pageband-course">Genel Tekrar</div></div>
+  
+    <div class="chcontinue"><div class="tag">Sözlük · Devam</div><div class="cctitle">Anahtar Kavramlar (devamı)</div></div>
+  
+  <div class="gloss-grid">
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Diyalektik Kuram</div>
+      <div class="gloss-def">Değişmeyi zıtlıkların çatışmasıyla açıklar.</div>
+      <div class="gloss-ref">Marx · 3. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Çatışma Yaklaşımı</div>
+      <div class="gloss-def">Çatışmanın değişimin itici gücü olduğunu savunur.</div>
+      <div class="gloss-ref">Dahrendorf · 3. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Yasal Otorite</div>
+      <div class="gloss-def">Geleneksel otoritenin yerini alan, sanayi toplumuna özgü otorite biçimi.</div>
+      <div class="gloss-ref">Weber · 3. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Modernlik</div>
+      <div class="gloss-def">17. yüzyılda başlayan, akılcılaşma ve uzmanlaşmayla tanımlanan kopuş.</div>
+      <div class="gloss-ref">Modernizm · 4. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Postmodernizm</div>
+      <div class="gloss-def">Modernliğin kesinlik iddialarına karşı çıkan, çoğulculuğu savunan yaklaşım.</div>
+      <div class="gloss-ref">Lyotard · 4. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Simülasyon</div>
+      <div class="gloss-def">Gerçeğin yerini imajların alması.</div>
+      <div class="gloss-ref">Baudrillard · 4. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Eklektisizm</div>
+      <div class="gloss-def">Postmodern düşüncede parçalanmışlık ve seçmecilik ilkesi.</div>
+      <div class="gloss-ref">Postmodernizm · 4. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Statü</div>
+      <div class="gloss-def">Bireyin grupta işgal ettiği, ilişkisel anlam kazanan konum.</div>
+      <div class="gloss-ref">Toplumsal Statü · 5. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Statüsel Saygınlık</div>
+      <div class="gloss-def">Bireyin işgal ettiği konuma toplumun verdiği değer.</div>
+      <div class="gloss-ref">Toplumsal Statü · 5. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Verilmiş Statü</div>
+      <div class="gloss-def">Doğumla, çaba dışı kazanılan statü.</div>
+      <div class="gloss-ref">Toplumsal Statü · 5. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Kazanılmış Statü</div>
+      <div class="gloss-def">Yetenek, eğitim ve çabayla elde edilen statü.</div>
+      <div class="gloss-ref">Toplumsal Statü · 5. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Anahtar Statü</div>
+      <div class="gloss-def">Bireyin kimliğini belirleyen, diğerlerine baskın statü.</div>
+      <div class="gloss-ref">Toplumsal Statü · 5. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Toplumsal Rol</div>
+      <div class="gloss-def">Statünün gerektirdiği görevleri yapma biçimi; statünün davranışa dökülmüş hali.</div>
+      <div class="gloss-ref">Toplumsal Rol · 6. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Rol Takımı</div>
+      <div class="gloss-def">Bir statüye bağlı yerine getirilmesi gereken tüm rollerin toplamı.</div>
+      <div class="gloss-ref">Toplumsal Rol · 6. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Rol Çatışması</div>
+      <div class="gloss-def">Bir rolün başka bir gruptaki rolle uyumsuz olması.</div>
+      <div class="gloss-ref">Toplumsal Rol · 6. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Anahtar Rol</div>
+      <div class="gloss-def">Bireyin rolleri arasında en önemli olanı.</div>
+      <div class="gloss-ref">Toplumsal Rol · 6. Bölüm</div>
+    </div>
+    
+  </div>
+  
+<div class="footer">
+  <div>Sosyoloji<span class="accent-word">ye</span> Giriş</div>
+  <div class="fnum">19</div>
+</div>
+
+</section>
+
+
+
+
+
+
+
+
+
+<section class="page body-page" id="exam">
+  <div class="pageband"><div>Sosyoloji<span class="accent-word">ye</span> Giriş</div><div class="pageband-course">Sınav</div></div>
+  
+    <div class="section-kicker">Sınav</div>
+    <div class="section-title">Genel Değerlendirme Testi</div>
+    <div class="section-lede">Kültür, toplumsallaşma, değişme, statü ve rol üzerine kapsamlı çoktan seçmeli test</div>
+    <div class="test-chip-row">
+      
+      <div class="test-chip"><b>20</b><span>Soru</span></div>
+      
+      <div class="test-chip"><b>Çoktan</b><span>Seçmeli</span></div>
+      
+      <div class="test-chip"><b>5</b><span>Seçenek (A-E)</span></div>
+      
+    </div>
+    <div class="test-instructions">Aşağıdaki sorularda beş seçenekten yalnızca birini işaretleyiniz. Süre: 30 dakika.</div>
+  
+  <div class="tq-list">
+    
+<div class="tq">
+  <div class="tq-head">
+    <div class="tq-num">1</div>
+    <div class="tq-stem">Aşağıdakilerden hangisi kültürün beş temel özelliğinden biri değildir?</div>
+  </div>
+  <ul class="tq-options">
+    
+    <li><span class="opt-letter">A</span><span>Kapsayıcı olması</span></li>
+    
+    <li><span class="opt-letter">B</span><span>Öğrenilmesi</span></li>
+    
+    <li><span class="opt-letter">C</span><span>Kalıtsal olması</span></li>
+    
+    <li><span class="opt-letter">D</span><span>Paylaşılması</span></li>
+    
+    <li><span class="opt-letter">E</span><span>Örüntülü olması</span></li>
+    
+  </ul>
+</div>
+
+<div class="tq">
+  <div class="tq-head">
+    <div class="tq-num">2</div>
+    <div class="tq-stem">Maddi kültür ögelerinin manevi kültür ögelerinden daha hızlı değişmesi sonucu ortaya çıkan uyumsuzluğa ne ad verilir?</div>
+  </div>
+  <ul class="tq-options">
+    
+    <li><span class="opt-letter">A</span><span>Kültürel Relativizm</span></li>
+    
+    <li><span class="opt-letter">B</span><span>Kültürel Gecikme</span></li>
+    
+    <li><span class="opt-letter">C</span><span>Kültürleşme</span></li>
+    
+    <li><span class="opt-letter">D</span><span>Kültür Şoku</span></li>
+    
+    <li><span class="opt-letter">E</span><span>Etnosentrizm</span></li>
+    
+  </ul>
+</div>
+
+<div class="tq">
+  <div class="tq-head">
+    <div class="tq-num">3</div>
+    <div class="tq-stem">Bir kişinin kendi kültürünü merkeze alıp başka kültürleri bu ölçütle yargılamasına ne ad verilir?</div>
+  </div>
+  <ul class="tq-options">
+    
+    <li><span class="opt-letter">A</span><span>Kültürel Relativizm</span></li>
+    
+    <li><span class="opt-letter">B</span><span>Kültürel Evrensellik</span></li>
+    
+    <li><span class="opt-letter">C</span><span>Etnosentrizm</span></li>
+    
+    <li><span class="opt-letter">D</span><span>Akkültürasyon</span></li>
+    
+    <li><span class="opt-letter">E</span><span>Difüzyon</span></li>
+    
+  </ul>
+</div>
+
+<div class="tq">
+  <div class="tq-head">
+    <div class="tq-num">4</div>
+    <div class="tq-stem">Aşağıdakilerden hangisi 'kültürel süreçler' arasında yer almaz?</div>
+  </div>
+  <ul class="tq-options">
+    
+    <li><span class="opt-letter">A</span><span>Enkültürasyon</span></li>
+    
+    <li><span class="opt-letter">B</span><span>Akkültürasyon</span></li>
+    
+    <li><span class="opt-letter">C</span><span>Difüzyon</span></li>
+    
+    <li><span class="opt-letter">D</span><span>Anahtar Statü</span></li>
+    
+    <li><span class="opt-letter">E</span><span>Kültür Şoku</span></li>
+    
+  </ul>
+</div>
+
+<div class="tq">
+  <div class="tq-head">
+    <div class="tq-num">5</div>
+    <div class="tq-stem">Fichter'e göre aşağıdakilerden hangisi kültürün işlevlerinden biri değildir?</div>
+  </div>
+  <ul class="tq-options">
+    
+    <li><span class="opt-letter">A</span><span>Toplumsal dayanışmayı sağlamak</span></li>
+    
+    <li><span class="opt-letter">B</span><span>Değerleri yorumlamak</span></li>
+    
+    <li><span class="opt-letter">C</span><span>Bireyin genetik yapısını belirlemek</span></li>
+    
+    <li><span class="opt-letter">D</span><span>Toplumun kimliği olmak</span></li>
+    
+    <li><span class="opt-letter">E</span><span>Kişiliğin oluşmasında başat faktör olmak</span></li>
+    
+  </ul>
+</div>
+
+<div class="tq">
+  <div class="tq-head">
+    <div class="tq-num">6</div>
+    <div class="tq-stem">Bireyin biyolojik bir varlıktan toplumsal bir varlığa dönüşmesi sürecine ne ad verilir?</div>
+  </div>
+  <ul class="tq-options">
+    
+    <li><span class="opt-letter">A</span><span>Enkültürasyon</span></li>
+    
+    <li><span class="opt-letter">B</span><span>Toplumsallaşma</span></li>
+    
+    <li><span class="opt-letter">C</span><span>Statü Aktarımı</span></li>
+    
+    <li><span class="opt-letter">D</span><span>Modernleşme</span></li>
+    
+    <li><span class="opt-letter">E</span><span>Kültürleşme</span></li>
+    
+  </ul>
+</div>
+
+  </div>
+  
+<div class="footer">
+  <div>Sosyoloji<span class="accent-word">ye</span> Giriş</div>
+  <div class="fnum">20</div>
+</div>
+
+</section>
+
+
+<section class="page body-page">
+  <div class="pageband"><div>Sosyoloji<span class="accent-word">ye</span> Giriş</div><div class="pageband-course">Test · Devam</div></div>
+  
+    <div class="chcontinue"><div class="tag">Test · Devam</div><div class="cctitle">Genel Değerlendirme Testi</div></div>
+  
+  <div class="tq-list">
+    
+<div class="tq">
+  <div class="tq-head">
+    <div class="tq-num">7</div>
+    <div class="tq-stem">Bir bireyin emeklilik sonrası yeni bir yaşam düzenine uyum sağlayarak değer ve davranışlarını temelden değiştirmesi hangi kavramla açıklanır?</div>
+  </div>
+  <ul class="tq-options">
+    
+    <li><span class="opt-letter">A</span><span>Başarısız Toplumsallaşma</span></li>
+    
+    <li><span class="opt-letter">B</span><span>Rol Çatışması</span></li>
+    
+    <li><span class="opt-letter">C</span><span>Yeniden Toplumsallaşma</span></li>
+    
+    <li><span class="opt-letter">D</span><span>Kültürel Gecikme</span></li>
+    
+    <li><span class="opt-letter">E</span><span>Statü Aktarımı</span></li>
+    
+  </ul>
+</div>
+
+<div class="tq">
+  <div class="tq-head">
+    <div class="tq-num">8</div>
+    <div class="tq-stem">Aşağıdakilerden hangisi toplumsallaşma araçlarından biri değildir?</div>
+  </div>
+  <ul class="tq-options">
+    
+    <li><span class="opt-letter">A</span><span>Aile</span></li>
+    
+    <li><span class="opt-letter">B</span><span>Okul</span></li>
+    
+    <li><span class="opt-letter">C</span><span>Arkadaş grupları</span></li>
+    
+    <li><span class="opt-letter">D</span><span>Kitle iletişim araçları</span></li>
+    
+    <li><span class="opt-letter">E</span><span>Genetik kalıtım</span></li>
+    
+  </ul>
+</div>
+
+<div class="tq">
+  <div class="tq-head">
+    <div class="tq-num">9</div>
+    <div class="tq-stem">Fikirleri tek taraflı olarak benimsetmeyi ve 'kabul ettirmeyi' amaçlayan yapay etkileme aracına ne ad verilir?</div>
+  </div>
+  <ul class="tq-options">
+    
+    <li><span class="opt-letter">A</span><span>Reklam</span></li>
+    
+    <li><span class="opt-letter">B</span><span>Kamuoyu</span></li>
+    
+    <li><span class="opt-letter">C</span><span>Propaganda</span></li>
+    
+    <li><span class="opt-letter">D</span><span>İdeoloji</span></li>
+    
+    <li><span class="opt-letter">E</span><span>Moda</span></li>
+    
+  </ul>
+</div>
+
+<div class="tq">
+  <div class="tq-head">
+    <div class="tq-num">10</div>
+    <div class="tq-stem">Toplumsal değişme kavramıyla ilgili aşağıdaki ifadelerden hangisi yanlıştır?</div>
+  </div>
+  <ul class="tq-options">
+    
+    <li><span class="opt-letter">A</span><span>Nesnel bir kavramdır, değer yargısı içermez</span></li>
+    
+    <li><span class="opt-letter">B</span><span>Teknoloji ve ideoloji iki temel dinamiğidir</span></li>
+    
+    <li><span class="opt-letter">C</span><span>Gelişme ile eş anlamlıdır ve daima olumlu bir yönü ifade eder</span></li>
+    
+    <li><span class="opt-letter">D</span><span>İnsan, zaman ve mekân üç temel ögesidir</span></li>
+    
+    <li><span class="opt-letter">E</span><span>İç ve dış kaynaklardan beslenir</span></li>
+    
+  </ul>
+</div>
+
+<div class="tq">
+  <div class="tq-head">
+    <div class="tq-num">11</div>
+    <div class="tq-stem">Toplumsal değişmeyi zıtlıkların çatışmasıyla açıklayan diyalektik kuramın temsilcisi kimdir?</div>
+  </div>
+  <ul class="tq-options">
+    
+    <li><span class="opt-letter">A</span><span>Auguste Comte</span></li>
+    
+    <li><span class="opt-letter">B</span><span>Émile Durkheim</span></li>
+    
+    <li><span class="opt-letter">C</span><span>Karl Marx</span></li>
+    
+    <li><span class="opt-letter">D</span><span>Talcott Parsons</span></li>
+    
+    <li><span class="opt-letter">E</span><span>İbni Haldun</span></li>
+    
+  </ul>
+</div>
+
+<div class="tq">
+  <div class="tq-head">
+    <div class="tq-num">12</div>
+    <div class="tq-stem">Geleneksel toplumdan sanayi toplumuna geçişte tabakalaşma alanındaki temel dönüşüm nedir?</div>
+  </div>
+  <ul class="tq-options">
+    
+    <li><span class="opt-letter">A</span><span>Kazanılmış statü yerine atfedilen statünün önem kazanması</span></li>
+    
+    <li><span class="opt-letter">B</span><span>Atfedilen statü yerine kazanılmış statünün önem kazanması</span></li>
+    
+    <li><span class="opt-letter">C</span><span>Statü kavramının tamamen ortadan kalkması</span></li>
+    
+    <li><span class="opt-letter">D</span><span>Geniş ailenin çekirdek aileye üstünlük sağlaması</span></li>
+    
+    <li><span class="opt-letter">E</span><span>Dinî otoritenin güçlenmesi</span></li>
+    
+  </ul>
+</div>
+
+<div class="tq">
+  <div class="tq-head">
+    <div class="tq-num">13</div>
+    <div class="tq-stem">Max Weber'e göre sanayi toplumuna özgü, geleneksel otoritenin yerini alan otorite biçimi hangisidir?</div>
+  </div>
+  <ul class="tq-options">
+    
+    <li><span class="opt-letter">A</span><span>Karizmatik Otorite</span></li>
+    
+    <li><span class="opt-letter">B</span><span>Yasal Otorite</span></li>
+    
+    <li><span class="opt-letter">C</span><span>Babaerkil Otorite</span></li>
+    
+    <li><span class="opt-letter">D</span><span>Teokratik Otorite</span></li>
+    
+    <li><span class="opt-letter">E</span><span>Doğal Otorite</span></li>
+    
+  </ul>
+</div>
+
+  </div>
+  
+<div class="footer">
+  <div>Sosyoloji<span class="accent-word">ye</span> Giriş</div>
+  <div class="fnum">21</div>
+</div>
+
+</section>
+
+
+<section class="page body-page">
+  <div class="pageband"><div>Sosyoloji<span class="accent-word">ye</span> Giriş</div><div class="pageband-course">Test · Devam</div></div>
+  
+    <div class="chcontinue"><div class="tag">Test · Devam</div><div class="cctitle">Genel Değerlendirme Testi</div></div>
+  
+  <div class="tq-list">
+    
+<div class="tq">
+  <div class="tq-head">
+    <div class="tq-num">14</div>
+    <div class="tq-stem">Lyotard'a göre postmodernizm, modernliğin hangi iddialarına karşı çıkar?</div>
+  </div>
+  <ul class="tq-options">
+    
+    <li><span class="opt-letter">A</span><span>Bireyselliğe ve özgürlüğe</span></li>
+    
+    <li><span class="opt-letter">B</span><span>Kesinlik ve evrensellik iddialarına</span></li>
+    
+    <li><span class="opt-letter">C</span><span>Bilim ve teknolojiye</span></li>
+    
+    <li><span class="opt-letter">D</span><span>Kapitalizme</span></li>
+    
+    <li><span class="opt-letter">E</span><span>Ulus devlete</span></li>
+    
+  </ul>
+</div>
+
+<div class="tq">
+  <div class="tq-head">
+    <div class="tq-num">15</div>
+    <div class="tq-stem">Baudrillard'ın 'simülasyon' teziyle ilgili aşağıdakilerden hangisi doğrudur?</div>
+  </div>
+  <ul class="tq-options">
+    
+    <li><span class="opt-letter">A</span><span>Gerçeklik hiçbir zaman imajlarla yer değiştirmez</span></li>
+    
+    <li><span class="opt-letter">B</span><span>Postmodern dönemde gerçeğin yerini imajlar ve kültürel ürünler alır</span></li>
+    
+    <li><span class="opt-letter">C</span><span>Simülasyon yalnızca sanayi toplumlarında görülür</span></li>
+    
+    <li><span class="opt-letter">D</span><span>Simülasyon, modernliğin ekonomik boyutunu açıklar</span></li>
+    
+    <li><span class="opt-letter">E</span><span>Simülasyon kavramı Weber'e aittir</span></li>
+    
+  </ul>
+</div>
+
+<div class="tq">
+  <div class="tq-head">
+    <div class="tq-num">16</div>
+    <div class="tq-stem">Bir bireyin toplumdaki konumuna, yani içinde yaşadığı grupta işgal ettiği mevkiye ne ad verilir?</div>
+  </div>
+  <ul class="tq-options">
+    
+    <li><span class="opt-letter">A</span><span>Rol</span></li>
+    
+    <li><span class="opt-letter">B</span><span>Statü</span></li>
+    
+    <li><span class="opt-letter">C</span><span>Norm</span></li>
+    
+    <li><span class="opt-letter">D</span><span>Kimlik</span></li>
+    
+    <li><span class="opt-letter">E</span><span>Kişilik</span></li>
+    
+  </ul>
+</div>
+
+<div class="tq">
+  <div class="tq-head">
+    <div class="tq-num">17</div>
+    <div class="tq-stem">İşini iyi yapan bir temizlik işçisinin çevresinde yüksek saygınlık kazanması, hangi kavramla açıklanır?</div>
+  </div>
+  <ul class="tq-options">
+    
+    <li><span class="opt-letter">A</span><span>Statüsel Saygınlık</span></li>
+    
+    <li><span class="opt-letter">B</span><span>Anahtar Statü</span></li>
+    
+    <li><span class="opt-letter">C</span><span>Kişisel Saygınlık</span></li>
+    
+    <li><span class="opt-letter">D</span><span>Statü Aktarımı</span></li>
+    
+    <li><span class="opt-letter">E</span><span>Verilmiş Statü</span></li>
+    
+  </ul>
+</div>
+
+<div class="tq">
+  <div class="tq-head">
+    <div class="tq-num">18</div>
+    <div class="tq-stem">Aşağıdakilerden hangisi 'verilmiş (ascribed) statü' belirleyicilerinden biri değildir?</div>
+  </div>
+  <ul class="tq-options">
+    
+    <li><span class="opt-letter">A</span><span>Yaş</span></li>
+    
+    <li><span class="opt-letter">B</span><span>Soy bağı</span></li>
+    
+    <li><span class="opt-letter">C</span><span>Cinsiyet</span></li>
+    
+    <li><span class="opt-letter">D</span><span>Eğitim</span></li>
+    
+    <li><span class="opt-letter">E</span><span>Biyolojik nitelikler</span></li>
+    
+  </ul>
+</div>
+
+<div class="tq">
+  <div class="tq-head">
+    <div class="tq-num">19</div>
+    <div class="tq-stem">Bir kişinin sahip olduğu statülerden birinin diğerlerine baskın çıkarak kimliğini belirlemesine ne ad verilir?</div>
+  </div>
+  <ul class="tq-options">
+    
+    <li><span class="opt-letter">A</span><span>Rol Takımı</span></li>
+    
+    <li><span class="opt-letter">B</span><span>Anahtar Statü</span></li>
+    
+    <li><span class="opt-letter">C</span><span>Statü Aktarımı</span></li>
+    
+    <li><span class="opt-letter">D</span><span>Rol Çatışması</span></li>
+    
+    <li><span class="opt-letter">E</span><span>Genel Rol</span></li>
+    
+  </ul>
+</div>
+
+<div class="tq">
+  <div class="tq-head">
+    <div class="tq-num">20</div>
+    <div class="tq-stem">'İyi bir baba olan birinin aynı zamanda iyi bir öğretmen olamaması' durumu hangi kavramla açıklanır?</div>
+  </div>
+  <ul class="tq-options">
+    
+    <li><span class="opt-letter">A</span><span>Roller Arası Pekiştirme</span></li>
+    
+    <li><span class="opt-letter">B</span><span>Rol Uzmanlaşması</span></li>
+    
+    <li><span class="opt-letter">C</span><span>Rol Çatışması</span></li>
+    
+    <li><span class="opt-letter">D</span><span>Rol Takımı</span></li>
+    
+    <li><span class="opt-letter">E</span><span>Anahtar Rol</span></li>
+    
+  </ul>
+</div>
+
+  </div>
+  
+<div class="footer">
+  <div>Sosyoloji<span class="accent-word">ye</span> Giriş</div>
+  <div class="fnum">22</div>
+</div>
+
+</section>
+
+
+
+
+
+<section class="page body-page" id="answer-key">
+  <div class="pageband"><div>Sosyoloji<span class="accent-word">ye</span> Giriş</div><div class="pageband-course">Cevap Anahtarı</div></div>
+  
+    <div class="section-kicker">Çözümler</div>
+    <div class="section-title">Cevap Anahtarı ve Çözümler</div>
+    <div class="section-lede">Her sorunun doğru cevabı ve kısa gerekçesi aşağıda yer almaktadır.</div>
+  
+  <div class="ans-list">
+    
+<div class="ans-item">
+  <div class="ans-num">1</div>
+  <div>
+    <span class="ans-correct">Doğru Cevap: C</span>
+    <div class="ans-explain">Kültür <b>öğrenilir</b>, doğuştan (kalıtsal) gelmez — bu, kültürü biyolojik özelliklerden ayıran en temel niteliktir.</div>
+  </div>
+</div>
+
+<div class="ans-item">
+  <div class="ans-num">2</div>
+  <div>
+    <span class="ans-correct">Doğru Cevap: B</span>
+    <div class="ans-explain"><b>Kültürel Gecikme</b> (Ogburn), maddi kültürün hızlı, manevi kültürün yavaş değişmesinden doğan boşluğu tanımlar.</div>
+  </div>
+</div>
+
+<div class="ans-item">
+  <div class="ans-num">3</div>
+  <div>
+    <span class="ans-correct">Doğru Cevap: C</span>
+    <div class="ans-explain"><b>Etnosentrizm</b>, kişinin kendi kültürünü ölçüt alıp diğerlerini yargılamasıdır; kültürel relativizm bunun tam tersidir.</div>
+  </div>
+</div>
+
+<div class="ans-item">
+  <div class="ans-num">4</div>
+  <div>
+    <span class="ans-correct">Doğru Cevap: D</span>
+    <div class="ans-explain"><b>Anahtar Statü</b> bir statü/rol kavramıdır, kültürel süreçlerle (enkültürasyon, akkültürasyon, difüzyon, kültür şoku) ilgili değildir.</div>
+  </div>
+</div>
+
+<div class="ans-item">
+  <div class="ans-num">5</div>
+  <div>
+    <span class="ans-correct">Doğru Cevap: C</span>
+    <div class="ans-explain">Fichter'e göre kültürün işlevleri toplumsaldır (dayanışma, kimlik, değer yorumlama, kişilik); genetik yapı biyolojik bir konudur, kültürün işlevi değildir.</div>
+  </div>
+</div>
+
+<div class="ans-item">
+  <div class="ans-num">6</div>
+  <div>
+    <span class="ans-correct">Doğru Cevap: B</span>
+    <div class="ans-explain"><b>Toplumsallaşma</b>, bireyin biyolojik varlıktan toplumsal varlığa dönüşme sürecinin tanımıdır.</div>
+  </div>
+</div>
+
+<div class="ans-item">
+  <div class="ans-num">7</div>
+  <div>
+    <span class="ans-correct">Doğru Cevap: C</span>
+    <div class="ans-explain"><b>Yeniden Toplumsallaşma (Resocialization)</b>, bireyin değer ve davranışlarını temelden değiştirmesidir; emeklilik gibi yeni roller bu sürece örnektir.</div>
+  </div>
+</div>
+
+<div class="ans-item">
+  <div class="ans-num">8</div>
+  <div>
+    <span class="ans-correct">Doğru Cevap: E</span>
+    <div class="ans-explain">Genetik kalıtım biyolojik bir aktarımdır; toplumsallaşma araçları aile, okul, arkadaş grupları ve kitle iletişim araçlarıdır.</div>
+  </div>
+</div>
+
+<div class="ans-item">
+  <div class="ans-num">9</div>
+  <div>
+    <span class="ans-correct">Doğru Cevap: C</span>
+    <div class="ans-explain"><b>Propaganda</b>, fikirleri tek taraflı benimsetmeyi ve 'kabul ettirmeyi' amaçlayan yapay etkileme aracıdır; reklam ise ticari amaçlıdır.</div>
+  </div>
+</div>
+
+<div class="ans-item">
+  <div class="ans-num">10</div>
+  <div>
+    <span class="ans-correct">Doğru Cevap: C</span>
+    <div class="ans-explain">Toplumsal değişme <b>nesnel</b> bir çatı kavramdır; gelişme ise değer yargısı içerir ve toplumsal değişmenin yalnızca özel (olumlu) bir görünümüdür, eş anlamlısı değildir.</div>
+  </div>
+</div>
+
+<div class="ans-item">
+  <div class="ans-num">11</div>
+  <div>
+    <span class="ans-correct">Doğru Cevap: C</span>
+    <div class="ans-explain"><b>Karl Marx</b>, toplumsal değişmeyi zıtlıkların çatışmasıyla açıklayan diyalektik kuramın temsilcisidir.</div>
+  </div>
+</div>
+
+<div class="ans-item">
+  <div class="ans-num">12</div>
+  <div>
+    <span class="ans-correct">Doğru Cevap: B</span>
+    <div class="ans-explain">Sanayi toplumunda doğuştan gelen (atfedilen) statüler yerine çabayla elde edilen (kazanılmış) statüler önem kazanır.</div>
+  </div>
+</div>
+
+<div class="ans-item">
+  <div class="ans-num">13</div>
+  <div>
+    <span class="ans-correct">Doğru Cevap: B</span>
+    <div class="ans-explain">Weber'e göre sanayi toplumuna özgü otorite biçimi <b>Yasal Otorite</b>dir; geleneksel otoritenin yerini alır.</div>
+  </div>
+</div>
+
+<div class="ans-item">
+  <div class="ans-num">14</div>
+  <div>
+    <span class="ans-correct">Doğru Cevap: B</span>
+    <div class="ans-explain">Lyotard'a göre postmodernizm, modernliğin kesinlik ve evrensellik iddialarına karşı çıkar, belirsizliği ve çoğulculuğu savunur.</div>
+  </div>
+</div>
+
+<div class="ans-item">
+  <div class="ans-num">15</div>
+  <div>
+    <span class="ans-correct">Doğru Cevap: B</span>
+    <div class="ans-explain">Baudrillard'a göre postmodern dönemde artık ekonomik/politik bir gerçeklik yoktur; yalnızca <b>kültürel ürünler ve imajlar</b> vardır.</div>
+  </div>
+</div>
+
+<div class="ans-item">
+  <div class="ans-num">16</div>
+  <div>
+    <span class="ans-correct">Doğru Cevap: B</span>
+    <div class="ans-explain"><b>Statü</b>, bireyin içinde yaşadığı grupta işgal ettiği konumdur; rol ise bu konumun gerektirdiği eylemdir.</div>
+  </div>
+</div>
+
+<div class="ans-item">
+  <div class="ans-num">17</div>
+  <div>
+    <span class="ans-correct">Doğru Cevap: C</span>
+    <div class="ans-explain"><b>Kişisel Saygınlık</b>, bireyin statüsünün gereklerini ne kadar başarıyla yerine getirdiğiyle ilgilidir — düşük statülü bir işte bile yüksek olabilir.</div>
+  </div>
+</div>
+
+<div class="ans-item">
+  <div class="ans-num">18</div>
+  <div>
+    <span class="ans-correct">Doğru Cevap: D</span>
+    <div class="ans-explain">Eğitim, kazanılmış (achieved) statünün belirleyicisidir; verilmiş statü doğuştan gelen özelliklere (yaş, soy, cinsiyet, biyolojik nitelikler) dayanır.</div>
+  </div>
+</div>
+
+<div class="ans-item">
+  <div class="ans-num">19</div>
+  <div>
+    <span class="ans-correct">Doğru Cevap: B</span>
+    <div class="ans-explain"><b>Anahtar Statü (Master Status)</b>, bireyin sahip olduğu statülerden birinin diğerlerine baskın çıkarak kimliğini belirlemesidir.</div>
+  </div>
+</div>
+
+<div class="ans-item">
+  <div class="ans-num">20</div>
+  <div>
+    <span class="ans-correct">Doğru Cevap: C</span>
+    <div class="ans-explain"><b>Rol Çatışması</b>, kişinin sahip olduğu bir rolün başka bir gruptaki rolüyle uyumsuz olması durumudur.</div>
+  </div>
+</div>
+
+  </div>
+  
+<div class="footer">
+  <div>Sosyoloji<span class="accent-word">ye</span> Giriş</div>
+  <div class="fnum">23</div>
+</div>
+
+</section>
+
+
+
+
+
+
+
+</body>
+</html>

@@ -14,17 +14,20 @@ bu yüzden dersler arası MİNİMUM alınır.
 
 Kullanım:
     python tools/kalibre.py                       # varsayılan ders kümesi
-    python tools/kalibre.py content.a content.b
+    python tools/kalibre.py --sinif 2 --donem 2 --sinav final
+    python tools/kalibre.py psikoloji sosyoloji --sinif 2 --donem 2 --sinav final
 """
 
-import importlib
 import json
 import subprocess
 import sys
+import argparse
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
+
+import donem as donem_mod   # noqa: E402
 
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8")
@@ -81,7 +84,7 @@ const files = {files};
 
 def render(module_name: str, tag: str):
     """Mevcut build sabitleriyle bir dersin HTML'ini üretir."""
-    pack = importlib.import_module(module_name).get_pack()
+    pack = B.DONEM.import_ders(module_name).get_pack()
     ctx = B.course_context(pack)
     env = Environment(loader=FileSystemLoader(str(B.TEMPLATES)))
     html = env.get_template("master.html.j2").render(
@@ -171,9 +174,17 @@ def run_js(jobs):
 
 
 if __name__ == "__main__":
-    mods = [a for a in sys.argv[1:] if not a.startswith("--")]
-    if not mods:
-        mods = importlib.import_module("content.kitap").get_book().course_modules
+    ap = argparse.ArgumentParser(prog="tools/kalibre.py")
+    ap.add_argument("dersler", nargs="*",
+                    help="kalibrasyonda kullanılacak dersler "
+                         "(boşsa dönemin kitap.py'sindeki tüm dersler)")
+    donem_mod.add_args(ap)
+    a = ap.parse_args()
+
+    d = donem_mod.resolve(a)
+    B.set_donem(d)
+    print(f"[kalibre] Dönem: {d}  ({d.etiket})")
+    mods = a.dersler or d.import_ders("kitap").get_book().course_modules
     print(f"{len(mods)} ders üzerinde kalibrasyon (taşmayan en büyük değer):")
     out = calibrate(mods)
     print("\nbuild.py için önerilen sabitler:")

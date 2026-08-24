@@ -1,6 +1,6 @@
 ---
 name: ders-anlatim
-description: Bir ders kaynağını (kaynaklar/ders_kaynaklari/) ya da öğretmenin dağınık/eksik dikte notlarını (kaynaklar/ogretmen_notlari/) fihristleyip bölüm bölüm, otomatik ve kesintisiz şekilde derinlemesine anlatır veya toparlar. Kullanıcı bir ders adı verip "anlat", "işle" veya "notlarımı toparla/düzenle" dediğinde devreye girer. Görsel PDF ders notu kitabı sisteminden bağımsızdır.
+description: Bir ders kaynağını (<dönem>/kaynaklar/ders_kaynaklari/) ya da öğretmenin dağınık/eksik dikte notlarını (<dönem>/kaynaklar/ogretmen_notlari/) fihristleyip bölüm bölüm, otomatik ve kesintisiz şekilde derinlemesine anlatır veya toparlar. Kullanıcı bir ders adı verip "anlat", "işle" veya "notlarımı toparla/düzenle" dediğinde devreye girer. Görsel PDF ders notu kitabı sisteminden bağımsızdır.
 ---
 
 # Ders Anlatım Otomasyonu
@@ -10,30 +10,35 @@ Bu talimat seti, `ders-uretim-sistemi` projesine entegre bir alt sistemdir. Mevc
 - **Mod 1 — Kaynak Anlatımı:** elde tam bir kaynak/kitap/PDF varsa; kaynağa sıkı sadakatle, derinlemesine anlatır.
 - **Mod 2 — Not Toparlama:** elde sadece öğretmenin yazdırdığı dağınık/eksik/hatalı notlar varsa; notları mantıklı sıraya koyar, akademik doğrusuyla tamamlar/düzeltir.
 
-## Kurulum (bir kerelik)
+## Klasör yapısı — SINIF / DÖNEM / SINAV
 
-Proje kökünde şu klasör yapısını oluştur:
+Proje artık dosyaları sınav dönemine göre ayrı ağaçlarda tutar. Bu skill de dönem bazlı çalışır; **dönemi asla varsayma, kullanıcı belirtmediyse SOR** (bkz. CLAUDE.md "KRİTİK KURAL 2").
 
 ```
-kaynaklar/
-├── ders_kaynaklari/     # Mod 1 girdisi: tam ders metinleri
-├── ogretmen_notlari/    # Mod 2 girdisi: dağınık/dikte öğretmen notları
-└── ders_ozetleri/       # mevcut görsel PDF sisteminin girdisi (değişmedi)
-
-ders_anlatimlari/        # Mod 1 çıktısı: <ders adı>.pdf
-calisma_rehberleri/      # Mod 2 çıktısı: <ders adı>.pdf
+<sinif>-sinif/<donem>-donem/<sinav>/          # <D> diye anacağız
+├── kaynaklar/
+│   ├── ders_kaynaklari/     # Mod 1 girdisi: tam ders metinleri
+│   └── ogretmen_notlari/    # Mod 2 girdisi: dağınık/dikte öğretmen notları
+├── ders_anlatimlari/        # Mod 1 çıktısı: <ders adı>.pdf
+├── calisma_rehberleri/      # Mod 2 çıktısı: <ders adı>.pdf
+├── src/                     # görsel PDF sisteminin ders modülleri (BU SKILL'E AİT DEĞİL)
+└── ders_ozetleri/           # görsel PDF sisteminin ÇIKTISI (BU SKILL'E AİT DEĞİL)
 ```
+
+`<sinif>` ∈ {2, 3} · `<donem>` ∈ {1, 2} · `<sinav>` ∈ {vize, final}. Sekiz dönem klasörünün hepsi hazırdır.
+
+Girdi ve çıktı HER ZAMAN aynı dönemin ağacındadır — bir dönemin kaynağından üretilen anlatımı başka bir döneme yazma.
 
 `.calisma/` adında gizli bir çalışma klasörü de kullanılır (bkz. "PDF Üretimi" bölümü) — bunu elle oluşturman gerekmez, sistem otomatik yönetir.
-
-Var olan ham ders özeti dosyalarını `kaynaklar/` kökünden `kaynaklar/ders_ozetleri/` içine taşı. Bu dosyayı CLAUDE.md içinden referans verebilirsin (örn. "Ders anlatımı/toparlaması isteniyorsa `ders-anlatim-otomasyonu.md`'deki talimatları uygula").
 
 ## Tetiklenme ve Mod Seçimi
 
 Kullanıcı sadece ders adını verir (örn. "Modern Felsefe Tarihi'ni anlat" veya "Hadis Usulü notlarımı toparla"). Sistem dosyanın hangi klasörde bulunduğuna bakarak modu otomatik seçer:
 
-- `kaynaklar/ders_kaynaklari/` içindeyse → **Mod 1**
-- `kaynaklar/ogretmen_notlari/` içindeyse → **Mod 2**
+- `<D>/kaynaklar/ders_kaynaklari/` içindeyse → **Mod 1**
+- `<D>/kaynaklar/ogretmen_notlari/` içindeyse → **Mod 2**
+
+Dosyayı ararken YALNIZCA kullanıcının belirttiği dönemin klasörlerine bak; bulunamazsa diğer dönemleri taramak yerine kullanıcıya sor.
 
 Her iki modda da süreç baştan sona **otomatik** ilerler — hiçbir aşamada kullanıcıdan "devam edeyim mi?" onayı istenmez.
 
@@ -67,7 +72,7 @@ Anlatım/toparlama tamamlandıktan sonra, biriken taslak doğrudan işlenmiş bi
 
 **Teknik yöntem:** `python-docx` ile yukarıdaki stile uygun bir `.docx` oluştur, ardından `docx2pdf` paketiyle (Windows'ta Word'ü COM üzerinden kullanarak) PDF'e çevir. Bu yöntem, referans PDF'in zaten Word ile üretilmiş olmasından dolayı emoji ve fontların birebir aynı görünmesini garanti eder — özellikle emoji ikonları (🔑 ⚠️ 💡) düz PDF kütüphaneleriyle (reportlab, fpdf2 vb.) doğru render edilemeyebilir, Word/docx2pdf yolu bunu bypass eder. Gerekli paketler kurulu değilse `pip install python-docx docx2pdf --break-system-packages` ile kur. Word veya `docx2pdf` çalışmazsa yedek yöntem olarak `soffice --headless --convert-to pdf` (LibreOffice) kullanılabilir.
 
-Nihai `.pdf` dosyası ilgili çıktı klasörüne (`ders_anlatimlari/` veya `calisma_rehberleri/`) `<ders adı>.pdf` adıyla kaydedilir; ara `.docx` ve `.calisma/` içindeki taslak silinir.
+Nihai `.pdf` dosyası ilgili dönemin çıktı klasörüne (`<D>/ders_anlatimlari/` veya `<D>/calisma_rehberleri/`) `<ders adı>.pdf` adıyla kaydedilir; ara `.docx` ve `.calisma/` içindeki taslak silinir.
 
 ---
 
@@ -96,7 +101,7 @@ Metnin ana başlıklarından "Konu Omurgası" (fihrist) çıkar, `.calisma/<ders
 Fihristteki her bölümü sırayla işle, `.calisma/<ders adı>.md` taslağına ekleye ekleye ilerle; bölüm bitince otomatik olarak sıradakine geç.
 
 ### 4. Çıktı
-Tüm bölümler bitince taslağı "PDF Üretimi" bölümündeki stile göre `ders_anlatimlari/<ders adı>.pdf` dosyasına dönüştür; taslağı ve ara dosyaları sil.
+Tüm bölümler bitince taslağı "PDF Üretimi" bölümündeki stile göre `<D>/ders_anlatimlari/<ders adı>.pdf` dosyasına dönüştür; taslağı ve ara dosyaları sil.
 
 ### Mod 1 Temel Kuralları
 
@@ -139,7 +144,7 @@ Dağınık notlardan mantıklı bir "Konu Omurgası" kur — notların orijinal 
 Fihristteki her bölümü sırayla düzenle/tamamla, `.calisma/<ders adı>.md` taslağına ekleye ekleye ilerle; bölüm bitince otomatik olarak sıradakine geç.
 
 ### 4. Çıktı
-Tüm bölümler bitince taslağı "PDF Üretimi" bölümündeki stile göre `calisma_rehberleri/<ders adı>.pdf` dosyasına dönüştür; taslağı ve ara dosyaları sil.
+Tüm bölümler bitince taslağı "PDF Üretimi" bölümündeki stile göre `<D>/calisma_rehberleri/<ders adı>.pdf` dosyasına dönüştür; taslağı ve ara dosyaları sil.
 
 ### Mod 2 Temel Kuralları
 

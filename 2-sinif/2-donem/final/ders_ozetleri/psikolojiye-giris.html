@@ -1,0 +1,2776 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<title>Psikoloji<span class="accent-word">ye</span> Giriş</title>
+<style>/* ============================================================
+   DERS ÜRETİM SİSTEMİ — Görsel Tasarım Sistemi v2
+   175x250mm trim (PUR Amerikan cilt), 3mm bleed, print-ready,
+   tema-parametrik.
+   Sistem fontlarına dayanır: gövde DejaVu Sans, başlıklar DejaVu Serif
+   (kitap/akademik karakter için) — harici font çağrısı yok, bu yüzden
+   her ortamda birebir aynı render garantidir.
+   ============================================================ */
+
+/* --- SAYFA GEOMETRİSİ ---------------------------------------------------
+   DİKKAT: aşağıdaki değerler yalnızca VARSAYILAN'dır. Gerçek kaynak
+   build.py içindeki TRIM_W_MM / TRIM_H_MM / BLEED_MM / MARGIN_*_MM
+   sabitleridir; build.py bu blogun aynısını page_geometry_css() ile
+   üretip style.css'in SONUNA ekler ve buradakileri ezer. Boyut
+   değiştirecekseniz build.py'yi düzenleyin, burayı değil. */
+@page { size: 181mm 256mm; margin: 0; }
+
+:root {
+  /* Bitmiş (kesilmiş) sayfa ölçüsü */
+  --trim-w: 175mm;
+  --trim-h: 250mm;
+  /* Taşma payı: tam sayfa zemin rengi / kapak gradyanı kenardan taşsın */
+  --bleed: 3mm;
+  /* Fiziksel render ölçüsü = trim + her iki yandan bleed */
+  --page-w: 181mm;
+  --page-h: 256mm;
+  /* Kenar boşlukları — TRIM kenarından ölçülür */
+  --mg-top: 11mm;
+  --mg-bottom: 19mm;    /* sayfa numarası payı dahil */
+  --mg-inner: 14mm;     /* sırt/gutter tarafı — PUR cilt payı */
+  --mg-outer: 9mm;
+  /* Render kutusunun (bleed box) kenarından ölçülen gerçek padding'ler */
+  --pad-top: 14mm;
+  --pad-bottom: 22mm;
+  --pad-inner: 17mm;
+  --pad-outer: 12mm;
+  /* Ayna simetri: sayfa tekliği/çiftliğine göre aşağıda yeniden atanır */
+  --pad-left: var(--pad-inner);
+  --pad-right: var(--pad-outer);
+
+  /* --- Nötr paleti (tüm temalarda sabit) --- */
+  --ink:        #14161b;
+  --ink-soft:   #464b5b;
+  --ink-faint:  #5c6270;   /* WCAG AA: beyaz üzerinde 6.1:1 -- eski #7d8394 (3.79:1) yerine */
+  --paper:      #ffffff;   /* build.py / .theme-XXXX bunu tema tonuna çeker */
+  --paper-tint: #f7f7f9;
+  --line:       #e3e4ea;
+  --line-soft:  #edeef2;
+  --shadow-sm:  0 0.82px 1.65px rgba(20,22,30,0.05), 0 0.82px 0.82px rgba(20,22,30,0.04);
+  --shadow-md:  0 2.47px 8.23px rgba(20,22,30,0.07), 0 0.82px 2.47px rgba(20,22,30,0.06);
+  --shadow-lg:  0 8.23px 24.69px rgba(15,17,30,0.16), 0 2.47px 6.58px rgba(15,17,30,0.10);
+
+  /* --- Sabit semantik renkler (callout tipleri; tema fark etmez) --- */
+  --focus-bg:   #fff8e8;
+  --focus-line: #e8b83f;
+  --focus-ink:  #6b4f04;
+
+  --caution-bg:   #eef4ff;
+  --caution-line: #6f8fd6;
+  --caution-ink:  #1f3d78;
+
+  --insight-bg:   #0d1830;
+  --insight-ink:  #ffffff;
+  --insight-accent: #e3c37c;
+
+  --route-bg:   #f2f0ff;
+  --route-line: #8a78e0;
+  --route-ink:  #40337f;
+
+  /* --- Tema değişkenleri: aşağıdaki .theme-XXXX sınıfları bunları ezer --- */
+  --accent:       #3a4fb0;
+  --accent-dark:  #232f6e;
+  --accent-soft:  #eef0fc;
+  --accent-tint:  #f5f6fd;
+  --cover-grad-1: #171d42;
+  --cover-grad-2: #3a4fb0;
+  --cover-grad-3: #4a5fc7;
+  --gold:         #d9b25c;
+  --gold-ink:     #6b5310;   /* açık zeminlerde gold yerine kullanılan okunur koyu ton */
+}
+
+/* ---------- Tema paletleri ----------
+   Her paper tonu kasıtlı çok hafiftir (L≈98%) — beyazdan ayırt edilir ama
+   metin kontrastını bozmaz; --line de aynı ton ailesinden seçilmiştir. */
+.theme-indigo {
+  --accent: #3a4fb0; --accent-dark: #232f6e; --accent-soft: #eef0fc; --accent-tint: #f5f6fd;
+  --cover-grad-1: #12163a; --cover-grad-2: #33449e; --cover-grad-3: #5468d4; --gold: #dfba68; --gold-ink: #6b5310;
+  --paper: #fbfbfe; --paper-tint: #f3f4fb; --line: #e2e3f0; --line-soft: #ececf6;
+}
+.theme-burgundy {
+  --accent: #8c2a3c; --accent-dark: #5c1522; --accent-soft: #fbeef0; --accent-tint: #fdf6f6;
+  --cover-grad-1: #31090f; --cover-grad-2: #7a2433; --cover-grad-3: #a8394c; --gold: #d1ab5c; --gold-ink: #6b4f10;
+  --paper: #fefbfa; --paper-tint: #fcf4f3; --line: #f0dfdd; --line-soft: #f6ecea;
+}
+.theme-forest {
+  --accent: #14665a; --accent-dark: #0b3e37; --accent-soft: #e9f5f2; --accent-tint: #f4faf9;
+  --cover-grad-1: #041a15; --cover-grad-2: #0f5049; --cover-grad-3: #1c8272; --gold: #d3bd76; --gold-ink: #6b5710;
+  --paper: #fafefd; --paper-tint: #f2faf8; --line: #dcefe9; --line-soft: #e9f5f1;
+}
+.theme-slate {
+  --accent: #3d5568; --accent-dark: #24333f; --accent-soft: #edf2f5; --accent-tint: #f6f9fa;
+  --cover-grad-1: #0e161d; --cover-grad-2: #324556; --cover-grad-3: #52738c; --gold: #d0b476; --gold-ink: #6b5510;
+  --paper: #fafcfd; --paper-tint: #f2f6f8; --line: #e0e8ec; --line-soft: #edf2f4;
+}
+.theme-plum {
+  --accent: #6a3b8c; --accent-dark: #3f2255; --accent-soft: #f4eef9; --accent-tint: #faf7fc;
+  --cover-grad-1: #1c0d2e; --cover-grad-2: #59317a; --cover-grad-3: #8552ac; --gold: #d5b168; --gold-ink: #6b4f10;
+  --paper: #fdfaff; --paper-tint: #f7f2fb; --line: #eae0f2; --line-soft: #f2ebf8;
+}
+
+/* ---------- Reset & font sistemi ---------- */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  font-family: "DejaVu Sans", "Liberation Sans", Arial, sans-serif;
+  color: var(--ink);
+  font-size: 7.9pt;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+strong, b { font-weight: 700; }
+em { font-style: italic; }
+
+.serif { font-family: "DejaVu Serif", "Liberation Serif", Georgia, serif; }
+
+.page {
+  position: relative;
+  width: var(--page-w);
+  height: var(--page-h);
+  overflow: hidden;
+  background: var(--paper);
+  page-break-after: always;
+  break-after: page;
+  display: flex;
+  flex-direction: column;
+}
+.page:last-child { page-break-after: auto; }
+
+/* zemin dokusu: çok hafif nokta matrisi -- kağıt/kumaş hissi verir, metni etkilemez */
+.body-page::before {
+  content: "";
+  position: absolute; inset: 0;
+  background-image: radial-gradient(circle, rgba(20,22,30,0.05) 0.6px, transparent 0.6px);
+  background-size: 3.6mm 3.6mm;
+  opacity: 0.55;
+  pointer-events: none;
+  z-index: 0;
+}
+.body-page > * { position: relative; z-index: 1; flex-shrink: 0; }
+
+/* ================= KAPAK — çok katmanlı, dokulu, amblemli ================= */
+.cover {
+  color: #fff;
+  position: relative;
+  background:
+    radial-gradient(circle at 85% 6%, rgba(255,255,255,0.14), transparent 38%),
+    radial-gradient(ellipse 70% 45% at 18% 100%, rgba(0,0,0,0.35), transparent 60%),
+    linear-gradient(152deg, var(--cover-grad-1) 0%, var(--cover-grad-2) 62%, var(--cover-grad-3) 100%);
+  padding: var(--pad-top) var(--pad-right) var(--pad-bottom) var(--pad-left);
+  justify-content: space-between;
+}
+/* ince nokta dokusu -- kumaş/kağıt hissi */
+.cover::before {
+  content: "";
+  position: absolute; inset: 0;
+  background-image: radial-gradient(circle, rgba(255,255,255,0.10) 0.7px, transparent 0.7px);
+  background-size: 4.2mm 4.2mm;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+}
+/* iç çerçeve -- "cilt" hissi */
+.cover::after {
+  content: "";
+  position: absolute; inset: calc(var(--bleed) + 7mm);
+  border: 1px solid rgba(255,255,255,0.20);
+  pointer-events: none;
+}
+.cover-corner { position:absolute; width:7mm; height:7mm; pointer-events:none; }
+.cover-corner::before, .cover-corner::after { content:""; position:absolute; background: rgba(255,255,255,0.55); }
+.cover-corner.tl { top:calc(var(--bleed) + 7mm); left:calc(var(--bleed) + 7mm); }
+.cover-corner.tr { top:calc(var(--bleed) + 7mm); right:calc(var(--bleed) + 7mm); transform: scaleX(-1); }
+.cover-corner.bl { bottom:calc(var(--bleed) + 7mm); left:calc(var(--bleed) + 7mm); transform: scaleY(-1); }
+.cover-corner.br { bottom:calc(var(--bleed) + 7mm); right:calc(var(--bleed) + 7mm); transform: scale(-1,-1); }
+.cover-corner::before { top:-1px; left:-1px; width:4.5mm; height:1.4px; }
+.cover-corner::after { top:-1px; left:-1px; width:1.4px; height:4.5mm; }
+.cover-inner { position:relative; z-index:2; display:flex; flex-direction:column; height:100%; justify-content:space-between; }
+
+.cover-top { display:flex; justify-content: space-between; align-items:flex-start; flex-shrink: 0; }
+.cover-kicker {
+  display:inline-block;
+  font-size: 7.4pt; letter-spacing: 2px; font-weight:700; text-transform:uppercase;
+  border: 1px solid rgba(255,255,255,0.4);
+  border-radius: 999px;
+  padding: 5.5px 15px;
+  color: rgba(255,255,255,0.95);
+  background: rgba(255,255,255,0.06);
+}
+
+/* Amblem: çok katmanlı halka + iç dolgu + minik saat-noktaları + mühür dokusu */
+.cover-emblem { position:relative; width: 32mm; height:32mm; }
+.cover-emblem .ring-outer {
+  position:absolute; inset:0; border-radius:50%;
+  border: 1px solid rgba(255,255,255,0.32);
+}
+.cover-emblem .ring-outer::before {
+  content:""; position:absolute; inset:-2.6mm; border-radius:50%;
+  border: 1px solid rgba(255,255,255,0.14);
+}
+.cover-emblem .ring-mid {
+  position:absolute; inset:3.4mm; border-radius:50%;
+  border: 1px solid rgba(255,255,255,0.24);
+  background: repeating-conic-gradient(rgba(255,255,255,0.12) 0deg 0.7deg, transparent 0.7deg 9deg);
+}
+.cover-emblem .ring-inner {
+  position:absolute; inset:7.2mm; border-radius:50%;
+  background: radial-gradient(circle at 32% 28%, rgba(255,255,255,0.28), rgba(255,255,255,0.03) 72%);
+  border: 1px solid rgba(255,255,255,0.45);
+  display:flex; align-items:center; justify-content:center;
+  box-shadow: inset 0 1px 5px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.06);
+}
+.cover-emblem .ring-inner span {
+  font-family: "DejaVu Serif", serif; font-size: 13.5pt; font-weight:700; color: var(--gold);
+  text-shadow: 0 1px 3px rgba(0,0,0,0.35);
+}
+.cover-emblem .tick {
+  position:absolute; width:1.4px; height:2.6mm; background: rgba(255,255,255,0.6);
+  left: 50%; top: -1.3mm; transform-origin: 50% 17mm;
+}
+.cover-emblem .tick.major { height: 3.6mm; background: var(--gold); opacity:0.85; }
+
+.cover-mid { flex: 1; display:flex; flex-direction:column; justify-content:flex-end; padding-bottom: 8mm; position:relative; }
+.cover-motif {
+  position:absolute; left:-3mm; bottom: 32mm;
+  font-family: "DejaVu Serif", serif;
+  font-size: 150pt; font-weight:700; color: rgba(255,255,255,0.075);
+  letter-spacing: -6px; line-height:1; z-index:0;
+  text-shadow: 0 0 40px rgba(255,255,255,0.04);
+}
+.cover-code { font-size: 8.6pt; letter-spacing:2.4px; color: var(--gold); font-weight:700; margin-bottom: 4.5mm; text-transform:uppercase; position:relative; }
+.cover-code::before { content:"—  "; color: rgba(255,255,255,0.5); }
+.cover-title {
+  font-family: "DejaVu Serif", "Liberation Serif", Georgia, serif;
+  font-size: 34pt; font-weight:700; line-height:1.08; letter-spacing: -0.3px;
+  position:relative; text-shadow: 0 2px 18px rgba(0,0,0,0.25);
+}
+.cover-title .accent-word { color: var(--gold); }
+.cover-subtitle { font-size: 13pt; font-weight:400; color: rgba(255,255,255,0.9); margin-top:5mm; max-width: 148mm; line-height:1.45; position:relative; }
+.cover-rule { width: 28mm; height:2.6px; background: linear-gradient(90deg, var(--gold), rgba(255,255,255,0.15)); margin: 7mm 0 6mm; border-radius:2px; position:relative; }
+.cover-desc { font-size: 9.7pt; color: rgba(255,255,255,0.82); max-width: 132mm; line-height:1.68; position:relative; }
+
+.cover-bottom { position:relative; flex-shrink: 0; }
+.cover-stats { display:flex; gap: 5mm; margin-bottom: 7mm; }
+.cover-stat {
+  flex:1;
+  border: 1px solid rgba(255,255,255,0.24);
+  border-top: 1px solid rgba(255,255,255,0.55);
+  border-radius: 9px;
+  padding: 4.2mm 5mm;
+  font-size: 8.4pt; font-weight:700; letter-spacing:.3px;
+  color: rgba(255,255,255,0.95);
+  background: linear-gradient(165deg, rgba(255,255,255,0.13), rgba(255,255,255,0.02) 60%);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.22), inset 0 1px 0 rgba(255,255,255,0.08);
+  position: relative; overflow: hidden;
+}
+.cover-stat::before {
+  content:""; position:absolute; top:0; left:0; right:0; height:1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent);
+}
+.cover-stat b { display:block; font-family:"DejaVu Serif",serif; font-size: 14pt; color: var(--gold); font-weight:700; margin-bottom:1.3mm; }
+.cover-foot {
+  display:flex; justify-content:space-between; align-items:center;
+  border-top: 1px solid rgba(255,255,255,0.25);
+  padding-top: 4mm;
+  font-size: 7.7pt; letter-spacing:1.2px; text-transform:uppercase; color: rgba(255,255,255,0.75);
+}
+
+/* ================= SAYFA GÖVDESİ (kapak-dışı tüm sayfalar) ================= */
+.body-page { padding: var(--pad-top) var(--pad-right) var(--pad-bottom) var(--pad-left); }
+
+.pageband {
+  display:flex; justify-content:space-between; align-items:center;
+  font-size: 6.09pt; letter-spacing: 0.99px; text-transform:uppercase; font-weight:700;
+  color: var(--ink-faint);
+  padding-bottom: 1.93mm; margin-bottom: 3.85mm;
+  border-bottom: 1.65px solid var(--accent);
+  position:relative;
+}
+.pageband::after {
+  content:""; position:absolute; left:0; bottom:-1.65px; width: 13.17mm; height:1.65px; background: var(--gold);
+}
+.pageband .pageband-course { color: var(--accent-dark); font-weight:700; }
+
+.footer {
+  position: absolute; bottom: calc(var(--bleed) + 9mm); left: var(--pad-left); right: var(--pad-right);
+  display:flex; justify-content:space-between; align-items:center;
+  font-size: 6.17pt; color: var(--ink-faint); font-weight:600;
+  border-top: 0.82px solid var(--line);
+  padding-top: 1.67mm;
+}
+.footer .fnum {
+  font-weight:700; color: #fff; background: var(--accent);
+  padding: 0.64px 4.49px; border-radius: 999px; font-size: 6.25pt;
+}
+
+/* ---------- İçindekiler ---------- */
+.toc-kicker { font-size: 6.58pt; letter-spacing:1.48px; font-weight:700; color: var(--accent); text-transform:uppercase; }
+.toc-title { font-family:"DejaVu Serif",serif; font-size: 20.57pt; font-weight:700; margin-top: 1.65mm; color: var(--ink); }
+.toc-lede { font-size: 7.9pt; color: var(--ink-soft); margin-top:2.47mm; max-width: 150mm; line-height:1.6; }
+.toc-list { margin-top: 6.58mm; display:flex; flex-direction:column; gap: 0; }
+.toc-row {
+  display:flex; align-items:center; gap: 4.11mm;
+  padding: 3.79mm 2.47mm;
+  border-bottom: 0.82px solid var(--line-soft);
+  border-radius: 4.94px;
+  text-decoration: none; color: inherit;
+}
+.toc-row:first-child { border-top: 0.82px solid var(--line-soft); }
+.toc-num {
+  flex: 0 0 auto;
+  width: 7.74mm; height:7.74mm; border-radius:50%;
+  background: var(--accent-soft); color: var(--accent-dark);
+  font-weight:700; font-size: 7.9pt; font-family:"DejaVu Serif",serif;
+  display:flex; align-items:center; justify-content:center;
+  box-shadow: var(--shadow-sm);
+}
+.toc-num.alt { background: var(--accent-dark); color:#fff; }
+.toc-body { flex: 1 1 auto; }
+.toc-heading { font-size: 8.89pt; font-weight:700; color: var(--ink); }
+.toc-sub { font-size: 6.99pt; color: var(--ink-faint); margin-top: 0.66mm; }
+.toc-page { flex: 0 0 auto; font-size: 7.57pt; font-weight:700; color: var(--accent); background: var(--accent-tint); padding: 1.32mm 2.47mm; border-radius: 4.94px; }
+
+/* ---------- Genel Bakış ---------- */
+.ov-hero {
+  background: linear-gradient(125deg, var(--accent-dark), var(--accent) 88%);
+  color: #fff; border-radius: 9.88px;
+  padding: 5.35mm 6.17mm; margin-top:1.65mm;
+  font-size: 7.98pt; line-height:1.6;
+  box-shadow: var(--shadow-md);
+  position:relative; overflow:hidden;
+}
+.ov-hero::after {
+  content:""; position:absolute; right:-8.23mm; top:-14.81mm; width:37.85mm; height:37.85mm; border-radius:50%;
+  border: 0.82px solid rgba(255,255,255,0.15);
+}
+.ov-hero b { color: var(--gold); }
+.ov-grid { display:grid; grid-template-columns: repeat(3, 1fr); gap: 3.46mm; margin-top: 4.94mm; }
+.ov-card {
+  border: 0.82px solid var(--line); border-radius: 7.41px; padding: 3.79mm 4.11mm;
+  background: var(--paper); box-shadow: var(--shadow-sm);
+  border-top: 2.14px solid var(--accent);
+}
+.ov-card-title { font-size: 7.82pt; font-weight:700; color: var(--accent-dark); margin-bottom:1.48mm; font-family:"DejaVu Serif",serif; }
+.ov-card-text { font-size: 6.99pt; color: var(--ink-soft); line-height:1.5; }
+
+.ov-flow { display:flex; align-items:stretch; gap: 0; margin-top: 4.94mm; }
+.ov-flow-step {
+  flex:1; background: linear-gradient(160deg, var(--accent-tint), var(--paper)); border: 0.82px solid var(--line);
+  border-radius: 7.41px; padding: 3.46mm 2.96mm; text-align:center; box-shadow: var(--shadow-sm);
+  /* Dar sayfada (5 adımda sütun ~22mm) uzun tek kelimeler kutuyu taşırıyordu:
+     flex öğesi min-content'in altına inemez, bu yüzden min-width:0 + kelime
+     kırma şart. Yoksa "Varoluşçuluğa" gibi kelimeler kart kenarından taşar. */
+  min-width: 0;
+  overflow-wrap: break-word;
+}
+.ov-flow-step b { display:block; font-size: 7.32pt; color: var(--accent-dark); margin-bottom: 0.82mm; font-family:"DejaVu Serif",serif; }
+.ov-flow-step span { font-size: 6.75pt; color: var(--ink-soft); }
+.ov-flow-arrow { flex: 0 0 5.76mm; display:flex; align-items:center; justify-content:center; color: var(--accent); }
+
+/* ================= BÖLÜM BANNER ================= */
+.chbanner {
+  background: linear-gradient(128deg, var(--accent-dark), var(--accent) 85%);
+  color:#fff; border-radius: 9.88px;
+  padding: 5.76mm 6.99mm; position:relative; overflow:hidden;
+  box-shadow: var(--shadow-lg);
+}
+.chbanner::before {
+  content:"";
+  position:absolute; inset:0;
+  background-image: radial-gradient(circle, rgba(255,255,255,0.12) 0.6px, transparent 0.6px);
+  background-size: 3.6mm 3.6mm; mix-blend-mode: overlay;
+}
+.chbanner::after {
+  content:""; position:absolute; right:-13.17mm; top:-13.17mm; width:46.08mm; height:46.08mm;
+  border-radius:50%; border: 0.82px solid rgba(255,255,255,0.22);
+}
+.chbanner-deco { position:absolute; right:8.23mm; bottom:-6.58mm; font-family:"DejaVu Serif",serif; font-size:49.38pt; font-weight:700; color: rgba(255,255,255,0.08); }
+.chbanner-kicker { font-size: 6.42pt; letter-spacing:1.65px; font-weight:700; text-transform:uppercase; color: var(--gold); position:relative; }
+.chbanner-title { font-family:"DejaVu Serif",serif; font-size: 16.46pt; font-weight:700; margin-top: 1.48mm; line-height:1.15; position:relative; }
+.chbanner-subtitle { font-size: 7.49pt; color: rgba(255,255,255,0.88); margin-top: 1.81mm; max-width: 150mm; line-height:1.5; position:relative; }
+
+/* ---------- 4'lü anahtar terim grid'i ---------- */
+.terms-grid { display:grid; grid-template-columns: 1fr 1fr; gap: 2.8mm; margin-top: 4.53mm; }
+.term-box {
+  border: 0.82px solid var(--line); border-left: 2.88px solid var(--accent);
+  border-radius: 5.76px; padding: 2.8mm 3.46mm; background: var(--paper);
+  box-shadow: var(--shadow-sm);
+}
+.term-box .term-name { font-size: 7.65pt; font-weight:700; color: var(--accent-dark); margin-bottom: 0.91mm; font-family:"DejaVu Serif",serif; }
+.term-box .term-def { font-size: 6.83pt; color: var(--ink-soft); line-height:1.45; }
+
+/* ---------- Kişi kartı ---------- */
+.person-card {
+  display:flex; gap: 3.46mm; align-items:flex-start;
+  margin-top: 4.53mm; padding: 3.46mm 4.11mm;
+  background: linear-gradient(155deg, var(--accent-tint), var(--paper));
+  border: 0.82px solid var(--line); border-radius: 7.41px;
+  box-shadow: var(--shadow-sm);
+}
+.person-avatar {
+  flex: 0 0 auto; width: 11.11mm; height:11.11mm; border-radius:50%;
+  background: linear-gradient(150deg, var(--accent), var(--accent-dark));
+  color:#fff; font-weight:700; font-size: 8.64pt; font-family:"DejaVu Serif",serif;
+  display:flex; align-items:center; justify-content:center;
+  box-shadow: var(--shadow-sm);
+}
+.person-name { font-size: 8.72pt; font-weight:700; color: var(--ink); font-family:"DejaVu Serif",serif; }
+.person-tag { font-size: 6.34pt; letter-spacing:.4.94px; text-transform:uppercase; font-weight:700; color: var(--accent-dark); margin: 0.58mm 0 1.4mm; }
+.person-bio { font-size: 6.83pt; color: var(--ink-soft); line-height:1.5; }
+.person-row { display:flex; gap: 4.94mm; margin-top:4.53mm; }
+.person-row .person-card { flex:1; margin-top:0; }
+
+/* ---------- Numaralı içerik blokları ---------- */
+.block { margin-top: 4.77mm; }
+.block-head { display:flex; align-items:baseline; gap: 2.3mm; margin-bottom: 2.14mm; }
+.block-num {
+  flex:0 0 auto; width: 5.27mm; height:5.27mm; border-radius:50%;
+  background: var(--accent-dark); color:#fff; font-size: 6.5pt; font-weight:700;
+  display:flex; align-items:center; justify-content:center; box-shadow: var(--shadow-sm);
+}
+.block-title { font-size: 8.89pt; font-weight:700; color: var(--ink); font-family:"DejaVu Serif",serif; }
+.block-subtitle { font-size: 6.75pt; color: var(--ink-faint); margin-top: -0.99mm; margin-bottom:1.65mm; margin-left: 7.57mm; font-style:italic; }
+.block ul { margin-left: 7.57mm; }
+.block li { font-size: 7.32pt; color: var(--ink-soft); margin-bottom: 1.4mm; line-height:1.5; list-style: none; position:relative; }
+.block li::before { content:"–"; position:absolute; left:-3.46mm; color: var(--accent); font-weight:700; }
+.block li b, .block li strong { color: var(--ink); font-weight:700; }
+
+/* ---------- Callout kutuları (gerçek SVG ikonlarla) ---------- */
+.callout { border-radius: 7.41px; padding: 3.13mm 3.95mm; margin-top: 4.28mm; display:flex; gap: 2.8mm; box-shadow: var(--shadow-sm); }
+.callout-icon { flex:0 0 auto; width: 5.76mm; height:5.76mm; border-radius:50%; display:flex; align-items:center; justify-content:center; }
+.callout-icon svg { width: 3.13mm; height:3.13mm; }
+.callout-title { font-size: 6.99pt; font-weight:700; text-transform:uppercase; letter-spacing:.4.11px; margin-bottom: 0.91mm; }
+.callout-text { font-size: 7.16pt; line-height:1.5; }
+
+.callout.focus { background: var(--focus-bg); border: 0.82px solid #eecf8a; }
+.callout.focus .callout-icon { background:#f0dba0; color: var(--focus-ink); }
+.callout.focus .callout-title, .callout.focus .callout-text { color: var(--focus-ink); }
+
+.callout.caution { background: var(--caution-bg); border: 0.82px solid #b9cdf2; }
+.callout.caution .callout-icon { background:#c3d3f5; color: var(--caution-ink); }
+.callout.caution .callout-title, .callout.caution .callout-text { color: var(--caution-ink); }
+
+.callout.insight { background: var(--insight-bg); border: 0.82px solid #1c2c4d; }
+.callout.insight .callout-icon { background: rgba(255,255,255,0.16); color: var(--insight-accent); }
+.callout.insight .callout-title { color: var(--insight-accent); }
+.callout.insight .callout-text { color: rgba(255,255,255,0.94); }
+
+.callout.route { background: var(--route-bg); border: 0.82px solid #c9bcf2; }
+.callout.route .callout-icon { background:#d6cdf5; color: var(--route-ink); }
+.callout.route .callout-title, .callout.route .callout-text { color: var(--route-ink); }
+
+/* ---------- Akış / süreç diyagramı ---------- */
+.flowdiag { display:flex; align-items:stretch; gap:0; margin-top: 4.77mm; }
+.flowdiag .fstep {
+  flex:1; background: var(--paper); border: 0.82px solid var(--line); border-top: 2.47px solid var(--accent);
+  border-radius: 6.58px; padding: 2.96mm 2.47mm; text-align:center; box-shadow: var(--shadow-sm);
+  min-width: 0; overflow-wrap: break-word;    /* bkz. .ov-flow-step notu */
+}
+.flowdiag .fstep-title { font-size: 6.99pt; font-weight:700; color: var(--ink); margin-bottom: 0.82mm; font-family:"DejaVu Serif",serif; }
+.flowdiag .fstep-text { font-size: 6.25pt; color: var(--ink-faint); line-height:1.35; }
+.flowdiag .farrow { flex: 0 0 5.35mm; display:flex; align-items:center; justify-content:center; color: var(--accent); }
+.flowdiag .farrow svg { width:3.29mm; height:3.29mm; }
+.flow-caption { font-size: 6.34pt; color: var(--ink-faint); margin-top: 1.48mm; font-style: italic; }
+
+/* ---------- Karşılaştırma tablosu ---------- */
+.ctable-wrap { margin-top: 4.77mm; }
+.ctable-caption { font-size: 7.16pt; font-weight:700; color: var(--accent-dark); margin-bottom: 1.81mm; font-family:"DejaVu Serif",serif; }
+table.ctable { width:100%; border-collapse: collapse; border-radius: 5.76px; overflow:hidden; box-shadow: var(--shadow-sm); }
+table.ctable th {
+  background: linear-gradient(120deg, var(--accent-dark), var(--accent));
+  color:#fff; font-size: 6.67pt; text-align:left;
+  padding: 2.3mm 2.96mm; font-weight:700; letter-spacing:.1.65px;
+}
+table.ctable td {
+  font-size: 6.75pt; color: var(--ink-soft); padding: 2.3mm 2.96mm;
+  border-bottom: 0.82px solid var(--line-soft); vertical-align: top; line-height:1.4;
+}
+table.ctable tr:nth-child(even) td { background: var(--accent-tint); }
+table.ctable td:first-child { font-weight:700; color: var(--ink); }
+
+/* ---------- Bilgi kartları (küçük istatistik grid) ---------- */
+.info-grid { display:grid; grid-template-columns: repeat(3, 1fr); gap: 2.8mm; margin-top: 4.77mm; }
+.info-card { border: 0.82px solid var(--line); border-radius:6.58px; padding: 2.8mm 3.13mm; position:relative; background: var(--paper); box-shadow: var(--shadow-sm); }
+.info-card .badge {
+  position:absolute; top:2.14mm; right:2.3mm; width: 4.44mm; height:4.44mm; border-radius:50%;
+  background: var(--accent-soft); color: var(--accent-dark);
+  font-size: 6.58pt; font-weight:700; font-family:"DejaVu Serif",serif;
+  display:flex; align-items:center; justify-content:center;
+}
+.info-card .ic-title { font-size: 6.99pt; font-weight:700; color: var(--ink); margin-bottom: 0.91mm; padding-right: 4.94mm; font-family:"DejaVu Serif",serif; }
+.info-card .ic-text { font-size: 6.5pt; color: var(--ink-soft); line-height:1.4; }
+
+/* ---------- Bölüm özeti ---------- */
+.chsummary {
+  margin-top: 5.1mm; background: linear-gradient(120deg, var(--accent-dark), var(--accent) 130%); color:#fff; border-radius: 7.41px;
+  padding: 3.62mm 4.28mm; font-size: 7.24pt; line-height:1.55; box-shadow: var(--shadow-md);
+}
+.chsummary b { color: var(--gold); text-transform:uppercase; font-size:6.34pt; letter-spacing:.4.94px; display:block; margin-bottom:1.23mm; }
+
+/* ---------- Ayet-i Kerime kartları (Arapça orijinal + meal + etimoloji) ---------- */
+.ayat-section-title { font-size: 7.08pt; font-weight:700; color: var(--accent-dark); margin-bottom: 1.81mm; margin-top: 4.77mm; font-family:"DejaVu Serif",serif; }
+.ayah-card {
+  border: 0.82px solid var(--line); border-left: 2.88px solid var(--gold);
+  border-radius: 6.58px; padding: 3.29mm 3.79mm; margin-top: 2.63mm;
+  background: linear-gradient(160deg, var(--accent-tint), var(--paper));
+  box-shadow: var(--shadow-sm);
+}
+.ayah-ref {
+  font-size: 6.25pt; font-weight:700; letter-spacing:.3.29px; text-transform:uppercase;
+  color: var(--gold-ink); margin-bottom: 1.65mm;
+}
+.ayah-arabic {
+  direction: rtl; text-align: right; unicode-bidi: isolate;
+  font-family: "DejaVu Sans", sans-serif;
+  font-size: 12.34pt; line-height: 2; color: var(--ink);
+  margin-bottom: 2.14mm; word-spacing: 1.23px;
+}
+.ayah-meal { font-size: 6.99pt; color: var(--ink-soft); line-height:1.5; font-style:italic; }
+.ayah-meal::before { content: "" ; }
+.ayah-etym { font-size: 6.58pt; color: var(--ink-faint); line-height:1.4; margin-top: 1.48mm; padding-top: 1.48mm; border-top: 0.82px solid var(--line-soft); }
+
+/* ================= SÖZLÜK ================= */
+.gloss-grid { display:grid; grid-template-columns: 1fr 1fr; gap: 2.63mm 4.53mm; margin-top: 4.94mm; }
+.gloss-item { border-bottom: 0.82px solid var(--line-soft); padding-bottom: 2.3mm; }
+.gloss-term { font-size: 7.49pt; font-weight:700; color: var(--accent-dark); font-family:"DejaVu Serif",serif; }
+.gloss-def { font-size: 6.75pt; color: var(--ink-soft); line-height:1.42; margin-top: 0.74mm; }
+.gloss-ref { font-size: 6.01pt; color: var(--ink-faint); margin-top: 0.74mm; font-style:italic; }
+
+/* ================= SINAV HAZIRLIK ================= */
+.dist-grid { display:grid; grid-template-columns: 1fr 1fr; gap: 2.96mm; margin-top: 4.28mm; }
+.dist-card { border: 0.82px solid var(--line); border-radius: 7.41px; padding: 3.13mm 3.62mm; background: var(--paper); box-shadow: var(--shadow-sm); }
+.dist-title { font-size: 7.32pt; font-weight:700; color: var(--accent-dark); margin-bottom:1.23mm; font-family:"DejaVu Serif",serif; }
+.dist-vs { color: var(--gold-ink); font-weight:700; }
+.dist-text { font-size: 6.75pt; color: var(--ink-soft); line-height:1.48; }
+
+.match-table-wrap { margin-top: 4.94mm; }
+table.matchtable { width:100%; border-collapse:collapse; box-shadow: var(--shadow-sm); }
+table.matchtable th { background: linear-gradient(120deg, var(--accent-dark), var(--accent)); color:#fff; font-size:6.5pt; padding:2.14mm 2.63mm; text-align:left; }
+table.matchtable td { font-size: 6.67pt; padding: 1.98mm 2.63mm; border-bottom:0.82px solid var(--line-soft); color: var(--ink-soft); }
+table.matchtable td:first-child { font-weight:700; color:var(--ink); }
+table.matchtable tr:nth-child(even) td { background: var(--accent-tint); }
+
+.qa-grid { display:grid; grid-template-columns: 1fr 1fr; gap: 2.63mm 4.94mm; margin-top: 4.94mm; }
+.qa-item { font-size: 6.83pt; border-left: 2.06px solid var(--accent-soft); padding-left: 2.47mm; }
+.qa-q { font-weight:700; color: var(--ink); margin-bottom: 0.74mm; }
+.qa-a { color: var(--accent-dark); }
+
+.checklist { margin-top: 4.94mm; display:grid; grid-template-columns: 1fr 1fr; gap: 1.98mm 4.94mm; }
+.check-item { display:flex; align-items:flex-start; gap: 1.98mm; font-size: 6.83pt; color: var(--ink-soft); }
+.check-box { flex:0 0 auto; width:3.13mm; height:3.13mm; border: 1.23px solid var(--accent); border-radius: 2.47px; margin-top: 0.49mm; }
+
+.section-kicker { font-size: 6.5pt; letter-spacing:1.48px; font-weight:700; color: var(--accent); text-transform:uppercase; }
+.section-title { font-family:"DejaVu Serif",serif; font-size: 17.28pt; font-weight:700; margin-top: 1.65mm; color: var(--ink); }
+.section-lede { font-size: 7.41pt; color: var(--ink-soft); margin-top: 2.14mm; }
+
+/* ================= TEST (20 Soruluk Değerlendirme) ================= */
+.test-chip-row { display:flex; gap: 2.8mm; margin-top: 4.53mm; }
+.test-chip {
+  flex:1; text-align:center; background: var(--accent-tint); border: 0.82px solid var(--line);
+  border-radius: 6.58px; padding: 2.47mm 1.65mm;
+}
+.test-chip b { display:block; font-family:"DejaVu Serif",serif; font-size: 10.29pt; color: var(--accent-dark); }
+.test-chip span { font-size: 5.76pt; font-weight:700; letter-spacing:.3.29px; text-transform:uppercase; color: var(--ink-faint); }
+.test-instructions {
+  margin-top: 3.29mm; background: var(--caution-bg); border: 0.82px solid #b9cdf2; color: var(--caution-ink);
+  border-radius: 6.58px; padding: 2.47mm 3.29mm; font-size: 6.91pt; line-height:1.5;
+}
+.tq-list { margin-top: 4.94mm; column-count: 2; column-gap: 6.58mm; column-fill: balance; }
+.tq { break-inside: avoid; -webkit-column-break-inside: avoid; margin-bottom: 4.53mm; }
+.tq-head { display:flex; align-items:flex-start; gap: 2.3mm; margin-bottom: 1.81mm; }
+.tq-num {
+  flex:0 0 auto; width: 5.27mm; height:5.27mm; border-radius:4.94px;
+  background: var(--accent-dark); color:#fff; font-size: 6.91pt; font-weight:700;
+  display:flex; align-items:center; justify-content:center; box-shadow: var(--shadow-sm); font-family:"DejaVu Serif",serif;
+}
+.tq-stem { font-size: 7.49pt; font-weight:700; color: var(--ink); line-height:1.4; padding-top:0.33mm; }
+.tq-options { margin-left: 7.57mm; display:flex; flex-direction:column; gap: 1.32mm; }
+.tq-options li { list-style:none; display:flex; gap: 1.98mm; align-items:flex-start; font-size: 7.08pt; color: var(--ink-soft); line-height:1.4; }
+.opt-letter {
+  flex:0 0 auto; width:3.79mm; height:3.79mm; border-radius:50%; border: 1.07px solid var(--accent);
+  color: var(--accent-dark); font-size: 5.6pt; font-weight:700;
+  display:flex; align-items:center; justify-content:center; margin-top: 0.16mm;
+}
+
+/* ================= CEVAP ANAHTARI VE ÇÖZÜMLER ================= */
+.ans-list { margin-top: 4.94mm; column-count: 2; column-gap: 6.58mm; column-fill: balance; }
+.ans-item { display:flex; gap: 2.47mm; break-inside: avoid; -webkit-column-break-inside: avoid; margin-bottom: 2.3mm; }
+.ans-num {
+  flex:0 0 auto; width: 5.27mm; height:5.27mm; border-radius:4.94px;
+  background: var(--accent-soft); color: var(--accent-dark); font-size: 6.91pt; font-weight:700;
+  display:flex; align-items:center; justify-content:center; font-family:"DejaVu Serif",serif; border: 0.82px solid var(--line);
+}
+.ans-correct {
+  display:inline-block; background:#e7f5ec; color:#1e7e42; font-weight:700; font-size:6.25pt;
+  letter-spacing:.2.47px; padding: 0.82mm 2.14mm; border-radius:999px; margin-bottom: 0.99mm;
+}
+.ans-explain { font-size: 6.99pt; color: var(--ink-soft); line-height:1.45; }
+.ans-explain b { color: var(--ink); }
+
+/* çok-sayfa: bölüm içi devam sayfası başlığı */
+.chcontinue { display:flex; align-items:flex-start; gap: 2.63mm; margin-bottom: 4.53mm; }
+.chcontinue .tag {
+  flex: 0 0 auto; margin-top: 0.49mm;
+  font-size: 6.17pt; font-weight:700; letter-spacing:.4.94px; text-transform:uppercase;
+  background: var(--accent-dark); color: #fff; padding: 1.48mm 2.8mm; border-radius: 999px;
+}
+.chcontinue .cctitle { font-family:"DejaVu Serif",serif; font-size: 11.52pt; font-weight:700; color: var(--ink); line-height:1.25; }
+
+/* ============================================================
+   KİTAP ÖN KISMI (build_kitap.py — ana kapak, künye, önsöz,
+   sayfa rehberi, ana içindekiler, ders haritası)
+   Sadece birleşik kitapta kullanılır; tek ders çıktısını etkilemez.
+   ============================================================ */
+
+/* --- Künye --- */
+.imprint-grid { margin-top: 5.76mm; border-top: 0.82px solid var(--line); }
+.imprint-row { display:flex; gap: 4.94mm; padding: 2.8mm 0.82mm; border-bottom: 0.82px solid var(--line-soft); }
+.imprint-label {
+  flex: 0 0 34.56mm; font-size: 6.58pt; font-weight:700; letter-spacing:0.91px;
+  text-transform:uppercase; color: var(--ink-faint);
+}
+.imprint-value { flex:1; font-size: 7.74pt; color: var(--ink); line-height:1.5; }
+.imprint-value b { color: var(--accent-dark); }
+.imprint-note {
+  margin-top: 5.76mm; font-size: 7.24pt; color: var(--ink-soft); line-height:1.6;
+  border-left: 2.14px solid var(--accent); padding: 0.82mm 0 0.82mm 4.11mm;
+}
+
+/* --- Önsöz --- */
+.pref-grid { display:grid; grid-template-columns: repeat(2, 1fr); gap: 4.11mm; margin-top: 5.76mm; }
+.pref-card {
+  border: 0.82px solid var(--line); border-top: 2.14px solid var(--accent);
+  border-radius: 7.41px; padding: 4.11mm 4.44mm; background: var(--paper); box-shadow: var(--shadow-sm);
+}
+.pref-card-title {
+  font-family:"DejaVu Serif",serif; font-size: 8.56pt; font-weight:700;
+  color: var(--accent-dark); margin-bottom: 1.98mm;
+}
+.pref-card-text { font-size: 7.24pt; color: var(--ink-soft); line-height:1.58; }
+.pref-card-text b { color: var(--ink); }
+
+/* --- Sayfa rehberi (legend) --- */
+.guide-grid { display:grid; grid-template-columns: repeat(2, 1fr); gap: 4.11mm 4.94mm; margin-top: 4.94mm; }
+.guide-item { display:flex; flex-direction:column; gap: 1.81mm; }
+.guide-cap {
+  font-size: 6.58pt; font-weight:700; letter-spacing:.7.41px; text-transform:uppercase;
+  color: var(--accent-dark);
+}
+.guide-cap span { display:block; text-transform:none; letter-spacing:0; font-weight:400; font-size:6.75pt; color: var(--ink-soft); margin-top:0.66mm; line-height:1.45; }
+.guide-demo { border: 0.82px dashed var(--line); border-radius: 6.58px; padding: 2.47mm; background: var(--paper-tint); }
+.guide-demo .callout { margin: 0; }
+.guide-demo .term-box { margin: 0; }
+.guide-demo .chsummary { margin: 0; }
+
+/* --- Ana içindekiler (ders listesi) --- */
+.btoc-list { margin-top: 4.94mm; display:flex; flex-direction:column; }
+.btoc-row {
+  display:flex; align-items:center; gap: 3.7mm;
+  padding: 3.29mm 2.47mm; border-bottom: 0.82px solid var(--line-soft);
+  text-decoration:none; color: inherit; border-radius: 4.94px;
+}
+.btoc-row:first-child { border-top: 0.82px solid var(--line-soft); }
+.btoc-chip {
+  flex: 0 0 auto; width: 8.64mm; height: 8.64mm; border-radius: 6.58px;
+  display:flex; align-items:center; justify-content:center;
+  font-family:"DejaVu Serif",serif; font-weight:700; font-size: 9.05pt; color:#fff;
+  box-shadow: var(--shadow-sm);
+}
+.btoc-body { flex: 1 1 auto; min-width: 0; }
+.btoc-name { font-size: 9.05pt; font-weight:700; color: var(--ink); }
+.btoc-sub { font-size: 6.83pt; color: var(--ink-faint); margin-top: 0.66mm; }
+.btoc-meta { flex: 0 0 auto; font-size: 6.42pt; color: var(--ink-faint); text-align:right; line-height:1.5; }
+.btoc-range {
+  flex: 0 0 auto; font-size: 7.57pt; font-weight:700; color: #fff;
+  padding: 1.48mm 2.63mm; border-radius: 4.94px; min-width: 20mm; text-align:center;
+}
+
+/* --- Ders haritası (sırt görünümü) --- */
+.map-note { font-size: 7.24pt; color: var(--ink-soft); line-height:1.6; margin-top: 2.47mm; }
+.map-list { margin-top: 5.76mm; display:flex; flex-direction:column; gap: 2.63mm; }
+.map-row { display:flex; align-items:center; gap: 3.29mm; }
+.map-name { flex: 0 0 42.79mm; font-size: 7.24pt; font-weight:700; color: var(--ink); }
+.map-track { flex: 1 1 auto; height: 5.43mm; background: var(--paper-tint); border: 0.82px solid var(--line); border-radius: 999px; overflow:hidden; }
+.map-fill { height: 100%; border-radius: 999px; display:flex; align-items:center; justify-content:flex-end; padding-right: 1.98mm; }
+.map-fill span { font-size: 6.09pt; font-weight:700; color: #fff; }
+.map-range { flex: 0 0 19.75mm; text-align:right; font-size: 6.75pt; font-weight:700; color: var(--ink-faint); }
+
+/* ===== build.py tarafından üretildi — elle düzenlemeyin ===================
+   Trim 175mm x 250mm · bleed 3mm ·
+   kenarlar: üst 11mm / alt 19mm /
+   iç 14mm / dış 9mm ·
+   tek sayfa sırtı: left
+   ========================================================================= */
+@page { size: 181mm 256mm; margin: 0; }
+:root {
+  --trim-w: 175mm;
+  --trim-h: 250mm;
+  --bleed: 3mm;
+  --page-w: 181mm;
+  --page-h: 256mm;
+  --mg-top: 11mm;
+  --mg-bottom: 19mm;
+  --mg-inner: 14mm;
+  --mg-outer: 9mm;
+  --pad-top: 14mm;
+  --pad-bottom: 22mm;
+  --pad-inner: 17mm;
+  --pad-outer: 12mm;
+}
+/* Ayna simetri — tek sayfada sırt left, çift sayfada right */
+body > section.page:nth-of-type(odd) {
+  --pad-left: var(--pad-inner);
+  --pad-right: var(--pad-outer);
+}
+body > section.page:nth-of-type(even) {
+  --pad-left: var(--pad-outer);
+  --pad-right: var(--pad-inner);
+}
+</style>
+
+</head>
+<body class="theme-indigo">
+
+
+
+<section class="page cover" id="cover">
+  <div class="cover-corner tl"></div>
+  <div class="cover-corner tr"></div>
+  <div class="cover-corner bl"></div>
+  <div class="cover-corner br"></div>
+  <div class="cover-top">
+    <div class="cover-kicker">Görsel Ders Notu Kitabı · Final Özeti</div>
+    <div class="cover-emblem">
+      <div class="ring-outer"></div>
+      <div class="ring-mid"></div>
+      
+      <div class="tick major" style="transform: translateX(-50%) rotate(0deg);"></div>
+      
+      <div class="tick" style="transform: translateX(-50%) rotate(30deg);"></div>
+      
+      <div class="tick" style="transform: translateX(-50%) rotate(60deg);"></div>
+      
+      <div class="tick major" style="transform: translateX(-50%) rotate(90deg);"></div>
+      
+      <div class="tick" style="transform: translateX(-50%) rotate(120deg);"></div>
+      
+      <div class="tick" style="transform: translateX(-50%) rotate(150deg);"></div>
+      
+      <div class="tick major" style="transform: translateX(-50%) rotate(180deg);"></div>
+      
+      <div class="tick" style="transform: translateX(-50%) rotate(210deg);"></div>
+      
+      <div class="tick" style="transform: translateX(-50%) rotate(240deg);"></div>
+      
+      <div class="tick major" style="transform: translateX(-50%) rotate(270deg);"></div>
+      
+      <div class="tick" style="transform: translateX(-50%) rotate(300deg);"></div>
+      
+      <div class="tick" style="transform: translateX(-50%) rotate(330deg);"></div>
+      
+      <div class="ring-inner"><span>Ψ</span></div>
+    </div>
+  </div>
+  <div class="cover-mid">
+    <div class="cover-motif">Ψ</div>
+    <div class="cover-code">PSİKOLOJİ</div>
+    <div class="cover-title">Psikoloji<span class="accent-word">ye</span> Giriş</div>
+    <div class="cover-subtitle">Gelişim Psikolojisi, Kişilik Kuramları ve Ruhsal Bozukluklara Temel Bakış</div>
+    <div class="cover-rule"></div>
+    <div class="cover-desc">Büyüme-gelişme ayrımından Freud ve Erikson'un gelişim kuramlarına; bebeklikten yaşlılığa yaşam boyu değişime, savunma mekanizmalarından kişilik kuramlarına uzanan final sınavı özeti.</div>
+  </div>
+  <div class="cover-bottom">
+    <div class="cover-stats">
+      <div class="cover-stat"><b>5</b>Bölüm</div>
+      <div class="cover-stat"><b>30</b>Anahtar Kavram</div>
+      <div class="cover-stat"><b>Final</b>Sınav Hazırlık</div>
+    </div>
+    <div class="cover-foot">
+      <div>Ders Notu Serisi</div>
+      <div>5 Bölüm · Final Sınavı Hazırlığı</div>
+    </div>
+  </div>
+</section>
+
+
+
+
+<section class="page body-page">
+  <div class="pageband"><div>Psikoloji<span class="accent-word">ye</span> Giriş</div><div class="pageband-course">PSİKOLOJİ</div></div>
+  
+  <div class="toc-kicker">Kitap Planı</div>
+  <div class="toc-title">İçindekiler</div>
+  <div class="toc-lede">Gelişim Psikolojisi, Kişilik Kuramları ve Ruhsal Bozukluklara Temel Bakış — bölüm bölüm takip edilecek çalışma haritası.</div>
+  
+  <div class="toc-list">
+    
+    <a class="toc-row" href="#ch-1">
+      <div class="toc-num">1</div>
+      <div class="toc-body">
+        <div class="toc-heading">Gelişim Psikolojisine Giriş</div>
+        <div class="toc-sub">Büyüme-gelişme ayrımından psikanalitik gelişim kuramlarına temel çerçeve</div>
+      </div>
+      <div class="toc-page">s.4</div>
+    </a>
+    
+    <a class="toc-row" href="#ch-2">
+      <div class="toc-num">2</div>
+      <div class="toc-body">
+        <div class="toc-heading">Bebeklik ve Çocukluk Dönemi</div>
+        <div class="toc-sub">Prenatal gelişimden okul çağı davranış kalıplarına somut gelişim çizgisi</div>
+      </div>
+      <div class="toc-page">s.6</div>
+    </a>
+    
+    <a class="toc-row" href="#ch-3">
+      <div class="toc-num">3</div>
+      <div class="toc-body">
+        <div class="toc-heading">Ergenlik, Ahlaki Gelişim ve Yaşam Boyu Değişim</div>
+        <div class="toc-sub">Fırtınalı geçişten ahlaki muhakemeye, yetişkinlikten ölüm kabulüne uzanan çizgi</div>
+      </div>
+      <div class="toc-page">s.8</div>
+    </a>
+    
+    <a class="toc-row" href="#ch-4">
+      <div class="toc-num">4</div>
+      <div class="toc-body">
+        <div class="toc-heading">Savunma Mekanizmaları</div>
+        <div class="toc-sub">Bireyin kaygıyı azaltmak için bilinçsizce başvurduğu on yol</div>
+      </div>
+      <div class="toc-page">s.10</div>
+    </a>
+    
+    <a class="toc-row" href="#ch-5">
+      <div class="toc-num">5</div>
+      <div class="toc-body">
+        <div class="toc-heading">Psikolojik Bozukluklar ve Kişilik Kuramları</div>
+        <div class="toc-sub">Nevroz-psikoz ayrımından kişiliği açıklayan kuramlara</div>
+      </div>
+      <div class="toc-page">s.12</div>
+    </a>
+    
+    <a class="toc-row" href="#glossary">
+      <div class="toc-num alt">A</div>
+      <div class="toc-body">
+        <div class="toc-heading">Anahtar Kavramlar Sözlüğü</div>
+        <div class="toc-sub">Tanımlı ve bağlamlandırılmış 30 kavram</div>
+      </div>
+      <div class="toc-page">s.14</div>
+    </a>
+    
+    <a class="toc-row" href="#exam">
+      <div class="toc-num alt">B</div>
+      <div class="toc-body">
+        <div class="toc-heading">Genel Değerlendirme Testi</div>
+        <div class="toc-sub">20 soruluk çoktan seçmeli test ve çözümlü cevap anahtarı</div>
+      </div>
+      <div class="toc-page">s.16</div>
+    </a>
+    
+  </div>
+  
+<div class="footer">
+  <div>Psikoloji<span class="accent-word">ye</span> Giriş</div>
+  <div class="fnum">2</div>
+</div>
+
+</section>
+
+
+
+
+<section class="page body-page">
+  <div class="pageband"><div>Psikoloji<span class="accent-word">ye</span> Giriş</div><div class="pageband-course">PSİKOLOJİ</div></div>
+  <div class="toc-kicker">Dersin Büyük Resmi</div>
+  <div class="toc-title">Genel Bakış</div>
+
+  <div class="ov-hero">Bu ders; insanın <b>döllenmeden ölüme</b> uzanan gelişim çizgisini, bu çizgiyi açıklayan başlıca kuramları ve kişiliği/ruh sağlığını konu alan temel kavramları bir bütün olarak ele alır.</div>
+
+  <div class="ov-grid">
+    
+    <div class="ov-card">
+      <div class="ov-card-title">Gelişimin Temelleri</div>
+      <div class="ov-card-text">Büyüme-gelişme ayrımı ve gelişimin 5 temel ilkesi.</div>
+    </div>
+    
+    <div class="ov-card">
+      <div class="ov-card-title">Psikanalitik Kuramlar</div>
+      <div class="ov-card-text">Freud'un psikoseksüel dönemleri, Erikson'un psikososyal evreleri.</div>
+    </div>
+    
+    <div class="ov-card">
+      <div class="ov-card-title">Yaşam Evreleri</div>
+      <div class="ov-card-text">Bebeklik, çocukluk, ergenlik, yetişkinlik, yaşlılık ve ölüm.</div>
+    </div>
+    
+    <div class="ov-card">
+      <div class="ov-card-title">Ahlaki Gelişim</div>
+      <div class="ov-card-text">Piaget'in heteronom/otonom ayrımı, Kohlberg'in üç düzeyi.</div>
+    </div>
+    
+    <div class="ov-card">
+      <div class="ov-card-title">Savunma Mekanizmaları</div>
+      <div class="ov-card-text">Egonun kaygıyla baş etmek için kullandığı 10 bilinçdışı yol.</div>
+    </div>
+    
+    <div class="ov-card">
+      <div class="ov-card-title">Kişilik ve Bozukluklar</div>
+      <div class="ov-card-text">Nevroz-psikoz ayrımı, tip kuramları, İd-Ego-Süperego.</div>
+    </div>
+    
+  </div>
+
+  
+  <div class="section-kicker" style="margin-top:3.5mm;">Çalışma Akışı</div>
+  <div class="ov-flow">
+    
+    
+    <div class="ov-flow-step"><b>Temel Kavramlar</b><span>Büyüme / gelişme</span></div>
+    
+    <div class="ov-flow-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="19" y2="12"/><polyline points="13 6 19 12 13 18"/></svg></div>
+    <div class="ov-flow-step"><b>Gelişim Kuramları</b><span>Freud / Erikson</span></div>
+    
+    <div class="ov-flow-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="19" y2="12"/><polyline points="13 6 19 12 13 18"/></svg></div>
+    <div class="ov-flow-step"><b>Yaşam Evreleri</b><span>Bebeklikten yaşlılığa</span></div>
+    
+    <div class="ov-flow-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="19" y2="12"/><polyline points="13 6 19 12 13 18"/></svg></div>
+    <div class="ov-flow-step"><b>Savunma & Kişilik</b><span>Mekanizmalar / tipler</span></div>
+    
+  </div>
+  
+
+  
+  <div class="callout caution" style="margin-top:3.5mm;">
+    <div class="callout-icon">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.5"/><line x1="12" y1="11" x2="12" y2="16.5"/><circle cx="12" cy="7.5" r="0.6" fill="currentColor" stroke="none"/></svg>
+
+</div>
+    <div><div class="callout-title">Sınavda Ana Ayrım</div><div class="callout-text">Sınavda en çok karıştırılan yer, <b>kuramcı-kavram eşleştirmesidir:</b> Freud'un dönemleri cinsellik temelli ve 18 yaşında biter; Erikson'un evreleri sosyal kriz temelli ve yaşam boyu sürer.</div></div>
+  </div>
+  
+
+  
+<div class="footer">
+  <div>Psikoloji<span class="accent-word">ye</span> Giriş</div>
+  <div class="fnum">3</div>
+</div>
+
+</section>
+
+
+
+
+  
+  
+  <section class="page body-page" data-ch="1" data-cp="0" id="ch-1">
+    <div class="pageband"><div>Psikoloji<span class="accent-word">ye</span> Giriş</div><div class="pageband-course">Bölüm 1</div></div>
+
+    
+      <div class="chbanner">
+        <div class="chbanner-kicker">1. Bölüm</div>
+        <div class="chbanner-title">Gelişim Psikolojisine Giriş</div>
+        <div class="chbanner-subtitle">Büyüme-gelişme ayrımından psikanalitik gelişim kuramlarına temel çerçeve</div>
+      </div>
+    
+
+    <!--item 0 terms-->
+  
+<div class="terms-grid">
+  
+  <div class="term-box">
+    <div class="term-name">Büyüme</div>
+    <div class="term-def">Sadece fiziksel/niceliksel değişimi ifade eder — boy uzaması, kilo artışı gibi bedence irileşme.</div>
+  </div>
+  
+  <div class="term-box">
+    <div class="term-name">Gelişme</div>
+    <div class="term-def">Büyümeyi de içine alan geniş kavram; fiziksel büyümeyle birlikte fonksiyonel beceri kazanımını kapsar.</div>
+  </div>
+  
+  <div class="term-box">
+    <div class="term-name">Haz Bölgesi (Erojen Bölge)</div>
+    <div class="term-def">Freud'a göre her psikoseksüel dönemde hazzın yoğunlaştığı beden bölgesi (ağız, anüs, cinsel organlar).</div>
+  </div>
+  
+  <div class="term-box">
+    <div class="term-name">Psikososyal Kriz</div>
+    <div class="term-def">Erikson'a göre her gelişim evresinde bireyin çözmesi gereken, kişiliği şekillendiren temel çatışma.</div>
+  </div>
+  
+</div>
+
+  
+<!--item 1 callout-->
+  
+<div class="callout route">
+  <div class="callout-icon">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.5"/><polygon points="15.5 8.5 13.2 13.2 8.5 15.5 10.8 10.8 15.5 8.5" fill="currentColor" stroke="none"/></svg>
+
+</div>
+  <div>
+    <div class="callout-title">Bölümün Rotası</div>
+    <div class="callout-text">Önce gelişimin biyolojik ve fonksiyonel yönlerini ayırıp <b>5 temel ilkesini</b> kuruyoruz; ardından psikanalitik geleneğin iki büyük kuramcısı <b>Freud</b> ve <b>Erikson</b>'ın evrelerini karşılaştırmalı işliyoruz.</div>
+  </div>
+</div>
+
+  
+<!--item 2 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">1</div>
+    <div class="block-title">Büyüme ve Gelişme Arasındaki Fark</div>
+  </div>
+  
+  <ul>
+    <li><b>Büyüme:</b> Çocuğun boyunun uzaması, kilonun artması gibi niceliksel/fiziksel değişimdir. Beyin hücresi sayısının artmayıp hacimce büyümesi de buna örnektir.</li><li><b>Gelişme:</b> Kemiklerin sadece uzaması değil, yapısının değişip sertleşmesi; çocuğun bedenen büyümesi değil duygularını kontrol edip uyumlu davranması gelişmedir.</li><li><b>Kapsamı:</b> Döllenmeden ölüme kadar süren, belli bir yöne doğru ilerleyen sürekli değişikliklerdir — sadece ileriye gidişi değil, yaşlılıktaki güçten düşmeyi de kapsar.</li>
+  </ul>
+</div>
+
+  
+<!--item 3 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">2</div>
+    <div class="block-title">Gelişimin 5 Temel İlkesi</div>
+  </div>
+  <div class="block-subtitle">Sınavda maddeler halinde sorulabilir.</div>
+  <ul>
+    <li>Gelişim dinamik bir olgudur.</li><li>Gelişim, genetik bireyselliğin sonucudur.</li><li>Gelişim, giderek artan bir özelleşme sürecidir.</li><li>Gelişimde denge vardır.</li><li>Gelişim, art arda görülen düzenli bir süreçtir.</li>
+  </ul>
+</div>
+
+  
+
+
+    
+<div class="footer">
+  <div>Psikoloji<span class="accent-word">ye</span> Giriş</div>
+  <div class="fnum">4</div>
+</div>
+
+  </section>
+  
+  
+  
+  <section class="page body-page" data-ch="1" data-cp="1">
+    <div class="pageband"><div>Psikoloji<span class="accent-word">ye</span> Giriş</div><div class="pageband-course">Bölüm 1</div></div>
+
+    
+
+    <!--item 0 person_row-->
+  
+<div class="person-row">
+  
+  <div class="person-card">
+    <div class="person-avatar">SF</div>
+    <div>
+      <div class="person-name">Sigmund Freud</div>
+      <div class="person-tag">1856–1939 · Psikanalizin Kurucusu</div>
+      <div class="person-bio">Kişiliği İd, Ego ve Süperego üçlüsüyle açıklar; gelişimi <b>haz</b> ve <b>cinsellik</b> odaklı beş psikoseksüel döneme ayırır.</div>
+    </div>
+  </div>
+  
+  <div class="person-card">
+    <div class="person-avatar">EE</div>
+    <div>
+      <div class="person-name">Erik Erikson</div>
+      <div class="person-tag">1902–1994 · Psikososyal Gelişim Kuramcısı</div>
+      <div class="person-bio">Freud'un öğrencisi; gelişimi ömür boyu süren, her evrede bir <b>kriz/çatışma</b> içeren sekiz <b>sosyal</b> evreye ayırır.</div>
+    </div>
+  </div>
+  
+</div>
+
+  
+<!--item 1 table-->
+  
+<div class="ctable-wrap">
+  <div class="ctable-caption">Paralel Okuma: Freud'un Psikoseksüel Dönemleri ile Erikson'un Psikososyal Evreleri</div>
+  <table class="ctable">
+    <thead><tr><th>Yaklaşık Yaş</th><th>Freud — Psikoseksüel Dönem</th><th>Erikson — Psikososyal Kriz</th></tr></thead>
+    <tbody>
+      
+      <tr><td>0–1,5 yaş</td><td><b>Oral Dönem:</b> Haz bölgesi ağızdır (emme, ısırma).</td><td><b>Temel Güven ↔ Güvensizlik:</b> Anne ilgiliyse güven oluşur.</td></tr>
+      
+      <tr><td>1,5–3 yaş</td><td><b>Anal Dönem:</b> Tuvalet kontrolünden zevk alınır; baskı cimrilik/inatçılık doğurur.</td><td><b>Özerklik ↔ Kuşku/Utanç:</b> Aşırı kısıtlama utanç yaratır.</td></tr>
+      
+      <tr><td>3–6 yaş</td><td><b>Fallik Dönem:</b> Haz bölgesi cinsel organlardır; cinsiyet farkındalığı başlar.</td><td><b>Girişimcilik ↔ Suçluluk</b> (4–5 yaş): Desteklenen amaç belirler.</td></tr>
+      
+      <tr><td>6–12 yaş</td><td><b>Gizil (Latent) Dönem:</b> Cinsel dürtüler 'uykuya yatar', enerji okul/oyuna yönelir.</td><td><b>Çalışkanlık ↔ Aşağılık Duygusu:</b> Okul başarısı belirleyicidir.</td></tr>
+      
+      <tr><td>12–18/20 yaş</td><td><b>Genital Dönem:</b> Karşı cinse ilgi başlar, cinsel kimlik olgunlaşır.</td><td><b>Kimlik Kazanma ↔ Rol Kargaşası:</b> 'Ben kimim?' sorusu merkezdedir.</td></tr>
+      
+    </tbody>
+  </table>
+</div>
+
+  
+<!--item 2 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">3</div>
+    <div class="block-title">Erikson'un Yetişkinlik Evreleri</div>
+  </div>
+  
+  <ul>
+    <li><b>Yakınlık ↔ Yalnızlık</b> (20–25 yaş): Kendi benliğini kaybetmeden biriyle 'biz' olabilmektir.</li><li><b>Üretkenlik ↔ Durağanlık</b> (25–65 yaş): Çocuk yetiştirmek veya iş üretmek esastır.</li><li><b>Benlik Bütünlüğü ↔ Umutsuzluk</b> (65+ yaş): Geçmişi kabullenen huzur bulur, 'keşke'leri olan korkar.</li>
+  </ul>
+</div>
+
+  
+<!--item 3 callout-->
+  
+<div class="callout caution">
+  <div class="callout-icon">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.5"/><line x1="12" y1="11" x2="12" y2="16.5"/><circle cx="12" cy="7.5" r="0.6" fill="currentColor" stroke="none"/></svg>
+
+</div>
+  <div>
+    <div class="callout-title">Dikkat / Ayırt Etme</div>
+    <div class="callout-text">Freud <b>haz</b> ve <b>cinsellik</b> odaklıyken, Erikson <b>sosyal ilişkiler</b> ve <b>krizler</b> odaklıdır. Freud'un dönemleri 18 yaşında biter; Erikson'un evreleri yaşam boyu (65 yaş sonrasına kadar) sürer.</div>
+  </div>
+</div>
+
+  
+<!--item 4 summary-->
+  
+<div class="chsummary"><b>Bölüm Özeti</b>Gelişim; büyümeyi de kapsayan, döllenmeden ölüme uzanan yönlü bir süreçtir. Freud bu süreci beş psikoseksüel döneme, Erikson ise sekiz psikososyal krize ayırarak açıklamıştır — ikisi de kişiliğin erken yaşlarda temellenip yaşam boyu şekillendiğini savunur.</div>
+
+  
+
+
+    
+<div class="footer">
+  <div>Psikoloji<span class="accent-word">ye</span> Giriş</div>
+  <div class="fnum">5</div>
+</div>
+
+  </section>
+  
+  
+
+  
+  
+  <section class="page body-page" data-ch="2" data-cp="0" id="ch-2">
+    <div class="pageband"><div>Psikoloji<span class="accent-word">ye</span> Giriş</div><div class="pageband-course">Bölüm 2</div></div>
+
+    
+      <div class="chbanner">
+        <div class="chbanner-kicker">2. Bölüm</div>
+        <div class="chbanner-title">Bebeklik ve Çocukluk Dönemi</div>
+        <div class="chbanner-subtitle">Prenatal gelişimden okul çağı davranış kalıplarına somut gelişim çizgisi</div>
+      </div>
+    
+
+    <!--item 0 terms-->
+  
+<div class="terms-grid">
+  
+  <div class="term-box">
+    <div class="term-name">Prenatal Gelişim</div>
+    <div class="term-def">Doğum öncesi, döllenmeden başlayıp zigot-blastula-gastrula evreleriyle ilerleyen hücresel gelişim süreci.</div>
+  </div>
+  
+  <div class="term-box">
+    <div class="term-name">Sefalokaudal İlke</div>
+    <div class="term-def">Gelişimin baştan kuyruk sokumuna doğru ilerlemesi ilkesi — önce baş/üst, sonra alt beden gelişir.</div>
+  </div>
+  
+  <div class="term-box">
+    <div class="term-name">Eko-Tepki</div>
+    <div class="term-def">Bebeğin ilk 6 ayında çıkardığı, henüz taklit içermeyen anlamsız hece dönemi.</div>
+  </div>
+  
+  <div class="term-box">
+    <div class="term-name">Olumsuzluk (Negativism)</div>
+    <div class="term-def">3 yaş civarı zirve yapan, otoriteye direnme ve inatçılıkla beliren çocukluk davranışı.</div>
+  </div>
+  
+</div>
+
+  
+<!--item 1 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">1</div>
+    <div class="block-title">Doğum Öncesi (Prenatal) Gelişim</div>
+  </div>
+  
+  <ul>
+    <li><b>Hücresel evreler:</b> Zigot (döllenmiş yumurta) sırasıyla mitoz bölünme, blastula ve gastrula evrelerinden geçer.</li><li><b>Gastrula evresindeki tabakalar:</b> Endoderm (sindirim/solunum sistemleri), Ektoderm (sinir sistemi/deri), Mezoderm (iskelet/kas/dolaşım).</li><li><b>Gelişim yönü:</b> Baştan kuyruk sokumuna doğru ilerler (sefalokaudal ilke).</li>
+  </ul>
+</div>
+
+  
+<!--item 2 flow-->
+  
+<div class="flowdiag">
+  
+  
+  <div class="fstep">
+    <div class="fstep-title">Zigot</div>
+    <div class="fstep-text">Döllenmiş yumurta</div>
+  </div>
+  
+  <div class="farrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="19" y2="12"/><polyline points="13 6 19 12 13 18"/></svg></div>
+  <div class="fstep">
+    <div class="fstep-title">Mitoz Bölünme</div>
+    <div class="fstep-text">Hücre çoğalması</div>
+  </div>
+  
+  <div class="farrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="19" y2="12"/><polyline points="13 6 19 12 13 18"/></svg></div>
+  <div class="fstep">
+    <div class="fstep-title">Blastula</div>
+    <div class="fstep-text">İçi boş hücre küresi</div>
+  </div>
+  
+  <div class="farrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="19" y2="12"/><polyline points="13 6 19 12 13 18"/></svg></div>
+  <div class="fstep">
+    <div class="fstep-title">Gastrula</div>
+    <div class="fstep-text">Üç tabaka oluşumu</div>
+  </div>
+  
+</div>
+<div class="flow-caption">Hücresel gelişim evreleri, döllenmeden itibaren sırayla.</div>
+
+  
+<!--item 3 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">2</div>
+    <div class="block-title">Doğum Sonrası Motor Gelişim</div>
+  </div>
+  
+  <ul>
+    <li><b>3. Ay:</b> Nesnelere ulaşma.</li><li><b>7. Ay:</b> Desteksiz oturma.</li><li><b>10. Ay:</b> Emekleme.</li><li><b>15. Ay:</b> Tek başına yürüme.</li>
+  </ul>
+</div>
+
+  
+<!--item 4 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">3</div>
+    <div class="block-title">Dil ve Duygusal Gelişim</div>
+  </div>
+  
+  <ul>
+    <li><b>Dil:</b> İlk 6 ay 'Eko-Tepki' (anlamsız heceler) dönemidir, taklit yoktur. Taklit 1 yaş sonunda başlar; 2 yaşında kelime dağarcığı 272 kelimeye çıkar.</li><li><b>Gülümseme:</b> Önce 'Refleks Gülümseme' (2. ay, uykuda), sonra 'Sosyal Gülümseme' görülür.</li><li><b>Öfke:</b> 1,5–3 yaş arasında zirve yapar. Nedenleri arasında oturağa zorla oturtulma, yüz yıkanması, oyuncağın alınması sayılabilir.</li>
+  </ul>
+</div>
+
+  
+
+
+    
+<div class="footer">
+  <div>Psikoloji<span class="accent-word">ye</span> Giriş</div>
+  <div class="fnum">6</div>
+</div>
+
+  </section>
+  
+  
+  
+  <section class="page body-page" data-ch="2" data-cp="1">
+    <div class="pageband"><div>Psikoloji<span class="accent-word">ye</span> Giriş</div><div class="pageband-course">Bölüm 2</div></div>
+
+    
+
+    <!--item 0 table-->
+  
+<div class="ctable-wrap">
+  <div class="ctable-caption">Çocuğun Sosyalleşirken Sergilediği Tipik Davranış Kalıpları</div>
+  <table class="ctable">
+    <thead><tr><th>Davranış</th><th>Tanımı / Zirve Noktası</th><th>Not</th></tr></thead>
+    <tbody>
+      
+      <tr><td>Olumsuzluk</td><td>3 yaş civarı zirve yapar; otoriteye direnme ve inatçılıktır.</td><td>4 yaşında ödül/ceza sisteminin anlaşılmasıyla azalır.</td></tr>
+      
+      <tr><td>Kıskançlık</td><td>İmrenmekten farklıdır — sevginin azalacağı korkusudur.</td><td>Genelde büyük kardeş küçüğü kıskanır; yatak ıslatma, 'bebekleşme' görülebilir.</td></tr>
+      
+      <tr><td>Kekeleme</td><td>4–5 yaşlarında görülür, tamamen psikolojik (korku, baskı) kökenlidir.</td><td>Çocuğa baskı yapılmamalıdır.</td></tr>
+      
+      <tr><td>Kızdırma / Kabadayılık</td><td>Aşağılık duygusu hisseden çocukların daha zayıflara saldırmasıdır.</td><td>Altta yatan duygu, dışa saldırganlık olarak görünür.</td></tr>
+      
+      <tr><td>Oyun</td><td>Çocuğun işidir; terapötik değeri saldırganlığı boşaltmak, eğitimsel değeri kural/kavram öğretmektir.</td><td>Hem duygusal hem bilişsel işlev görür.</td></tr>
+      
+    </tbody>
+  </table>
+</div>
+
+  
+<!--item 1 callout-->
+  
+<div class="callout focus">
+  <div class="callout-icon">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.5"/><line x1="12" y1="7.5" x2="12" y2="13"/><circle cx="12" cy="16.5" r="0.6" fill="currentColor" stroke="none"/></svg>
+
+</div>
+  <div>
+    <div class="callout-title">Kritik Odak: Okul Başarısını Etkileyenler</div>
+    <div class="callout-text">Okul başarısını üç grup etken belirler: <b>bireysel nedenler</b> (zeka), <b>öğretim sistemi</b> (ezberci sistem kötü etkiler) ve <b>aile/öğretmen tutumları</b>.</div>
+  </div>
+</div>
+
+  
+<!--item 2 summary-->
+  
+<div class="chsummary"><b>Bölüm Özeti</b>Bebeklik dönemi; hücresel evrelerden başlayarak sefalokaudal ilkeyle ilerleyen motor, dil ve duygusal gelişimi kapsar. Çocukluk döneminde ise olumsuzluk, kıskançlık, kekeleme gibi davranış kalıpları çocuğun sosyalleşme sürecinin doğal parçalarıdır ve genelde baskı değil, dengeli yaklaşım gerektirir.</div>
+
+  
+
+
+    
+<div class="footer">
+  <div>Psikoloji<span class="accent-word">ye</span> Giriş</div>
+  <div class="fnum">7</div>
+</div>
+
+  </section>
+  
+  
+
+  
+  
+  <section class="page body-page" data-ch="3" data-cp="0" id="ch-3">
+    <div class="pageband"><div>Psikoloji<span class="accent-word">ye</span> Giriş</div><div class="pageband-course">Bölüm 3</div></div>
+
+    
+      <div class="chbanner">
+        <div class="chbanner-kicker">3. Bölüm</div>
+        <div class="chbanner-title">Ergenlik, Ahlaki Gelişim ve Yaşam Boyu Değişim</div>
+        <div class="chbanner-subtitle">Fırtınalı geçişten ahlaki muhakemeye, yetişkinlikten ölüm kabulüne uzanan çizgi</div>
+      </div>
+    
+
+    <!--item 0 terms-->
+  
+<div class="terms-grid">
+  
+  <div class="term-box">
+    <div class="term-name">Heteronom Ahlak</div>
+    <div class="term-def">Piaget'e göre 10 yaş öncesi görülen, kuralları değişmez sayan ve sonuca bakan ahlak evresi.</div>
+  </div>
+  
+  <div class="term-box">
+    <div class="term-name">Otonom Ahlak</div>
+    <div class="term-def">Piaget'e göre 11 yaş sonrası görülen, kuralları esnek sayan ve niyeti önemseyen ahlak evresi.</div>
+  </div>
+  
+  <div class="term-box">
+    <div class="term-name">Gelenek Sonrası Ahlak</div>
+    <div class="term-def">Kohlberg'e göre yasaların insan hakkına aykırıysa değişebileceğini savunan en üst ahlak düzeyi.</div>
+  </div>
+  
+  <div class="term-box">
+    <div class="term-name">Levinson'ın Rüyası</div>
+    <div class="term-def">Genç yetişkinin geleceğini hayal edip buna uygun roller geliştirmesi süreci.</div>
+  </div>
+  
+</div>
+
+  
+<!--item 1 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">1</div>
+    <div class="block-title">Ergenlik Dönemi: Fiziksel ve Sosyal Görünüm</div>
+  </div>
+  
+  <ul>
+    <li><b>Fiziksel belirtiler:</b> Kızlarda regl, erkeklerde ses kalınlaşması/tüylenme görülür. Kızlar (11–20 yaş) erkeklerden (13–20 yaş) daha erken olgunlaşır.</li><li><b>Temel sorunlar:</b> Kimlik arayışı, bedeni beğenmeme, güvensizlik ve otoriteyle çatışma.</li><li><b>Sosyal olgunlaşma:</b> Ergenliğin başında çok sayıda geçici arkadaş ve ailenin hiçe sayılması görülürken; sonunda az sayıda derin dostluk ve ailenin fikrinin önemsenmesi görülür.</li>
+  </ul>
+</div>
+
+  
+<!--item 2 table-->
+  
+<div class="ctable-wrap">
+  <div class="ctable-caption">Ergenlik Kişilik Tipleri</div>
+  <table class="ctable">
+    <thead><tr><th>Tip</th><th>Tanım</th></tr></thead>
+    <tbody>
+      
+      <tr><td>Kuralcı</td><td>Toplum beklentilerine uyan, görev alan tip.</td></tr>
+      
+      <tr><td>İdealist</td><td>Adalet duygusu yüksek, dünyayı düzeltmeye çalışan tip.</td></tr>
+      
+      <tr><td>Hedonist</td><td>Gününü gün eden, zevk düşkünü tip.</td></tr>
+      
+      <tr><td>Psikopat Eğilimli</td><td>Toplumu umursamayan, zarar veren tip.</td></tr>
+      
+    </tbody>
+  </table>
+</div>
+
+  
+<!--item 3 table-->
+  
+<div class="ctable-wrap">
+  <div class="ctable-caption">Piaget'in Ahlaki Gelişim Evreleri</div>
+  <table class="ctable">
+    <thead><tr><th>Evre</th><th>Özellik</th><th>Örnek</th></tr></thead>
+    <tbody>
+      
+      <tr><td>Heteronom (Dışa Bağlı) — 10 yaş altı</td><td>Kurallar değişmezdir; sonuca bakılır.</td><td>10 bardak kıran, bilerek 1 bardak kırandan daha suçlu görülür.</td></tr>
+      
+      <tr><td>Otonom (Özerk) — 11 yaş üstü</td><td>Kurallar esnektir; niyet önemlidir.</td><td>Kazara kıran suçsuz görülebilir.</td></tr>
+      
+    </tbody>
+  </table>
+</div>
+
+  
+
+
+    
+<div class="footer">
+  <div>Psikoloji<span class="accent-word">ye</span> Giriş</div>
+  <div class="fnum">8</div>
+</div>
+
+  </section>
+  
+  
+  
+  <section class="page body-page" data-ch="3" data-cp="1">
+    <div class="pageband"><div>Psikoloji<span class="accent-word">ye</span> Giriş</div><div class="pageband-course">Bölüm 3</div></div>
+
+    
+
+    <!--item 0 table-->
+  
+<div class="ctable-wrap">
+  <div class="ctable-caption">Kohlberg'in Ahlaki Gelişim Düzeyleri</div>
+  <table class="ctable">
+    <thead><tr><th>Düzey</th><th>Aşama</th><th>Açıklama</th></tr></thead>
+    <tbody>
+      
+      <tr><td>Gelenek Öncesi (Çıkarcı)</td><td>Ceza-İtaat</td><td>Ceza almamak için kurala uyulur.</td></tr>
+      
+      <tr><td>Gelenek Öncesi (Çıkarcı)</td><td>Çıkarcılık</td><td>'Kaz gelecek yerden tavuk esirgenmez' mantığı.</td></tr>
+      
+      <tr><td>Geleneksel (Toplumsal)</td><td>İyi Çocuk</td><td>Gruba yaranmak, onay almak esastır.</td></tr>
+      
+      <tr><td>Geleneksel (Toplumsal)</td><td>Kanun ve Düzen</td><td>Toplum kurallarına körü körüne uyulur.</td></tr>
+      
+      <tr><td>Gelenek Sonrası (Evrensel)</td><td>Toplumsal Anlaşma</td><td>Yasalar insan hakkına aykırıysa değişebilir.</td></tr>
+      
+      <tr><td>Gelenek Sonrası (Evrensel)</td><td>Evrensel Ahlak</td><td>Adalet, eşitlik, yaşam hakkı her şeyin üstündedir.</td></tr>
+      
+    </tbody>
+  </table>
+</div>
+
+  
+<!--item 1 callout-->
+  
+<div class="callout caution">
+  <div class="callout-icon">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.5"/><line x1="12" y1="11" x2="12" y2="16.5"/><circle cx="12" cy="7.5" r="0.6" fill="currentColor" stroke="none"/></svg>
+
+</div>
+  <div>
+    <div class="callout-title">Dikkat / Ayırt Etme</div>
+    <div class="callout-text">Piaget <b>iki evreli</b> (heteronom/otonom) basit bir geçişi anlatır; Kohlberg bunu <b>üç düzey altı aşamaya</b> genişletip yetişkinliğe kadar uzatır.</div>
+  </div>
+</div>
+
+  
+<!--item 2 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">2</div>
+    <div class="block-title">Yetişkinlik, Yaşlılık ve Ölüm</div>
+  </div>
+  
+  <ul>
+    <li><b>Genç Yetişkinlik (Levinson'ın Rüyası):</b> Birey geleceğini hayal eder ve buna uygun roller geliştirir.</li><li><b>Orta Yaş Krizleri:</b> Kadınlarda menopoz (doğurganlığın bitmesi), erkeklerde andropoz (hormon azalması, cinsel ilgi kayması).</li><li><b>Yaşlılık Kuramı — İlgiyi Kesme (Henry):</b> Yaşlının toplumdan kopmasının doğal ve mutluluk getirici olduğunu savunur; eleştirilmiş bir kuramdır.</li>
+  </ul>
+</div>
+
+  
+<!--item 3 flow-->
+  
+<div class="flowdiag">
+  
+  
+  <div class="fstep">
+    <div class="fstep-title">İnkâr</div>
+    <div class="fstep-text">'Bu ben olamam'</div>
+  </div>
+  
+  <div class="farrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="19" y2="12"/><polyline points="13 6 19 12 13 18"/></svg></div>
+  <div class="fstep">
+    <div class="fstep-title">Öfke</div>
+    <div class="fstep-text">'Neden ben?'</div>
+  </div>
+  
+  <div class="farrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="19" y2="12"/><polyline points="13 6 19 12 13 18"/></svg></div>
+  <div class="fstep">
+    <div class="fstep-title">Pazarlık</div>
+    <div class="fstep-text">'Biraz daha zaman ver'</div>
+  </div>
+  
+  <div class="farrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="19" y2="12"/><polyline points="13 6 19 12 13 18"/></svg></div>
+  <div class="fstep">
+    <div class="fstep-title">Depresyon</div>
+    <div class="fstep-text">İçe kapanma</div>
+  </div>
+  
+  <div class="farrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="19" y2="12"/><polyline points="13 6 19 12 13 18"/></svg></div>
+  <div class="fstep">
+    <div class="fstep-title">Kabullenme</div>
+    <div class="fstep-text">Huzur</div>
+  </div>
+  
+</div>
+<div class="flow-caption">Kübler-Ross'un Ölümün 5 Evresi.</div>
+
+  
+<!--item 4 summary-->
+  
+<div class="chsummary"><b>Bölüm Özeti</b>Ergenlik; fiziksel olgunlaşmanın yanı sıra kimlik arayışı ve sosyal olgunlaşmayı da içeren geçiş dönemidir. Ahlaki gelişimde Piaget sonuç-niyet ayrımını, Kohlberg ise çıkardan evrensel ilkelere uzanan üç düzeyi vurgular. Yaşam çizgisi, Levinson'ın rüyasından Kübler-Ross'un beş ölüm evresine kadar uzanır.</div>
+
+  
+
+
+    
+<div class="footer">
+  <div>Psikoloji<span class="accent-word">ye</span> Giriş</div>
+  <div class="fnum">9</div>
+</div>
+
+  </section>
+  
+  
+
+  
+  
+  <section class="page body-page" data-ch="4" data-cp="0" id="ch-4">
+    <div class="pageband"><div>Psikoloji<span class="accent-word">ye</span> Giriş</div><div class="pageband-course">Bölüm 4</div></div>
+
+    
+      <div class="chbanner">
+        <div class="chbanner-kicker">4. Bölüm</div>
+        <div class="chbanner-title">Savunma Mekanizmaları</div>
+        <div class="chbanner-subtitle">Bireyin kaygıyı azaltmak için bilinçsizce başvurduğu on yol</div>
+      </div>
+    
+
+    <!--item 0 terms-->
+  
+<div class="terms-grid">
+  
+  <div class="term-box">
+    <div class="term-name">Savunma Mekanizması</div>
+    <div class="term-def">Bireyin kaygıyı azaltmak için bilinçdışı biçimde başvurduğu psikolojik baş etme yolu.</div>
+  </div>
+  
+  <div class="term-box">
+    <div class="term-name">Rasyonalizasyon</div>
+    <div class="term-def">Mantığa bürüme; bir davranışa sonradan makul bir kılıf uydurma.</div>
+  </div>
+  
+  <div class="term-box">
+    <div class="term-name">Yansıtma (Projection)</div>
+    <div class="term-def">Kişinin kendi kusurunu başkasında görmesi.</div>
+  </div>
+  
+  <div class="term-box">
+    <div class="term-name">Yüceltme (Sublimation)</div>
+    <div class="term-def">Olumsuz bir dürtüyü toplumca kabul gören, faydalı bir işe çevirme.</div>
+  </div>
+  
+</div>
+
+  
+<!--item 1 callout-->
+  
+<div class="callout caution">
+  <div class="callout-icon">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.5"/><line x1="12" y1="11" x2="12" y2="16.5"/><circle cx="12" cy="7.5" r="0.6" fill="currentColor" stroke="none"/></svg>
+
+</div>
+  <div>
+    <div class="callout-title">Dikkat / Sınav Formatı</div>
+    <div class="callout-text">Sınavda genellikle bir <b>vaka/örnek</b> verilir ve mekanizmanın adı sorulur. Bu yüzden her mekanizmayı tanımından çok, tipik örneğiyle birlikte ezberlemek daha güvenlidir.</div>
+  </div>
+</div>
+
+  
+<!--item 2 callout-->
+  
+<div class="callout insight">
+  <div class="callout-icon">
+<svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 1.5 L14.6 9 L22 9 L15.9 13.6 L18.2 21 L12 16.6 L5.8 21 L8.1 13.6 L2 9 L9.4 9 Z"/></svg>
+
+</div>
+  <div>
+    <div class="callout-title">Ortak Payda</div>
+    <div class="callout-text">On mekanizmanın hepsi, egonun <b>kaygıyla doğrudan yüzleşmek yerine dolaylı bir yol bulması</b> ilkesine dayanır — farklı olan, kaygının hangi yöne saptırıldığıdır: davranışa (rasyonalizasyon), başkasına (yansıtma), farklı bir hedefe (yer değiştirme) veya üretken bir alana (yüceltme).</div>
+  </div>
+</div>
+
+  
+
+
+    
+<div class="footer">
+  <div>Psikoloji<span class="accent-word">ye</span> Giriş</div>
+  <div class="fnum">10</div>
+</div>
+
+  </section>
+  
+  
+  
+  <section class="page body-page" data-ch="4" data-cp="1">
+    <div class="pageband"><div>Psikoloji<span class="accent-word">ye</span> Giriş</div><div class="pageband-course">Bölüm 4</div></div>
+
+    
+
+    <!--item 0 table-->
+  
+<div class="ctable-wrap">
+  <div class="ctable-caption">On Savunma Mekanizması</div>
+  <table class="ctable">
+    <thead><tr><th>Mekanizma</th><th>Tanım</th><th>Tipik Örnek</th></tr></thead>
+    <tbody>
+      
+      <tr><td>Mantığa Bürüme (Rasyonalizasyon)</td><td>Davranışa kılıf uydurma.</td><td>Borçlanan kişinin 'Borç yiğidin kamçısıdır' demesi.</td></tr>
+      
+      <tr><td>Karşıt Tepki Geliştirme</td><td>Hissedilenin tam tersini yapma.</td><td>Nefret ettiği kişiye aşırı kibar davranmak.</td></tr>
+      
+      <tr><td>Bastırma (Repression)</td><td>Unutma, bilinç dışına itme.</td><td>Ölüm korkusunu yok sayıp hiç ölmeyecekmiş gibi yaşamak.</td></tr>
+      
+      <tr><td>Yansıtma (Projection)</td><td>Kendi kusurunu başkasında görme.</td><td>Cimri birinin 'Herkes çok bencil' demesi.</td></tr>
+      
+      <tr><td>Özdeşleşme (Identification)</td><td>Başkasının özelliklerini taklit etme.</td><td>Film yıldızı gibi giyinmek.</td></tr>
+      
+      <tr><td>Yer Değiştirme (Displacement)</td><td>Öfkeyi asıl kaynağa değil, gücünün yettiğine yöneltme.</td><td>Müdüre kızıp evde çocuğa bağırmak.</td></tr>
+      
+      <tr><td>Yüceltme (Sublimation)</td><td>Olumsuz dürtüyü faydalı bir işe çevirme.</td><td>Saldırgan birinin boksör veya polis olması.</td></tr>
+      
+      <tr><td>Düşünselleştirme</td><td>Duyguyu soyut bilgiyle örtme.</td><td>Hak yiyen patronun işçi hakları üzerine felsefe yapması.</td></tr>
+      
+      <tr><td>Telafi (Compensation)</td><td>Bir alandaki eksikliği başka alanla kapatma.</td><td>Dersleri kötü olanın sporda şampiyon olması.</td></tr>
+      
+      <tr><td>İnkâr (Denial)</td><td>Gerçeği reddetme.</td><td>'Ben yapmadım, öyle bir şey yok' demek.</td></tr>
+      
+    </tbody>
+  </table>
+</div>
+
+  
+<!--item 1 summary-->
+  
+<div class="chsummary"><b>Bölüm Özeti</b>Savunma mekanizmaları, egonun kaygıyla baş etmek için bilinçdışı olarak devreye soktuğu on farklı stratejidir. Ortak nokta, gerçeğin doğrudan değil dolaylı biçimde ele alınmasıdır — bu da onları sınavda vaka-eşleştirme sorularının klasik konusu yapar.</div>
+
+  
+
+
+    
+<div class="footer">
+  <div>Psikoloji<span class="accent-word">ye</span> Giriş</div>
+  <div class="fnum">11</div>
+</div>
+
+  </section>
+  
+  
+
+  
+  
+  <section class="page body-page" data-ch="5" data-cp="0" id="ch-5">
+    <div class="pageband"><div>Psikoloji<span class="accent-word">ye</span> Giriş</div><div class="pageband-course">Bölüm 5</div></div>
+
+    
+      <div class="chbanner">
+        <div class="chbanner-kicker">5. Bölüm</div>
+        <div class="chbanner-title">Psikolojik Bozukluklar ve Kişilik Kuramları</div>
+        <div class="chbanner-subtitle">Nevroz-psikoz ayrımından kişiliği açıklayan kuramlara</div>
+      </div>
+    
+
+    <!--item 0 terms-->
+  
+<div class="terms-grid">
+  
+  <div class="term-box">
+    <div class="term-name">Nevroz</div>
+    <div class="term-def">Gerçeklik algısının korunduğu, görece hafif seyreden psikolojik bozukluk grubu.</div>
+  </div>
+  
+  <div class="term-box">
+    <div class="term-name">Psikoz</div>
+    <div class="term-def">Gerçeklikle bağın koptuğu, ağır seyreden psikolojik bozukluk grubu.</div>
+  </div>
+  
+  <div class="term-box">
+    <div class="term-name">Mizaç (Huy)</div>
+    <div class="term-def">Biyolojik, doğuştan gelen ve değişmeyen kişilik bileşeni.</div>
+  </div>
+  
+  <div class="term-box">
+    <div class="term-name">Karakter</div>
+    <div class="term-def">Sosyal, sonradan kazanılan ve eğitimle değişebilen kişilik bileşeni.</div>
+  </div>
+  
+</div>
+
+  
+<!--item 1 callout-->
+  
+<div class="callout route">
+  <div class="callout-icon">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.5"/><polygon points="15.5 8.5 13.2 13.2 8.5 15.5 10.8 10.8 15.5 8.5" fill="currentColor" stroke="none"/></svg>
+
+</div>
+  <div>
+    <div class="callout-title">Bölümün Rotası</div>
+    <div class="callout-text">Psikolojik bozukluklar <b>nevroz</b> (hafif, gerçeklik algısı korunur) ve <b>psikoz</b> (ağır, gerçeklikle bağ kopar) olarak ikiye ayrılır; ardından kişiliği açıklayan tip kuramlarına ve Freud'un yapısal modeline geçilir.</div>
+  </div>
+</div>
+
+  
+<!--item 2 table-->
+  
+<div class="ctable-wrap">
+  <div class="ctable-caption">Nevrozlar (Psikonevrozlar) — Hafif Bozukluklar</div>
+  <table class="ctable">
+    <thead><tr><th>Tip</th><th>Belirti</th></tr></thead>
+    <tbody>
+      
+      <tr><td>Nevrasteni</td><td>Sebepsiz yorgunluk, 'bitiklik' hali.</td></tr>
+      
+      <tr><td>Psikasteni (OKB)</td><td>Takıntılı düşünceler (obsesyon) ve tekrarlayan hareketler (kompulsiyon) — ör. kapıyı 10 kere kontrol etmek.</td></tr>
+      
+      <tr><td>Histeri</td><td>İlgi çekmek için fiziksel hastalık taklidi yapma (ör. psikolojik felç).</td></tr>
+      
+    </tbody>
+  </table>
+</div>
+
+  
+<!--item 3 table-->
+  
+<div class="ctable-wrap">
+  <div class="ctable-caption">Psikozlar — Ağır Bozukluklar</div>
+  <table class="ctable">
+    <thead><tr><th>Tip</th><th>Belirti</th></tr></thead>
+    <tbody>
+      
+      <tr><td>Şizofreni — Katatonik</td><td>Donup kalma.</td></tr>
+      
+      <tr><td>Şizofreni — Paranoid</td><td>'Beni öldürecekler' kuşkusu.</td></tr>
+      
+      <tr><td>Şizofreni — Dezorganize</td><td>Saçma konuşma, çocuksu hareketler.</td></tr>
+      
+      <tr><td>Paranoya</td><td>Sistemli hezeyanlar (kıskançlık paranoyası, büyüklük/mehdi kompleksi).</td></tr>
+      
+      <tr><td>Mani-Depresif (İki Uçlu)</td><td>Bir dönem aşırı neşe (mani), bir dönem derin üzüntü (depresyon).</td></tr>
+      
+    </tbody>
+  </table>
+</div>
+
+  
+
+
+    
+<div class="footer">
+  <div>Psikoloji<span class="accent-word">ye</span> Giriş</div>
+  <div class="fnum">12</div>
+</div>
+
+  </section>
+  
+  
+  
+  <section class="page body-page" data-ch="5" data-cp="1">
+    <div class="pageband"><div>Psikoloji<span class="accent-word">ye</span> Giriş</div><div class="pageband-course">Bölüm 5</div></div>
+
+    
+
+    <!--item 0 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">1</div>
+    <div class="block-title">Temel Tanımlar</div>
+  </div>
+  
+  <ul>
+    <li><b>Persona:</b> Maske demektir.</li><li><b>Mizaç (Huy):</b> Biyolojiktir, doğuştan gelir, değişmez (ör. çabuk kızmak).</li><li><b>Karakter:</b> Sosyaldir, sonradan kazanılır, eğitimle değişir (ör. dürüstlük).</li>
+  </ul>
+</div>
+
+  
+<!--item 1 table-->
+  
+<div class="ctable-wrap">
+  <div class="ctable-caption">Sınıflandırma (Tip) Kuramları</div>
+  <table class="ctable">
+    <thead><tr><th>Kuramcı</th><th>Sınıflandırma</th></tr></thead>
+    <tbody>
+      
+      <tr><td>Hipokrat (Sıvılar)</td><td>Kan (canlı), Balgam (yavaş), Kara Safra (melankolik), Sarı Safra (öfkeli).</td></tr>
+      
+      <tr><td>Sheldon (Beden Tipleri)</td><td>Endomorf (şişman/rahat), Mezomorf (kaslı/enerjik), Ektomorf (zayıf/içe dönük).</td></tr>
+      
+      <tr><td>Jung</td><td>İçe dönük ve Dışa dönük.</td></tr>
+      
+    </tbody>
+  </table>
+</div>
+
+  
+<!--item 2 info_cards-->
+  
+<div class="block-subtitle" style="margin-left:0; font-weight:700; color:var(--ink); font-size:8.6pt; margin-top:5.5mm; margin-bottom:2mm;">Freud'un Psikanalitik Kişilik Yapısı</div>
+<div class="info-grid">
+  
+  <div class="info-card">
+    <div class="badge">1</div>
+    <div class="ic-title">İd (Altben)</div>
+    <div class="ic-text">İlkeldir, haz ilkesiyle çalışır — 'Hemen istiyorum' der.</div>
+  </div>
+  
+  <div class="info-card">
+    <div class="badge">2</div>
+    <div class="ic-title">Ego (Ben)</div>
+    <div class="ic-text">Mantıklıdır, gerçeklik ilkesiyle çalışır — İd ile Süperego'yu uzlaştırır.</div>
+  </div>
+  
+  <div class="info-card">
+    <div class="badge">3</div>
+    <div class="ic-title">Süperego (Üstben)</div>
+    <div class="ic-text">Vicdandır, ahlak ilkesiyle çalışır — 'Ayıp, yasak' der.</div>
+  </div>
+  
+</div>
+
+  
+<!--item 3 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">2</div>
+    <div class="block-title">Kişiliği Etkileyen Faktörler</div>
+  </div>
+  
+  <ul>
+    <li><b>Kalıtım:</b> Zeka büyük oranda kalıtsaldır.</li><li><b>Aile:</b> Demokratik tutum en sağlıklısıdır; aşırı koruyucu veya otoriter aile kişiliği bozar.</li><li><b>Din:</b> Benlik oluşumunda referans kaynağıdır, güven verir.</li>
+  </ul>
+</div>
+
+  
+<!--item 4 summary-->
+  
+<div class="chsummary"><b>Bölüm Özeti</b>Psikolojik bozukluklar gerçeklik algısının korunup korunmamasına göre nevroz-psikoz ekseninde sınıflanır. Kişilik ise hem biyolojik (mizaç) hem sosyal (karakter) bileşenlerden oluşur; Freud'un İd-Ego-Süperego modeli bu yapının iç dengesini, kalıtım-aile-din üçlüsü ise dış etkenlerini açıklar.</div>
+
+  
+
+
+    
+<div class="footer">
+  <div>Psikoloji<span class="accent-word">ye</span> Giriş</div>
+  <div class="fnum">13</div>
+</div>
+
+  </section>
+  
+  
+
+
+
+
+
+<section class="page body-page" id="glossary">
+  <div class="pageband"><div>Psikoloji<span class="accent-word">ye</span> Giriş</div><div class="pageband-course">Genel Tekrar</div></div>
+  
+    <div class="section-kicker">Genel Tekrar</div>
+    <div class="section-title">Anahtar Kavramlar Sözlüğü</div>
+    <div class="section-lede">Her kavram, kısa tanımı ve geldiği bölümle birlikte listelenmiştir — hızlı tekrar ve eşleştirme için.</div>
+  
+  <div class="gloss-grid">
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Büyüme</div>
+      <div class="gloss-def">Fiziksel/niceliksel değişim; boy ve kilo artışı.</div>
+      <div class="gloss-ref">Gelişim Temelleri · 1. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Gelişme</div>
+      <div class="gloss-def">Büyümeyi de kapsayan, fonksiyonel beceri kazanımını içeren geniş kavram.</div>
+      <div class="gloss-ref">Gelişim Temelleri · 1. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Oral Dönem</div>
+      <div class="gloss-def">0–1,5 yaş; haz bölgesi ağızdır.</div>
+      <div class="gloss-ref">Freud · 1. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Anal Dönem</div>
+      <div class="gloss-def">1,5–3 yaş; haz bölgesi anüstür, tuvalet kontrolü önemlidir.</div>
+      <div class="gloss-ref">Freud · 1. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Fallik Dönem</div>
+      <div class="gloss-def">3–6 yaş; haz bölgesi cinsel organlardır.</div>
+      <div class="gloss-ref">Freud · 1. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Gizil (Latent) Dönem</div>
+      <div class="gloss-def">6–12 yaş; cinsel dürtüler uykuya yatar.</div>
+      <div class="gloss-ref">Freud · 1. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Genital Dönem</div>
+      <div class="gloss-def">12–18/20 yaş; cinsel kimlik olgunlaşır.</div>
+      <div class="gloss-ref">Freud · 1. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Temel Güven vs. Güvensizlik</div>
+      <div class="gloss-def">0–1 yaş; anne ilgisi güven duygusunu belirler.</div>
+      <div class="gloss-ref">Erikson · 1. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Kimlik Kazanma vs. Rol Kargaşası</div>
+      <div class="gloss-def">12–20 yaş; 'Ben kimim?' sorusu merkezdedir.</div>
+      <div class="gloss-ref">Erikson · 1. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Sefalokaudal İlke</div>
+      <div class="gloss-def">Gelişimin baştan kuyruk sokumuna doğru ilerlemesi.</div>
+      <div class="gloss-ref">Prenatal Gelişim · 2. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Eko-Tepki</div>
+      <div class="gloss-def">İlk 6 ayda görülen, taklit içermeyen anlamsız hece dönemi.</div>
+      <div class="gloss-ref">Dil Gelişimi · 2. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Olumsuzluk (Negativism)</div>
+      <div class="gloss-def">3 yaş civarı zirve yapan otoriteye direnme davranışı.</div>
+      <div class="gloss-ref">Çocukluk Dönemi · 2. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Heteronom Ahlak</div>
+      <div class="gloss-def">10 yaş altı; kurallar değişmez, sonuca bakılır.</div>
+      <div class="gloss-ref">Piaget · 3. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Otonom Ahlak</div>
+      <div class="gloss-def">11 yaş üstü; kurallar esnektir, niyet önemlidir.</div>
+      <div class="gloss-ref">Piaget · 3. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Gelenek Öncesi Düzey</div>
+      <div class="gloss-def">Ceza-itaat ve çıkarcılık aşamalarını içeren ilk ahlak düzeyi.</div>
+      <div class="gloss-ref">Kohlberg · 3. Bölüm</div>
+    </div>
+    
+  </div>
+  
+<div class="footer">
+  <div>Psikoloji<span class="accent-word">ye</span> Giriş</div>
+  <div class="fnum">14</div>
+</div>
+
+</section>
+
+
+<section class="page body-page">
+  <div class="pageband"><div>Psikoloji<span class="accent-word">ye</span> Giriş</div><div class="pageband-course">Genel Tekrar</div></div>
+  
+    <div class="chcontinue"><div class="tag">Sözlük · Devam</div><div class="cctitle">Anahtar Kavramlar (devamı)</div></div>
+  
+  <div class="gloss-grid">
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Gelenek Sonrası Düzey</div>
+      <div class="gloss-def">Toplumsal anlaşma ve evrensel ahlak aşamalarını içeren en üst düzey.</div>
+      <div class="gloss-ref">Kohlberg · 3. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Levinson'ın Rüyası</div>
+      <div class="gloss-def">Genç yetişkinin geleceğini hayal edip ona uygun roller geliştirmesi.</div>
+      <div class="gloss-ref">Yetişkinlik · 3. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Kübler-Ross'un Beş Evresi</div>
+      <div class="gloss-def">İnkâr, öfke, pazarlık, depresyon, kabullenme.</div>
+      <div class="gloss-ref">Ölüm Psikolojisi · 3. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Rasyonalizasyon</div>
+      <div class="gloss-def">Davranışa sonradan mantıklı bir kılıf uydurma.</div>
+      <div class="gloss-ref">Savunma Mekanizmaları · 4. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Yansıtma (Projection)</div>
+      <div class="gloss-def">Kendi kusurunu başkasında görme.</div>
+      <div class="gloss-ref">Savunma Mekanizmaları · 4. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Yer Değiştirme (Displacement)</div>
+      <div class="gloss-def">Öfkeyi asıl kaynağa değil, gücünün yettiğine yöneltme.</div>
+      <div class="gloss-ref">Savunma Mekanizmaları · 4. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Yüceltme (Sublimation)</div>
+      <div class="gloss-def">Olumsuz dürtüyü faydalı bir işe çevirme.</div>
+      <div class="gloss-ref">Savunma Mekanizmaları · 4. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Telafi (Compensation)</div>
+      <div class="gloss-def">Bir alandaki eksikliği başka alanla kapatma.</div>
+      <div class="gloss-ref">Savunma Mekanizmaları · 4. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Nevroz</div>
+      <div class="gloss-def">Gerçeklik algısının korunduğu hafif bozukluk grubu.</div>
+      <div class="gloss-ref">Bozukluklar · 5. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Psikoz</div>
+      <div class="gloss-def">Gerçeklikle bağın koptuğu ağır bozukluk grubu.</div>
+      <div class="gloss-ref">Bozukluklar · 5. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Şizofreni</div>
+      <div class="gloss-def">Gerçeklikten kopuşla giden; katatonik, paranoid, dezorganize tipleri vardır.</div>
+      <div class="gloss-ref">Bozukluklar · 5. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">İd (Altben)</div>
+      <div class="gloss-def">Haz ilkesiyle çalışan, ilkel kişilik katmanı.</div>
+      <div class="gloss-ref">Freud'un Kişilik Yapısı · 5. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Ego (Ben)</div>
+      <div class="gloss-def">Gerçeklik ilkesiyle çalışan, dengeleyici kişilik katmanı.</div>
+      <div class="gloss-ref">Freud'un Kişilik Yapısı · 5. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Süperego (Üstben)</div>
+      <div class="gloss-def">Ahlak ilkesiyle çalışan, vicdan işlevi gören kişilik katmanı.</div>
+      <div class="gloss-ref">Freud'un Kişilik Yapısı · 5. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Mizaç</div>
+      <div class="gloss-def">Doğuştan gelen, değişmeyen kişilik bileşeni.</div>
+      <div class="gloss-ref">Kişilik Kuramları · 5. Bölüm</div>
+    </div>
+    
+  </div>
+  
+<div class="footer">
+  <div>Psikoloji<span class="accent-word">ye</span> Giriş</div>
+  <div class="fnum">15</div>
+</div>
+
+</section>
+
+
+
+
+
+
+
+
+
+<section class="page body-page" id="exam">
+  <div class="pageband"><div>Psikoloji<span class="accent-word">ye</span> Giriş</div><div class="pageband-course">Sınav</div></div>
+  
+    <div class="section-kicker">Sınav</div>
+    <div class="section-title">Genel Değerlendirme Testi</div>
+    <div class="section-lede">Gelişim, ahlaki gelişim, savunma mekanizmaları ve kişilik kuramları üzerine kapsamlı test</div>
+    <div class="test-chip-row">
+      
+      <div class="test-chip"><b>20</b><span>Soru</span></div>
+      
+      <div class="test-chip"><b>Çoktan</b><span>Seçmeli</span></div>
+      
+      <div class="test-chip"><b>5</b><span>Seçenek (A-E)</span></div>
+      
+    </div>
+    <div class="test-instructions">Aşağıdaki sorularda beş seçenekten yalnızca birini işaretleyiniz. Süre: 30 dakika.</div>
+  
+  <div class="tq-list">
+    
+<div class="tq">
+  <div class="tq-head">
+    <div class="tq-num">1</div>
+    <div class="tq-stem">Çocuğun boyunun uzaması ve kilosunun artması gibi yalnızca niceliksel/fiziksel değişimlere ne ad verilir?</div>
+  </div>
+  <ul class="tq-options">
+    
+    <li><span class="opt-letter">A</span><span>Gelişme</span></li>
+    
+    <li><span class="opt-letter">B</span><span>Büyüme</span></li>
+    
+    <li><span class="opt-letter">C</span><span>Olgunlaşma</span></li>
+    
+    <li><span class="opt-letter">D</span><span>Öğrenme</span></li>
+    
+    <li><span class="opt-letter">E</span><span>Toplumsallaşma</span></li>
+    
+  </ul>
+</div>
+
+<div class="tq">
+  <div class="tq-head">
+    <div class="tq-num">2</div>
+    <div class="tq-stem">Freud'a göre 3-6 yaş arasında haz bölgesinin cinsel organlar olduğu, cinsiyet farkındalığının başladığı dönem hangisidir?</div>
+  </div>
+  <ul class="tq-options">
+    
+    <li><span class="opt-letter">A</span><span>Oral Dönem</span></li>
+    
+    <li><span class="opt-letter">B</span><span>Anal Dönem</span></li>
+    
+    <li><span class="opt-letter">C</span><span>Fallik Dönem</span></li>
+    
+    <li><span class="opt-letter">D</span><span>Gizil Dönem</span></li>
+    
+    <li><span class="opt-letter">E</span><span>Genital Dönem</span></li>
+    
+  </ul>
+</div>
+
+<div class="tq">
+  <div class="tq-head">
+    <div class="tq-num">3</div>
+    <div class="tq-stem">Erikson'a göre 0-1 yaş arasındaki psikososyal kriz hangisidir?</div>
+  </div>
+  <ul class="tq-options">
+    
+    <li><span class="opt-letter">A</span><span>Özerklik vs. Kuşku</span></li>
+    
+    <li><span class="opt-letter">B</span><span>Temel Güven vs. Güvensizlik</span></li>
+    
+    <li><span class="opt-letter">C</span><span>Girişimcilik vs. Suçluluk</span></li>
+    
+    <li><span class="opt-letter">D</span><span>Kimlik Kazanma vs. Rol Kargaşası</span></li>
+    
+    <li><span class="opt-letter">E</span><span>Yakınlık vs. Yalnızlık</span></li>
+    
+  </ul>
+</div>
+
+<div class="tq">
+  <div class="tq-head">
+    <div class="tq-num">4</div>
+    <div class="tq-stem">Freud ile Erikson'un gelişim kuramları arasındaki temel fark nedir?</div>
+  </div>
+  <ul class="tq-options">
+    
+    <li><span class="opt-letter">A</span><span>Freud sosyal krizleri, Erikson cinselliği esas alır</span></li>
+    
+    <li><span class="opt-letter">B</span><span>Freud'un evreleri yaşam boyu, Erikson'unkiler 18 yaşında biter</span></li>
+    
+    <li><span class="opt-letter">C</span><span>Freud haz ve cinsellik odaklıdır, Erikson sosyal ilişkiler ve krizler odaklıdır</span></li>
+    
+    <li><span class="opt-letter">D</span><span>İkisi de aynı yaş aralıklarını kullanır</span></li>
+    
+    <li><span class="opt-letter">E</span><span>Erikson kişiliği İd-Ego-Süperego ile açıklar</span></li>
+    
+  </ul>
+</div>
+
+<div class="tq">
+  <div class="tq-head">
+    <div class="tq-num">5</div>
+    <div class="tq-stem">Gelişimin baştan kuyruk sokumuna doğru ilerlemesi ilkesine ne ad verilir?</div>
+  </div>
+  <ul class="tq-options">
+    
+    <li><span class="opt-letter">A</span><span>Sefalokaudal İlke</span></li>
+    
+    <li><span class="opt-letter">B</span><span>Proksimodistal İlke</span></li>
+    
+    <li><span class="opt-letter">C</span><span>Kritik Dönem İlkesi</span></li>
+    
+    <li><span class="opt-letter">D</span><span>Süreklilik İlkesi</span></li>
+    
+    <li><span class="opt-letter">E</span><span>Bireyselleşme İlkesi</span></li>
+    
+  </ul>
+</div>
+
+<div class="tq">
+  <div class="tq-head">
+    <div class="tq-num">6</div>
+    <div class="tq-stem">Bebeğin ilk 6 ayında çıkardığı, henüz taklit içermeyen anlamsız hecelere ne ad verilir?</div>
+  </div>
+  <ul class="tq-options">
+    
+    <li><span class="opt-letter">A</span><span>Sosyal Gülümseme</span></li>
+    
+    <li><span class="opt-letter">B</span><span>Refleks Gülümseme</span></li>
+    
+    <li><span class="opt-letter">C</span><span>Eko-Tepki</span></li>
+    
+    <li><span class="opt-letter">D</span><span>Olumsuzluk</span></li>
+    
+    <li><span class="opt-letter">E</span><span>Kekeleme</span></li>
+    
+  </ul>
+</div>
+
+  </div>
+  
+<div class="footer">
+  <div>Psikoloji<span class="accent-word">ye</span> Giriş</div>
+  <div class="fnum">16</div>
+</div>
+
+</section>
+
+
+<section class="page body-page">
+  <div class="pageband"><div>Psikoloji<span class="accent-word">ye</span> Giriş</div><div class="pageband-course">Test · Devam</div></div>
+  
+    <div class="chcontinue"><div class="tag">Test · Devam</div><div class="cctitle">Genel Değerlendirme Testi</div></div>
+  
+  <div class="tq-list">
+    
+<div class="tq">
+  <div class="tq-head">
+    <div class="tq-num">7</div>
+    <div class="tq-stem">3 yaş civarında zirve yapan, otoriteye direnme ve inatçılıkla beliren çocukluk davranışına ne ad verilir?</div>
+  </div>
+  <ul class="tq-options">
+    
+    <li><span class="opt-letter">A</span><span>Kıskançlık</span></li>
+    
+    <li><span class="opt-letter">B</span><span>Olumsuzluk (Negativism)</span></li>
+    
+    <li><span class="opt-letter">C</span><span>Kekeleme</span></li>
+    
+    <li><span class="opt-letter">D</span><span>Kabadayılık</span></li>
+    
+    <li><span class="opt-letter">E</span><span>Kültür Şoku</span></li>
+    
+  </ul>
+</div>
+
+<div class="tq">
+  <div class="tq-head">
+    <div class="tq-num">8</div>
+    <div class="tq-stem">Piaget'e göre 10 yaş altındaki çocuklar, kasıtlı olarak 1 bardak kıran ile kazara 10 bardak kıran arasında nasıl bir değerlendirme yapar?</div>
+  </div>
+  <ul class="tq-options">
+    
+    <li><span class="opt-letter">A</span><span>Niyete bakarak kasıtlı kıran daha suçlu bulunur</span></li>
+    
+    <li><span class="opt-letter">B</span><span>Sonuca bakarak 10 bardak kıran daha suçlu bulunur</span></li>
+    
+    <li><span class="opt-letter">C</span><span>İkisi de eşit suçlu bulunur</span></li>
+    
+    <li><span class="opt-letter">D</span><span>İkisi de suçsuz bulunur</span></li>
+    
+    <li><span class="opt-letter">E</span><span>Yaş bu değerlendirmeyi etkilemez</span></li>
+    
+  </ul>
+</div>
+
+<div class="tq">
+  <div class="tq-head">
+    <div class="tq-num">9</div>
+    <div class="tq-stem">Kohlberg'in ahlaki gelişim kuramında yasaların insan hakkına aykırıysa değişebileceğini savunan en üst düzey hangisidir?</div>
+  </div>
+  <ul class="tq-options">
+    
+    <li><span class="opt-letter">A</span><span>Gelenek Öncesi Düzey</span></li>
+    
+    <li><span class="opt-letter">B</span><span>Geleneksel Düzey</span></li>
+    
+    <li><span class="opt-letter">C</span><span>Gelenek Sonrası Düzey</span></li>
+    
+    <li><span class="opt-letter">D</span><span>Heteronom Düzey</span></li>
+    
+    <li><span class="opt-letter">E</span><span>Otonom Düzey</span></li>
+    
+  </ul>
+</div>
+
+<div class="tq">
+  <div class="tq-head">
+    <div class="tq-num">10</div>
+    <div class="tq-stem">Piaget'in ahlaki gelişim modeli ile Kohlberg'in modeli arasındaki temel fark nedir?</div>
+  </div>
+  <ul class="tq-options">
+    
+    <li><span class="opt-letter">A</span><span>Piaget üç düzeyli, Kohlberg iki evrelidir</span></li>
+    
+    <li><span class="opt-letter">B</span><span>Piaget iki evreli basit bir geçişi anlatır; Kohlberg üç düzey altı aşamaya genişletir</span></li>
+    
+    <li><span class="opt-letter">C</span><span>İkisi de aynı yaş aralığını kapsar</span></li>
+    
+    <li><span class="opt-letter">D</span><span>Kohlberg yalnızca çocukluğu inceler</span></li>
+    
+    <li><span class="opt-letter">E</span><span>Piaget yetişkinliğe kadar uzanır</span></li>
+    
+  </ul>
+</div>
+
+<div class="tq">
+  <div class="tq-head">
+    <div class="tq-num">11</div>
+    <div class="tq-stem">Genç yetişkinin geleceğini hayal edip buna uygun roller geliştirmesi süreci hangi kavramla açıklanır?</div>
+  </div>
+  <ul class="tq-options">
+    
+    <li><span class="opt-letter">A</span><span>Levinson'ın Rüyası</span></li>
+    
+    <li><span class="opt-letter">B</span><span>Kübler-Ross'un Evreleri</span></li>
+    
+    <li><span class="opt-letter">C</span><span>Andropoz</span></li>
+    
+    <li><span class="opt-letter">D</span><span>Kimlik Kazanma</span></li>
+    
+    <li><span class="opt-letter">E</span><span>Yaşlılık Kuramı</span></li>
+    
+  </ul>
+</div>
+
+<div class="tq">
+  <div class="tq-head">
+    <div class="tq-num">12</div>
+    <div class="tq-stem">Kübler-Ross'un ölümün beş evresi hangi sırayla ilerler?</div>
+  </div>
+  <ul class="tq-options">
+    
+    <li><span class="opt-letter">A</span><span>Öfke → İnkâr → Pazarlık → Kabullenme → Depresyon</span></li>
+    
+    <li><span class="opt-letter">B</span><span>İnkâr → Öfke → Pazarlık → Depresyon → Kabullenme</span></li>
+    
+    <li><span class="opt-letter">C</span><span>Pazarlık → İnkâr → Depresyon → Öfke → Kabullenme</span></li>
+    
+    <li><span class="opt-letter">D</span><span>Depresyon → İnkâr → Öfke → Pazarlık → Kabullenme</span></li>
+    
+    <li><span class="opt-letter">E</span><span>İnkâr → Depresyon → Öfke → Pazarlık → Kabullenme</span></li>
+    
+  </ul>
+</div>
+
+<div class="tq">
+  <div class="tq-head">
+    <div class="tq-num">13</div>
+    <div class="tq-stem">Cimri bir kişinin 'Herkes çok bencil' demesi hangi savunma mekanizmasına örnektir?</div>
+  </div>
+  <ul class="tq-options">
+    
+    <li><span class="opt-letter">A</span><span>Rasyonalizasyon</span></li>
+    
+    <li><span class="opt-letter">B</span><span>Yansıtma (Projection)</span></li>
+    
+    <li><span class="opt-letter">C</span><span>Yüceltme (Sublimation)</span></li>
+    
+    <li><span class="opt-letter">D</span><span>Telafi (Compensation)</span></li>
+    
+    <li><span class="opt-letter">E</span><span>Bastırma (Repression)</span></li>
+    
+  </ul>
+</div>
+
+  </div>
+  
+<div class="footer">
+  <div>Psikoloji<span class="accent-word">ye</span> Giriş</div>
+  <div class="fnum">17</div>
+</div>
+
+</section>
+
+
+<section class="page body-page">
+  <div class="pageband"><div>Psikoloji<span class="accent-word">ye</span> Giriş</div><div class="pageband-course">Test · Devam</div></div>
+  
+    <div class="chcontinue"><div class="tag">Test · Devam</div><div class="cctitle">Genel Değerlendirme Testi</div></div>
+  
+  <div class="tq-list">
+    
+<div class="tq">
+  <div class="tq-head">
+    <div class="tq-num">14</div>
+    <div class="tq-stem">Saldırgan bir kişinin boksör veya polis olmayı seçmesi hangi savunma mekanizmasına örnektir?</div>
+  </div>
+  <ul class="tq-options">
+    
+    <li><span class="opt-letter">A</span><span>Yer Değiştirme (Displacement)</span></li>
+    
+    <li><span class="opt-letter">B</span><span>Karşıt Tepki Geliştirme</span></li>
+    
+    <li><span class="opt-letter">C</span><span>Yüceltme (Sublimation)</span></li>
+    
+    <li><span class="opt-letter">D</span><span>İnkâr (Denial)</span></li>
+    
+    <li><span class="opt-letter">E</span><span>Düşünselleştirme</span></li>
+    
+  </ul>
+</div>
+
+<div class="tq">
+  <div class="tq-head">
+    <div class="tq-num">15</div>
+    <div class="tq-stem">Müdürüne kızan bir kişinin eve gelip çocuğuna bağırması hangi savunma mekanizmasına örnektir?</div>
+  </div>
+  <ul class="tq-options">
+    
+    <li><span class="opt-letter">A</span><span>Yer Değiştirme (Displacement)</span></li>
+    
+    <li><span class="opt-letter">B</span><span>Yansıtma (Projection)</span></li>
+    
+    <li><span class="opt-letter">C</span><span>Telafi (Compensation)</span></li>
+    
+    <li><span class="opt-letter">D</span><span>Özdeşleşme (Identification)</span></li>
+    
+    <li><span class="opt-letter">E</span><span>Rasyonalizasyon</span></li>
+    
+  </ul>
+</div>
+
+<div class="tq">
+  <div class="tq-head">
+    <div class="tq-num">16</div>
+    <div class="tq-stem">Gerçeklik algısının korunduğu, görece hafif seyreden psikolojik bozukluk grubuna ne ad verilir?</div>
+  </div>
+  <ul class="tq-options">
+    
+    <li><span class="opt-letter">A</span><span>Psikoz</span></li>
+    
+    <li><span class="opt-letter">B</span><span>Nevroz</span></li>
+    
+    <li><span class="opt-letter">C</span><span>Şizofreni</span></li>
+    
+    <li><span class="opt-letter">D</span><span>Paranoya</span></li>
+    
+    <li><span class="opt-letter">E</span><span>Mani-Depresif Bozukluk</span></li>
+    
+  </ul>
+</div>
+
+<div class="tq">
+  <div class="tq-head">
+    <div class="tq-num">17</div>
+    <div class="tq-stem">Takıntılı düşünceler (obsesyon) ve tekrarlayan hareketler (kompulsiyon) ile belirgin nevroz türü hangisidir?</div>
+  </div>
+  <ul class="tq-options">
+    
+    <li><span class="opt-letter">A</span><span>Nevrasteni</span></li>
+    
+    <li><span class="opt-letter">B</span><span>Histeri</span></li>
+    
+    <li><span class="opt-letter">C</span><span>Psikasteni (OKB)</span></li>
+    
+    <li><span class="opt-letter">D</span><span>Paranoya</span></li>
+    
+    <li><span class="opt-letter">E</span><span>Şizofreni</span></li>
+    
+  </ul>
+</div>
+
+<div class="tq">
+  <div class="tq-head">
+    <div class="tq-num">18</div>
+    <div class="tq-stem">Freud'un kişilik yapısında 'Hemen istiyorum' diyen, haz ilkesiyle çalışan ilkel katman hangisidir?</div>
+  </div>
+  <ul class="tq-options">
+    
+    <li><span class="opt-letter">A</span><span>Ego</span></li>
+    
+    <li><span class="opt-letter">B</span><span>Süperego</span></li>
+    
+    <li><span class="opt-letter">C</span><span>İd</span></li>
+    
+    <li><span class="opt-letter">D</span><span>Persona</span></li>
+    
+    <li><span class="opt-letter">E</span><span>Mizaç</span></li>
+    
+  </ul>
+</div>
+
+<div class="tq">
+  <div class="tq-head">
+    <div class="tq-num">19</div>
+    <div class="tq-stem">Mizaç ile karakter arasındaki fark nedir?</div>
+  </div>
+  <ul class="tq-options">
+    
+    <li><span class="opt-letter">A</span><span>Mizaç sonradan kazanılır, karakter doğuştan gelir</span></li>
+    
+    <li><span class="opt-letter">B</span><span>Mizaç biyolojik ve değişmezdir; karakter sosyaldir ve eğitimle değişebilir</span></li>
+    
+    <li><span class="opt-letter">C</span><span>İkisi de tamamen değişmezdir</span></li>
+    
+    <li><span class="opt-letter">D</span><span>İkisi de tamamen sonradan kazanılır</span></li>
+    
+    <li><span class="opt-letter">E</span><span>Mizaç yalnızca yetişkinlikte oluşur</span></li>
+    
+  </ul>
+</div>
+
+<div class="tq">
+  <div class="tq-head">
+    <div class="tq-num">20</div>
+    <div class="tq-stem">Sheldon'un beden tiplerine dayalı kişilik sınıflandırmasında 'kaslı/enerjik' tipe ne ad verilir?</div>
+  </div>
+  <ul class="tq-options">
+    
+    <li><span class="opt-letter">A</span><span>Endomorf</span></li>
+    
+    <li><span class="opt-letter">B</span><span>Mezomorf</span></li>
+    
+    <li><span class="opt-letter">C</span><span>Ektomorf</span></li>
+    
+    <li><span class="opt-letter">D</span><span>Melankolik</span></li>
+    
+    <li><span class="opt-letter">E</span><span>İçe Dönük</span></li>
+    
+  </ul>
+</div>
+
+  </div>
+  
+<div class="footer">
+  <div>Psikoloji<span class="accent-word">ye</span> Giriş</div>
+  <div class="fnum">18</div>
+</div>
+
+</section>
+
+
+
+
+
+<section class="page body-page" id="answer-key">
+  <div class="pageband"><div>Psikoloji<span class="accent-word">ye</span> Giriş</div><div class="pageband-course">Cevap Anahtarı</div></div>
+  
+    <div class="section-kicker">Çözümler</div>
+    <div class="section-title">Cevap Anahtarı ve Çözümler</div>
+    <div class="section-lede">Her sorunun doğru cevabı ve kısa gerekçesi aşağıda yer almaktadır.</div>
+  
+  <div class="ans-list">
+    
+<div class="ans-item">
+  <div class="ans-num">1</div>
+  <div>
+    <span class="ans-correct">Doğru Cevap: B</span>
+    <div class="ans-explain"><b>Büyüme</b>, boy/kilo artışı gibi yalnızca niceliksel/fiziksel değişimdir; gelişme ise buna fonksiyonel beceri kazanımını da ekler.</div>
+  </div>
+</div>
+
+<div class="ans-item">
+  <div class="ans-num">2</div>
+  <div>
+    <span class="ans-correct">Doğru Cevap: C</span>
+    <div class="ans-explain"><b>Fallik Dönem</b> (3-6 yaş), haz bölgesinin cinsel organlar olduğu, cinsiyet farkındalığının başladığı dönemdir.</div>
+  </div>
+</div>
+
+<div class="ans-item">
+  <div class="ans-num">3</div>
+  <div>
+    <span class="ans-correct">Doğru Cevap: B</span>
+    <div class="ans-explain">Erikson'un ilk psikososyal krizi <b>Temel Güven vs. Güvensizlik</b>'dir (0-1 yaş); anne ilgisi güven duygusunu belirler.</div>
+  </div>
+</div>
+
+<div class="ans-item">
+  <div class="ans-num">4</div>
+  <div>
+    <span class="ans-correct">Doğru Cevap: C</span>
+    <div class="ans-explain">Freud haz ve cinsellik odaklıyken, Erikson sosyal ilişkiler ve krizler odaklıdır; bu ayrım sınavda en sık sorulan noktadır.</div>
+  </div>
+</div>
+
+<div class="ans-item">
+  <div class="ans-num">5</div>
+  <div>
+    <span class="ans-correct">Doğru Cevap: A</span>
+    <div class="ans-explain"><b>Sefalokaudal İlke</b>, gelişimin baştan (baş/üst) kuyruk sokumuna (alt beden) doğru ilerlemesidir.</div>
+  </div>
+</div>
+
+<div class="ans-item">
+  <div class="ans-num">6</div>
+  <div>
+    <span class="ans-correct">Doğru Cevap: C</span>
+    <div class="ans-explain"><b>Eko-Tepki</b>, bebeğin ilk 6 ayında çıkardığı, henüz taklit içermeyen anlamsız hece dönemidir.</div>
+  </div>
+</div>
+
+<div class="ans-item">
+  <div class="ans-num">7</div>
+  <div>
+    <span class="ans-correct">Doğru Cevap: B</span>
+    <div class="ans-explain"><b>Olumsuzluk (Negativism)</b>, 3 yaş civarı zirve yapan, otoriteye direnme ve inatçılıkla beliren davranıştır.</div>
+  </div>
+</div>
+
+<div class="ans-item">
+  <div class="ans-num">8</div>
+  <div>
+    <span class="ans-correct">Doğru Cevap: B</span>
+    <div class="ans-explain">Heteronom (dışa bağlı) ahlak döneminde (10 yaş altı) niyet değil sonuç önemlidir; bu yüzden 10 bardak kıran daha suçlu bulunur.</div>
+  </div>
+</div>
+
+<div class="ans-item">
+  <div class="ans-num">9</div>
+  <div>
+    <span class="ans-correct">Doğru Cevap: C</span>
+    <div class="ans-explain"><b>Gelenek Sonrası Düzey</b>, Kohlberg'in en üst ahlak düzeyidir; yasaların insan hakkına aykırıysa değişebileceğini savunur.</div>
+  </div>
+</div>
+
+<div class="ans-item">
+  <div class="ans-num">10</div>
+  <div>
+    <span class="ans-correct">Doğru Cevap: B</span>
+    <div class="ans-explain">Piaget iki evreli (heteronom/otonom) basit bir geçişi anlatırken, Kohlberg bunu üç düzey altı aşamaya genişletip yetişkinliğe kadar uzatır.</div>
+  </div>
+</div>
+
+<div class="ans-item">
+  <div class="ans-num">11</div>
+  <div>
+    <span class="ans-correct">Doğru Cevap: A</span>
+    <div class="ans-explain"><b>Levinson'ın Rüyası</b>, genç yetişkinin geleceğini hayal edip buna uygun roller geliştirmesi sürecidir.</div>
+  </div>
+</div>
+
+<div class="ans-item">
+  <div class="ans-num">12</div>
+  <div>
+    <span class="ans-correct">Doğru Cevap: B</span>
+    <div class="ans-explain">Kübler-Ross'un sırası: <b>İnkâr → Öfke → Pazarlık → Depresyon → Kabullenme</b>.</div>
+  </div>
+</div>
+
+<div class="ans-item">
+  <div class="ans-num">13</div>
+  <div>
+    <span class="ans-correct">Doğru Cevap: B</span>
+    <div class="ans-explain"><b>Yansıtma (Projection)</b>, kişinin kendi kusurunu başkasında görmesidir; cimri kişinin başkalarını bencillikle suçlaması buna örnektir.</div>
+  </div>
+</div>
+
+<div class="ans-item">
+  <div class="ans-num">14</div>
+  <div>
+    <span class="ans-correct">Doğru Cevap: C</span>
+    <div class="ans-explain"><b>Yüceltme (Sublimation)</b>, olumsuz bir dürtüyü toplumca kabul gören faydalı bir işe çevirmedir (ör. saldırganlığın boksörlüğe dönüşmesi).</div>
+  </div>
+</div>
+
+<div class="ans-item">
+  <div class="ans-num">15</div>
+  <div>
+    <span class="ans-correct">Doğru Cevap: A</span>
+    <div class="ans-explain"><b>Yer Değiştirme (Displacement)</b>, öfkeyi asıl kaynağa değil, gücünün yettiği bir hedefe yöneltmedir.</div>
+  </div>
+</div>
+
+<div class="ans-item">
+  <div class="ans-num">16</div>
+  <div>
+    <span class="ans-correct">Doğru Cevap: B</span>
+    <div class="ans-explain"><b>Nevroz</b>, gerçeklik algısının korunduğu, görece hafif seyreden bozukluk grubudur; psikozda ise gerçeklikle bağ kopar.</div>
+  </div>
+</div>
+
+<div class="ans-item">
+  <div class="ans-num">17</div>
+  <div>
+    <span class="ans-correct">Doğru Cevap: C</span>
+    <div class="ans-explain"><b>Psikasteni (OKB)</b>, takıntılı düşünceler (obsesyon) ve tekrarlayan hareketlerle (kompulsiyon) belirgindir.</div>
+  </div>
+</div>
+
+<div class="ans-item">
+  <div class="ans-num">18</div>
+  <div>
+    <span class="ans-correct">Doğru Cevap: C</span>
+    <div class="ans-explain"><b>İd (Altben)</b>, haz ilkesiyle çalışan, 'hemen istiyorum' diyen ilkel kişilik katmanıdır.</div>
+  </div>
+</div>
+
+<div class="ans-item">
+  <div class="ans-num">19</div>
+  <div>
+    <span class="ans-correct">Doğru Cevap: B</span>
+    <div class="ans-explain"><b>Mizaç</b> biyolojik ve değişmezdir (ör. çabuk kızmak); <b>karakter</b> ise sosyaldir ve eğitimle değişebilir (ör. dürüstlük).</div>
+  </div>
+</div>
+
+<div class="ans-item">
+  <div class="ans-num">20</div>
+  <div>
+    <span class="ans-correct">Doğru Cevap: B</span>
+    <div class="ans-explain">Sheldon'un sınıflandırmasında <b>Mezomorf</b> kaslı/enerjik beden tipini; Endomorf şişman/rahat, Ektomorf zayıf/içe dönük tipi tanımlar.</div>
+  </div>
+</div>
+
+  </div>
+  
+<div class="footer">
+  <div>Psikoloji<span class="accent-word">ye</span> Giriş</div>
+  <div class="fnum">19</div>
+</div>
+
+</section>
+
+
+
+
+
+
+
+</body>
+</html>

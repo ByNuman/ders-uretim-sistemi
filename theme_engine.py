@@ -101,7 +101,7 @@ def resolve_theme_css(theme_color, selector: str = ":root") -> str:
 
 # ---------------------------------------------------------------------------
 # Hazır palet — 16 isimlendirilmiş, birbirinden net ayrışan hue/sat çifti.
-# content.py dosyalarında theme_color=PALETTE["bordo"] gibi kullanılabilir,
+# src/<ders>.py dosyalarında theme_color=PALETTE["bordo"] gibi kullanılabilir,
 # ya da doğrudan herhangi bir hex geçilebilir (palet bir kolaylık, zorunlu değil).
 # ---------------------------------------------------------------------------
 PALETTE_HUES = {

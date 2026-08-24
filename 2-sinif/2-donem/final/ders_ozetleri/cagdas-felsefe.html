@@ -1,0 +1,3445 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<title>Çağdaş <span class="accent-word">Felsefe</span></title>
+<style>/* ============================================================
+   DERS ÜRETİM SİSTEMİ — Görsel Tasarım Sistemi v2
+   175x250mm trim (PUR Amerikan cilt), 3mm bleed, print-ready,
+   tema-parametrik.
+   Sistem fontlarına dayanır: gövde DejaVu Sans, başlıklar DejaVu Serif
+   (kitap/akademik karakter için) — harici font çağrısı yok, bu yüzden
+   her ortamda birebir aynı render garantidir.
+   ============================================================ */
+
+/* --- SAYFA GEOMETRİSİ ---------------------------------------------------
+   DİKKAT: aşağıdaki değerler yalnızca VARSAYILAN'dır. Gerçek kaynak
+   build.py içindeki TRIM_W_MM / TRIM_H_MM / BLEED_MM / MARGIN_*_MM
+   sabitleridir; build.py bu blogun aynısını page_geometry_css() ile
+   üretip style.css'in SONUNA ekler ve buradakileri ezer. Boyut
+   değiştirecekseniz build.py'yi düzenleyin, burayı değil. */
+@page { size: 181mm 256mm; margin: 0; }
+
+:root {
+  /* Bitmiş (kesilmiş) sayfa ölçüsü */
+  --trim-w: 175mm;
+  --trim-h: 250mm;
+  /* Taşma payı: tam sayfa zemin rengi / kapak gradyanı kenardan taşsın */
+  --bleed: 3mm;
+  /* Fiziksel render ölçüsü = trim + her iki yandan bleed */
+  --page-w: 181mm;
+  --page-h: 256mm;
+  /* Kenar boşlukları — TRIM kenarından ölçülür */
+  --mg-top: 11mm;
+  --mg-bottom: 19mm;    /* sayfa numarası payı dahil */
+  --mg-inner: 14mm;     /* sırt/gutter tarafı — PUR cilt payı */
+  --mg-outer: 9mm;
+  /* Render kutusunun (bleed box) kenarından ölçülen gerçek padding'ler */
+  --pad-top: 14mm;
+  --pad-bottom: 22mm;
+  --pad-inner: 17mm;
+  --pad-outer: 12mm;
+  /* Ayna simetri: sayfa tekliği/çiftliğine göre aşağıda yeniden atanır */
+  --pad-left: var(--pad-inner);
+  --pad-right: var(--pad-outer);
+
+  /* --- Nötr paleti (tüm temalarda sabit) --- */
+  --ink:        #14161b;
+  --ink-soft:   #464b5b;
+  --ink-faint:  #5c6270;   /* WCAG AA: beyaz üzerinde 6.1:1 -- eski #7d8394 (3.79:1) yerine */
+  --paper:      #ffffff;   /* build.py / .theme-XXXX bunu tema tonuna çeker */
+  --paper-tint: #f7f7f9;
+  --line:       #e3e4ea;
+  --line-soft:  #edeef2;
+  --shadow-sm:  0 0.82px 1.65px rgba(20,22,30,0.05), 0 0.82px 0.82px rgba(20,22,30,0.04);
+  --shadow-md:  0 2.47px 8.23px rgba(20,22,30,0.07), 0 0.82px 2.47px rgba(20,22,30,0.06);
+  --shadow-lg:  0 8.23px 24.69px rgba(15,17,30,0.16), 0 2.47px 6.58px rgba(15,17,30,0.10);
+
+  /* --- Sabit semantik renkler (callout tipleri; tema fark etmez) --- */
+  --focus-bg:   #fff8e8;
+  --focus-line: #e8b83f;
+  --focus-ink:  #6b4f04;
+
+  --caution-bg:   #eef4ff;
+  --caution-line: #6f8fd6;
+  --caution-ink:  #1f3d78;
+
+  --insight-bg:   #0d1830;
+  --insight-ink:  #ffffff;
+  --insight-accent: #e3c37c;
+
+  --route-bg:   #f2f0ff;
+  --route-line: #8a78e0;
+  --route-ink:  #40337f;
+
+  /* --- Tema değişkenleri: aşağıdaki .theme-XXXX sınıfları bunları ezer --- */
+  --accent:       #3a4fb0;
+  --accent-dark:  #232f6e;
+  --accent-soft:  #eef0fc;
+  --accent-tint:  #f5f6fd;
+  --cover-grad-1: #171d42;
+  --cover-grad-2: #3a4fb0;
+  --cover-grad-3: #4a5fc7;
+  --gold:         #d9b25c;
+  --gold-ink:     #6b5310;   /* açık zeminlerde gold yerine kullanılan okunur koyu ton */
+}
+
+/* ---------- Tema paletleri ----------
+   Her paper tonu kasıtlı çok hafiftir (L≈98%) — beyazdan ayırt edilir ama
+   metin kontrastını bozmaz; --line de aynı ton ailesinden seçilmiştir. */
+.theme-indigo {
+  --accent: #3a4fb0; --accent-dark: #232f6e; --accent-soft: #eef0fc; --accent-tint: #f5f6fd;
+  --cover-grad-1: #12163a; --cover-grad-2: #33449e; --cover-grad-3: #5468d4; --gold: #dfba68; --gold-ink: #6b5310;
+  --paper: #fbfbfe; --paper-tint: #f3f4fb; --line: #e2e3f0; --line-soft: #ececf6;
+}
+.theme-burgundy {
+  --accent: #8c2a3c; --accent-dark: #5c1522; --accent-soft: #fbeef0; --accent-tint: #fdf6f6;
+  --cover-grad-1: #31090f; --cover-grad-2: #7a2433; --cover-grad-3: #a8394c; --gold: #d1ab5c; --gold-ink: #6b4f10;
+  --paper: #fefbfa; --paper-tint: #fcf4f3; --line: #f0dfdd; --line-soft: #f6ecea;
+}
+.theme-forest {
+  --accent: #14665a; --accent-dark: #0b3e37; --accent-soft: #e9f5f2; --accent-tint: #f4faf9;
+  --cover-grad-1: #041a15; --cover-grad-2: #0f5049; --cover-grad-3: #1c8272; --gold: #d3bd76; --gold-ink: #6b5710;
+  --paper: #fafefd; --paper-tint: #f2faf8; --line: #dcefe9; --line-soft: #e9f5f1;
+}
+.theme-slate {
+  --accent: #3d5568; --accent-dark: #24333f; --accent-soft: #edf2f5; --accent-tint: #f6f9fa;
+  --cover-grad-1: #0e161d; --cover-grad-2: #324556; --cover-grad-3: #52738c; --gold: #d0b476; --gold-ink: #6b5510;
+  --paper: #fafcfd; --paper-tint: #f2f6f8; --line: #e0e8ec; --line-soft: #edf2f4;
+}
+.theme-plum {
+  --accent: #6a3b8c; --accent-dark: #3f2255; --accent-soft: #f4eef9; --accent-tint: #faf7fc;
+  --cover-grad-1: #1c0d2e; --cover-grad-2: #59317a; --cover-grad-3: #8552ac; --gold: #d5b168; --gold-ink: #6b4f10;
+  --paper: #fdfaff; --paper-tint: #f7f2fb; --line: #eae0f2; --line-soft: #f2ebf8;
+}
+
+/* ---------- Reset & font sistemi ---------- */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  font-family: "DejaVu Sans", "Liberation Sans", Arial, sans-serif;
+  color: var(--ink);
+  font-size: 7.9pt;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+strong, b { font-weight: 700; }
+em { font-style: italic; }
+
+.serif { font-family: "DejaVu Serif", "Liberation Serif", Georgia, serif; }
+
+.page {
+  position: relative;
+  width: var(--page-w);
+  height: var(--page-h);
+  overflow: hidden;
+  background: var(--paper);
+  page-break-after: always;
+  break-after: page;
+  display: flex;
+  flex-direction: column;
+}
+.page:last-child { page-break-after: auto; }
+
+/* zemin dokusu: çok hafif nokta matrisi -- kağıt/kumaş hissi verir, metni etkilemez */
+.body-page::before {
+  content: "";
+  position: absolute; inset: 0;
+  background-image: radial-gradient(circle, rgba(20,22,30,0.05) 0.6px, transparent 0.6px);
+  background-size: 3.6mm 3.6mm;
+  opacity: 0.55;
+  pointer-events: none;
+  z-index: 0;
+}
+.body-page > * { position: relative; z-index: 1; flex-shrink: 0; }
+
+/* ================= KAPAK — çok katmanlı, dokulu, amblemli ================= */
+.cover {
+  color: #fff;
+  position: relative;
+  background:
+    radial-gradient(circle at 85% 6%, rgba(255,255,255,0.14), transparent 38%),
+    radial-gradient(ellipse 70% 45% at 18% 100%, rgba(0,0,0,0.35), transparent 60%),
+    linear-gradient(152deg, var(--cover-grad-1) 0%, var(--cover-grad-2) 62%, var(--cover-grad-3) 100%);
+  padding: var(--pad-top) var(--pad-right) var(--pad-bottom) var(--pad-left);
+  justify-content: space-between;
+}
+/* ince nokta dokusu -- kumaş/kağıt hissi */
+.cover::before {
+  content: "";
+  position: absolute; inset: 0;
+  background-image: radial-gradient(circle, rgba(255,255,255,0.10) 0.7px, transparent 0.7px);
+  background-size: 4.2mm 4.2mm;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+}
+/* iç çerçeve -- "cilt" hissi */
+.cover::after {
+  content: "";
+  position: absolute; inset: calc(var(--bleed) + 7mm);
+  border: 1px solid rgba(255,255,255,0.20);
+  pointer-events: none;
+}
+.cover-corner { position:absolute; width:7mm; height:7mm; pointer-events:none; }
+.cover-corner::before, .cover-corner::after { content:""; position:absolute; background: rgba(255,255,255,0.55); }
+.cover-corner.tl { top:calc(var(--bleed) + 7mm); left:calc(var(--bleed) + 7mm); }
+.cover-corner.tr { top:calc(var(--bleed) + 7mm); right:calc(var(--bleed) + 7mm); transform: scaleX(-1); }
+.cover-corner.bl { bottom:calc(var(--bleed) + 7mm); left:calc(var(--bleed) + 7mm); transform: scaleY(-1); }
+.cover-corner.br { bottom:calc(var(--bleed) + 7mm); right:calc(var(--bleed) + 7mm); transform: scale(-1,-1); }
+.cover-corner::before { top:-1px; left:-1px; width:4.5mm; height:1.4px; }
+.cover-corner::after { top:-1px; left:-1px; width:1.4px; height:4.5mm; }
+.cover-inner { position:relative; z-index:2; display:flex; flex-direction:column; height:100%; justify-content:space-between; }
+
+.cover-top { display:flex; justify-content: space-between; align-items:flex-start; flex-shrink: 0; }
+.cover-kicker {
+  display:inline-block;
+  font-size: 7.4pt; letter-spacing: 2px; font-weight:700; text-transform:uppercase;
+  border: 1px solid rgba(255,255,255,0.4);
+  border-radius: 999px;
+  padding: 5.5px 15px;
+  color: rgba(255,255,255,0.95);
+  background: rgba(255,255,255,0.06);
+}
+
+/* Amblem: çok katmanlı halka + iç dolgu + minik saat-noktaları + mühür dokusu */
+.cover-emblem { position:relative; width: 32mm; height:32mm; }
+.cover-emblem .ring-outer {
+  position:absolute; inset:0; border-radius:50%;
+  border: 1px solid rgba(255,255,255,0.32);
+}
+.cover-emblem .ring-outer::before {
+  content:""; position:absolute; inset:-2.6mm; border-radius:50%;
+  border: 1px solid rgba(255,255,255,0.14);
+}
+.cover-emblem .ring-mid {
+  position:absolute; inset:3.4mm; border-radius:50%;
+  border: 1px solid rgba(255,255,255,0.24);
+  background: repeating-conic-gradient(rgba(255,255,255,0.12) 0deg 0.7deg, transparent 0.7deg 9deg);
+}
+.cover-emblem .ring-inner {
+  position:absolute; inset:7.2mm; border-radius:50%;
+  background: radial-gradient(circle at 32% 28%, rgba(255,255,255,0.28), rgba(255,255,255,0.03) 72%);
+  border: 1px solid rgba(255,255,255,0.45);
+  display:flex; align-items:center; justify-content:center;
+  box-shadow: inset 0 1px 5px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.06);
+}
+.cover-emblem .ring-inner span {
+  font-family: "DejaVu Serif", serif; font-size: 13.5pt; font-weight:700; color: var(--gold);
+  text-shadow: 0 1px 3px rgba(0,0,0,0.35);
+}
+.cover-emblem .tick {
+  position:absolute; width:1.4px; height:2.6mm; background: rgba(255,255,255,0.6);
+  left: 50%; top: -1.3mm; transform-origin: 50% 17mm;
+}
+.cover-emblem .tick.major { height: 3.6mm; background: var(--gold); opacity:0.85; }
+
+.cover-mid { flex: 1; display:flex; flex-direction:column; justify-content:flex-end; padding-bottom: 8mm; position:relative; }
+.cover-motif {
+  position:absolute; left:-3mm; bottom: 32mm;
+  font-family: "DejaVu Serif", serif;
+  font-size: 150pt; font-weight:700; color: rgba(255,255,255,0.075);
+  letter-spacing: -6px; line-height:1; z-index:0;
+  text-shadow: 0 0 40px rgba(255,255,255,0.04);
+}
+.cover-code { font-size: 8.6pt; letter-spacing:2.4px; color: var(--gold); font-weight:700; margin-bottom: 4.5mm; text-transform:uppercase; position:relative; }
+.cover-code::before { content:"—  "; color: rgba(255,255,255,0.5); }
+.cover-title {
+  font-family: "DejaVu Serif", "Liberation Serif", Georgia, serif;
+  font-size: 34pt; font-weight:700; line-height:1.08; letter-spacing: -0.3px;
+  position:relative; text-shadow: 0 2px 18px rgba(0,0,0,0.25);
+}
+.cover-title .accent-word { color: var(--gold); }
+.cover-subtitle { font-size: 13pt; font-weight:400; color: rgba(255,255,255,0.9); margin-top:5mm; max-width: 148mm; line-height:1.45; position:relative; }
+.cover-rule { width: 28mm; height:2.6px; background: linear-gradient(90deg, var(--gold), rgba(255,255,255,0.15)); margin: 7mm 0 6mm; border-radius:2px; position:relative; }
+.cover-desc { font-size: 9.7pt; color: rgba(255,255,255,0.82); max-width: 132mm; line-height:1.68; position:relative; }
+
+.cover-bottom { position:relative; flex-shrink: 0; }
+.cover-stats { display:flex; gap: 5mm; margin-bottom: 7mm; }
+.cover-stat {
+  flex:1;
+  border: 1px solid rgba(255,255,255,0.24);
+  border-top: 1px solid rgba(255,255,255,0.55);
+  border-radius: 9px;
+  padding: 4.2mm 5mm;
+  font-size: 8.4pt; font-weight:700; letter-spacing:.3px;
+  color: rgba(255,255,255,0.95);
+  background: linear-gradient(165deg, rgba(255,255,255,0.13), rgba(255,255,255,0.02) 60%);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.22), inset 0 1px 0 rgba(255,255,255,0.08);
+  position: relative; overflow: hidden;
+}
+.cover-stat::before {
+  content:""; position:absolute; top:0; left:0; right:0; height:1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent);
+}
+.cover-stat b { display:block; font-family:"DejaVu Serif",serif; font-size: 14pt; color: var(--gold); font-weight:700; margin-bottom:1.3mm; }
+.cover-foot {
+  display:flex; justify-content:space-between; align-items:center;
+  border-top: 1px solid rgba(255,255,255,0.25);
+  padding-top: 4mm;
+  font-size: 7.7pt; letter-spacing:1.2px; text-transform:uppercase; color: rgba(255,255,255,0.75);
+}
+
+/* ================= SAYFA GÖVDESİ (kapak-dışı tüm sayfalar) ================= */
+.body-page { padding: var(--pad-top) var(--pad-right) var(--pad-bottom) var(--pad-left); }
+
+.pageband {
+  display:flex; justify-content:space-between; align-items:center;
+  font-size: 6.09pt; letter-spacing: 0.99px; text-transform:uppercase; font-weight:700;
+  color: var(--ink-faint);
+  padding-bottom: 1.93mm; margin-bottom: 3.85mm;
+  border-bottom: 1.65px solid var(--accent);
+  position:relative;
+}
+.pageband::after {
+  content:""; position:absolute; left:0; bottom:-1.65px; width: 13.17mm; height:1.65px; background: var(--gold);
+}
+.pageband .pageband-course { color: var(--accent-dark); font-weight:700; }
+
+.footer {
+  position: absolute; bottom: calc(var(--bleed) + 9mm); left: var(--pad-left); right: var(--pad-right);
+  display:flex; justify-content:space-between; align-items:center;
+  font-size: 6.17pt; color: var(--ink-faint); font-weight:600;
+  border-top: 0.82px solid var(--line);
+  padding-top: 1.67mm;
+}
+.footer .fnum {
+  font-weight:700; color: #fff; background: var(--accent);
+  padding: 0.64px 4.49px; border-radius: 999px; font-size: 6.25pt;
+}
+
+/* ---------- İçindekiler ---------- */
+.toc-kicker { font-size: 6.58pt; letter-spacing:1.48px; font-weight:700; color: var(--accent); text-transform:uppercase; }
+.toc-title { font-family:"DejaVu Serif",serif; font-size: 20.57pt; font-weight:700; margin-top: 1.65mm; color: var(--ink); }
+.toc-lede { font-size: 7.9pt; color: var(--ink-soft); margin-top:2.47mm; max-width: 150mm; line-height:1.6; }
+.toc-list { margin-top: 6.58mm; display:flex; flex-direction:column; gap: 0; }
+.toc-row {
+  display:flex; align-items:center; gap: 4.11mm;
+  padding: 3.79mm 2.47mm;
+  border-bottom: 0.82px solid var(--line-soft);
+  border-radius: 4.94px;
+  text-decoration: none; color: inherit;
+}
+.toc-row:first-child { border-top: 0.82px solid var(--line-soft); }
+.toc-num {
+  flex: 0 0 auto;
+  width: 7.74mm; height:7.74mm; border-radius:50%;
+  background: var(--accent-soft); color: var(--accent-dark);
+  font-weight:700; font-size: 7.9pt; font-family:"DejaVu Serif",serif;
+  display:flex; align-items:center; justify-content:center;
+  box-shadow: var(--shadow-sm);
+}
+.toc-num.alt { background: var(--accent-dark); color:#fff; }
+.toc-body { flex: 1 1 auto; }
+.toc-heading { font-size: 8.89pt; font-weight:700; color: var(--ink); }
+.toc-sub { font-size: 6.99pt; color: var(--ink-faint); margin-top: 0.66mm; }
+.toc-page { flex: 0 0 auto; font-size: 7.57pt; font-weight:700; color: var(--accent); background: var(--accent-tint); padding: 1.32mm 2.47mm; border-radius: 4.94px; }
+
+/* ---------- Genel Bakış ---------- */
+.ov-hero {
+  background: linear-gradient(125deg, var(--accent-dark), var(--accent) 88%);
+  color: #fff; border-radius: 9.88px;
+  padding: 5.35mm 6.17mm; margin-top:1.65mm;
+  font-size: 7.98pt; line-height:1.6;
+  box-shadow: var(--shadow-md);
+  position:relative; overflow:hidden;
+}
+.ov-hero::after {
+  content:""; position:absolute; right:-8.23mm; top:-14.81mm; width:37.85mm; height:37.85mm; border-radius:50%;
+  border: 0.82px solid rgba(255,255,255,0.15);
+}
+.ov-hero b { color: var(--gold); }
+.ov-grid { display:grid; grid-template-columns: repeat(3, 1fr); gap: 3.46mm; margin-top: 4.94mm; }
+.ov-card {
+  border: 0.82px solid var(--line); border-radius: 7.41px; padding: 3.79mm 4.11mm;
+  background: var(--paper); box-shadow: var(--shadow-sm);
+  border-top: 2.14px solid var(--accent);
+}
+.ov-card-title { font-size: 7.82pt; font-weight:700; color: var(--accent-dark); margin-bottom:1.48mm; font-family:"DejaVu Serif",serif; }
+.ov-card-text { font-size: 6.99pt; color: var(--ink-soft); line-height:1.5; }
+
+.ov-flow { display:flex; align-items:stretch; gap: 0; margin-top: 4.94mm; }
+.ov-flow-step {
+  flex:1; background: linear-gradient(160deg, var(--accent-tint), var(--paper)); border: 0.82px solid var(--line);
+  border-radius: 7.41px; padding: 3.46mm 2.96mm; text-align:center; box-shadow: var(--shadow-sm);
+  /* Dar sayfada (5 adımda sütun ~22mm) uzun tek kelimeler kutuyu taşırıyordu:
+     flex öğesi min-content'in altına inemez, bu yüzden min-width:0 + kelime
+     kırma şart. Yoksa "Varoluşçuluğa" gibi kelimeler kart kenarından taşar. */
+  min-width: 0;
+  overflow-wrap: break-word;
+}
+.ov-flow-step b { display:block; font-size: 7.32pt; color: var(--accent-dark); margin-bottom: 0.82mm; font-family:"DejaVu Serif",serif; }
+.ov-flow-step span { font-size: 6.75pt; color: var(--ink-soft); }
+.ov-flow-arrow { flex: 0 0 5.76mm; display:flex; align-items:center; justify-content:center; color: var(--accent); }
+
+/* ================= BÖLÜM BANNER ================= */
+.chbanner {
+  background: linear-gradient(128deg, var(--accent-dark), var(--accent) 85%);
+  color:#fff; border-radius: 9.88px;
+  padding: 5.76mm 6.99mm; position:relative; overflow:hidden;
+  box-shadow: var(--shadow-lg);
+}
+.chbanner::before {
+  content:"";
+  position:absolute; inset:0;
+  background-image: radial-gradient(circle, rgba(255,255,255,0.12) 0.6px, transparent 0.6px);
+  background-size: 3.6mm 3.6mm; mix-blend-mode: overlay;
+}
+.chbanner::after {
+  content:""; position:absolute; right:-13.17mm; top:-13.17mm; width:46.08mm; height:46.08mm;
+  border-radius:50%; border: 0.82px solid rgba(255,255,255,0.22);
+}
+.chbanner-deco { position:absolute; right:8.23mm; bottom:-6.58mm; font-family:"DejaVu Serif",serif; font-size:49.38pt; font-weight:700; color: rgba(255,255,255,0.08); }
+.chbanner-kicker { font-size: 6.42pt; letter-spacing:1.65px; font-weight:700; text-transform:uppercase; color: var(--gold); position:relative; }
+.chbanner-title { font-family:"DejaVu Serif",serif; font-size: 16.46pt; font-weight:700; margin-top: 1.48mm; line-height:1.15; position:relative; }
+.chbanner-subtitle { font-size: 7.49pt; color: rgba(255,255,255,0.88); margin-top: 1.81mm; max-width: 150mm; line-height:1.5; position:relative; }
+
+/* ---------- 4'lü anahtar terim grid'i ---------- */
+.terms-grid { display:grid; grid-template-columns: 1fr 1fr; gap: 2.8mm; margin-top: 4.53mm; }
+.term-box {
+  border: 0.82px solid var(--line); border-left: 2.88px solid var(--accent);
+  border-radius: 5.76px; padding: 2.8mm 3.46mm; background: var(--paper);
+  box-shadow: var(--shadow-sm);
+}
+.term-box .term-name { font-size: 7.65pt; font-weight:700; color: var(--accent-dark); margin-bottom: 0.91mm; font-family:"DejaVu Serif",serif; }
+.term-box .term-def { font-size: 6.83pt; color: var(--ink-soft); line-height:1.45; }
+
+/* ---------- Kişi kartı ---------- */
+.person-card {
+  display:flex; gap: 3.46mm; align-items:flex-start;
+  margin-top: 4.53mm; padding: 3.46mm 4.11mm;
+  background: linear-gradient(155deg, var(--accent-tint), var(--paper));
+  border: 0.82px solid var(--line); border-radius: 7.41px;
+  box-shadow: var(--shadow-sm);
+}
+.person-avatar {
+  flex: 0 0 auto; width: 11.11mm; height:11.11mm; border-radius:50%;
+  background: linear-gradient(150deg, var(--accent), var(--accent-dark));
+  color:#fff; font-weight:700; font-size: 8.64pt; font-family:"DejaVu Serif",serif;
+  display:flex; align-items:center; justify-content:center;
+  box-shadow: var(--shadow-sm);
+}
+.person-name { font-size: 8.72pt; font-weight:700; color: var(--ink); font-family:"DejaVu Serif",serif; }
+.person-tag { font-size: 6.34pt; letter-spacing:.4.94px; text-transform:uppercase; font-weight:700; color: var(--accent-dark); margin: 0.58mm 0 1.4mm; }
+.person-bio { font-size: 6.83pt; color: var(--ink-soft); line-height:1.5; }
+.person-row { display:flex; gap: 4.94mm; margin-top:4.53mm; }
+.person-row .person-card { flex:1; margin-top:0; }
+
+/* ---------- Numaralı içerik blokları ---------- */
+.block { margin-top: 4.77mm; }
+.block-head { display:flex; align-items:baseline; gap: 2.3mm; margin-bottom: 2.14mm; }
+.block-num {
+  flex:0 0 auto; width: 5.27mm; height:5.27mm; border-radius:50%;
+  background: var(--accent-dark); color:#fff; font-size: 6.5pt; font-weight:700;
+  display:flex; align-items:center; justify-content:center; box-shadow: var(--shadow-sm);
+}
+.block-title { font-size: 8.89pt; font-weight:700; color: var(--ink); font-family:"DejaVu Serif",serif; }
+.block-subtitle { font-size: 6.75pt; color: var(--ink-faint); margin-top: -0.99mm; margin-bottom:1.65mm; margin-left: 7.57mm; font-style:italic; }
+.block ul { margin-left: 7.57mm; }
+.block li { font-size: 7.32pt; color: var(--ink-soft); margin-bottom: 1.4mm; line-height:1.5; list-style: none; position:relative; }
+.block li::before { content:"–"; position:absolute; left:-3.46mm; color: var(--accent); font-weight:700; }
+.block li b, .block li strong { color: var(--ink); font-weight:700; }
+
+/* ---------- Callout kutuları (gerçek SVG ikonlarla) ---------- */
+.callout { border-radius: 7.41px; padding: 3.13mm 3.95mm; margin-top: 4.28mm; display:flex; gap: 2.8mm; box-shadow: var(--shadow-sm); }
+.callout-icon { flex:0 0 auto; width: 5.76mm; height:5.76mm; border-radius:50%; display:flex; align-items:center; justify-content:center; }
+.callout-icon svg { width: 3.13mm; height:3.13mm; }
+.callout-title { font-size: 6.99pt; font-weight:700; text-transform:uppercase; letter-spacing:.4.11px; margin-bottom: 0.91mm; }
+.callout-text { font-size: 7.16pt; line-height:1.5; }
+
+.callout.focus { background: var(--focus-bg); border: 0.82px solid #eecf8a; }
+.callout.focus .callout-icon { background:#f0dba0; color: var(--focus-ink); }
+.callout.focus .callout-title, .callout.focus .callout-text { color: var(--focus-ink); }
+
+.callout.caution { background: var(--caution-bg); border: 0.82px solid #b9cdf2; }
+.callout.caution .callout-icon { background:#c3d3f5; color: var(--caution-ink); }
+.callout.caution .callout-title, .callout.caution .callout-text { color: var(--caution-ink); }
+
+.callout.insight { background: var(--insight-bg); border: 0.82px solid #1c2c4d; }
+.callout.insight .callout-icon { background: rgba(255,255,255,0.16); color: var(--insight-accent); }
+.callout.insight .callout-title { color: var(--insight-accent); }
+.callout.insight .callout-text { color: rgba(255,255,255,0.94); }
+
+.callout.route { background: var(--route-bg); border: 0.82px solid #c9bcf2; }
+.callout.route .callout-icon { background:#d6cdf5; color: var(--route-ink); }
+.callout.route .callout-title, .callout.route .callout-text { color: var(--route-ink); }
+
+/* ---------- Akış / süreç diyagramı ---------- */
+.flowdiag { display:flex; align-items:stretch; gap:0; margin-top: 4.77mm; }
+.flowdiag .fstep {
+  flex:1; background: var(--paper); border: 0.82px solid var(--line); border-top: 2.47px solid var(--accent);
+  border-radius: 6.58px; padding: 2.96mm 2.47mm; text-align:center; box-shadow: var(--shadow-sm);
+  min-width: 0; overflow-wrap: break-word;    /* bkz. .ov-flow-step notu */
+}
+.flowdiag .fstep-title { font-size: 6.99pt; font-weight:700; color: var(--ink); margin-bottom: 0.82mm; font-family:"DejaVu Serif",serif; }
+.flowdiag .fstep-text { font-size: 6.25pt; color: var(--ink-faint); line-height:1.35; }
+.flowdiag .farrow { flex: 0 0 5.35mm; display:flex; align-items:center; justify-content:center; color: var(--accent); }
+.flowdiag .farrow svg { width:3.29mm; height:3.29mm; }
+.flow-caption { font-size: 6.34pt; color: var(--ink-faint); margin-top: 1.48mm; font-style: italic; }
+
+/* ---------- Karşılaştırma tablosu ---------- */
+.ctable-wrap { margin-top: 4.77mm; }
+.ctable-caption { font-size: 7.16pt; font-weight:700; color: var(--accent-dark); margin-bottom: 1.81mm; font-family:"DejaVu Serif",serif; }
+table.ctable { width:100%; border-collapse: collapse; border-radius: 5.76px; overflow:hidden; box-shadow: var(--shadow-sm); }
+table.ctable th {
+  background: linear-gradient(120deg, var(--accent-dark), var(--accent));
+  color:#fff; font-size: 6.67pt; text-align:left;
+  padding: 2.3mm 2.96mm; font-weight:700; letter-spacing:.1.65px;
+}
+table.ctable td {
+  font-size: 6.75pt; color: var(--ink-soft); padding: 2.3mm 2.96mm;
+  border-bottom: 0.82px solid var(--line-soft); vertical-align: top; line-height:1.4;
+}
+table.ctable tr:nth-child(even) td { background: var(--accent-tint); }
+table.ctable td:first-child { font-weight:700; color: var(--ink); }
+
+/* ---------- Bilgi kartları (küçük istatistik grid) ---------- */
+.info-grid { display:grid; grid-template-columns: repeat(3, 1fr); gap: 2.8mm; margin-top: 4.77mm; }
+.info-card { border: 0.82px solid var(--line); border-radius:6.58px; padding: 2.8mm 3.13mm; position:relative; background: var(--paper); box-shadow: var(--shadow-sm); }
+.info-card .badge {
+  position:absolute; top:2.14mm; right:2.3mm; width: 4.44mm; height:4.44mm; border-radius:50%;
+  background: var(--accent-soft); color: var(--accent-dark);
+  font-size: 6.58pt; font-weight:700; font-family:"DejaVu Serif",serif;
+  display:flex; align-items:center; justify-content:center;
+}
+.info-card .ic-title { font-size: 6.99pt; font-weight:700; color: var(--ink); margin-bottom: 0.91mm; padding-right: 4.94mm; font-family:"DejaVu Serif",serif; }
+.info-card .ic-text { font-size: 6.5pt; color: var(--ink-soft); line-height:1.4; }
+
+/* ---------- Bölüm özeti ---------- */
+.chsummary {
+  margin-top: 5.1mm; background: linear-gradient(120deg, var(--accent-dark), var(--accent) 130%); color:#fff; border-radius: 7.41px;
+  padding: 3.62mm 4.28mm; font-size: 7.24pt; line-height:1.55; box-shadow: var(--shadow-md);
+}
+.chsummary b { color: var(--gold); text-transform:uppercase; font-size:6.34pt; letter-spacing:.4.94px; display:block; margin-bottom:1.23mm; }
+
+/* ---------- Ayet-i Kerime kartları (Arapça orijinal + meal + etimoloji) ---------- */
+.ayat-section-title { font-size: 7.08pt; font-weight:700; color: var(--accent-dark); margin-bottom: 1.81mm; margin-top: 4.77mm; font-family:"DejaVu Serif",serif; }
+.ayah-card {
+  border: 0.82px solid var(--line); border-left: 2.88px solid var(--gold);
+  border-radius: 6.58px; padding: 3.29mm 3.79mm; margin-top: 2.63mm;
+  background: linear-gradient(160deg, var(--accent-tint), var(--paper));
+  box-shadow: var(--shadow-sm);
+}
+.ayah-ref {
+  font-size: 6.25pt; font-weight:700; letter-spacing:.3.29px; text-transform:uppercase;
+  color: var(--gold-ink); margin-bottom: 1.65mm;
+}
+.ayah-arabic {
+  direction: rtl; text-align: right; unicode-bidi: isolate;
+  font-family: "DejaVu Sans", sans-serif;
+  font-size: 12.34pt; line-height: 2; color: var(--ink);
+  margin-bottom: 2.14mm; word-spacing: 1.23px;
+}
+.ayah-meal { font-size: 6.99pt; color: var(--ink-soft); line-height:1.5; font-style:italic; }
+.ayah-meal::before { content: "" ; }
+.ayah-etym { font-size: 6.58pt; color: var(--ink-faint); line-height:1.4; margin-top: 1.48mm; padding-top: 1.48mm; border-top: 0.82px solid var(--line-soft); }
+
+/* ================= SÖZLÜK ================= */
+.gloss-grid { display:grid; grid-template-columns: 1fr 1fr; gap: 2.63mm 4.53mm; margin-top: 4.94mm; }
+.gloss-item { border-bottom: 0.82px solid var(--line-soft); padding-bottom: 2.3mm; }
+.gloss-term { font-size: 7.49pt; font-weight:700; color: var(--accent-dark); font-family:"DejaVu Serif",serif; }
+.gloss-def { font-size: 6.75pt; color: var(--ink-soft); line-height:1.42; margin-top: 0.74mm; }
+.gloss-ref { font-size: 6.01pt; color: var(--ink-faint); margin-top: 0.74mm; font-style:italic; }
+
+/* ================= SINAV HAZIRLIK ================= */
+.dist-grid { display:grid; grid-template-columns: 1fr 1fr; gap: 2.96mm; margin-top: 4.28mm; }
+.dist-card { border: 0.82px solid var(--line); border-radius: 7.41px; padding: 3.13mm 3.62mm; background: var(--paper); box-shadow: var(--shadow-sm); }
+.dist-title { font-size: 7.32pt; font-weight:700; color: var(--accent-dark); margin-bottom:1.23mm; font-family:"DejaVu Serif",serif; }
+.dist-vs { color: var(--gold-ink); font-weight:700; }
+.dist-text { font-size: 6.75pt; color: var(--ink-soft); line-height:1.48; }
+
+.match-table-wrap { margin-top: 4.94mm; }
+table.matchtable { width:100%; border-collapse:collapse; box-shadow: var(--shadow-sm); }
+table.matchtable th { background: linear-gradient(120deg, var(--accent-dark), var(--accent)); color:#fff; font-size:6.5pt; padding:2.14mm 2.63mm; text-align:left; }
+table.matchtable td { font-size: 6.67pt; padding: 1.98mm 2.63mm; border-bottom:0.82px solid var(--line-soft); color: var(--ink-soft); }
+table.matchtable td:first-child { font-weight:700; color:var(--ink); }
+table.matchtable tr:nth-child(even) td { background: var(--accent-tint); }
+
+.qa-grid { display:grid; grid-template-columns: 1fr 1fr; gap: 2.63mm 4.94mm; margin-top: 4.94mm; }
+.qa-item { font-size: 6.83pt; border-left: 2.06px solid var(--accent-soft); padding-left: 2.47mm; }
+.qa-q { font-weight:700; color: var(--ink); margin-bottom: 0.74mm; }
+.qa-a { color: var(--accent-dark); }
+
+.checklist { margin-top: 4.94mm; display:grid; grid-template-columns: 1fr 1fr; gap: 1.98mm 4.94mm; }
+.check-item { display:flex; align-items:flex-start; gap: 1.98mm; font-size: 6.83pt; color: var(--ink-soft); }
+.check-box { flex:0 0 auto; width:3.13mm; height:3.13mm; border: 1.23px solid var(--accent); border-radius: 2.47px; margin-top: 0.49mm; }
+
+.section-kicker { font-size: 6.5pt; letter-spacing:1.48px; font-weight:700; color: var(--accent); text-transform:uppercase; }
+.section-title { font-family:"DejaVu Serif",serif; font-size: 17.28pt; font-weight:700; margin-top: 1.65mm; color: var(--ink); }
+.section-lede { font-size: 7.41pt; color: var(--ink-soft); margin-top: 2.14mm; }
+
+/* ================= TEST (20 Soruluk Değerlendirme) ================= */
+.test-chip-row { display:flex; gap: 2.8mm; margin-top: 4.53mm; }
+.test-chip {
+  flex:1; text-align:center; background: var(--accent-tint); border: 0.82px solid var(--line);
+  border-radius: 6.58px; padding: 2.47mm 1.65mm;
+}
+.test-chip b { display:block; font-family:"DejaVu Serif",serif; font-size: 10.29pt; color: var(--accent-dark); }
+.test-chip span { font-size: 5.76pt; font-weight:700; letter-spacing:.3.29px; text-transform:uppercase; color: var(--ink-faint); }
+.test-instructions {
+  margin-top: 3.29mm; background: var(--caution-bg); border: 0.82px solid #b9cdf2; color: var(--caution-ink);
+  border-radius: 6.58px; padding: 2.47mm 3.29mm; font-size: 6.91pt; line-height:1.5;
+}
+.tq-list { margin-top: 4.94mm; column-count: 2; column-gap: 6.58mm; column-fill: balance; }
+.tq { break-inside: avoid; -webkit-column-break-inside: avoid; margin-bottom: 4.53mm; }
+.tq-head { display:flex; align-items:flex-start; gap: 2.3mm; margin-bottom: 1.81mm; }
+.tq-num {
+  flex:0 0 auto; width: 5.27mm; height:5.27mm; border-radius:4.94px;
+  background: var(--accent-dark); color:#fff; font-size: 6.91pt; font-weight:700;
+  display:flex; align-items:center; justify-content:center; box-shadow: var(--shadow-sm); font-family:"DejaVu Serif",serif;
+}
+.tq-stem { font-size: 7.49pt; font-weight:700; color: var(--ink); line-height:1.4; padding-top:0.33mm; }
+.tq-options { margin-left: 7.57mm; display:flex; flex-direction:column; gap: 1.32mm; }
+.tq-options li { list-style:none; display:flex; gap: 1.98mm; align-items:flex-start; font-size: 7.08pt; color: var(--ink-soft); line-height:1.4; }
+.opt-letter {
+  flex:0 0 auto; width:3.79mm; height:3.79mm; border-radius:50%; border: 1.07px solid var(--accent);
+  color: var(--accent-dark); font-size: 5.6pt; font-weight:700;
+  display:flex; align-items:center; justify-content:center; margin-top: 0.16mm;
+}
+
+/* ================= CEVAP ANAHTARI VE ÇÖZÜMLER ================= */
+.ans-list { margin-top: 4.94mm; column-count: 2; column-gap: 6.58mm; column-fill: balance; }
+.ans-item { display:flex; gap: 2.47mm; break-inside: avoid; -webkit-column-break-inside: avoid; margin-bottom: 2.3mm; }
+.ans-num {
+  flex:0 0 auto; width: 5.27mm; height:5.27mm; border-radius:4.94px;
+  background: var(--accent-soft); color: var(--accent-dark); font-size: 6.91pt; font-weight:700;
+  display:flex; align-items:center; justify-content:center; font-family:"DejaVu Serif",serif; border: 0.82px solid var(--line);
+}
+.ans-correct {
+  display:inline-block; background:#e7f5ec; color:#1e7e42; font-weight:700; font-size:6.25pt;
+  letter-spacing:.2.47px; padding: 0.82mm 2.14mm; border-radius:999px; margin-bottom: 0.99mm;
+}
+.ans-explain { font-size: 6.99pt; color: var(--ink-soft); line-height:1.45; }
+.ans-explain b { color: var(--ink); }
+
+/* çok-sayfa: bölüm içi devam sayfası başlığı */
+.chcontinue { display:flex; align-items:flex-start; gap: 2.63mm; margin-bottom: 4.53mm; }
+.chcontinue .tag {
+  flex: 0 0 auto; margin-top: 0.49mm;
+  font-size: 6.17pt; font-weight:700; letter-spacing:.4.94px; text-transform:uppercase;
+  background: var(--accent-dark); color: #fff; padding: 1.48mm 2.8mm; border-radius: 999px;
+}
+.chcontinue .cctitle { font-family:"DejaVu Serif",serif; font-size: 11.52pt; font-weight:700; color: var(--ink); line-height:1.25; }
+
+/* ============================================================
+   KİTAP ÖN KISMI (build_kitap.py — ana kapak, künye, önsöz,
+   sayfa rehberi, ana içindekiler, ders haritası)
+   Sadece birleşik kitapta kullanılır; tek ders çıktısını etkilemez.
+   ============================================================ */
+
+/* --- Künye --- */
+.imprint-grid { margin-top: 5.76mm; border-top: 0.82px solid var(--line); }
+.imprint-row { display:flex; gap: 4.94mm; padding: 2.8mm 0.82mm; border-bottom: 0.82px solid var(--line-soft); }
+.imprint-label {
+  flex: 0 0 34.56mm; font-size: 6.58pt; font-weight:700; letter-spacing:0.91px;
+  text-transform:uppercase; color: var(--ink-faint);
+}
+.imprint-value { flex:1; font-size: 7.74pt; color: var(--ink); line-height:1.5; }
+.imprint-value b { color: var(--accent-dark); }
+.imprint-note {
+  margin-top: 5.76mm; font-size: 7.24pt; color: var(--ink-soft); line-height:1.6;
+  border-left: 2.14px solid var(--accent); padding: 0.82mm 0 0.82mm 4.11mm;
+}
+
+/* --- Önsöz --- */
+.pref-grid { display:grid; grid-template-columns: repeat(2, 1fr); gap: 4.11mm; margin-top: 5.76mm; }
+.pref-card {
+  border: 0.82px solid var(--line); border-top: 2.14px solid var(--accent);
+  border-radius: 7.41px; padding: 4.11mm 4.44mm; background: var(--paper); box-shadow: var(--shadow-sm);
+}
+.pref-card-title {
+  font-family:"DejaVu Serif",serif; font-size: 8.56pt; font-weight:700;
+  color: var(--accent-dark); margin-bottom: 1.98mm;
+}
+.pref-card-text { font-size: 7.24pt; color: var(--ink-soft); line-height:1.58; }
+.pref-card-text b { color: var(--ink); }
+
+/* --- Sayfa rehberi (legend) --- */
+.guide-grid { display:grid; grid-template-columns: repeat(2, 1fr); gap: 4.11mm 4.94mm; margin-top: 4.94mm; }
+.guide-item { display:flex; flex-direction:column; gap: 1.81mm; }
+.guide-cap {
+  font-size: 6.58pt; font-weight:700; letter-spacing:.7.41px; text-transform:uppercase;
+  color: var(--accent-dark);
+}
+.guide-cap span { display:block; text-transform:none; letter-spacing:0; font-weight:400; font-size:6.75pt; color: var(--ink-soft); margin-top:0.66mm; line-height:1.45; }
+.guide-demo { border: 0.82px dashed var(--line); border-radius: 6.58px; padding: 2.47mm; background: var(--paper-tint); }
+.guide-demo .callout { margin: 0; }
+.guide-demo .term-box { margin: 0; }
+.guide-demo .chsummary { margin: 0; }
+
+/* --- Ana içindekiler (ders listesi) --- */
+.btoc-list { margin-top: 4.94mm; display:flex; flex-direction:column; }
+.btoc-row {
+  display:flex; align-items:center; gap: 3.7mm;
+  padding: 3.29mm 2.47mm; border-bottom: 0.82px solid var(--line-soft);
+  text-decoration:none; color: inherit; border-radius: 4.94px;
+}
+.btoc-row:first-child { border-top: 0.82px solid var(--line-soft); }
+.btoc-chip {
+  flex: 0 0 auto; width: 8.64mm; height: 8.64mm; border-radius: 6.58px;
+  display:flex; align-items:center; justify-content:center;
+  font-family:"DejaVu Serif",serif; font-weight:700; font-size: 9.05pt; color:#fff;
+  box-shadow: var(--shadow-sm);
+}
+.btoc-body { flex: 1 1 auto; min-width: 0; }
+.btoc-name { font-size: 9.05pt; font-weight:700; color: var(--ink); }
+.btoc-sub { font-size: 6.83pt; color: var(--ink-faint); margin-top: 0.66mm; }
+.btoc-meta { flex: 0 0 auto; font-size: 6.42pt; color: var(--ink-faint); text-align:right; line-height:1.5; }
+.btoc-range {
+  flex: 0 0 auto; font-size: 7.57pt; font-weight:700; color: #fff;
+  padding: 1.48mm 2.63mm; border-radius: 4.94px; min-width: 20mm; text-align:center;
+}
+
+/* --- Ders haritası (sırt görünümü) --- */
+.map-note { font-size: 7.24pt; color: var(--ink-soft); line-height:1.6; margin-top: 2.47mm; }
+.map-list { margin-top: 5.76mm; display:flex; flex-direction:column; gap: 2.63mm; }
+.map-row { display:flex; align-items:center; gap: 3.29mm; }
+.map-name { flex: 0 0 42.79mm; font-size: 7.24pt; font-weight:700; color: var(--ink); }
+.map-track { flex: 1 1 auto; height: 5.43mm; background: var(--paper-tint); border: 0.82px solid var(--line); border-radius: 999px; overflow:hidden; }
+.map-fill { height: 100%; border-radius: 999px; display:flex; align-items:center; justify-content:flex-end; padding-right: 1.98mm; }
+.map-fill span { font-size: 6.09pt; font-weight:700; color: #fff; }
+.map-range { flex: 0 0 19.75mm; text-align:right; font-size: 6.75pt; font-weight:700; color: var(--ink-faint); }
+
+/* ===== build.py tarafından üretildi — elle düzenlemeyin ===================
+   Trim 175mm x 250mm · bleed 3mm ·
+   kenarlar: üst 11mm / alt 19mm /
+   iç 14mm / dış 9mm ·
+   tek sayfa sırtı: left
+   ========================================================================= */
+@page { size: 181mm 256mm; margin: 0; }
+:root {
+  --trim-w: 175mm;
+  --trim-h: 250mm;
+  --bleed: 3mm;
+  --page-w: 181mm;
+  --page-h: 256mm;
+  --mg-top: 11mm;
+  --mg-bottom: 19mm;
+  --mg-inner: 14mm;
+  --mg-outer: 9mm;
+  --pad-top: 14mm;
+  --pad-bottom: 22mm;
+  --pad-inner: 17mm;
+  --pad-outer: 12mm;
+}
+/* Ayna simetri — tek sayfada sırt left, çift sayfada right */
+body > section.page:nth-of-type(odd) {
+  --pad-left: var(--pad-inner);
+  --pad-right: var(--pad-outer);
+}
+body > section.page:nth-of-type(even) {
+  --pad-left: var(--pad-outer);
+  --pad-right: var(--pad-inner);
+}
+</style>
+<style>:root {
+  --accent: #185F6D;
+  --accent-dark: #0A2D34;
+  --accent-soft: #EEF7F9;
+  --accent-tint: #F6FBFB;
+  --cover-grad-1: #06262D;
+  --cover-grad-2: #134D58;
+  --cover-grad-3: #287E90;
+  --gold: #d9b466;
+  --gold-ink: #6b5210;
+  --paper: #FCFDFD;
+  --paper-tint: #F4F9F9;
+  --line: #E0EBEE;
+  --line-soft: #ECF3F5;
+}</style>
+</head>
+<body class="theme-custom">
+
+
+
+<section class="page cover" id="cover">
+  <div class="cover-corner tl"></div>
+  <div class="cover-corner tr"></div>
+  <div class="cover-corner bl"></div>
+  <div class="cover-corner br"></div>
+  <div class="cover-top">
+    <div class="cover-kicker">Görsel Ders Notu Kitabı · Final Özeti</div>
+    <div class="cover-emblem">
+      <div class="ring-outer"></div>
+      <div class="ring-mid"></div>
+      
+      <div class="tick major" style="transform: translateX(-50%) rotate(0deg);"></div>
+      
+      <div class="tick" style="transform: translateX(-50%) rotate(30deg);"></div>
+      
+      <div class="tick" style="transform: translateX(-50%) rotate(60deg);"></div>
+      
+      <div class="tick major" style="transform: translateX(-50%) rotate(90deg);"></div>
+      
+      <div class="tick" style="transform: translateX(-50%) rotate(120deg);"></div>
+      
+      <div class="tick" style="transform: translateX(-50%) rotate(150deg);"></div>
+      
+      <div class="tick major" style="transform: translateX(-50%) rotate(180deg);"></div>
+      
+      <div class="tick" style="transform: translateX(-50%) rotate(210deg);"></div>
+      
+      <div class="tick" style="transform: translateX(-50%) rotate(240deg);"></div>
+      
+      <div class="tick major" style="transform: translateX(-50%) rotate(270deg);"></div>
+      
+      <div class="tick" style="transform: translateX(-50%) rotate(300deg);"></div>
+      
+      <div class="tick" style="transform: translateX(-50%) rotate(330deg);"></div>
+      
+      <div class="ring-inner"><span>Ç</span></div>
+    </div>
+  </div>
+  <div class="cover-mid">
+    <div class="cover-motif">Ç</div>
+    <div class="cover-code">ÇAĞD. FELSEFE</div>
+    <div class="cover-title">Çağdaş <span class="accent-word">Felsefe</span></div>
+    <div class="cover-subtitle">Öğretmen Notlarıyla Pozitivizmden Varoluşçuluğa 20. Yüzyıl Düşünce Akımları</div>
+    <div class="cover-rule"></div>
+    <div class="cover-desc">Öğretmenin kendi dikte notlarından toparlanmış çalışma rehberi: Comte'un pozitivizminden Schopenhauer'ın kötümserliğine, Darwin ve Freud'un bilimsel devrimlerinden Russell'ın analitik felsefesine, Kierkegaard'ın varoluşçu öncülüğünden Nietzsche'nin Üstinsan idealine ve faydacılıktan Marx'ın tarihsel maddeciliğine uzanan, sınavda en çok karıştırılan noktaların ayrıca işaretlendiği kapsamlı bir çağdaş felsefe özeti.</div>
+  </div>
+  <div class="cover-bottom">
+    <div class="cover-stats">
+      <div class="cover-stat"><b>7</b>Bölüm</div>
+      <div class="cover-stat"><b>36</b>Anahtar Kavram</div>
+      <div class="cover-stat"><b>Final</b>Sınav Hazırlık</div>
+    </div>
+    <div class="cover-foot">
+      <div>Ders Notu Serisi</div>
+      <div>7 Bölüm · Final Sınavı Hazırlığı</div>
+    </div>
+  </div>
+</section>
+
+
+
+
+<section class="page body-page">
+  <div class="pageband"><div>Çağdaş <span class="accent-word">Felsefe</span></div><div class="pageband-course">ÇAĞD. FELSEFE</div></div>
+  
+  <div class="toc-kicker">Kitap Planı</div>
+  <div class="toc-title">İçindekiler</div>
+  <div class="toc-lede">Öğretmen Notlarıyla Pozitivizmden Varoluşçuluğa 20. Yüzyıl Düşünce Akımları — bölüm bölüm takip edilecek çalışma haritası.</div>
+  
+  <div class="toc-list">
+    
+    <a class="toc-row" href="#ch-1">
+      <div class="toc-num">1</div>
+      <div class="toc-body">
+        <div class="toc-heading">Pozitivizm ve Kötümser Felsefe</div>
+        <div class="toc-sub">Comte'un bilim temelli iyimserliğinden Schopenhauer'ın irade kötümserliğine</div>
+      </div>
+      <div class="toc-page">s.5</div>
+    </a>
+    
+    <a class="toc-row" href="#ch-2">
+      <div class="toc-num">2</div>
+      <div class="toc-body">
+        <div class="toc-heading">Evrim Teorisi ve Psikanaliz</div>
+        <div class="toc-sub">Darwin'in doğal seçilimi ile Freud'un bilinçdışı keşfi, dönemin dinî ve akılcı güvenini sarsar</div>
+      </div>
+      <div class="toc-page">s.8</div>
+    </a>
+    
+    <a class="toc-row" href="#ch-3">
+      <div class="toc-num">3</div>
+      <div class="toc-body">
+        <div class="toc-heading">Analitik Felsefe</div>
+        <div class="toc-sub">Analitik-Kıta Felsefesi ayrımından Russell'ın mantıksal atomculuğuna ve din eleştirisine</div>
+      </div>
+      <div class="toc-page">s.11</div>
+    </a>
+    
+    <a class="toc-row" href="#ch-4">
+      <div class="toc-num">4</div>
+      <div class="toc-body">
+        <div class="toc-heading">Varoluşçuluğun Öncüsü: Kierkegaard</div>
+        <div class="toc-sub">Nesnel ve öznel doğru ayrımından İman Şövalyesi'ne giden üç aşamaya</div>
+      </div>
+      <div class="toc-page">s.13</div>
+    </a>
+    
+    <a class="toc-row" href="#ch-5">
+      <div class="toc-num">5</div>
+      <div class="toc-body">
+        <div class="toc-heading">Fenomenoloji ve Varoluşçuluk</div>
+        <div class="toc-sub">Husserl'in bilinç deneyiminden Heidegger'in Dasein'ına; Sartre'ın özgürlüğünden Camus'nün absürdizmine</div>
+      </div>
+      <div class="toc-page">s.15</div>
+    </a>
+    
+    <a class="toc-row" href="#ch-6">
+      <div class="toc-num">6</div>
+      <div class="toc-body">
+        <div class="toc-heading">Güç İstenci, Üstinsan ve Nihilizm</div>
+        <div class="toc-sub">Nietzsche'nin eleştiri felsefesinden Tanrı'nın ölümüne ve Üstinsan idealine</div>
+      </div>
+      <div class="toc-page">s.18</div>
+    </a>
+    
+    <a class="toc-row" href="#ch-7">
+      <div class="toc-num">7</div>
+      <div class="toc-body">
+        <div class="toc-heading">Faydacılık ve Tarihsel Maddecilik</div>
+        <div class="toc-sub">Bentham'ın niceliksel ve Mill'in niteliksel faydacılığından Marx'ın alt yapı-üst yapı çatışmasına</div>
+      </div>
+      <div class="toc-page">s.20</div>
+    </a>
+    
+  </div>
+  
+<div class="footer">
+  <div>Çağdaş <span class="accent-word">Felsefe</span></div>
+  <div class="fnum">2</div>
+</div>
+
+</section>
+
+
+<section class="page body-page">
+  <div class="pageband"><div>Çağdaş <span class="accent-word">Felsefe</span></div><div class="pageband-course">İçindekiler · Devam</div></div>
+  
+  <div class="toc-list">
+    
+    <a class="toc-row" href="#glossary">
+      <div class="toc-num alt">A</div>
+      <div class="toc-body">
+        <div class="toc-heading">Anahtar Kavramlar Sözlüğü</div>
+        <div class="toc-sub">Tanımlı ve bağlamlandırılmış 36 kavram</div>
+      </div>
+      <div class="toc-page">s.23</div>
+    </a>
+    
+    <a class="toc-row" href="#exam">
+      <div class="toc-num alt">B</div>
+      <div class="toc-body">
+        <div class="toc-heading">Genel Değerlendirme Testi</div>
+        <div class="toc-sub">20 soruluk çoktan seçmeli test ve çözümlü cevap anahtarı</div>
+      </div>
+      <div class="toc-page">s.25</div>
+    </a>
+    
+  </div>
+  
+<div class="footer">
+  <div>Çağdaş <span class="accent-word">Felsefe</span></div>
+  <div class="fnum">3</div>
+</div>
+
+</section>
+
+
+
+
+<section class="page body-page">
+  <div class="pageband"><div>Çağdaş <span class="accent-word">Felsefe</span></div><div class="pageband-course">ÇAĞD. FELSEFE</div></div>
+  <div class="toc-kicker">Dersin Büyük Resmi</div>
+  <div class="toc-title">Genel Bakış</div>
+
+  <div class="ov-hero">Bu ders, bir öğretmenin kendi dikte notlarını toparlayıp düzelttiği bir çalışma rehberine dayanır: <b>Comte'un pozitivizminden</b> <b>Schopenhauer'ın kötümserliğine</b>, <b>Darwin ve Freud'un bilimsel devrimlerinden</b> <b>Russell'ın analitik felsefesine</b>, <b>Kierkegaard'dan Sartre ve Camus'ye uzanan varoluşçuluğa</b> ve <b>Nietzsche'den Marx'a</b> kadar çağdaş felsefenin yedi temel durağını bir bütün olarak sunar.</div>
+
+  <div class="ov-grid">
+    
+    <div class="ov-card">
+      <div class="ov-card-title">Pozitivizm ve Kötümser Felsefe</div>
+      <div class="ov-card-text">Comte'un bilim temelli Üç Hal Yasası ile Schopenhauer'ın irade kötümserliği.</div>
+    </div>
+    
+    <div class="ov-card">
+      <div class="ov-card-title">Evrim ve Psikanaliz</div>
+      <div class="ov-card-text">Darwin'in doğal seçilimi ile Freud'un bilinçdışı keşfi.</div>
+    </div>
+    
+    <div class="ov-card">
+      <div class="ov-card-title">Analitik Felsefe</div>
+      <div class="ov-card-text">Çağdaş felsefenin iki damarı ve Russell'ın mantıksal atomculuğu, din eleştirisi.</div>
+    </div>
+    
+    <div class="ov-card">
+      <div class="ov-card-title">Varoluşçuluğun Kökleri</div>
+      <div class="ov-card-text">Kierkegaard'ın öznel doğrusundan Husserl ve Heidegger'in fenomenolojisine.</div>
+    </div>
+    
+    <div class="ov-card">
+      <div class="ov-card-title">Varoluşçuluk</div>
+      <div class="ov-card-text">Sartre'ın özgürlük/sorumluluk anlayışı ve Camus'nün Sisifos Miti ile absürdizmi.</div>
+    </div>
+    
+    <div class="ov-card">
+      <div class="ov-card-title">Güç İstenci, Faydacılık ve Marx</div>
+      <div class="ov-card-text">Nietzsche'nin Üstinsan idealinden Bentham/Mill'in faydacılığına ve Marx'ın tarihsel maddeciliğine.</div>
+    </div>
+    
+  </div>
+
+  
+  <div class="section-kicker" style="margin-top:3.5mm;">Çalışma Akışı</div>
+  <div class="ov-flow">
+    
+    
+    <div class="ov-flow-step"><b>Pozitivizm & Kötümserlik</b><span>Comte, Schopenhauer</span></div>
+    
+    <div class="ov-flow-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="19" y2="12"/><polyline points="13 6 19 12 13 18"/></svg></div>
+    <div class="ov-flow-step"><b>Evrim & Psikanaliz</b><span>Darwin, Freud</span></div>
+    
+    <div class="ov-flow-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="19" y2="12"/><polyline points="13 6 19 12 13 18"/></svg></div>
+    <div class="ov-flow-step"><b>Analitik Felsefe</b><span>Russell</span></div>
+    
+    <div class="ov-flow-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="19" y2="12"/><polyline points="13 6 19 12 13 18"/></svg></div>
+    <div class="ov-flow-step"><b>Kıta Felsefesi</b><span>Kierkegaard, Husserl, Heidegger, Sartre, Camus</span></div>
+    
+    <div class="ov-flow-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="19" y2="12"/><polyline points="13 6 19 12 13 18"/></svg></div>
+    <div class="ov-flow-step"><b>Güç İstenci & Toplum Felsefesi</b><span>Nietzsche, Bentham, Mill, Marx</span></div>
+    
+  </div>
+  
+
+  
+  <div class="callout caution" style="margin-top:3.5mm;">
+    <div class="callout-icon">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.5"/><line x1="12" y1="11" x2="12" y2="16.5"/><circle cx="12" cy="7.5" r="0.6" fill="currentColor" stroke="none"/></svg>
+
+</div>
+    <div><div class="callout-title">Sınavda Ana Ayrım</div><div class="callout-text">Bu kitaptaki <b>mavi 'Notlardaki Bir Hata'</b> kutucukları, öğretmenin kendi dikte notlarındaki hataları (yanlış tarih, karıştırılan kavram, yarım kalan cümle) fark edip düzelttiği noktaları işaretler — sınavda en çok karıştırılan ayrımlar genelde tam da bu noktalarda gizlidir.</div></div>
+  </div>
+  
+
+  
+<div class="footer">
+  <div>Çağdaş <span class="accent-word">Felsefe</span></div>
+  <div class="fnum">4</div>
+</div>
+
+</section>
+
+
+
+
+  
+  
+  <section class="page body-page" data-ch="1" data-cp="0" id="ch-1">
+    <div class="pageband"><div>Çağdaş <span class="accent-word">Felsefe</span></div><div class="pageband-course">Bölüm 1</div></div>
+
+    
+      <div class="chbanner">
+        <div class="chbanner-kicker">1. Bölüm</div>
+        <div class="chbanner-title">Pozitivizm ve Kötümser Felsefe</div>
+        <div class="chbanner-subtitle">Comte'un bilim temelli iyimserliğinden Schopenhauer'ın irade kötümserliğine</div>
+      </div>
+    
+
+    <!--item 0 terms-->
+  
+<div class="terms-grid">
+  
+  <div class="term-box">
+    <div class="term-name">Pozitivizm</div>
+    <div class="term-def">Bilginin yalnızca gözlem, deney ve bilimsel yöntemle elde edilebileceğini savunan görüş.</div>
+  </div>
+  
+  <div class="term-box">
+    <div class="term-name">Üç Hal Yasası</div>
+    <div class="term-def">Comte'un insan düşüncesinin tarihsel gelişimini teolojik–metafizik–pozitif üç aşamada açıkladığı yasa.</div>
+  </div>
+  
+  <div class="term-box">
+    <div class="term-name">İnsanlık Dini</div>
+    <div class="term-def">Comte'un, toplumu bilim etrafında birleştirmek için önerdiği, tanrısız ama dinsel biçimde örgütlenmiş ahlaki sistem.</div>
+  </div>
+  
+  <div class="term-box">
+    <div class="term-name">İrade (Wille)</div>
+    <div class="term-def">Schopenhauer'e göre evrenin ve insanın temelinde yatan, doyumsuz, amaçsız itki.</div>
+  </div>
+  
+</div>
+
+  
+<!--item 1 person-->
+  
+<div class="person-card">
+  <div class="person-avatar">AC</div>
+  <div>
+    <div class="person-name">Auguste Comte</div>
+    <div class="person-tag">1798–1857 · Pozitivizmin Kurucusu, Sosyoloji Biliminin İsim Babası</div>
+    <div class="person-bio">Katolik bir ailede yetişmiş, 14 yaşında kiliseden ayrılmış; Politeknik Okulu'nda okuduktan sonra <b>Saint-Simon</b>'un yanında 7 yıl sekreterlik yaparak yetişmiş, başyapıtı <b>Olgusal (Pozitif) Felsefe Dersleri</b>'nde bilimi tek geçerli bilgi sistemi ilan etmiştir.</div>
+  </div>
+</div>
+
+  
+<!--item 2 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">1</div>
+    <div class="block-title">Hayatı ve Entelektüel Kökleri</div>
+  </div>
+  
+  <ul>
+    <li>Katolik bir ailede yetişmiş; 14 yaşında kiliseden ayrılmış, bu ailesinin büyük tepkisini çekmiştir.</li><li>Politeknik Okulu'nda (École Polytechnique) okumuş; pozitivizmin kurucusu sayılan Saint-Simon ile tanışıp yanında 7 yıl boyunca asistanlık ve sekreterlik yapmıştır.</li><li><b>Montesquieu, Kant ve Hume</b>'un düşünceleri, Comte'un fikirlerini şekillendiren başlıca etkiler arasında sayılır.</li><li>Felsefi sisteminin mottosu: <b>'İlke olarak aşk, temel olarak düzen, amaç olarak ilerleme.'</b></li>
+  </ul>
+</div>
+
+  
+<!--item 3 callout-->
+  
+<div class="callout caution">
+  <div class="callout-icon">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.5"/><line x1="12" y1="11" x2="12" y2="16.5"/><circle cx="12" cy="7.5" r="0.6" fill="currentColor" stroke="none"/></svg>
+
+</div>
+  <div>
+    <div class="callout-title">Notlardaki Bir Hata: Doğum Yılı</div>
+    <div class="callout-text">Öğretmenin ham dikte notlarında Comte'un doğum yılı yanlışlıkla '1989 – Fransa' olarak geçmişti; bu, Comte'un 1857'de öldüğü bilgisiyle çelişir (1989 kronolojik olarak imkânsızdır). Doğrusu <b>1798'dir</b> ve bu kitapta düzeltilmiş haliyle kullanılmıştır.</div>
+  </div>
+</div>
+
+  
+
+
+    
+<div class="footer">
+  <div>Çağdaş <span class="accent-word">Felsefe</span></div>
+  <div class="fnum">5</div>
+</div>
+
+  </section>
+  
+  
+  
+  <section class="page body-page" data-ch="1" data-cp="1">
+    <div class="pageband"><div>Çağdaş <span class="accent-word">Felsefe</span></div><div class="pageband-course">Bölüm 1</div></div>
+
+    
+
+    <!--item 0 flow-->
+  
+<div class="flowdiag">
+  
+  
+  <div class="fstep">
+    <div class="fstep-title">Teolojik Aşama</div>
+    <div class="fstep-text">Her şey Tanrı/tanrısal güçlerle açıklanır</div>
+  </div>
+  
+  <div class="farrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="19" y2="12"/><polyline points="13 6 19 12 13 18"/></svg></div>
+  <div class="fstep">
+    <div class="fstep-title">Metafizik Aşama</div>
+    <div class="fstep-text">Tanrılar devre dışıdır; hak, hukuk, eşitlik gibi soyut kavramlarla açıklanır</div>
+  </div>
+  
+  <div class="farrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="19" y2="12"/><polyline points="13 6 19 12 13 18"/></svg></div>
+  <div class="fstep">
+    <div class="fstep-title">Pozitif Aşama</div>
+    <div class="fstep-text">Bilimsel yöntem ve doğrulanabilir teorilerle açıklanır</div>
+  </div>
+  
+</div>
+<div class="flow-caption">Comte'un Üç Hal Yasası: İnsan Düşüncesinin Tarihsel Gelişimi</div>
+
+  
+<!--item 1 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">2</div>
+    <div class="block-title">İnsanlık Dini</div>
+  </div>
+  
+  <ul>
+    <li>Comte, topluma faydalı ve çağın ruhuna uygun bir din geliştirilmesi gerektiğini savunmuş, buna <b>'İnsanlık Dini'</b> adını vermiştir: 'Benim dinim, insanları bilimle aydınlatan bir dindir.'</li><li>Bu dinin ibadethaneleri üniversiteler, din adamları ise bilim insanlarıdır; Yüce Varlık, Büyük Fetiş ve Büyük Ortam bu dinin sembolik unsurlarıdır.</li>
+  </ul>
+</div>
+
+  
+<!--item 2 callout-->
+  
+<div class="callout insight">
+  <div class="callout-icon">
+<svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 1.5 L14.6 9 L22 9 L15.9 13.6 L18.2 21 L12 16.6 L5.8 21 L8.1 13.6 L2 9 L9.4 9 Z"/></svg>
+
+</div>
+  <div>
+    <div class="callout-title">Kritik Odak: Comte'un 'Dini' Neyi Kastediyor?</div>
+    <div class="callout-text">Comte'un 'din' derken kastettiği tanrı inancı değil, bilimi merkeze alan ahlaki/toplumsal bir örgütlenme biçimidir — sınavlarda bu ayrım sıkça karıştırılır.</div>
+  </div>
+</div>
+
+  
+<!--item 3 person-->
+  
+<div class="person-card">
+  <div class="person-avatar">AS</div>
+  <div>
+    <div class="person-name">Arthur Schopenhauer</div>
+    <div class="person-tag">1788–1860 · Kötümser İrade Felsefesinin Kurucusu</div>
+    <div class="person-bio">Başyapıtı <b>İsteme ve Tasarım Olarak Dünya</b>'da evrenin ve insanın temelinde doyumsuz, amaçsız bir 'irade' (Wille) bulunduğunu; mutluluğun ise pozitif bir durum değil yalnızca acının yokluğu ('negatif hedonizm') olduğunu savunarak yaşamı köklü bir kötümserlikle yorumlamıştır.</div>
+  </div>
+</div>
+
+  
+<!--item 4 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">3</div>
+    <div class="block-title">İrade, Acı ve Negatif Hedonizm</div>
+  </div>
+  
+  <ul>
+    <li>Felsefesinin temelini insanın içsel arzuları ve iradesi oluşturur: <b>'Çok mutsuz olmanın en güvenilir yolu, mutlu olmayı istememektir.'</b></li><li>Felsefesi kötümser (pesimist) ve karamsardır: yaşam acıdan, tatminsizlikten ve karşılanması güç arzulardan ibarettir; gerçekçi olmayan beklentilerin kaynağı, aşırı mutluluk arzusudur.</li><li>Acı ve ızdırabın yokluğu en yüksek iyiliktir — bu görüşe <b>'negatif hedonizm'</b> denir. Leibniz'in iyimserliğini eleştirir: 'Dünya, ızdırabı ve acıyı içinde barındırır; mutluluk ise yalnızca acının yokluğudur.'</li>
+  </ul>
+</div>
+
+  
+<!--item 5 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">4</div>
+    <div class="block-title">Yalnızlık ve Özgürlük</div>
+  </div>
+  
+  <ul>
+    <li>Acıyı azaltmanın yolu olarak ılımlılığı ve çileciliği teşvik eder; gençlerin yalnızlığa katlanmayı öğrenmesi gerektiğini söyler — yalnızlık, mutluluğun ve içsel huzurun kaynağıdır.</li><li><b>'İnsan, yalnız kaldığı sürece kendisi olur.' 'Yalnızlığı sevmeyen, özgürlüğü sevemez.'</b> Yalnızlık her insanın temel bir ihtiyacıdır; mutluluk, kendini keşfetmek ve acıdan kaçınmakla mümkündür.</li>
+  </ul>
+</div>
+
+  
+
+
+    
+<div class="footer">
+  <div>Çağdaş <span class="accent-word">Felsefe</span></div>
+  <div class="fnum">6</div>
+</div>
+
+  </section>
+  
+  
+  
+  <section class="page body-page" data-ch="1" data-cp="2">
+    <div class="pageband"><div>Çağdaş <span class="accent-word">Felsefe</span></div><div class="pageband-course">Bölüm 1</div></div>
+
+    
+
+    <!--item 0 table-->
+  
+<div class="ctable-wrap">
+  <div class="ctable-caption">Karşılaştırma: Comte ve Schopenhauer</div>
+  <table class="ctable">
+    <thead><tr><th>Ölçüt</th><th>Auguste Comte</th><th>Arthur Schopenhauer</th></tr></thead>
+    <tbody>
+      
+      <tr><td>Dünya görüşü</td><td>İyimser — bilim ve akıl yoluyla toplumsal ilerleme mümkündür.</td><td>Kötümser (pesimist) — yaşam özünde acı ve tatminsizliktir.</td></tr>
+      
+      <tr><td>Temel kavram</td><td>Pozitif bilgi / Üç Hal Yasası.</td><td>İrade (Wille).</td></tr>
+      
+      <tr><td>Çözüm önerisi</td><td>Bilim temelli 'İnsanlık Dini' ile toplumsal düzen.</td><td>Çilecilik, ılımlılık, yalnızlık yoluyla acıdan kaçınma.</td></tr>
+      
+    </tbody>
+  </table>
+</div>
+
+  
+<!--item 1 summary-->
+  
+<div class="chsummary"><b>Bölüm Özeti</b>Comte, insanlığın teolojik ve metafizik aşamalardan bilimsel/pozitif aşamaya evrildiğini savunarak toplumu bilim etrafında yeniden örgütlemeyi önerirken; Schopenhauer, yaşamın temelinde doyumsuz bir irade olduğunu, mutluluğun ancak bu iradenin doğurduğu acıdan kaçınmakla (yalnızlık, ılımlılık, çilecilik) mümkün olduğunu savunur.</div>
+
+  
+
+
+    
+<div class="footer">
+  <div>Çağdaş <span class="accent-word">Felsefe</span></div>
+  <div class="fnum">7</div>
+</div>
+
+  </section>
+  
+  
+
+  
+  
+  <section class="page body-page" data-ch="2" data-cp="0" id="ch-2">
+    <div class="pageband"><div>Çağdaş <span class="accent-word">Felsefe</span></div><div class="pageband-course">Bölüm 2</div></div>
+
+    
+      <div class="chbanner">
+        <div class="chbanner-kicker">2. Bölüm</div>
+        <div class="chbanner-title">Evrim Teorisi ve Psikanaliz</div>
+        <div class="chbanner-subtitle">Darwin'in doğal seçilimi ile Freud'un bilinçdışı keşfi, dönemin dinî ve akılcı güvenini sarsar</div>
+      </div>
+    
+
+    <!--item 0 terms-->
+  
+<div class="terms-grid">
+  
+  <div class="term-box">
+    <div class="term-name">Doğal Seçilim</div>
+    <div class="term-def">Çevreye en uyumlu bireylerin hayatta kalıp üreme şansını artırdığı, türlerin zamanla değiştiği süreç.</div>
+  </div>
+  
+  <div class="term-box">
+    <div class="term-name">Bilinçdışı (İd/Es)</div>
+    <div class="term-def">Freud'a göre haz ilkesine göre çalışan, akıl dışı dürtülerin bulunduğu zihinsel katman.</div>
+  </div>
+  
+  <div class="term-box">
+    <div class="term-name">Süperego (Üst-Ben)</div>
+    <div class="term-def">Çevrenin ahlaki beklentilerinin içselleştirilmesiyle oluşan zihinsel katman.</div>
+  </div>
+  
+  <div class="term-box">
+    <div class="term-name">Serbest Çağrışım</div>
+    <div class="term-def">Freud'un bilinçdışına ulaşmak için kullandığı, danışanın aklına gelen her şeyi sansürsüz söylemesini istediği yöntem.</div>
+  </div>
+  
+</div>
+
+  
+<!--item 1 person-->
+  
+<div class="person-card">
+  <div class="person-avatar">CD</div>
+  <div>
+    <div class="person-name">Charles Darwin</div>
+    <div class="person-tag">1809–1882 · Doğal Seçilim Yoluyla Evrim Teorisinin Kurucusu</div>
+    <div class="person-bio">HMS Beagle gemisiyle 22 yaşında çıktığı ve 5 yıl süren dünya turunda, özellikle Galapagos Adaları'nda topladığı kanıtlarla türlerin ortak bir atadan <b>Doğal Seçilim</b> yoluyla evrimleştiğini, başyapıtı <b>İnsanın Türeyişi</b>'nde ortaya koymuştur.</div>
+  </div>
+</div>
+
+  
+<!--item 2 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">1</div>
+    <div class="block-title">Hayatı ve Dünya Turu</div>
+  </div>
+  
+  <ul>
+    <li>Babası doktordu; küçükken böcek koleksiyonu yapmış, okula bu böcekleri götürmüştür. Doğa bilimleriyle ve jeolojiyle ilgilenmiş, Güney Amerika haritasını çıkarmıştır.</li><li>HMS Beagle gemisiyle <b>22 yaşında yola çıkmış</b>, 5 yıl süren dünya turunda özellikle Güney Amerika'daki Galapagos Adaları'nda çalışmalarını yapmış, İngiltere'ye ~27 yaşında dönmüştür.</li>
+  </ul>
+</div>
+
+  
+<!--item 3 callout-->
+  
+<div class="callout caution">
+  <div class="callout-icon">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.5"/><line x1="12" y1="11" x2="12" y2="16.5"/><circle cx="12" cy="7.5" r="0.6" fill="currentColor" stroke="none"/></svg>
+
+</div>
+  <div>
+    <div class="callout-title">Notlardaki Bir Hata: Beagle Seferi ve Soy Karışıklığı</div>
+    <div class="callout-text">Ham notlarda Beagle seferinin yaş sırası belirsizdi ('22 yaşında İngiltere'ye dönmüş' gibi yazılmıştı); doğrusu Darwin <b>22 yaşında yola çıkmış, 5 yıl sonra dönmüştür</b>. Ayrıca notlarda 'Jean de Lamarck / Erasmus torunu' ifadesi kime ait olduğu belirsiz yazılmıştı: Darwin, erken bir evrim fikri öne süren dedesi <b>Erasmus Darwin</b>'in torunuydu; Lamarck ise ondan önce yaşamış, farklı bir evrim mekanizması öneren ayrı bir zoologtur.</div>
+  </div>
+</div>
+
+  
+<!--item 4 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">2</div>
+    <div class="block-title">Evrim Teorisinin İki Tezi ve Kanıtları</div>
+  </div>
+  
+  <ul>
+    <li>Teorisi iki temel tezi özetler: <b>(1)</b> biyolojik evrim gerçekleşir, <b>(2)</b> bu evrim doğal seçilim yoluyla gerçekleşir.</li><li><b>Kanıtlar:</b> deniz fosillerinin dağların tepesinde bulunması; canlı türlerinin coğrafi dağılımı ('Tanrı her ada için ayrı bir kaplumbağa türü mü yarattı?'); köpek, yarasa, tavşan ve insan embriyolarının ilk gelişim evrelerinde birbirine çok benzemesi.</li><li>İnsanların çiftçilikte iyi örnekleri seçip zayıfları elemesi (yapay seçilim) doğadaki doğal seçilime ilham kaynağı olmuş; Thomas Malthus'un <b>Nüfus İlkesi Üzerine Bir Deneme</b> adlı eseri Darwin'e evrimin nasıl gerçekleştiğine dair açıklayıcı bir çerçeve sunmuştur.</li>
+  </ul>
+</div>
+
+  
+
+
+    
+<div class="footer">
+  <div>Çağdaş <span class="accent-word">Felsefe</span></div>
+  <div class="fnum">8</div>
+</div>
+
+  </section>
+  
+  
+  
+  <section class="page body-page" data-ch="2" data-cp="1">
+    <div class="pageband"><div>Çağdaş <span class="accent-word">Felsefe</span></div><div class="pageband-course">Bölüm 2</div></div>
+
+    
+
+    <!--item 0 person-->
+  
+<div class="person-card">
+  <div class="person-avatar">SF</div>
+  <div>
+    <div class="person-name">Sigmund Freud</div>
+    <div class="person-tag">1856–1939 · Psikanalizin (Ruhçözümlemenin) Kurucusu</div>
+    <div class="person-bio">Davranışlarımızın çoğu zaman akıl değil bilinçdışı, akıl dışı dürtüler tarafından yönetildiğini savunmuş; zihni İd-Ego-Süperego üçlüsüyle modelleyip <b>Rüyaların Yorumu</b> ile bilinçdışına ulaşmanın yollarını ('ruh arkeolojisi') sistemleştirmiştir.</div>
+  </div>
+</div>
+
+  
+<!--item 1 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">3</div>
+    <div class="block-title">Zihnin Yapısı</div>
+  </div>
+  
+  <ul>
+    <li>İnsanların ihtiyaçları/içgüdüleriyle çevrenin dayattıkları arasında bir gerilim olduğunu savunur; düşüncelerimizi, rüyalarımızı ve eylemlerimizi çoğu zaman akıl dışı dürtüler belirler ('ruh arkeolojisi').</li><li><b>İd (Es):</b> doğuştan gelen, haz ilkesine göre çalışan katman. İnsan büyüdükçe <b>gerçeklik ilkesi</b>, haz ilkesini dengelemeye başlar; çevrenin ahlaki beklentileri içimizde yer edip <b>süperego</b>yu (üst-ben) oluşturur.</li>
+  </ul>
+</div>
+
+  
+<!--item 2 callout-->
+  
+<div class="callout caution">
+  <div class="callout-icon">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.5"/><line x1="12" y1="11" x2="12" y2="16.5"/><circle cx="12" cy="7.5" r="0.6" fill="currentColor" stroke="none"/></svg>
+
+</div>
+  <div>
+    <div class="callout-title">Notlardaki Bir Hata: İd ile Haz İlkesi</div>
+    <div class="callout-text">Ham notlarda "'O' ya da Haz ilkesi" ifadesi İd (O) ile haz ilkesini eş anlamlıymış gibi sunuyordu; doğrusu <b>haz ilkesi, İd'in çalışma prensibidir, İd'in kendisi değildir</b> — bu kitapta ilişki bu şekilde netleştirilmiştir.</div>
+  </div>
+</div>
+
+  
+<!--item 3 table-->
+  
+<div class="ctable-wrap">
+  <div class="ctable-caption">Freud'un Mekânsal Zihin Metaforu</div>
+  <table class="ctable">
+    <thead><tr><th>Mekân</th><th>Karşılığı</th></tr></thead>
+    <tbody>
+      
+      <tr><td>Salon</td><td>Bilinç — farkında olduğumuz, düşündüğümüz şeyler.</td></tr>
+      
+      <tr><td>Koridor</td><td>Bilinçdışı — bastırılmaya çalışılan düşünceler; geçişi 'yansıtma' denen savunma mekanizması kontrol eder.</td></tr>
+      
+    </tbody>
+  </table>
+</div>
+
+  
+<!--item 4 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">4</div>
+    <div class="block-title">Serbest Çağrışım ve Travma</div>
+  </div>
+  
+  <ul>
+    <li>İnsan bir konuyu ne kadar çok unutmak isterse, o konuyu o kadar çok düşünür (bastırma paradoksu) — Freud bu yüzden <b>serbest çağrışım</b> yöntemini geliştirmiştir.</li><li>Travma, ruhsal bir yaralanmayı ifade eder ('yara' anlamına gelir).</li>
+  </ul>
+</div>
+
+  
+<!--item 5 table-->
+  
+<div class="ctable-wrap">
+  <div class="ctable-caption">Karşılaştırma: Darwin ve Freud</div>
+  <table class="ctable">
+    <thead><tr><th>Ölçüt</th><th>Darwin</th><th>Freud</th></tr></thead>
+    <tbody>
+      
+      <tr><td>Alan</td><td>Biyoloji / doğa bilimleri.</td><td>Psikoloji / psikanaliz.</td></tr>
+      
+      <tr><td>Temel iddia</td><td>İnsan da dahil türler, doğal seçilimle zaman içinde evrilir.</td><td>Davranışları akıl değil, çoğunlukla bilinçdışı/akıl dışı dürtüler yönetir.</td></tr>
+      
+      <tr><td>Döneme etkisi</td><td>Kutsal kitaplardaki 'türler değişmez' görüşünü sarsar.</td><td>İnsanın kendi aklına tam hakim olduğu görüşünü sarsar.</td></tr>
+      
+    </tbody>
+  </table>
+</div>
+
+  
+
+
+    
+<div class="footer">
+  <div>Çağdaş <span class="accent-word">Felsefe</span></div>
+  <div class="fnum">9</div>
+</div>
+
+  </section>
+  
+  
+  
+  <section class="page body-page" data-ch="2" data-cp="2">
+    <div class="pageband"><div>Çağdaş <span class="accent-word">Felsefe</span></div><div class="pageband-course">Bölüm 2</div></div>
+
+    
+
+    <!--item 0 summary-->
+  
+<div class="chsummary"><b>Bölüm Özeti</b>Darwin, türlerin doğal seçilim yoluyla ortak bir atadan evrildiğini göstererek insanın doğadaki konumunu; Freud ise davranışlarımızın büyük ölçüde bilinçdışı, akıl dışı dürtülerce yönetildiğini göstererek insanın kendi aklına hakimiyeti konusundaki güvenini sarsmıştır.</div>
+
+  
+
+
+    
+<div class="footer">
+  <div>Çağdaş <span class="accent-word">Felsefe</span></div>
+  <div class="fnum">10</div>
+</div>
+
+  </section>
+  
+  
+
+  
+  
+  <section class="page body-page" data-ch="3" data-cp="0" id="ch-3">
+    <div class="pageband"><div>Çağdaş <span class="accent-word">Felsefe</span></div><div class="pageband-course">Bölüm 3</div></div>
+
+    
+      <div class="chbanner">
+        <div class="chbanner-kicker">3. Bölüm</div>
+        <div class="chbanner-title">Analitik Felsefe</div>
+        <div class="chbanner-subtitle">Analitik-Kıta Felsefesi ayrımından Russell'ın mantıksal atomculuğuna ve din eleştirisine</div>
+      </div>
+    
+
+    <!--item 0 terms-->
+  
+<div class="terms-grid">
+  
+  <div class="term-box">
+    <div class="term-name">Çağdaş Felsefe</div>
+    <div class="term-def">20. yüzyıl başlarından günümüze uzanan, disiplinler arası, eleştirel ve çoğulcu felsefe dönemi.</div>
+  </div>
+  
+  <div class="term-box">
+    <div class="term-name">Analitik Felsefe</div>
+    <div class="term-def">Dilin, mantığın ve bilimsel yöntemin analizine odaklanan felsefe geleneği.</div>
+  </div>
+  
+  <div class="term-box">
+    <div class="term-name">Kıta Felsefesi</div>
+    <div class="term-def">Tarihsel, kültürel ve varoluşsal konuları merkeze alan Avrupa kökenli felsefe geleneği.</div>
+  </div>
+  
+  <div class="term-box">
+    <div class="term-name">Mantıksal Atomculuk</div>
+    <div class="term-def">Dil ile dünya arasında yapısal bir benzerlik olduğunu savunan görüş.</div>
+  </div>
+  
+</div>
+
+  
+<!--item 1 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">1</div>
+    <div class="block-title">Çağdaş Felsefenin İki Büyük Geleneği</div>
+  </div>
+  
+  <ul>
+    <li>Çağdaş felsefe, 20. yüzyıl başlarından günümüze kadar gelişen; disiplinler arası, eleştirel ve çoğulcu bir felsefe alanıdır.</li><li>20. yüzyıl felsefesi büyük ölçüde pozitivizmin sınırlarına bir tepki olarak ortaya çıkmıştır: insan deneyimini, anlamı, dili ve toplumu daha derinlemesine ele alan yaklaşımlar (fenomenoloji, varoluşçuluk, hermeneutik, yapısalcılık, postyapısalcılık gibi) bu dönemde gelişmiştir.</li>
+  </ul>
+</div>
+
+  
+<!--item 2 table-->
+  
+<div class="ctable-wrap">
+  <div class="ctable-caption">Karşılaştırma: Analitik Felsefe – Kıta Felsefesi</div>
+  <table class="ctable">
+    <thead><tr><th>Ölçüt</th><th>Analitik Felsefe</th><th>Kıta Felsefesi</th></tr></thead>
+    <tbody>
+      
+      <tr><td>Coğrafya</td><td>İngiltere ve Amerika.</td><td>Avrupa (kıta).</td></tr>
+      
+      <tr><td>Odak</td><td>Dilin, mantığın ve bilimsel yöntemin analizi.</td><td>Tarihsel, kültürel ve varoluşsal konular.</td></tr>
+      
+      <tr><td>Önde gelen isimler</td><td>Bertrand Russell, Ludwig Wittgenstein, G. E. Moore.</td><td>—</td></tr>
+      
+      <tr><td>İçerdiği akımlar</td><td>Mantıksal atomculuk, dil felsefesi.</td><td>Fenomenoloji, varoluşçuluk, hermeneutik, postyapısalcılık.</td></tr>
+      
+    </tbody>
+  </table>
+</div>
+
+  
+<!--item 3 person-->
+  
+<div class="person-card">
+  <div class="person-avatar">BR</div>
+  <div>
+    <div class="person-name">Bertrand Russell</div>
+    <div class="person-tag">1872–1970 · Modern Analitik Felsefenin Kurucularından, Hümanist Filozof</div>
+    <div class="person-bio">G. E. Moore ile birlikte modern analitik felsefenin kurucularından biridir; Whitehead ile yazdığı <b>Principia Mathematica</b> ile matematiği mantığa indirgemeye çalışmış, 1949'da Liyakat Nişanı, 1950'de ise insan hakları ve özgür düşünce üzerine yazdığı yazılar nedeniyle Nobel Edebiyat Ödülü'nü kazanmıştır.</div>
+  </div>
+</div>
+
+  
+
+
+    
+<div class="footer">
+  <div>Çağdaş <span class="accent-word">Felsefe</span></div>
+  <div class="fnum">11</div>
+</div>
+
+  </section>
+  
+  
+  
+  <section class="page body-page" data-ch="3" data-cp="1">
+    <div class="pageband"><div>Çağdaş <span class="accent-word">Felsefe</span></div><div class="pageband-course">Bölüm 3</div></div>
+
+    
+
+    <!--item 0 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">2</div>
+    <div class="block-title">Hayatı ve Aktivist Kişiliği</div>
+  </div>
+  
+  <ul>
+    <li>İngiliz, hümanist bir filozoftur: <b>'Düşüncelerim için ölmeyi göze almam, çünkü yanılıyor olabilirim.'</b> Cambridge Trinity College'daki 'Havariler' (Apostles) grubuna alınmıştır.</li><li>Matematik üzerine çalışmalar yapmış, kendi adıyla bilinen <b>Russell Paradoksu</b>'nu geliştirmiş; Whitehead ile yazdığı <b>Principia Mathematica</b> ile matematiği tamamen mantıksal ilkelerden türetmeye çalışmıştır.</li><li>Bertrand Russell Barış Vakfı'nı ve Atlantik Vakfı'nı kurmuş; ABD'nin Vietnam'a saldırısına karşı çıkarak Uluslararası Savaş Suçları Mahkemesi'ni toplamıştır.</li>
+  </ul>
+</div>
+
+  
+<!--item 1 callout-->
+  
+<div class="callout caution">
+  <div class="callout-icon">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.5"/><line x1="12" y1="11" x2="12" y2="16.5"/><circle cx="12" cy="7.5" r="0.6" fill="currentColor" stroke="none"/></svg>
+
+</div>
+  <div>
+    <div class="callout-title">Notlardaki Bir Hata: İki Ayrı Ödül</div>
+    <div class="callout-text">Ham notlarda '1949'da... liyakat nişanı almış... nedeniyle Nobel Edebiyat Ödülü'nü almış' yazıyordu; bu, iki ayrı ödülü tek bir olay gibi sunuyordu. Doğrusu: Russell <b>1949'da Order of Merit</b> (Liyakat Nişanı), <b>1950'de ise</b> insan hakları ve özgür düşünce üzerine yazdığı yazıları nedeniyle <b>Nobel Edebiyat Ödülü'nü</b> ayrı ayrı kazanmıştır.</div>
+  </div>
+</div>
+
+  
+<!--item 2 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">3</div>
+    <div class="block-title">Russell'ın Felsefesinin Temel Başlıkları</div>
+  </div>
+  
+  <ul>
+    <li><b>Mantıksal atomculuk:</b> dil ve dünya arasında yapısal bir benzerlik vardır. 'Bir insanın neyi kastettiğini anlamak için, neyi söylediğine değil, nasıl söylediğine bak.'</li><li><b>Bilgi teorisi:</b> bilginin temelinde duyusal deneyim vardır; bazı şeyleri doğrudan deneyimleyerek, bazılarını çıkarım yaparak biliriz — kesin bilgiye mantıksal analizle ulaşılır.</li><li><b>Din eleştirisi:</b> ateisttir. <b>Neden Hristiyan Değilim</b> adlı eserinde Tanrı'nın varlığına dair delilleri çürütmeye çalışır; ona göre din akla değil korkuya dayanır ve ilerlemeye engeldir.</li><li><b>Etik ve siyaset:</b> kapitalizm ve din bireysel düşünceyi bastırır; akıl ve eğitim özgür bir toplumun gelişmesine katkıda bulunur. Hayatı boyunca aşk özlemi, bilgi arayışı ve insanlığın ızdırabına duyduğu merhamet tarafından yönlendirildiğini söylemiştir.</li>
+  </ul>
+</div>
+
+  
+<!--item 3 callout-->
+  
+<div class="callout focus">
+  <div class="callout-icon">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.5"/><line x1="12" y1="7.5" x2="12" y2="13"/><circle cx="12" cy="16.5" r="0.6" fill="currentColor" stroke="none"/></svg>
+
+</div>
+  <div>
+    <div class="callout-title">Russell'ı Yönlendiren Üç His</div>
+    <div class="callout-text">Russell, hayatı boyunca kendisini yönlendiren üç büyük his ve arzu tanımlamıştır: <b>aşk özlemi, bilgi arayışı</b> ve <b>insanlığın ızdırabına karşı duyduğu merhamet.</b></div>
+  </div>
+</div>
+
+  
+<!--item 4 summary-->
+  
+<div class="chsummary"><b>Bölüm Özeti</b>Çağdaş felsefe, dil ve mantığın kesinliğine odaklanan Analitik Felsefe ile insan deneyimini ve tarihselliği merkeze alan Kıta Felsefesi olmak üzere iki ana damardan beslenir; Russell, G. E. Moore ile birlikte kurduğu mantıksal atomculuk ve dilin mantıksal analiziyle bu geleneğin en önemli temsilcilerinden biri olmuştur.</div>
+
+  
+
+
+    
+<div class="footer">
+  <div>Çağdaş <span class="accent-word">Felsefe</span></div>
+  <div class="fnum">12</div>
+</div>
+
+  </section>
+  
+  
+
+  
+  
+  <section class="page body-page" data-ch="4" data-cp="0" id="ch-4">
+    <div class="pageband"><div>Çağdaş <span class="accent-word">Felsefe</span></div><div class="pageband-course">Bölüm 4</div></div>
+
+    
+      <div class="chbanner">
+        <div class="chbanner-kicker">4. Bölüm</div>
+        <div class="chbanner-title">Varoluşçuluğun Öncüsü: Kierkegaard</div>
+        <div class="chbanner-subtitle">Nesnel ve öznel doğru ayrımından İman Şövalyesi'ne giden üç aşamaya</div>
+      </div>
+    
+
+    <!--item 0 terms-->
+  
+<div class="terms-grid">
+  
+  <div class="term-box">
+    <div class="term-name">Nesnel Doğru</div>
+    <div class="term-def">Herkes tarafından kabul edilen, üzerinde tartışılmayan doğrular (ör. 2×2=4).</div>
+  </div>
+  
+  <div class="term-box">
+    <div class="term-name">Öznel Doğru</div>
+    <div class="term-def">Kişinin kendi iç dünyasında doğru kabul ettiği şeyler (ör. din/Tanrı inancı).</div>
+  </div>
+  
+  <div class="term-box">
+    <div class="term-name">İman Şövalyesi</div>
+    <div class="term-def">Gerçek dindarlık formuna bürünmüş insan.</div>
+  </div>
+  
+  <div class="term-box">
+    <div class="term-name">İnanç Sıçraması</div>
+    <div class="term-def">Anlama akıl yoluyla değil, aklı devre dışı bırakıp doğrudan inancı seçerek ulaşmak.</div>
+  </div>
+  
+</div>
+
+  
+<!--item 1 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">1</div>
+    <div class="block-title">Doğrunun İkiye Ayrımı</div>
+  </div>
+  
+  <ul>
+    <li>Kierkegaard'a göre inanmak ve sorgulamak, iki düşman eylemdir. İnanan insanlar öznel doğruları nesnel doğrulardan daha üstün tutar (Öznel doğru > Nesnel doğru); çünkü nesnel doğruların sınırları vardır ve inanan insana tek başına yetmez.</li><li>Kierkegaard, inanan insanları da ikiye ayırır: <b>Yobazlar</b>, dini nesnel bir doğru gibi görüp Tanrı'nın varlığını 'kanıtlamak' için evrimi çürütmeye çalışırlar; <b>Dindarlar</b> ise inancı öznel bir doğru olarak görür, Tanrı'yı mantık yoluyla kanıtlamaya çalışmazlar.</li>
+  </ul>
+</div>
+
+  
+<!--item 2 table-->
+  
+<div class="ctable-wrap">
+  <div class="ctable-caption">Karşılaştırma: Nesnel Doğru – Öznel Doğru</div>
+  <table class="ctable">
+    <thead><tr><th>Ölçüt</th><th>Nesnel Doğru</th><th>Öznel Doğru</th></tr></thead>
+    <tbody>
+      
+      <tr><td>Tanım</td><td>Herkes tarafından kabul edilen, tartışılmayan konular.</td><td>Kişinin kendi iç dünyasında doğru kabul ettiği şeyler.</td></tr>
+      
+      <tr><td>Örnek</td><td>2 × 2 = 4</td><td>Din ve Tanrı inancı</td></tr>
+      
+      <tr><td>İnanan insan için önceliği</td><td>İkincil — tek başına yeterli gelmez, sınırlıdır.</td><td>Birincil — inanan insan öznel doğruyu nesnel doğrudan üstün tutar.</td></tr>
+      
+    </tbody>
+  </table>
+</div>
+
+  
+<!--item 3 flow-->
+  
+<div class="flowdiag">
+  
+  
+  <div class="fstep">
+    <div class="fstep-title">Estetik Aşama</div>
+    <div class="fstep-text">Haz arayışı; beraberinde can sıkıntısı gelir</div>
+  </div>
+  
+  <div class="farrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="19" y2="12"/><polyline points="13 6 19 12 13 18"/></svg></div>
+  <div class="fstep">
+    <div class="fstep-title">Etik Aşama</div>
+    <div class="fstep-text">Eylemleri doğru-yanlış diye ayırma</div>
+  </div>
+  
+  <div class="farrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="19" y2="12"/><polyline points="13 6 19 12 13 18"/></svg></div>
+  <div class="fstep">
+    <div class="fstep-title">Dinsel Aşama</div>
+    <div class="fstep-text">İnanç Sıçraması ile anlama ulaşma</div>
+  </div>
+  
+</div>
+<div class="flow-caption">İman Şövalyesi Olabilmek İçin Geçilmesi Gereken Üç Aşama</div>
+
+  
+
+
+    
+<div class="footer">
+  <div>Çağdaş <span class="accent-word">Felsefe</span></div>
+  <div class="fnum">13</div>
+</div>
+
+  </section>
+  
+  
+  
+  <section class="page body-page" data-ch="4" data-cp="1">
+    <div class="pageband"><div>Çağdaş <span class="accent-word">Felsefe</span></div><div class="pageband-course">Bölüm 4</div></div>
+
+    
+
+    <!--item 0 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">2</div>
+    <div class="block-title">Aşamaların İçeriği</div>
+  </div>
+  
+  <ul>
+    <li><b>Estetik aşama:</b> kişi zevkini en yüksek seviyeye çıkarmak, acısını en aza indirmek ister. Bu aşamada can sıkıntısı çok tehlikeli bir olgudur; kişi acıdan kaçmamalı, onunla yüzleşmelidir — acı, kişinin ruhsal gelişiminde çok önemlidir, insana farkındalık katar, 'ben ne haldeyim' diye sorgulamasını sağlar. Bu sorguyu soran kişi bir sonraki aşamaya geçer.</li><li><b>Etik aşama:</b> kişi eylemlerini doğru ve yanlış diye ayırır; bu insanın son formu değildir — anlamlı yaşama akılla ulaşılamaz, akıl bir kenara konup bir sonraki aşamaya geçilmelidir.</li><li><b>Dinsel aşama:</b> anlam kavramına sorgulayarak değil, inanarak ulaşılır — buna 'inanç sıçraması' denir.</li>
+  </ul>
+</div>
+
+  
+<!--item 1 callout-->
+  
+<div class="callout caution">
+  <div class="callout-icon">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.5"/><line x1="12" y1="11" x2="12" y2="16.5"/><circle cx="12" cy="7.5" r="0.6" fill="currentColor" stroke="none"/></svg>
+
+</div>
+  <div>
+    <div class="callout-title">Notlardaki Boşluk: Estetik Aşama Cümlesi</div>
+    <div class="callout-text">Öğretmenin ham notlarında 'Kişi acıdan kaçmamalı, acısını içine…' cümlesi yarım kalmıştı — cümle tamamlanmadan bırakılmış. Bu kitapta, takip eden cümlelerle (acının farkındalık kattığı, sorgulamaya yol açtığı) tutarlı olacak biçimde <b>'acısını içine atıp bastırmamalı, onunla yüzleşmelidir'</b> şeklinde tamamlanmıştır; bu tamamlama yorumsaldır.</div>
+  </div>
+</div>
+
+  
+<!--item 2 callout-->
+  
+<div class="callout insight">
+  <div class="callout-icon">
+<svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 1.5 L14.6 9 L22 9 L15.9 13.6 L18.2 21 L12 16.6 L5.8 21 L8.1 13.6 L2 9 L9.4 9 Z"/></svg>
+
+</div>
+  <div>
+    <div class="callout-title">Kritik Odak: Şüphe ve Gerçek Dindarlık</div>
+    <div class="callout-text">Dindar bir insan inancına karşı şüphe duymalıdır — Kierkegaard'a göre asıl dindarlık, şüpheye rağmen inanmaya devam etmektir. Bu, sınav sorularında en çok karıştırılan noktadır: dindarlık, şüphenin yokluğu değil, <b>şüpheye rağmen sürdürülen inançtır.</b></div>
+  </div>
+</div>
+
+  
+<!--item 3 summary-->
+  
+<div class="chsummary"><b>Bölüm Özeti</b>Kierkegaard, doğruyu nesnel ve öznel olarak ikiye ayırarak inancın öznel bir doğru olduğunu savunur; insanın gerçek dindarlığa (iman şövalyeliğine) ulaşması için estetik, etik ve dinsel aşamalardan geçip son aşamada aklı bir kenara bırakarak 'inanç sıçraması' yapması gerektiğini öne sürer.</div>
+
+  
+
+
+    
+<div class="footer">
+  <div>Çağdaş <span class="accent-word">Felsefe</span></div>
+  <div class="fnum">14</div>
+</div>
+
+  </section>
+  
+  
+
+  
+  
+  <section class="page body-page" data-ch="5" data-cp="0" id="ch-5">
+    <div class="pageband"><div>Çağdaş <span class="accent-word">Felsefe</span></div><div class="pageband-course">Bölüm 5</div></div>
+
+    
+      <div class="chbanner">
+        <div class="chbanner-kicker">5. Bölüm</div>
+        <div class="chbanner-title">Fenomenoloji ve Varoluşçuluk</div>
+        <div class="chbanner-subtitle">Husserl'in bilinç deneyiminden Heidegger'in Dasein'ına; Sartre'ın özgürlüğünden Camus'nün absürdizmine</div>
+      </div>
+    
+
+    <!--item 0 terms-->
+  
+<div class="terms-grid">
+  
+  <div class="term-box">
+    <div class="term-name">Fenomenoloji</div>
+    <div class="term-def">Nesnelerin bilince nasıl göründüğünü, yani deneyimin özünü inceleyen felsefe akımı.</div>
+  </div>
+  
+  <div class="term-box">
+    <div class="term-name">Dasein (orada-varlık)</div>
+    <div class="term-def">Heidegger'in insanı tanımlamak için kullandığı, 'dünyada orada bulunan varlık' anlamına gelen kavram.</div>
+  </div>
+  
+  <div class="term-box">
+    <div class="term-name">Kötü Niyet (mauvaise foi)</div>
+    <div class="term-def">Sartre'a göre insanın özgürlükten ve onun getirdiği sorumluluktan kaçma çabası.</div>
+  </div>
+  
+  <div class="term-box">
+    <div class="term-name">Absürdizm</div>
+    <div class="term-def">Camus'ye göre insanın anlam arayışı ile evrenin sessizliği arasındaki uyumsuzluktan doğan durum.</div>
+  </div>
+  
+</div>
+
+  
+<!--item 1 person_row-->
+  
+<div class="person-row">
+  
+  <div class="person-card">
+    <div class="person-avatar">EH</div>
+    <div>
+      <div class="person-name">Edmund Husserl</div>
+      <div class="person-tag">1859–1938 · Fenomenolojinin Kurucusu</div>
+      <div class="person-bio">Felsefenin görevinin nesnelerin bilince nasıl göründüğünü, yani deneyimin özünü incelemek olduğunu savunmuş; kesin bilgiye ancak önyargılardan sıyrılıp yalnızca bilincin deneyimine odaklanan <b>Fenomenolojik İndirgeme</b> yöntemiyle ulaşılabileceğini öne sürmüştür.</div>
+    </div>
+  </div>
+  
+  <div class="person-card">
+    <div class="person-avatar">MH</div>
+    <div>
+      <div class="person-name">Martin Heidegger</div>
+      <div class="person-tag">1889–1976 · 'Dasein' Kavramıyla Varlığı Sorgulayan Filozof</div>
+      <div class="person-bio">Husserl'in öğrencisi olarak fenomenolojiyi Husserl'den farklı biçimde, varlık sorusunu merkeze alarak yeniden şekillendirmiş; insanın dünyada 'orada-varlık' (<b>Dasein</b>) olarak bulunduğunu, varoluşun ancak zaman, ölüm ve kaygı üzerinden çözümlenebileceğini savunmuştur.</div>
+    </div>
+  </div>
+  
+</div>
+
+  
+<!--item 2 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">1</div>
+    <div class="block-title">Husserl: Bilincin Deneyimi</div>
+  </div>
+  
+  <ul>
+    <li>Fenomenoloji, Husserl tarafından geliştirilmiştir. Felsefenin görevi, nesnelerin bilince nasıl göründüğünü, yani deneyimin özünü incelemektir. <b>Fenomenolojik indirgeme</b> adlı yöntem: önyargılardan sıyrılarak yalnızca bilincin deneyimine odaklanmak — felsefe kesin bilgiye ancak bu yolla ulaşır.</li>
+  </ul>
+</div>
+
+  
+<!--item 3 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">2</div>
+    <div class="block-title">Heidegger: Varlık Sorusu ve Dasein</div>
+  </div>
+  
+  <ul>
+    <li>Husserl'in öğrencisi olan Heidegger, fenomenolojiyi varlık sorusunu merkeze alarak yeniden şekillendirmiştir. İnsan, dünyada 'orada-varlık' (<b>Dasein</b>) olarak bulunur: kendi varlığına dair anlayışından yola çıkarak, genel olarak varlığı anlayıp anlamlandırabilme yetisi.</li><li>Varlığı anlamak, varoluşun koşullarını çözümlemekle mümkündür; zaman, ölüm, kaygı gibi kavramlar üzerinden insanın özgür varoluşunu inceler.</li>
+  </ul>
+</div>
+
+  
+
+
+    
+<div class="footer">
+  <div>Çağdaş <span class="accent-word">Felsefe</span></div>
+  <div class="fnum">15</div>
+</div>
+
+  </section>
+  
+  
+  
+  <section class="page body-page" data-ch="5" data-cp="1">
+    <div class="pageband"><div>Çağdaş <span class="accent-word">Felsefe</span></div><div class="pageband-course">Bölüm 5</div></div>
+
+    
+
+    <!--item 0 table-->
+  
+<div class="ctable-wrap">
+  <div class="ctable-caption">Karşılaştırma: Husserl – Heidegger</div>
+  <table class="ctable">
+    <thead><tr><th>Ölçüt</th><th>Edmund Husserl</th><th>Martin Heidegger</th></tr></thead>
+    <tbody>
+      
+      <tr><td>Fenomenolojinin odağı</td><td>Bilincin deneyimi, nesnelerin bilince görünüşü.</td><td>Varlık sorusu (insanın varoluşu).</td></tr>
+      
+      <tr><td>Anahtar kavram</td><td>Fenomenolojik indirgeme.</td><td>Dasein (orada-varlık).</td></tr>
+      
+      <tr><td>Yöntem</td><td>Önyargılardan sıyrılıp saf deneyime odaklanmak.</td><td>Zaman, ölüm, kaygı üzerinden varoluşu çözümlemek.</td></tr>
+      
+    </tbody>
+  </table>
+</div>
+
+  
+<!--item 1 person_row-->
+  
+<div class="person-row">
+  
+  <div class="person-card">
+    <div class="person-avatar">JS</div>
+    <div>
+      <div class="person-name">Jean-Paul Sartre</div>
+      <div class="person-tag">1905–1980 · 'Önce Varoluş, Sonra Öz' İlkesinin Sahibi</div>
+      <div class="person-bio">'İnsan önce var olur, sonra kendi özünü kendi eylemleriyle oluşturur' ilkesiyle insanın tamamen özgür ve bu özgürlükten sorumlu olduğunu savunmuş; özgürlükten ve onun getirdiği sorumluluktan kaçma çabasına <b>'kötü niyet' (mauvaise foi)</b> adını vermiştir.</div>
+    </div>
+  </div>
+  
+  <div class="person-card">
+    <div class="person-avatar">AC</div>
+    <div>
+      <div class="person-name">Albert Camus</div>
+      <div class="person-tag">1913–1960 · Absürdizm ve Sisifos Miti</div>
+      <div class="person-bio">Varoluşçuluğa 'absürdizm' kavramını katmış; insanın anlam arayışı ile evrenin sessizliği arasındaki uyumsuzluğu 'absürt' olarak tanımlamış, bu absürtlüğe rağmen insanın hayatı anlamlandırmaya ve mücadeleyi sürdürmeye devam etmesi gerektiğini <b>Sisifos Miti</b> ile simgeleştirmiştir.</div>
+    </div>
+  </div>
+  
+</div>
+
+  
+<!--item 2 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">3</div>
+    <div class="block-title">Sartre: Özgürlük ve Kötü Niyet</div>
+  </div>
+  
+  <ul>
+    <li>Fransız filozoftur. <b>'İnsan önce var olur, sonra kendi özünü kendi eylemleriyle oluşturur.'</b> İnsan tamamen özgürdür ve bu özgürlük aynı zamanda sorumluluk taşımasına neden olur.</li><li>İnsanlar özgürlükten, yani bu özgürlüğün getirdiği sorumluluktan kaçmak isteyebilirler — buna <b>'kötü niyet'</b> adını vermiştir.</li>
+  </ul>
+</div>
+
+  
+<!--item 3 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">4</div>
+    <div class="block-title">Camus: Absürdizm ve Sisifos</div>
+  </div>
+  
+  <ul>
+    <li>'Absürdizm' kavramını varoluşçuluğa katar: insanların evrende anlam bulma çabasının saçma olduğunu, bu anlam arayışının eninde sonunda başarısızlıkla sonuçlanacağını anlatır — insanın anlam arayışı ile dünyanın sessizliği arasındaki bu uyumsuzluğa 'absürt' denir.</li><li>Bütün bu absürtlüğe rağmen insan hayatı anlamlandırmaya çalışmalı, yaşamı seçmelidir: <b>Sisifos Miti</b> — anlam olmasa bile mücadele devam eder.</li>
+  </ul>
+</div>
+
+  
+<!--item 4 table-->
+  
+<div class="ctable-wrap">
+  <div class="ctable-caption">Karşılaştırma: Sartre – Camus</div>
+  <table class="ctable">
+    <thead><tr><th>Ölçüt</th><th>Jean-Paul Sartre</th><th>Albert Camus</th></tr></thead>
+    <tbody>
+      
+      <tr><td>Anahtar kavram</td><td>Özgürlük ve sorumluluk / kötü niyet.</td><td>Absürt / absürdizm.</td></tr>
+      
+      <tr><td>Temel tez</td><td>İnsan özünü kendi eylemleriyle oluşturur, özgürlükten kaçmamalıdır.</td><td>Evrende anlam yoktur, ama insan yine de yaşamı anlamlandırmaya çalışmalı, mücadeleyi sürdürmelidir.</td></tr>
+      
+      <tr><td>Simge</td><td>—</td><td>Sisifos Miti</td></tr>
+      
+    </tbody>
+  </table>
+</div>
+
+  
+
+
+    
+<div class="footer">
+  <div>Çağdaş <span class="accent-word">Felsefe</span></div>
+  <div class="fnum">16</div>
+</div>
+
+  </section>
+  
+  
+  
+  <section class="page body-page" data-ch="5" data-cp="2">
+    <div class="pageband"><div>Çağdaş <span class="accent-word">Felsefe</span></div><div class="pageband-course">Bölüm 5</div></div>
+
+    
+
+    <!--item 0 summary-->
+  
+<div class="chsummary"><b>Bölüm Özeti</b>Husserl, fenomenolojiyi bilincin deneyimini önyargısız incelemenin bir yöntemi olarak kurarken; öğrencisi Heidegger bu yöntemi insanın 'orada-varlık' (Dasein) olarak varoluşunu çözümlemeye yöneltmiştir. Bu zemin üzerinde Sartre, insanın özünü özgür eylemleriyle oluşturduğunu ve bu özgürlükten kaçışın 'kötü niyet' olduğunu savunurken; Camus, evrenin anlamsız sessizliği karşısında insanın yine de yaşamı ve mücadeleyi (Sisifos Miti) seçmesi gerektiğini öne sürer.</div>
+
+  
+
+
+    
+<div class="footer">
+  <div>Çağdaş <span class="accent-word">Felsefe</span></div>
+  <div class="fnum">17</div>
+</div>
+
+  </section>
+  
+  
+
+  
+  
+  <section class="page body-page" data-ch="6" data-cp="0" id="ch-6">
+    <div class="pageband"><div>Çağdaş <span class="accent-word">Felsefe</span></div><div class="pageband-course">Bölüm 6</div></div>
+
+    
+      <div class="chbanner">
+        <div class="chbanner-kicker">6. Bölüm</div>
+        <div class="chbanner-title">Güç İstenci, Üstinsan ve Nihilizm</div>
+        <div class="chbanner-subtitle">Nietzsche'nin eleştiri felsefesinden Tanrı'nın ölümüne ve Üstinsan idealine</div>
+      </div>
+    
+
+    <!--item 0 terms-->
+  
+<div class="terms-grid">
+  
+  <div class="term-box">
+    <div class="term-name">Güç İstenci</div>
+    <div class="term-def">Nietzsche'ye göre her canlıda bulunan, sadece var olmayı değil güçlü olmayı isteyen temel itki.</div>
+  </div>
+  
+  <div class="term-box">
+    <div class="term-name">Üstinsan (Übermensch)</div>
+    <div class="term-def">Tutkularının kölesi olmaktan kurtulup kendi değerlerini yaratan, güçlü insan.</div>
+  </div>
+  
+  <div class="term-box">
+    <div class="term-name">'Tanrı Öldü'</div>
+    <div class="term-def">Nietzsche'nin, Avrupa'nın geleneksel ahlak, değer ve düzen kaynağı olarak Tanrı'ya artık ihtiyaç duymadığını ifade eden sözü.</div>
+  </div>
+  
+  <div class="term-box">
+    <div class="term-name">Nihilizm</div>
+    <div class="term-def">Hayatın, ahlakın, bilginin ve değerlerin nesnel bir temeli ve anlamı olmadığını savunan, her türlü otoriteyi ve toplumsal kuralı reddeden görüş.</div>
+  </div>
+  
+</div>
+
+  
+<!--item 1 person-->
+  
+<div class="person-card">
+  <div class="person-avatar">FN</div>
+  <div>
+    <div class="person-name">Friedrich Nietzsche</div>
+    <div class="person-tag">1844–1900 · 'Tanrı Öldü' Diyen Yaşam Filozofu</div>
+    <div class="person-bio">13 yaşında kötülük sorunu üzerine düşünmeye başlamış, Schopenhauer'in <b>İsteme ve Tasarım Olarak Dünya</b> kitabından derinden etkilenmiş; felsefesinin özü eleştiridir — Kant, Hegel, Schopenhauer, Katolik Hristiyanlığı ve Avrupa kültürünün yürürlükteki tüm değerlerini sertçe eleştirmiştir.</div>
+  </div>
+</div>
+
+  
+<!--item 2 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">1</div>
+    <div class="block-title">Hayatı ve Entelektüel Dönüşümü</div>
+  </div>
+  
+  <ul>
+    <li>Ona göre yeryüzündeki bütün dinler ve politik görüşler insanoğlunun özgür gelişmesini engeller; bu yüzden hepsi yıkılmalıdır. 13 yaşındayken kötülük sorunu üzerine düşünmeye başlamıştır: 'Madem Tanrı iyiyse, dünyadaki bu kadar acı neden var?'</li><li>Frengi hastasıdır. Schopenhauer'in <b>İsteme ve Tasarım Olarak Dünya</b> kitabını okuduktan sonra ondan derinden etkilenmiştir; 24 yaşında Basel Üniversitesi'nde görev yapmıştır.</li><li>Savaşa katılmış, subaylardan etkilenmiştir: 'En güçlü ve en yüksek yaşama isteminin, sefil bir var oluş mücadelesinde değil, savaş isteminde, güç isteminde, yenmek isteminde olduğunu ilk kez orada hissettim.' Savaşta gördüğü vahşetler yüzünden sağlığı bozulup askeriyeden ayrılmıştır.</li>
+  </ul>
+</div>
+
+  
+<!--item 3 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">2</div>
+    <div class="block-title">Lou Andreas-Salomé ve Sonu</div>
+  </div>
+  
+  <ul>
+    <li>1882'de tanıştığı, evlenme teklif edip reddedildiği Rus yazar/psikanalist Lou Andreas-Salomé ile kısa süren yoğun entelektüel ilişkisi Nietzsche üzerinde derin bir etki bırakmış, yaşadığı hayal kırıklığı <b>Böyle Buyurdu Zerdüşt</b> eserinin yazımına ilham vermiştir.</li><li>1887'de Dostoyevski'yi okurken bir atın kırbaçlandığı bölümden etkilenmiş; gerçek hayatta da bir atın kırbaçlandığını görünce atın boynuna sarılıp 'Seni anlıyorum' demiş ve orada bayılmıştır. Gözünü bir akıl hastanesinde açmış, delirmiş ve 1900'de ölmüştür.</li>
+  </ul>
+</div>
+
+  
+
+
+    
+<div class="footer">
+  <div>Çağdaş <span class="accent-word">Felsefe</span></div>
+  <div class="fnum">18</div>
+</div>
+
+  </section>
+  
+  
+  
+  <section class="page body-page" data-ch="6" data-cp="1">
+    <div class="pageband"><div>Çağdaş <span class="accent-word">Felsefe</span></div><div class="pageband-course">Bölüm 6</div></div>
+
+    
+
+    <!--item 0 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">3</div>
+    <div class="block-title">Eleştiri ve Üç İnsan Tipi</div>
+  </div>
+  
+  <ul>
+    <li>Felsefesinin özü eleştiridir — Kant'ı, Hegel'i, Schopenhauer'i, Katolik Hristiyanlığı, Avrupa kültürünü ve yürürlükteki değerleri eleştirir. Felsefesinin baş kahramanı insandır: insan bir güçtür, özgürlüğünü ele alabilecek tek güçtür.</li>
+  </ul>
+</div>
+
+  
+<!--item 1 flow-->
+  
+<div class="flowdiag">
+  
+  
+  <div class="fstep">
+    <div class="fstep-title">Sürü İnsanı</div>
+    <div class="fstep-text">Kendisini yönetecek bir çobana/başa ihtiyaç duyar</div>
+  </div>
+  
+  <div class="farrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="19" y2="12"/><polyline points="13 6 19 12 13 18"/></svg></div>
+  <div class="fstep">
+    <div class="fstep-title">Özgür İnsan</div>
+    <div class="fstep-text">Sürüden ayrılmış, dünyayı kendi gözleriyle görmek ister</div>
+  </div>
+  
+  <div class="farrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="19" y2="12"/><polyline points="13 6 19 12 13 18"/></svg></div>
+  <div class="fstep">
+    <div class="fstep-title">Trajik İnsan</div>
+    <div class="fstep-text">Geçmişini tüm yönleriyle kabul edip yaşamı olumlar</div>
+  </div>
+  
+</div>
+<div class="flow-caption">Nietzsche'ye Göre İnsan Tipleri</div>
+
+  
+<!--item 2 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">4</div>
+    <div class="block-title">Güç İstenci ve Üstinsan</div>
+  </div>
+  
+  <ul>
+    <li>Yaşamda özgür olmanın, hiçbir şeye boyun eğmemenin tek yolu güç istemidir. Mutluluk hazda değil güçtedir — güç istemi herkeste bulunur: filozof ve bilim insanı için hakikatin izindedir, sanatçılar eserlerinde, iş insanları zengin olmakla güç istencini bulur.</li><li><b>Üstinsan:</b> evrenin gerçek efendisidir; bedensel ve akıl bakımından güçlüdür, çıkarına ulaşmak için bencillikten çekinmez (acımak insanı zayıflatan bir duygudur). Ahlak ve Tanrı gibi güçlü görünen kavramları yıkar; tutkularının kölesi olmaktan kurtulup kendi efendisi olmuş insandır. Üstinsan kavramı Böyle Buyurdu Zerdüşt'te dile getirilmiştir.</li>
+  </ul>
+</div>
+
+  
+<!--item 3 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">5</div>
+    <div class="block-title">Tanrı'nın Ölümü</div>
+  </div>
+  
+  <ul>
+    <li>Nietzsche, Tanrı'nın yerine insanı koymuş ve 'Tanrı öldü' sözünü <b>Şen Bilim</b> adlı kitabında dile getirmiştir: Avrupa, evrendeki tüm ahlak, değer ve düzenin kaynağı olarak artık Tanrı'ya ihtiyaç duymamaktadır — felsefe ve bilim bu işlevi zaten görebilmektedir.</li><li>Tanrı, uzun yıllar insanların üzerine gölgesini bırakmaya devam edecektir; insanlığı bu durumdan kurtaracak olanlar üstinsanlardır.</li>
+  </ul>
+</div>
+
+  
+<!--item 4 callout-->
+  
+<div class="callout insight">
+  <div class="callout-icon">
+<svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 1.5 L14.6 9 L22 9 L15.9 13.6 L18.2 21 L12 16.6 L5.8 21 L8.1 13.6 L2 9 L9.4 9 Z"/></svg>
+
+</div>
+  <div>
+    <div class="callout-title">Kritik Odak: Nihilizm Bir Övgü Değil, Bir Teşhistir</div>
+    <div class="callout-text">Nihilizm, hayatın, ahlakın, bilginin ve değerlerin nesnel bir temeli ve anlamı olmadığını savunan, her türlü otoriteyi ve sistemi reddeden görüştür. Nietzsche'nin 'Tanrı öldü' tespiti bir nihilizm övgüsü değil, tam tersine <b>Avrupa'nın içine düştüğü nihilist krizin bir teşhisidir</b> — üstinsan kavramı, bu krizi aşmanın yolu olarak önerilir.</div>
+  </div>
+</div>
+
+  
+<!--item 5 summary-->
+  
+<div class="chsummary"><b>Bölüm Özeti</b>Nietzsche, geleneksel ahlakı ve dini 'Tanrı'nın ölümü' tespitiyle eleştirerek, insanın anlamı dışarıdan (Tanrı, ahlak) değil kendi güç istenciyle yaratması gerektiğini savunur; bu yaratımı başarabilen insan tipine 'üstinsan' adını verir.</div>
+
+  
+
+
+    
+<div class="footer">
+  <div>Çağdaş <span class="accent-word">Felsefe</span></div>
+  <div class="fnum">19</div>
+</div>
+
+  </section>
+  
+  
+
+  
+  
+  <section class="page body-page" data-ch="7" data-cp="0" id="ch-7">
+    <div class="pageband"><div>Çağdaş <span class="accent-word">Felsefe</span></div><div class="pageband-course">Bölüm 7</div></div>
+
+    
+      <div class="chbanner">
+        <div class="chbanner-kicker">7. Bölüm</div>
+        <div class="chbanner-title">Faydacılık ve Tarihsel Maddecilik</div>
+        <div class="chbanner-subtitle">Bentham'ın niceliksel ve Mill'in niteliksel faydacılığından Marx'ın alt yapı-üst yapı çatışmasına</div>
+      </div>
+    
+
+    <!--item 0 terms-->
+  
+<div class="terms-grid">
+  
+  <div class="term-box">
+    <div class="term-name">Faydacılık (Utilitarizm)</div>
+    <div class="term-def">Bir eylemin ahlaki değerinin, yarattığı mutluluğa/faydaya göre belirlendiğini savunan görüş.</div>
+  </div>
+  
+  <div class="term-box">
+    <div class="term-name">En Büyük Mutluluk İlkesi</div>
+    <div class="term-def">Mümkün olan en çok sayıda insan için en büyük mutluluğu sağlamayı amaçlayan ilke.</div>
+  </div>
+  
+  <div class="term-box">
+    <div class="term-name">Alt Yapı ve Üst Yapı</div>
+    <div class="term-def">Alt yapı toplumun maddi/ekonomik üretim ilişkilerini; üst yapı toplumun düşünüş tarzı, kurumları, hukuku, dini, ahlakı ve felsefesini kapsar.</div>
+  </div>
+  
+  <div class="term-box">
+    <div class="term-name">Diyalektik Materyalizm</div>
+    <div class="term-def">Alt yapı ile üst yapı arasındaki çatışmaya dayanan, Marx'ın tarih ve toplum anlayışı.</div>
+  </div>
+  
+</div>
+
+  
+<!--item 1 person_row-->
+  
+<div class="person-row">
+  
+  <div class="person-card">
+    <div class="person-avatar">JB</div>
+    <div>
+      <div class="person-name">Jeremy Bentham</div>
+      <div class="person-tag">1748–1832 · Klasik (Niceliksel) Faydacılığın Kurucusu</div>
+      <div class="person-bio">İngiliz filozof, hukukçu ve sosyal reformcu; 'en büyük mutluluk ilkesi'ni savunarak eylemlerin ahlaki değerinin sonuçlarının yarattığı ölçülebilir haz/acı dengesiyle belirlendiğini iddia etmiş, gözetim mimarisi <b>Panoptikon</b>'u tasarlamıştır.</div>
+    </div>
+  </div>
+  
+  <div class="person-card">
+    <div class="person-avatar">JS</div>
+    <div>
+      <div class="person-name">John Stuart Mill</div>
+      <div class="person-tag">1806–1873 · Özgürlükçü (Liberal) Faydacılığın Öncüsü</div>
+      <div class="person-bio">İngiliz filozof, ekonomist ve siyasetçi; Bentham'ın faydacılığını 'hazlar arasında nitelik farkı vardır (zihinsel hazlar bedensel hazlardan üstündür)' ilkesiyle geliştirmiş, <b>Özgürlük Üzerine</b>'de bireysel özgürlüğü, <b>Kadınların Boyunduruk Altında</b>'da toplumsal cinsiyet eşitliğini savunmuştur.</div>
+    </div>
+  </div>
+  
+</div>
+
+  
+<!--item 2 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">1</div>
+    <div class="block-title">Jeremy Bentham: Klasik Faydacılık</div>
+  </div>
+  
+  <ul>
+    <li>İngiliz filozof, hukukçu ve sosyal reformcudur; faydacılık felsefesinin kurucusudur. <b>En büyük mutluluk ilkesi:</b> en çok sayıda insan için en büyük mutluluğu sağlamak.</li><li>Hedonist yaklaşım: mutluluk = haz + acının yokluğu. Ahlaki kararlar nesnel olmalı, ahlaki eylemler ölçülebilir olmalıdır; yasaların amacı toplumda en fazla faydayı sağlamak, cezalar suçun topluma verdiği zarara göre şekillenmelidir. <b>Panoptikon</b> hapishane tasarımıyla tanınır.</li>
+  </ul>
+</div>
+
+  
+<!--item 3 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">2</div>
+    <div class="block-title">John Stuart Mill: Liberal Faydacılık</div>
+  </div>
+  
+  <ul>
+    <li>İngiliz filozof, ekonomist ve siyasetçidir; liberal düşüncenin öncülerindendir, Bentham'ın düşüncelerini geliştirmiştir. Bentham'dan farklı olarak hazlar arasında niteliksel bir ayrım yapar: zihinsel hazlar bedensel hazlardan üstündür.</li><li><b>Özgürlük Üzerine</b>'de bireysel özgürlüğün korunması gerektiğini savunur — başkasına zarar vermediği sürece her birey özgürdür; <b>Kadınların Boyunduruk Altında</b> adlı eseri de vardır. Empiristtir, ama bilimsel yönteme de büyük önem verir.</li>
+  </ul>
+</div>
+
+  
+
+
+    
+<div class="footer">
+  <div>Çağdaş <span class="accent-word">Felsefe</span></div>
+  <div class="fnum">20</div>
+</div>
+
+  </section>
+  
+  
+  
+  <section class="page body-page" data-ch="7" data-cp="1">
+    <div class="pageband"><div>Çağdaş <span class="accent-word">Felsefe</span></div><div class="pageband-course">Bölüm 7</div></div>
+
+    
+
+    <!--item 0 table-->
+  
+<div class="ctable-wrap">
+  <div class="ctable-caption">Karşılaştırma: Bentham – Mill</div>
+  <table class="ctable">
+    <thead><tr><th>Ölçüt</th><th>Jeremy Bentham</th><th>John Stuart Mill</th></tr></thead>
+    <tbody>
+      
+      <tr><td>Haz anlayışı</td><td>Niceliksel — tüm hazlar eşit sayılır, önemli olan miktardır.</td><td>Niteliksel — zihinsel hazlar bedensel hazlardan üstündür.</td></tr>
+      
+      <tr><td>Vurgu</td><td>Ölçülebilirlik, yasa ve ceza reformu.</td><td>Bireysel özgürlük, başkasına zarar vermeme ilkesi.</td></tr>
+      
+      <tr><td>Temel katkı</td><td>Faydacılığın kurucusu, Panoptikon.</td><td>Faydacılığı geliştirdi, liberal düşüncenin öncüsü.</td></tr>
+      
+    </tbody>
+  </table>
+</div>
+
+  
+<!--item 1 summary-->
+  
+<div class="chsummary"><b>Bölüm Özeti</b>Bentham, bir eylemin ahlakiliğini yarattığı hazza göre ölçülebilir biçimde değerlendiren faydacılığı kurarken; Mill bu görüşü geliştirip hazlar arasında nitelik farkı gözeterek bireysel özgürlüğü de faydacı çerçeveye eklemiştir.</div>
+
+  
+<!--item 2 person-->
+  
+<div class="person-card">
+  <div class="person-avatar">KM</div>
+  <div>
+    <div class="person-name">Karl Marx</div>
+    <div class="person-tag">1818–1883 · Tarihsel ve Diyalektik Maddeciliğin Kurucusu</div>
+    <div class="person-bio">Toplumu, maddi/ekonomik ilişkilerden oluşan 'alt yapı' ile siyaset, hukuk, din ve felsefeden oluşan 'üst yapı' arasındaki çatışma üzerinden açıklamış; Friedrich Engels ile birlikte yayımladığı <b>Komünist Manifesto</b>'da proletarya diktatörlüğü yoluyla sınıfsız bir düzen hedeflemiştir.</div>
+  </div>
+</div>
+
+  
+<!--item 3 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">3</div>
+    <div class="block-title">Alt Yapı ve Üst Yapı</div>
+  </div>
+  
+  <ul>
+    <li>Marx, toplumda iki temel yapı olduğunu söyler: <b>alt yapı</b>, toplumdaki maddi, ekonomik ve toplumsal (üretim) ilişkileri kapsar; <b>üst yapı</b> ise toplumun düşünüş tarzı, politik kurumlar, yasalar, din, ahlak, sanat, felsefe ve bilimdir.</li><li>Alt yapı ile üst yapı arasında bir çatışma vardır — bu yüzden Marx'ın görüşü <b>diyalektik materyalizm</b> olarak adlandırılır. Ahlak açısından neyin doğru olacağı, toplumsal alt yapının bir ürünüdür.</li>
+  </ul>
+</div>
+
+  
+<!--item 4 table-->
+  
+<div class="ctable-wrap">
+  <div class="ctable-caption">Alt Yapının İç Hiyerarşisi</div>
+  <table class="ctable">
+    <thead><tr><th>Katman</th><th>İçerik</th></tr></thead>
+    <tbody>
+      
+      <tr><td>Doğal Üretim Koşulları</td><td>Doğal kaynaklar, iklim koşulları, hammaddeler — en temel katman.</td></tr>
+      
+      <tr><td>Üretici Güçler</td><td>İnsanların sahip olduğu araç, gereç, aletler, makineler.</td></tr>
+      
+    </tbody>
+  </table>
+</div>
+
+  
+<!--item 5 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">4</div>
+    <div class="block-title">Sınıf Çatışması ve Yabancılaşma</div>
+  </div>
+  
+  <ul>
+    <li>Marx'ın döneminde burjuvazi (kapitalistler) ile proletarya (işçiler) arasında bir çatışma vardır: 'Bana ne iş yaptığını söyle, sana kim olduğunu söyleyeyim.' Nasıl çalıştığımız bilincimizi, bilincimiz de nasıl çalıştığımızı etkiler.</li><li>İşçi, başkası adına çalışarak kendi emeğine ve kendine <b>yabancılaşır</b>. Marx'a göre emek halkın kendisine aittir — bu düzende emeğe yabancılaşma yoktur.</li>
+  </ul>
+</div>
+
+  
+
+
+    
+<div class="footer">
+  <div>Çağdaş <span class="accent-word">Felsefe</span></div>
+  <div class="fnum">21</div>
+</div>
+
+  </section>
+  
+  
+  
+  <section class="page body-page" data-ch="7" data-cp="2">
+    <div class="pageband"><div>Çağdaş <span class="accent-word">Felsefe</span></div><div class="pageband-course">Bölüm 7</div></div>
+
+    
+
+    <!--item 0 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">5</div>
+    <div class="block-title">Komünist Manifesto ve Proletarya Diktatörlüğü</div>
+  </div>
+  
+  <ul>
+    <li>Friedrich Engels ile birlikte <b>Komünist Manifesto</b>'yu yayımlamıştır. Avrupa'da bir 'komünizm hayaleti' dolaşmaktadır; komünistler toplum düzenini zorla devirmeyi hedefler: işçi sınıfının başkaldırıp üretim araçlarını ele geçireceğine inanır.</li><li><b>Proletarya diktatörlüğü:</b> işçi sınıfının burjuva sınıfını baskı altında tutması.</li>
+  </ul>
+</div>
+
+  
+<!--item 1 callout-->
+  
+<div class="callout route">
+  <div class="callout-icon">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.5"/><polygon points="15.5 8.5 13.2 13.2 8.5 15.5 10.8 10.8 15.5 8.5" fill="currentColor" stroke="none"/></svg>
+
+</div>
+  <div>
+    <div class="callout-title">Kritik Odak: Marx Sonrası Komünist Hareket</div>
+    <div class="callout-text">Marx'tan sonra komünizm hareketi ikiye ayrılır: <b>(1) Sosyal demokrasi</b> ve <b>(2) Leninizm.</b></div>
+  </div>
+</div>
+
+  
+<!--item 2 summary-->
+  
+<div class="chsummary"><b>Bölüm Özeti</b>Marx, toplumu maddi/ekonomik ilişkilerden oluşan alt yapı ile düşünce, hukuk ve kültürden oluşan üst yapının çatışması (diyalektik materyalizm) üzerinden açıklar; bu çatışmayı burjuvazi–proletarya mücadelesi ve işçinin emeğine yabancılaşması üzerinden somutlaştırır, çözüm olarak proletarya diktatörlüğünü önerir.</div>
+
+  
+
+
+    
+<div class="footer">
+  <div>Çağdaş <span class="accent-word">Felsefe</span></div>
+  <div class="fnum">22</div>
+</div>
+
+  </section>
+  
+  
+
+
+
+
+
+<section class="page body-page" id="glossary">
+  <div class="pageband"><div>Çağdaş <span class="accent-word">Felsefe</span></div><div class="pageband-course">Genel Tekrar</div></div>
+  
+    <div class="section-kicker">Genel Tekrar</div>
+    <div class="section-title">Anahtar Kavramlar Sözlüğü</div>
+    <div class="section-lede">Her kavram, kısa tanımı ve geldiği bölümle birlikte listelenmiştir — hızlı tekrar ve eşleştirme için.</div>
+  
+  <div class="gloss-grid">
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Pozitivizm</div>
+      <div class="gloss-def">Bilginin yalnızca gözlem, deney ve bilimsel yöntemle elde edilebileceğini savunan görüş.</div>
+      <div class="gloss-ref">Auguste Comte · 1. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Üç Hal Yasası</div>
+      <div class="gloss-def">İnsan düşüncesinin teolojik–metafizik–pozitif üç aşamada geliştiğini açıklayan yasa.</div>
+      <div class="gloss-ref">Auguste Comte · 1. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">İnsanlık Dini</div>
+      <div class="gloss-def">Toplumu bilim etrafında birleştirmeyi hedefleyen, tanrısız ama dinsel biçimde örgütlenmiş ahlaki sistem.</div>
+      <div class="gloss-ref">Auguste Comte · 1. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">İrade (Wille)</div>
+      <div class="gloss-def">Evrenin ve insanın temelinde yatan, doyumsuz, amaçsız itki.</div>
+      <div class="gloss-ref">Arthur Schopenhauer · 1. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Negatif Hedonizm</div>
+      <div class="gloss-def">Mutluluğun pozitif bir haz değil, yalnızca acı ve ızdırabın yokluğu olduğunu savunan görüş.</div>
+      <div class="gloss-ref">Arthur Schopenhauer · 1. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Doğal Seçilim</div>
+      <div class="gloss-def">Çevreye en uyumlu bireylerin hayatta kalıp üreme şansını artırdığı süreç.</div>
+      <div class="gloss-ref">Charles Darwin · 2. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Yapay Seçilim</div>
+      <div class="gloss-def">İnsanların çiftçilik/hayvancılıkta iyi örnekleri seçip zayıfları elemesi; doğal seçilime ilham kaynağı.</div>
+      <div class="gloss-ref">Charles Darwin · 2. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Bilinçdışı (İd/Es)</div>
+      <div class="gloss-def">Haz ilkesine göre çalışan, akıl dışı dürtülerin bulunduğu zihinsel katman.</div>
+      <div class="gloss-ref">Sigmund Freud · 2. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Süperego (Üst-Ben)</div>
+      <div class="gloss-def">Çevrenin ahlaki beklentilerinin içselleştirilmesiyle oluşan zihinsel katman.</div>
+      <div class="gloss-ref">Sigmund Freud · 2. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Serbest Çağrışım</div>
+      <div class="gloss-def">Danışanın aklına gelen her şeyi sansürsüz söylemesini isteyen, bilinçdışına ulaşma yöntemi.</div>
+      <div class="gloss-ref">Sigmund Freud · 2. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Çağdaş Felsefe</div>
+      <div class="gloss-def">20. yüzyıl başlarından günümüze uzanan, disiplinler arası, eleştirel ve çoğulcu felsefe dönemi.</div>
+      <div class="gloss-ref">Genel · 3. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Analitik Felsefe</div>
+      <div class="gloss-def">Dilin, mantığın ve bilimsel yöntemin analizine odaklanan felsefe geleneği.</div>
+      <div class="gloss-ref">Bertrand Russell · 3. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Kıta Felsefesi</div>
+      <div class="gloss-def">Tarihsel, kültürel ve varoluşsal konuları merkeze alan Avrupa kökenli felsefe geleneği.</div>
+      <div class="gloss-ref">Genel · 3. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Mantıksal Atomculuk</div>
+      <div class="gloss-def">Dil ile dünya arasında yapısal bir benzerlik olduğunu savunan görüş.</div>
+      <div class="gloss-ref">Bertrand Russell · 3. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Russell Paradoksu</div>
+      <div class="gloss-def">Kümeler kuramında kendini içermeyen kümeler kümesiyle ilgili çelişki.</div>
+      <div class="gloss-ref">Bertrand Russell · 3. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Nesnel Doğru</div>
+      <div class="gloss-def">Herkes tarafından kabul edilen, üzerinde tartışılmayan doğrular.</div>
+      <div class="gloss-ref">Søren Kierkegaard · 4. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Öznel Doğru</div>
+      <div class="gloss-def">Kişinin kendi iç dünyasında doğru kabul ettiği şeyler.</div>
+      <div class="gloss-ref">Søren Kierkegaard · 4. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">İman Şövalyesi</div>
+      <div class="gloss-def">Gerçek dindarlık formuna bürünmüş, şüpheye rağmen inanmaya devam eden insan.</div>
+      <div class="gloss-ref">Søren Kierkegaard · 4. Bölüm</div>
+    </div>
+    
+  </div>
+  
+<div class="footer">
+  <div>Çağdaş <span class="accent-word">Felsefe</span></div>
+  <div class="fnum">23</div>
+</div>
+
+</section>
+
+
+<section class="page body-page">
+  <div class="pageband"><div>Çağdaş <span class="accent-word">Felsefe</span></div><div class="pageband-course">Genel Tekrar</div></div>
+  
+    <div class="chcontinue"><div class="tag">Sözlük · Devam</div><div class="cctitle">Anahtar Kavramlar (devamı)</div></div>
+  
+  <div class="gloss-grid">
+    
+    <div class="gloss-item">
+      <div class="gloss-term">İnanç Sıçraması</div>
+      <div class="gloss-def">Aklı devre dışı bırakıp doğrudan inancı seçerek anlama ulaşma.</div>
+      <div class="gloss-ref">Søren Kierkegaard · 4. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Fenomenoloji</div>
+      <div class="gloss-def">Nesnelerin bilince nasıl göründüğünü, deneyimin özünü inceleyen felsefe akımı.</div>
+      <div class="gloss-ref">Edmund Husserl · 5. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Fenomenolojik İndirgeme</div>
+      <div class="gloss-def">Önyargılardan sıyrılıp yalnızca bilincin deneyimine odaklanma yöntemi.</div>
+      <div class="gloss-ref">Edmund Husserl · 5. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Dasein (orada-varlık)</div>
+      <div class="gloss-def">İnsanın dünyada bulunuş hali; kendi varlığını anlayıp anlamlandırabilme yetisi.</div>
+      <div class="gloss-ref">Martin Heidegger · 5. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Kötü Niyet (mauvaise foi)</div>
+      <div class="gloss-def">İnsanın özgürlükten ve onun getirdiği sorumluluktan kaçma çabası.</div>
+      <div class="gloss-ref">Jean-Paul Sartre · 5. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Absürdizm</div>
+      <div class="gloss-def">İnsanın anlam arayışı ile evrenin sessizliği arasındaki uyumsuzluktan doğan durum.</div>
+      <div class="gloss-ref">Albert Camus · 5. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Sisifos Miti</div>
+      <div class="gloss-def">Anlam olmasa bile mücadelenin devam etmesi gerektiğini anlatan simge.</div>
+      <div class="gloss-ref">Albert Camus · 5. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Güç İstenci</div>
+      <div class="gloss-def">Her canlıda bulunan, sadece var olmayı değil güçlü olmayı isteyen temel itki.</div>
+      <div class="gloss-ref">Friedrich Nietzsche · 6. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Üstinsan (Übermensch)</div>
+      <div class="gloss-def">Tutkularının kölesi olmaktan kurtulup kendi değerlerini yaratan, güçlü insan.</div>
+      <div class="gloss-ref">Friedrich Nietzsche · 6. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">'Tanrı Öldü'</div>
+      <div class="gloss-def">Avrupa'nın geleneksel ahlak, değer ve düzen kaynağı olarak Tanrı'ya artık ihtiyaç duymadığını ifade eden söz.</div>
+      <div class="gloss-ref">Friedrich Nietzsche · 6. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Nihilizm</div>
+      <div class="gloss-def">Hayatın, ahlakın ve değerlerin nesnel bir temeli ve anlamı olmadığını savunan görüş.</div>
+      <div class="gloss-ref">Friedrich Nietzsche · 6. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Faydacılık (Utilitarizm)</div>
+      <div class="gloss-def">Bir eylemin ahlaki değerinin yarattığı mutluluğa/faydaya göre belirlendiğini savunan görüş.</div>
+      <div class="gloss-ref">Bentham / Mill · 7. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">En Büyük Mutluluk İlkesi</div>
+      <div class="gloss-def">Mümkün olan en çok sayıda insan için en büyük mutluluğu sağlamayı amaçlayan ilke.</div>
+      <div class="gloss-ref">Jeremy Bentham · 7. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Panoptikon</div>
+      <div class="gloss-def">Tek bir gözetmenin merkezi bir kuleden tüm hücreleri görebildiği hapishane modeli.</div>
+      <div class="gloss-ref">Jeremy Bentham · 7. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Alt Yapı ve Üst Yapı</div>
+      <div class="gloss-def">Toplumun maddi/ekonomik zemini (alt yapı) ile düşünce, hukuk ve kültürden oluşan kurumlar (üst yapı).</div>
+      <div class="gloss-ref">Karl Marx · 7. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Diyalektik Materyalizm</div>
+      <div class="gloss-def">Alt yapı ile üst yapı arasındaki çatışmaya dayanan tarih ve toplum anlayışı.</div>
+      <div class="gloss-ref">Karl Marx · 7. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Proletarya Diktatörlüğü</div>
+      <div class="gloss-def">İşçi sınıfının burjuva sınıfını baskı altında tuttuğu geçiş dönemi.</div>
+      <div class="gloss-ref">Karl Marx · 7. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Yabancılaşma</div>
+      <div class="gloss-def">İşçinin başkası adına çalışarak kendi emeğine ve kendine uzaklaşması durumu.</div>
+      <div class="gloss-ref">Karl Marx · 7. Bölüm</div>
+    </div>
+    
+  </div>
+  
+<div class="footer">
+  <div>Çağdaş <span class="accent-word">Felsefe</span></div>
+  <div class="fnum">24</div>
+</div>
+
+</section>
+
+
+
+
+
+
+
+
+
+<section class="page body-page" id="exam">
+  <div class="pageband"><div>Çağdaş <span class="accent-word">Felsefe</span></div><div class="pageband-course">Sınav</div></div>
+  
+    <div class="section-kicker">Sınav</div>
+    <div class="section-title">Genel Değerlendirme Testi</div>
+    <div class="section-lede">Comte'tan Marx'a, çağdaş felsefe tarihi üzerine kapsamlı çoktan seçmeli test</div>
+    <div class="test-chip-row">
+      
+      <div class="test-chip"><b>20</b><span>Soru</span></div>
+      
+      <div class="test-chip"><b>Çoktan</b><span>Seçmeli</span></div>
+      
+      <div class="test-chip"><b>5</b><span>Seçenek (A-E)</span></div>
+      
+    </div>
+    <div class="test-instructions">Aşağıdaki sorularda beş seçenekten yalnızca birini işaretleyiniz. Süre: 30 dakika.</div>
+  
+  <div class="tq-list">
+    
+<div class="tq">
+  <div class="tq-head">
+    <div class="tq-num">1</div>
+    <div class="tq-stem">Comte'un 'Üç Hal Yasası'na göre insan düşüncesi hangi sırayla ilerler?</div>
+  </div>
+  <ul class="tq-options">
+    
+    <li><span class="opt-letter">A</span><span>Metafizik → Teolojik → Pozitif</span></li>
+    
+    <li><span class="opt-letter">B</span><span>Pozitif → Metafizik → Teolojik</span></li>
+    
+    <li><span class="opt-letter">C</span><span>Teolojik → Metafizik → Pozitif</span></li>
+    
+    <li><span class="opt-letter">D</span><span>Teolojik → Pozitif → Metafizik</span></li>
+    
+    <li><span class="opt-letter">E</span><span>Metafizik → Pozitif → Teolojik</span></li>
+    
+  </ul>
+</div>
+
+<div class="tq">
+  <div class="tq-head">
+    <div class="tq-num">2</div>
+    <div class="tq-stem">Comte'un 'İnsanlık Dini' anlayışında ibadethaneler ve din adamları sırasıyla neye karşılık gelir?</div>
+  </div>
+  <ul class="tq-options">
+    
+    <li><span class="opt-letter">A</span><span>Kiliseler / Rahipler</span></li>
+    
+    <li><span class="opt-letter">B</span><span>Üniversiteler / Bilim insanları</span></li>
+    
+    <li><span class="opt-letter">C</span><span>Meclisler / Politikacılar</span></li>
+    
+    <li><span class="opt-letter">D</span><span>Fabrikalar / Mühendisler</span></li>
+    
+    <li><span class="opt-letter">E</span><span>Okullar / Öğretmenler</span></li>
+    
+  </ul>
+</div>
+
+<div class="tq">
+  <div class="tq-head">
+    <div class="tq-num">3</div>
+    <div class="tq-stem">Schopenhauer'e göre mutluluk nedir?</div>
+  </div>
+  <ul class="tq-options">
+    
+    <li><span class="opt-letter">A</span><span>Sürekli haz arayışının sonucu</span></li>
+    
+    <li><span class="opt-letter">B</span><span>Kendi başına var olan pozitif bir durum</span></li>
+    
+    <li><span class="opt-letter">C</span><span>Acı ve ızdırabın yokluğu</span></li>
+    
+    <li><span class="opt-letter">D</span><span>Toplumsal statünün getirdiği tatmin</span></li>
+    
+    <li><span class="opt-letter">E</span><span>İradenin sınırsızca tatmin edilmesi</span></li>
+    
+  </ul>
+</div>
+
+<div class="tq">
+  <div class="tq-head">
+    <div class="tq-num">4</div>
+    <div class="tq-stem">Schopenhauer'e göre yalnızlık ile hangi kavram arasında kopmaz bir bağ vardır?</div>
+  </div>
+  <ul class="tq-options">
+    
+    <li><span class="opt-letter">A</span><span>Özgürlük</span></li>
+    
+    <li><span class="opt-letter">B</span><span>Zenginlik</span></li>
+    
+    <li><span class="opt-letter">C</span><span>Bilgi</span></li>
+    
+    <li><span class="opt-letter">D</span><span>İktidar</span></li>
+    
+    <li><span class="opt-letter">E</span><span>Toplumsal statü</span></li>
+    
+  </ul>
+</div>
+
+<div class="tq">
+  <div class="tq-head">
+    <div class="tq-num">5</div>
+    <div class="tq-stem">Darwin'in evrim teorisine kanıt olarak sunduğu gözlemlerden biri aşağıdakilerden hangisidir?</div>
+  </div>
+  <ul class="tq-options">
+    
+    <li><span class="opt-letter">A</span><span>Tüm türlerin ayrı ayrı yaratıldığının kanıtlanması</span></li>
+    
+    <li><span class="opt-letter">B</span><span>Farklı hayvan embriyolarının ilk evrelerde birbirine benzemesi</span></li>
+    
+    <li><span class="opt-letter">C</span><span>Fosillerin yalnızca deniz seviyesinde bulunması</span></li>
+    
+    <li><span class="opt-letter">D</span><span>Türlerin coğrafyadan bağımsız olarak aynı olması</span></li>
+    
+    <li><span class="opt-letter">E</span><span>İnsan zekâsının hayvanlardan tamamen farklı kökenden gelmesi</span></li>
+    
+  </ul>
+</div>
+
+<div class="tq">
+  <div class="tq-head">
+    <div class="tq-num">6</div>
+    <div class="tq-stem">Darwin'e evrimin nasıl gerçekleştiğine dair açıklayıcı bir çerçeve sunan eser ve yazarı hangisidir?</div>
+  </div>
+  <ul class="tq-options">
+    
+    <li><span class="opt-letter">A</span><span>Malthus'un Nüfus İlkesi Üzerine Bir Deneme'si</span></li>
+    
+    <li><span class="opt-letter">B</span><span>Lamarck'ın evrim kuramı</span></li>
+    
+    <li><span class="opt-letter">C</span><span>Erasmus Darwin'in şiirleri</span></li>
+    
+    <li><span class="opt-letter">D</span><span>Mendel'in kalıtım yasaları</span></li>
+    
+    <li><span class="opt-letter">E</span><span>Lyell'in jeoloji ilkeleri</span></li>
+    
+  </ul>
+</div>
+
+  </div>
+  
+<div class="footer">
+  <div>Çağdaş <span class="accent-word">Felsefe</span></div>
+  <div class="fnum">25</div>
+</div>
+
+</section>
+
+
+<section class="page body-page">
+  <div class="pageband"><div>Çağdaş <span class="accent-word">Felsefe</span></div><div class="pageband-course">Test · Devam</div></div>
+  
+    <div class="chcontinue"><div class="tag">Test · Devam</div><div class="cctitle">Genel Değerlendirme Testi</div></div>
+  
+  <div class="tq-list">
+    
+<div class="tq">
+  <div class="tq-head">
+    <div class="tq-num">7</div>
+    <div class="tq-stem">Freud'un zihin modelinde, İd'in haz ilkesini dengelemeye başlayan katman hangisidir?</div>
+  </div>
+  <ul class="tq-options">
+    
+    <li><span class="opt-letter">A</span><span>Süperego</span></li>
+    
+    <li><span class="opt-letter">B</span><span>Bilinçdışı</span></li>
+    
+    <li><span class="opt-letter">C</span><span>Gerçeklik ilkesi (Ego)</span></li>
+    
+    <li><span class="opt-letter">D</span><span>Dasein</span></li>
+    
+    <li><span class="opt-letter">E</span><span>Ön bilinç</span></li>
+    
+  </ul>
+</div>
+
+<div class="tq">
+  <div class="tq-head">
+    <div class="tq-num">8</div>
+    <div class="tq-stem">Freud'un zihin metaforunda 'koridor' neyi temsil eder?</div>
+  </div>
+  <ul class="tq-options">
+    
+    <li><span class="opt-letter">A</span><span>Bilinci</span></li>
+    
+    <li><span class="opt-letter">B</span><span>Ön bilinci</span></li>
+    
+    <li><span class="opt-letter">C</span><span>Bilinçdışını</span></li>
+    
+    <li><span class="opt-letter">D</span><span>Süperego'yu</span></li>
+    
+    <li><span class="opt-letter">E</span><span>Serbest çağrışımı</span></li>
+    
+  </ul>
+</div>
+
+<div class="tq">
+  <div class="tq-head">
+    <div class="tq-num">9</div>
+    <div class="tq-stem">Bertrand Russell ve G. E. Moore'un öncülerinden olduğu, dilin ve mantığın analizine odaklanan çağdaş felsefe geleneği hangisidir?</div>
+  </div>
+  <ul class="tq-options">
+    
+    <li><span class="opt-letter">A</span><span>Kıta Felsefesi</span></li>
+    
+    <li><span class="opt-letter">B</span><span>Analitik Felsefe</span></li>
+    
+    <li><span class="opt-letter">C</span><span>Fenomenoloji</span></li>
+    
+    <li><span class="opt-letter">D</span><span>Varoluşçuluk</span></li>
+    
+    <li><span class="opt-letter">E</span><span>Pozitivizm</span></li>
+    
+  </ul>
+</div>
+
+<div class="tq">
+  <div class="tq-head">
+    <div class="tq-num">10</div>
+    <div class="tq-stem">Russell'ın Whitehead ile birlikte yazdığı, matematiği mantıksal ilkelerden türetmeyi amaçlayan eseri hangisidir?</div>
+  </div>
+  <ul class="tq-options">
+    
+    <li><span class="opt-letter">A</span><span>Neden Hristiyan Değilim</span></li>
+    
+    <li><span class="opt-letter">B</span><span>Principia Mathematica</span></li>
+    
+    <li><span class="opt-letter">C</span><span>Mantıksal Araştırmalar</span></li>
+    
+    <li><span class="opt-letter">D</span><span>Varlık ve Zaman</span></li>
+    
+    <li><span class="opt-letter">E</span><span>Sisifos Söyleni</span></li>
+    
+  </ul>
+</div>
+
+<div class="tq">
+  <div class="tq-head">
+    <div class="tq-num">11</div>
+    <div class="tq-stem">Russell'a göre din, aşağıdakilerden hangisine dayanır ve bu yüzden ilerlemeye engeldir?</div>
+  </div>
+  <ul class="tq-options">
+    
+    <li><span class="opt-letter">A</span><span>Akla</span></li>
+    
+    <li><span class="opt-letter">B</span><span>Bilime</span></li>
+    
+    <li><span class="opt-letter">C</span><span>Korkuya</span></li>
+    
+    <li><span class="opt-letter">D</span><span>Mantığa</span></li>
+    
+    <li><span class="opt-letter">E</span><span>Deneyime</span></li>
+    
+  </ul>
+</div>
+
+<div class="tq">
+  <div class="tq-head">
+    <div class="tq-num">12</div>
+    <div class="tq-stem">Kierkegaard'a göre inanan insanlar için hangi ifade doğrudur?</div>
+  </div>
+  <ul class="tq-options">
+    
+    <li><span class="opt-letter">A</span><span>Nesnel doğrular öznel doğrulardan daima üstündür</span></li>
+    
+    <li><span class="opt-letter">B</span><span>Öznel doğrular nesnel doğrulardan daima üstündür</span></li>
+    
+    <li><span class="opt-letter">C</span><span>Nesnel ve öznel doğrular arasında fark yoktur</span></li>
+    
+    <li><span class="opt-letter">D</span><span>Din, nesnel bir bilimsel olgu olarak kanıtlanmalıdır</span></li>
+    
+    <li><span class="opt-letter">E</span><span>Şüphe, gerçek imanla bağdaşmaz</span></li>
+    
+  </ul>
+</div>
+
+<div class="tq">
+  <div class="tq-head">
+    <div class="tq-num">13</div>
+    <div class="tq-stem">Kierkegaard'ın 'İman Şövalyesi'ne giden üç aşaması hangi sırayla ilerler?</div>
+  </div>
+  <ul class="tq-options">
+    
+    <li><span class="opt-letter">A</span><span>Etik → Estetik → Dinsel</span></li>
+    
+    <li><span class="opt-letter">B</span><span>Dinsel → Etik → Estetik</span></li>
+    
+    <li><span class="opt-letter">C</span><span>Estetik → Etik → Dinsel</span></li>
+    
+    <li><span class="opt-letter">D</span><span>Estetik → Dinsel → Etik</span></li>
+    
+    <li><span class="opt-letter">E</span><span>Etik → Dinsel → Estetik</span></li>
+    
+  </ul>
+</div>
+
+  </div>
+  
+<div class="footer">
+  <div>Çağdaş <span class="accent-word">Felsefe</span></div>
+  <div class="fnum">26</div>
+</div>
+
+</section>
+
+
+<section class="page body-page">
+  <div class="pageband"><div>Çağdaş <span class="accent-word">Felsefe</span></div><div class="pageband-course">Test · Devam</div></div>
+  
+    <div class="chcontinue"><div class="tag">Test · Devam</div><div class="cctitle">Genel Değerlendirme Testi</div></div>
+  
+  <div class="tq-list">
+    
+<div class="tq">
+  <div class="tq-head">
+    <div class="tq-num">14</div>
+    <div class="tq-stem">Heidegger'in insanın dünyadaki bulunuş halini ve kendi varlığını anlamlandırma kapasitesini ifade etmek için kullandığı kavram hangisidir?</div>
+  </div>
+  <ul class="tq-options">
+    
+    <li><span class="opt-letter">A</span><span>Fenomenolojik İndirgeme</span></li>
+    
+    <li><span class="opt-letter">B</span><span>Dasein</span></li>
+    
+    <li><span class="opt-letter">C</span><span>Kötü Niyet</span></li>
+    
+    <li><span class="opt-letter">D</span><span>İnanç Sıçraması</span></li>
+    
+    <li><span class="opt-letter">E</span><span>Absürdizm</span></li>
+    
+  </ul>
+</div>
+
+<div class="tq">
+  <div class="tq-head">
+    <div class="tq-num">15</div>
+    <div class="tq-stem">Sartre'a göre insanın özgürlüğünden ve bu özgürlüğün getirdiği sorumluluktan kaçma çabasına ne ad verilir?</div>
+  </div>
+  <ul class="tq-options">
+    
+    <li><span class="opt-letter">A</span><span>Absürdizm</span></li>
+    
+    <li><span class="opt-letter">B</span><span>Kötü niyet (mauvaise foi)</span></li>
+    
+    <li><span class="opt-letter">C</span><span>Nihilizm</span></li>
+    
+    <li><span class="opt-letter">D</span><span>Fenomenolojik indirgeme</span></li>
+    
+    <li><span class="opt-letter">E</span><span>İnanç sıçraması</span></li>
+    
+  </ul>
+</div>
+
+<div class="tq">
+  <div class="tq-head">
+    <div class="tq-num">16</div>
+    <div class="tq-stem">Camus'nün 'Sisifos Miti' ile özetlediği absürdizm anlayışına göre insan nasıl davranmalıdır?</div>
+  </div>
+  <ul class="tq-options">
+    
+    <li><span class="opt-letter">A</span><span>Anlamsızlık karşısında hayata küsmelidir</span></li>
+    
+    <li><span class="opt-letter">B</span><span>Anlam arayışından tamamen vazgeçmelidir</span></li>
+    
+    <li><span class="opt-letter">C</span><span>Her şeye inat hayatı anlamlandırmaya çalışmalı, mücadeleyi sürdürmelidir</span></li>
+    
+    <li><span class="opt-letter">D</span><span>Dinsel bir otoriteye sığınmalıdır</span></li>
+    
+    <li><span class="opt-letter">E</span><span>Toplumsal kurallara mutlak biçimde uymalıdır</span></li>
+    
+  </ul>
+</div>
+
+<div class="tq">
+  <div class="tq-head">
+    <div class="tq-num">17</div>
+    <div class="tq-stem">Nietzsche 'Tanrı Öldü' söylemini hangi eseriyle felsefe literatürüne kazandırmıştır?</div>
+  </div>
+  <ul class="tq-options">
+    
+    <li><span class="opt-letter">A</span><span>Böyle Buyurdu Zerdüşt</span></li>
+    
+    <li><span class="opt-letter">B</span><span>Şen Bilim</span></li>
+    
+    <li><span class="opt-letter">C</span><span>Güç İstenci</span></li>
+    
+    <li><span class="opt-letter">D</span><span>Ecce Homo</span></li>
+    
+    <li><span class="opt-letter">E</span><span>Putların Alacakaranlığı</span></li>
+    
+  </ul>
+</div>
+
+<div class="tq">
+  <div class="tq-head">
+    <div class="tq-num">18</div>
+    <div class="tq-stem">Nietzsche'ye göre insan tiplerinden 'Trajik İnsan' nasıl tanımlanır?</div>
+  </div>
+  <ul class="tq-options">
+    
+    <li><span class="opt-letter">A</span><span>Bir çobana, kendisini yönetecek bir başa ihtiyaç duyan insan</span></li>
+    
+    <li><span class="opt-letter">B</span><span>Sürüden ayrılmış, dünyayı kendi gözleriyle görmek isteyen insan</span></li>
+    
+    <li><span class="opt-letter">C</span><span>Geçmişini tüm yönleriyle kabul edip yaşamı olumlayan insan</span></li>
+    
+    <li><span class="opt-letter">D</span><span>Tanrı'ya mutlak biçimde bağlı kalan insan</span></li>
+    
+    <li><span class="opt-letter">E</span><span>Yalnızca bilimsel bilgiye güvenen insan</span></li>
+    
+  </ul>
+</div>
+
+<div class="tq">
+  <div class="tq-head">
+    <div class="tq-num">19</div>
+    <div class="tq-stem">Bentham ve Mill'in haz anlayışı karşılaştırıldığında, aşağıdakilerden hangisi Mill'e (niteliksel faydacılığa) aittir?</div>
+  </div>
+  <ul class="tq-options">
+    
+    <li><span class="opt-letter">A</span><span>Bütün hazlar temelde aynıdır</span></li>
+    
+    <li><span class="opt-letter">B</span><span>Önemli olan hazzın miktarıdır</span></li>
+    
+    <li><span class="opt-letter">C</span><span>Zihinsel hazlar bedensel hazlardan üstündür</span></li>
+    
+    <li><span class="opt-letter">D</span><span>Bedensel ve zihinsel hazlar eşdeğerdir</span></li>
+    
+    <li><span class="opt-letter">E</span><span>Haz matematiksel olarak ölçülemez</span></li>
+    
+  </ul>
+</div>
+
+<div class="tq">
+  <div class="tq-head">
+    <div class="tq-num">20</div>
+    <div class="tq-stem">Marx'ın toplum modelinde siyaset, hukuk, din, ahlak ve felsefe gibi kurumlar hangi katmanda yer alır?</div>
+  </div>
+  <ul class="tq-options">
+    
+    <li><span class="opt-letter">A</span><span>Alt Yapı</span></li>
+    
+    <li><span class="opt-letter">B</span><span>Üst Yapı</span></li>
+    
+    <li><span class="opt-letter">C</span><span>Doğal Üretim Koşulları</span></li>
+    
+    <li><span class="opt-letter">D</span><span>Proletarya</span></li>
+    
+    <li><span class="opt-letter">E</span><span>Üretici Güçler</span></li>
+    
+  </ul>
+</div>
+
+  </div>
+  
+<div class="footer">
+  <div>Çağdaş <span class="accent-word">Felsefe</span></div>
+  <div class="fnum">27</div>
+</div>
+
+</section>
+
+
+
+
+
+<section class="page body-page" id="answer-key">
+  <div class="pageband"><div>Çağdaş <span class="accent-word">Felsefe</span></div><div class="pageband-course">Cevap Anahtarı</div></div>
+  
+    <div class="section-kicker">Çözümler</div>
+    <div class="section-title">Cevap Anahtarı ve Çözümler</div>
+    <div class="section-lede">Her sorunun doğru cevabı ve kısa gerekçesi aşağıda yer almaktadır.</div>
+  
+  <div class="ans-list">
+    
+<div class="ans-item">
+  <div class="ans-num">1</div>
+  <div>
+    <span class="ans-correct">Doğru Cevap: C</span>
+    <div class="ans-explain">Comte'a göre insan düşüncesi <b>Teolojik → Metafizik → Pozitif</b> sırasıyla, hiyerarşik ve zorunlu bir şekilde ilerler.</div>
+  </div>
+</div>
+
+<div class="ans-item">
+  <div class="ans-num">2</div>
+  <div>
+    <span class="ans-correct">Doğru Cevap: B</span>
+    <div class="ans-explain">Comte'un İnsanlık Dini'nde ibadethaneler <b>üniversiteler</b>, din adamları ise <b>bilim insanlarıdır</b>.</div>
+  </div>
+</div>
+
+<div class="ans-item">
+  <div class="ans-num">3</div>
+  <div>
+    <span class="ans-correct">Doğru Cevap: C</span>
+    <div class="ans-explain">Schopenhauer'e göre mutluluk kendi başına pozitif bir durum değildir, yalnızca <b>'acı ve ızdırabın yokluğu'</b>dur (negatif hedonizm).</div>
+  </div>
+</div>
+
+<div class="ans-item">
+  <div class="ans-num">4</div>
+  <div>
+    <span class="ans-correct">Doğru Cevap: A</span>
+    <div class="ans-explain">Schopenhauer'e göre <b>'yalnızlığı sevmeyen, özgürlüğü sevemez'</b> — yalnızlık ile özgürlük arasında kopmaz bir bağ vardır.</div>
+  </div>
+</div>
+
+<div class="ans-item">
+  <div class="ans-num">5</div>
+  <div>
+    <span class="ans-correct">Doğru Cevap: B</span>
+    <div class="ans-explain">Köpek, yarasa, tavşan ve insan embriyolarının ilk evrelerde birbirinin aynısı olması, Darwin'e göre ortak kökenden gelme tezini güçlendiren kanıtlardan biridir.</div>
+  </div>
+</div>
+
+<div class="ans-item">
+  <div class="ans-num">6</div>
+  <div>
+    <span class="ans-correct">Doğru Cevap: A</span>
+    <div class="ans-explain">Thomas <b>Malthus'un Nüfus İlkesi Üzerine Bir Deneme</b> adlı eseri, Darwin'e evrimin nasıl gerçekleştiğine dair açıklayıcı bir çerçeve sunmuştur.</div>
+  </div>
+</div>
+
+<div class="ans-item">
+  <div class="ans-num">7</div>
+  <div>
+    <span class="ans-correct">Doğru Cevap: C</span>
+    <div class="ans-explain"><b>Gerçeklik ilkesi (Ego)</b>, insan büyüdükçe gelişip İd'in haz ilkesini dengelemeye başlayan katmandır.</div>
+  </div>
+</div>
+
+<div class="ans-item">
+  <div class="ans-num">8</div>
+  <div>
+    <span class="ans-correct">Doğru Cevap: C</span>
+    <div class="ans-explain">Freud'un metaforunda 'koridor', bastırılan düşünce ve travmaların hapsedildiği <b>Bilinçdışı</b>nı temsil eder.</div>
+  </div>
+</div>
+
+<div class="ans-item">
+  <div class="ans-num">9</div>
+  <div>
+    <span class="ans-correct">Doğru Cevap: B</span>
+    <div class="ans-explain"><b>Analitik Felsefe</b>, Russell, Wittgenstein ve Moore'un öncülerinden olduğu, dilin ve mantığın analizine odaklanan çağdaş felsefe geleneğidir.</div>
+  </div>
+</div>
+
+<div class="ans-item">
+  <div class="ans-num">10</div>
+  <div>
+    <span class="ans-correct">Doğru Cevap: B</span>
+    <div class="ans-explain">Russell'ın Whitehead ile birlikte kaleme aldığı <b>Principia Mathematica</b>, matematiği mantıksal ilkelerden türetmeyi amaçlar.</div>
+  </div>
+</div>
+
+<div class="ans-item">
+  <div class="ans-num">11</div>
+  <div>
+    <span class="ans-correct">Doğru Cevap: C</span>
+    <div class="ans-explain">Russell'a göre din akla değil <b>korkuya</b> dayanır ve ilerlemeye engeldir; bu görüşünü Neden Hristiyan Değilim'de savunur.</div>
+  </div>
+</div>
+
+<div class="ans-item">
+  <div class="ans-num">12</div>
+  <div>
+    <span class="ans-correct">Doğru Cevap: B</span>
+    <div class="ans-explain">Kierkegaard'a göre inanan insanlar için <b>öznel doğrular nesnel doğrulardan daima üstündür</b>, çünkü nesnel bilgi varoluşsal anlam için yeterli değildir.</div>
+  </div>
+</div>
+
+<div class="ans-item">
+  <div class="ans-num">13</div>
+  <div>
+    <span class="ans-correct">Doğru Cevap: C</span>
+    <div class="ans-explain">İman Şövalyesi'ne giden yol <b>Estetik → Etik → Dinsel</b> aşamalar sırasıyla ilerler.</div>
+  </div>
+</div>
+
+<div class="ans-item">
+  <div class="ans-num">14</div>
+  <div>
+    <span class="ans-correct">Doğru Cevap: B</span>
+    <div class="ans-explain"><b>Dasein (orada-varlık)</b>, Heidegger'in insanın dünyadaki bulunuş halini ve varlığı anlamlandırma yetisini ifade etmek için kullandığı kavramdır.</div>
+  </div>
+</div>
+
+<div class="ans-item">
+  <div class="ans-num">15</div>
+  <div>
+    <span class="ans-correct">Doğru Cevap: B</span>
+    <div class="ans-explain">Sartre, insanın özgürlükten ve bu özgürlüğün getirdiği sorumluluktan kaçma çabasına <b>'kötü niyet' (mauvaise foi)</b> adını vermiştir.</div>
+  </div>
+</div>
+
+<div class="ans-item">
+  <div class="ans-num">16</div>
+  <div>
+    <span class="ans-correct">Doğru Cevap: C</span>
+    <div class="ans-explain">Camus'ye göre absürtlüğe rağmen insan hayata küsmemeli, <b>her şeye inat hayatı anlamlandırmaya çalışmalı ve mücadeleyi sürdürmelidir</b> — Sisifos'un ebedi mücadelesi gibi.</div>
+  </div>
+</div>
+
+<div class="ans-item">
+  <div class="ans-num">17</div>
+  <div>
+    <span class="ans-correct">Doğru Cevap: B</span>
+    <div class="ans-explain">Nietzsche, 'Tanrı Öldü' söylemini <b>Şen Bilim</b> adlı eseriyle felsefe literatürüne kazandırmıştır; 'Üstinsan' ise Böyle Buyurdu Zerdüşt'te sistemleşir.</div>
+  </div>
+</div>
+
+<div class="ans-item">
+  <div class="ans-num">18</div>
+  <div>
+    <span class="ans-correct">Doğru Cevap: C</span>
+    <div class="ans-explain"><b>Trajik İnsan</b>, geçmişini iyi ve kötü tüm yönleriyle kabul edip yaşamı olumlayan, yaşamın anlamsızlığını anlayan insan tipidir.</div>
+  </div>
+</div>
+
+<div class="ans-item">
+  <div class="ans-num">19</div>
+  <div>
+    <span class="ans-correct">Doğru Cevap: C</span>
+    <div class="ans-explain">Mill'in niteliksel faydacılığına göre <b>zihinsel hazlar</b>, bedensel hazlardan her zaman daha üstündür; Bentham ise tüm hazları nicelik olarak eşit sayar.</div>
+  </div>
+</div>
+
+<div class="ans-item">
+  <div class="ans-num">20</div>
+  <div>
+    <span class="ans-correct">Doğru Cevap: B</span>
+    <div class="ans-explain">Siyaset, hukuk, din, ahlak ve felsefe gibi kurumlar Marx'ın modelinde <b>Üst Yapı</b>'yı oluşturur; alt yapı ise maddi üretim koşullarını kapsar.</div>
+  </div>
+</div>
+
+  </div>
+  
+<div class="footer">
+  <div>Çağdaş <span class="accent-word">Felsefe</span></div>
+  <div class="fnum">28</div>
+</div>
+
+</section>
+
+
+
+
+
+
+
+</body>
+</html>

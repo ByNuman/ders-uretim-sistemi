@@ -3,17 +3,22 @@
 DERS ÜRETİM SİSTEMİ — build.py
 ================================
 Kullanım:
-    python3 build.py content.psikoloji
+    python build.py psikoloji --sinif 2 --donem 2 --sinav final
+
+Sınıf/dönem/sınav VARSAYILAN DEĞİLDİR: verilmezse sorulur (bkz. donem.py).
+Ders modülü, seçilen dönemin src/ klasöründen okunur; çıktı aynı dönemin
+ders_ozetleri/ klasörüne yazılır.
 
 CoursePack nesnesini alır -> Jinja2 ile HTML üretir -> Playwright/Chromium
 ile 175x250mm (+3mm bleed) PDF'e render eder -> sayfa kutularını (TrimBox)
 yazar -> Ghostscript ile PDF/X-4 CMYK'ya çevirir.
-Çıktı: output/<slug>.pdf (CMYK, baskıya hazır) ve (denetim için) .html
+Çıktı: <sinif>-sinif/<donem>-donem/<sinav>/ders_ozetleri/<slug>.pdf
+(CMYK, baskıya hazır) ve (denetim için) aynı klasörde .html
 """
 
 import sys
+import argparse
 import subprocess
-import importlib
 from dataclasses import dataclass
 from pathlib import Path
 from jinja2 import Environment, FileSystemLoader
@@ -24,11 +29,40 @@ if hasattr(sys.stdout, "reconfigure"):
 
 from theme_engine import resolve_theme_css
 import pdfx
+import donem as donem_mod
 
 ROOT = Path(__file__).parent
 TEMPLATES = ROOT / "templates"
-OUTPUT = ROOT / "output"
-OUTPUT.mkdir(exist_ok=True)
+
+# ÇIKTI KLASÖRÜ ARTIK SABİT DEĞİL: seçilen sınav dönemine bağlıdır.
+# set_donem() çağrılana kadar None kalır -- böylece "hangi döneme yazdığı
+# belirsiz" bir build yapısal olarak imkânsızdır (sessizce output/'a düşmez).
+DONEM: "donem_mod.Donem | None" = None
+OUTPUT: "Path | None" = None
+
+
+def set_donem(d: "donem_mod.Donem") -> "donem_mod.Donem":
+    """Aktif sınav dönemini ayarlar: çıktı klasörünü ve modül arama yolunu kurar.
+
+    build_kitap.py ve tools/*.py bu fonksiyonu çağırıp ardından B.OUTPUT'u
+    kullanır; tek kaynak burasıdır.
+    """
+    global DONEM, OUTPUT
+    DONEM = d.ensure().activate()
+    OUTPUT = d.ders_ozetleri
+    return d
+
+
+def out_dir() -> Path:
+    """Aktif dönemin çıktı klasörü. Dönem seçilmediyse net bir hatayla durur."""
+    if OUTPUT is None:
+        raise SystemExit(
+            "[hata] Önce sınav dönemi seçilmeli.\n"
+            "        Komut satırından: --sinif 2 --donem 2 --sinav final\n"
+            "        Kod içinden:      build.set_donem(donem.resolve(args))"
+        )
+    OUTPUT.mkdir(parents=True, exist_ok=True)
+    return OUTPUT
 
 
 # =============================================================================
@@ -37,7 +71,8 @@ OUTPUT.mkdir(exist_ok=True)
 # Sayfa ölçüsü, taşma payı ve kenar boşlukları burada TANIMLANIR. Birbirinden
 # BAĞIMSIZ iki config vardır (bkz. CLAUDE.md'nin en üstündeki KRİTİK KURAL):
 #
-#     SINGLE_GEOMETRY -> `python build.py content.<slug>` ile üretilen TEKİL
+#     SINGLE_GEOMETRY -> `python build.py <slug> --sinif X --donem Y --sinav Z`
+#                        ile üretilen TEKİL
 #                        ders PDF'i.
 #     BOOK_GEOMETRY   -> `python build_kitap.py` ile üretilen BİRLEŞİK kitap.
 #
@@ -359,8 +394,12 @@ def exam_page_count(pack) -> int:
     return n
 
 
-def build(module_name: str):
-    mod = importlib.import_module(module_name)
+def build(module_name: str, d: "donem_mod.Donem | None" = None):
+    if d is not None:
+        set_donem(d)
+    if DONEM is None:
+        out_dir()      # dönem seçilmediyse burada net hatayla durur
+    mod = DONEM.import_ders(module_name)
     pack = mod.get_pack()
 
     ctx = course_context(pack)
@@ -375,8 +414,8 @@ def build(module_name: str):
     )
 
     slug = slugify(pack.title)
-    html_path = OUTPUT / f"{slug}.html"
-    pdf_path = OUTPUT / f"{slug}.pdf"
+    html_path = out_dir() / f"{slug}.html"
+    pdf_path = out_dir() / f"{slug}.pdf"
     html_path.write_text(html, encoding="utf-8")
     print(f"[build] HTML yazıldı: {html_path}")
 
@@ -567,7 +606,7 @@ const {{ chromium }} = require('playwright');
   await browser.close();
 }})();
 """
-    tmp_js = OUTPUT / "_render.js"
+    tmp_js = out_dir() / "_render.js"
     tmp_js.write_text(script, encoding="utf-8")
     # encoding açıkça verilmeli: Windows varsayılanı (cp1254) node'un
     # UTF-8 hata çıktısını çözemeyip build'i asıl hatayı göstermeden düşürüyor.
@@ -596,5 +635,16 @@ const {{ chromium }} = require('playwright');
 
 if __name__ == "__main__":
     sys.path.insert(0, str(ROOT))
-    module_name = sys.argv[1] if len(sys.argv) > 1 else "content.psikoloji"
-    build(module_name)
+    ap = argparse.ArgumentParser(
+        prog="build.py",
+        description="Tek bir dersin görsel ders notu PDF'ini üretir.",
+        epilog="Örnek: python build.py kelam_tarihi --sinif 2 --donem 2 --sinav final",
+    )
+    ap.add_argument("ders", help="Ders modülünün adı, ör. kelam_tarihi "
+                                 "(eski 'content.kelam_tarihi' yazımı da kabul edilir)")
+    donem_mod.add_args(ap)
+    args = ap.parse_args()
+
+    d = donem_mod.resolve(args)
+    print(f"[build] Dönem: {d}  ({d.etiket})")
+    build(args.ders, d)

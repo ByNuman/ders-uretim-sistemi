@@ -1,0 +1,3449 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<title>İslam Tarihi<span class="accent-word"> III</span></title>
+<style>/* ============================================================
+   DERS ÜRETİM SİSTEMİ — Görsel Tasarım Sistemi v2
+   175x250mm trim (PUR Amerikan cilt), 3mm bleed, print-ready,
+   tema-parametrik.
+   Sistem fontlarına dayanır: gövde DejaVu Sans, başlıklar DejaVu Serif
+   (kitap/akademik karakter için) — harici font çağrısı yok, bu yüzden
+   her ortamda birebir aynı render garantidir.
+   ============================================================ */
+
+/* --- SAYFA GEOMETRİSİ ---------------------------------------------------
+   DİKKAT: aşağıdaki değerler yalnızca VARSAYILAN'dır. Gerçek kaynak
+   build.py içindeki TRIM_W_MM / TRIM_H_MM / BLEED_MM / MARGIN_*_MM
+   sabitleridir; build.py bu blogun aynısını page_geometry_css() ile
+   üretip style.css'in SONUNA ekler ve buradakileri ezer. Boyut
+   değiştirecekseniz build.py'yi düzenleyin, burayı değil. */
+@page { size: 181mm 256mm; margin: 0; }
+
+:root {
+  /* Bitmiş (kesilmiş) sayfa ölçüsü */
+  --trim-w: 175mm;
+  --trim-h: 250mm;
+  /* Taşma payı: tam sayfa zemin rengi / kapak gradyanı kenardan taşsın */
+  --bleed: 3mm;
+  /* Fiziksel render ölçüsü = trim + her iki yandan bleed */
+  --page-w: 181mm;
+  --page-h: 256mm;
+  /* Kenar boşlukları — TRIM kenarından ölçülür */
+  --mg-top: 11mm;
+  --mg-bottom: 19mm;    /* sayfa numarası payı dahil */
+  --mg-inner: 14mm;     /* sırt/gutter tarafı — PUR cilt payı */
+  --mg-outer: 9mm;
+  /* Render kutusunun (bleed box) kenarından ölçülen gerçek padding'ler */
+  --pad-top: 14mm;
+  --pad-bottom: 22mm;
+  --pad-inner: 17mm;
+  --pad-outer: 12mm;
+  /* Ayna simetri: sayfa tekliği/çiftliğine göre aşağıda yeniden atanır */
+  --pad-left: var(--pad-inner);
+  --pad-right: var(--pad-outer);
+
+  /* --- Nötr paleti (tüm temalarda sabit) --- */
+  --ink:        #14161b;
+  --ink-soft:   #464b5b;
+  --ink-faint:  #5c6270;   /* WCAG AA: beyaz üzerinde 6.1:1 -- eski #7d8394 (3.79:1) yerine */
+  --paper:      #ffffff;   /* build.py / .theme-XXXX bunu tema tonuna çeker */
+  --paper-tint: #f7f7f9;
+  --line:       #e3e4ea;
+  --line-soft:  #edeef2;
+  --shadow-sm:  0 0.82px 1.65px rgba(20,22,30,0.05), 0 0.82px 0.82px rgba(20,22,30,0.04);
+  --shadow-md:  0 2.47px 8.23px rgba(20,22,30,0.07), 0 0.82px 2.47px rgba(20,22,30,0.06);
+  --shadow-lg:  0 8.23px 24.69px rgba(15,17,30,0.16), 0 2.47px 6.58px rgba(15,17,30,0.10);
+
+  /* --- Sabit semantik renkler (callout tipleri; tema fark etmez) --- */
+  --focus-bg:   #fff8e8;
+  --focus-line: #e8b83f;
+  --focus-ink:  #6b4f04;
+
+  --caution-bg:   #eef4ff;
+  --caution-line: #6f8fd6;
+  --caution-ink:  #1f3d78;
+
+  --insight-bg:   #0d1830;
+  --insight-ink:  #ffffff;
+  --insight-accent: #e3c37c;
+
+  --route-bg:   #f2f0ff;
+  --route-line: #8a78e0;
+  --route-ink:  #40337f;
+
+  /* --- Tema değişkenleri: aşağıdaki .theme-XXXX sınıfları bunları ezer --- */
+  --accent:       #3a4fb0;
+  --accent-dark:  #232f6e;
+  --accent-soft:  #eef0fc;
+  --accent-tint:  #f5f6fd;
+  --cover-grad-1: #171d42;
+  --cover-grad-2: #3a4fb0;
+  --cover-grad-3: #4a5fc7;
+  --gold:         #d9b25c;
+  --gold-ink:     #6b5310;   /* açık zeminlerde gold yerine kullanılan okunur koyu ton */
+}
+
+/* ---------- Tema paletleri ----------
+   Her paper tonu kasıtlı çok hafiftir (L≈98%) — beyazdan ayırt edilir ama
+   metin kontrastını bozmaz; --line de aynı ton ailesinden seçilmiştir. */
+.theme-indigo {
+  --accent: #3a4fb0; --accent-dark: #232f6e; --accent-soft: #eef0fc; --accent-tint: #f5f6fd;
+  --cover-grad-1: #12163a; --cover-grad-2: #33449e; --cover-grad-3: #5468d4; --gold: #dfba68; --gold-ink: #6b5310;
+  --paper: #fbfbfe; --paper-tint: #f3f4fb; --line: #e2e3f0; --line-soft: #ececf6;
+}
+.theme-burgundy {
+  --accent: #8c2a3c; --accent-dark: #5c1522; --accent-soft: #fbeef0; --accent-tint: #fdf6f6;
+  --cover-grad-1: #31090f; --cover-grad-2: #7a2433; --cover-grad-3: #a8394c; --gold: #d1ab5c; --gold-ink: #6b4f10;
+  --paper: #fefbfa; --paper-tint: #fcf4f3; --line: #f0dfdd; --line-soft: #f6ecea;
+}
+.theme-forest {
+  --accent: #14665a; --accent-dark: #0b3e37; --accent-soft: #e9f5f2; --accent-tint: #f4faf9;
+  --cover-grad-1: #041a15; --cover-grad-2: #0f5049; --cover-grad-3: #1c8272; --gold: #d3bd76; --gold-ink: #6b5710;
+  --paper: #fafefd; --paper-tint: #f2faf8; --line: #dcefe9; --line-soft: #e9f5f1;
+}
+.theme-slate {
+  --accent: #3d5568; --accent-dark: #24333f; --accent-soft: #edf2f5; --accent-tint: #f6f9fa;
+  --cover-grad-1: #0e161d; --cover-grad-2: #324556; --cover-grad-3: #52738c; --gold: #d0b476; --gold-ink: #6b5510;
+  --paper: #fafcfd; --paper-tint: #f2f6f8; --line: #e0e8ec; --line-soft: #edf2f4;
+}
+.theme-plum {
+  --accent: #6a3b8c; --accent-dark: #3f2255; --accent-soft: #f4eef9; --accent-tint: #faf7fc;
+  --cover-grad-1: #1c0d2e; --cover-grad-2: #59317a; --cover-grad-3: #8552ac; --gold: #d5b168; --gold-ink: #6b4f10;
+  --paper: #fdfaff; --paper-tint: #f7f2fb; --line: #eae0f2; --line-soft: #f2ebf8;
+}
+
+/* ---------- Reset & font sistemi ---------- */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  font-family: "DejaVu Sans", "Liberation Sans", Arial, sans-serif;
+  color: var(--ink);
+  font-size: 7.9pt;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+strong, b { font-weight: 700; }
+em { font-style: italic; }
+
+.serif { font-family: "DejaVu Serif", "Liberation Serif", Georgia, serif; }
+
+.page {
+  position: relative;
+  width: var(--page-w);
+  height: var(--page-h);
+  overflow: hidden;
+  background: var(--paper);
+  page-break-after: always;
+  break-after: page;
+  display: flex;
+  flex-direction: column;
+}
+.page:last-child { page-break-after: auto; }
+
+/* zemin dokusu: çok hafif nokta matrisi -- kağıt/kumaş hissi verir, metni etkilemez */
+.body-page::before {
+  content: "";
+  position: absolute; inset: 0;
+  background-image: radial-gradient(circle, rgba(20,22,30,0.05) 0.6px, transparent 0.6px);
+  background-size: 3.6mm 3.6mm;
+  opacity: 0.55;
+  pointer-events: none;
+  z-index: 0;
+}
+.body-page > * { position: relative; z-index: 1; flex-shrink: 0; }
+
+/* ================= KAPAK — çok katmanlı, dokulu, amblemli ================= */
+.cover {
+  color: #fff;
+  position: relative;
+  background:
+    radial-gradient(circle at 85% 6%, rgba(255,255,255,0.14), transparent 38%),
+    radial-gradient(ellipse 70% 45% at 18% 100%, rgba(0,0,0,0.35), transparent 60%),
+    linear-gradient(152deg, var(--cover-grad-1) 0%, var(--cover-grad-2) 62%, var(--cover-grad-3) 100%);
+  padding: var(--pad-top) var(--pad-right) var(--pad-bottom) var(--pad-left);
+  justify-content: space-between;
+}
+/* ince nokta dokusu -- kumaş/kağıt hissi */
+.cover::before {
+  content: "";
+  position: absolute; inset: 0;
+  background-image: radial-gradient(circle, rgba(255,255,255,0.10) 0.7px, transparent 0.7px);
+  background-size: 4.2mm 4.2mm;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+}
+/* iç çerçeve -- "cilt" hissi */
+.cover::after {
+  content: "";
+  position: absolute; inset: calc(var(--bleed) + 7mm);
+  border: 1px solid rgba(255,255,255,0.20);
+  pointer-events: none;
+}
+.cover-corner { position:absolute; width:7mm; height:7mm; pointer-events:none; }
+.cover-corner::before, .cover-corner::after { content:""; position:absolute; background: rgba(255,255,255,0.55); }
+.cover-corner.tl { top:calc(var(--bleed) + 7mm); left:calc(var(--bleed) + 7mm); }
+.cover-corner.tr { top:calc(var(--bleed) + 7mm); right:calc(var(--bleed) + 7mm); transform: scaleX(-1); }
+.cover-corner.bl { bottom:calc(var(--bleed) + 7mm); left:calc(var(--bleed) + 7mm); transform: scaleY(-1); }
+.cover-corner.br { bottom:calc(var(--bleed) + 7mm); right:calc(var(--bleed) + 7mm); transform: scale(-1,-1); }
+.cover-corner::before { top:-1px; left:-1px; width:4.5mm; height:1.4px; }
+.cover-corner::after { top:-1px; left:-1px; width:1.4px; height:4.5mm; }
+.cover-inner { position:relative; z-index:2; display:flex; flex-direction:column; height:100%; justify-content:space-between; }
+
+.cover-top { display:flex; justify-content: space-between; align-items:flex-start; flex-shrink: 0; }
+.cover-kicker {
+  display:inline-block;
+  font-size: 7.4pt; letter-spacing: 2px; font-weight:700; text-transform:uppercase;
+  border: 1px solid rgba(255,255,255,0.4);
+  border-radius: 999px;
+  padding: 5.5px 15px;
+  color: rgba(255,255,255,0.95);
+  background: rgba(255,255,255,0.06);
+}
+
+/* Amblem: çok katmanlı halka + iç dolgu + minik saat-noktaları + mühür dokusu */
+.cover-emblem { position:relative; width: 32mm; height:32mm; }
+.cover-emblem .ring-outer {
+  position:absolute; inset:0; border-radius:50%;
+  border: 1px solid rgba(255,255,255,0.32);
+}
+.cover-emblem .ring-outer::before {
+  content:""; position:absolute; inset:-2.6mm; border-radius:50%;
+  border: 1px solid rgba(255,255,255,0.14);
+}
+.cover-emblem .ring-mid {
+  position:absolute; inset:3.4mm; border-radius:50%;
+  border: 1px solid rgba(255,255,255,0.24);
+  background: repeating-conic-gradient(rgba(255,255,255,0.12) 0deg 0.7deg, transparent 0.7deg 9deg);
+}
+.cover-emblem .ring-inner {
+  position:absolute; inset:7.2mm; border-radius:50%;
+  background: radial-gradient(circle at 32% 28%, rgba(255,255,255,0.28), rgba(255,255,255,0.03) 72%);
+  border: 1px solid rgba(255,255,255,0.45);
+  display:flex; align-items:center; justify-content:center;
+  box-shadow: inset 0 1px 5px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.06);
+}
+.cover-emblem .ring-inner span {
+  font-family: "DejaVu Serif", serif; font-size: 13.5pt; font-weight:700; color: var(--gold);
+  text-shadow: 0 1px 3px rgba(0,0,0,0.35);
+}
+.cover-emblem .tick {
+  position:absolute; width:1.4px; height:2.6mm; background: rgba(255,255,255,0.6);
+  left: 50%; top: -1.3mm; transform-origin: 50% 17mm;
+}
+.cover-emblem .tick.major { height: 3.6mm; background: var(--gold); opacity:0.85; }
+
+.cover-mid { flex: 1; display:flex; flex-direction:column; justify-content:flex-end; padding-bottom: 8mm; position:relative; }
+.cover-motif {
+  position:absolute; left:-3mm; bottom: 32mm;
+  font-family: "DejaVu Serif", serif;
+  font-size: 150pt; font-weight:700; color: rgba(255,255,255,0.075);
+  letter-spacing: -6px; line-height:1; z-index:0;
+  text-shadow: 0 0 40px rgba(255,255,255,0.04);
+}
+.cover-code { font-size: 8.6pt; letter-spacing:2.4px; color: var(--gold); font-weight:700; margin-bottom: 4.5mm; text-transform:uppercase; position:relative; }
+.cover-code::before { content:"—  "; color: rgba(255,255,255,0.5); }
+.cover-title {
+  font-family: "DejaVu Serif", "Liberation Serif", Georgia, serif;
+  font-size: 34pt; font-weight:700; line-height:1.08; letter-spacing: -0.3px;
+  position:relative; text-shadow: 0 2px 18px rgba(0,0,0,0.25);
+}
+.cover-title .accent-word { color: var(--gold); }
+.cover-subtitle { font-size: 13pt; font-weight:400; color: rgba(255,255,255,0.9); margin-top:5mm; max-width: 148mm; line-height:1.45; position:relative; }
+.cover-rule { width: 28mm; height:2.6px; background: linear-gradient(90deg, var(--gold), rgba(255,255,255,0.15)); margin: 7mm 0 6mm; border-radius:2px; position:relative; }
+.cover-desc { font-size: 9.7pt; color: rgba(255,255,255,0.82); max-width: 132mm; line-height:1.68; position:relative; }
+
+.cover-bottom { position:relative; flex-shrink: 0; }
+.cover-stats { display:flex; gap: 5mm; margin-bottom: 7mm; }
+.cover-stat {
+  flex:1;
+  border: 1px solid rgba(255,255,255,0.24);
+  border-top: 1px solid rgba(255,255,255,0.55);
+  border-radius: 9px;
+  padding: 4.2mm 5mm;
+  font-size: 8.4pt; font-weight:700; letter-spacing:.3px;
+  color: rgba(255,255,255,0.95);
+  background: linear-gradient(165deg, rgba(255,255,255,0.13), rgba(255,255,255,0.02) 60%);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.22), inset 0 1px 0 rgba(255,255,255,0.08);
+  position: relative; overflow: hidden;
+}
+.cover-stat::before {
+  content:""; position:absolute; top:0; left:0; right:0; height:1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent);
+}
+.cover-stat b { display:block; font-family:"DejaVu Serif",serif; font-size: 14pt; color: var(--gold); font-weight:700; margin-bottom:1.3mm; }
+.cover-foot {
+  display:flex; justify-content:space-between; align-items:center;
+  border-top: 1px solid rgba(255,255,255,0.25);
+  padding-top: 4mm;
+  font-size: 7.7pt; letter-spacing:1.2px; text-transform:uppercase; color: rgba(255,255,255,0.75);
+}
+
+/* ================= SAYFA GÖVDESİ (kapak-dışı tüm sayfalar) ================= */
+.body-page { padding: var(--pad-top) var(--pad-right) var(--pad-bottom) var(--pad-left); }
+
+.pageband {
+  display:flex; justify-content:space-between; align-items:center;
+  font-size: 6.09pt; letter-spacing: 0.99px; text-transform:uppercase; font-weight:700;
+  color: var(--ink-faint);
+  padding-bottom: 1.93mm; margin-bottom: 3.85mm;
+  border-bottom: 1.65px solid var(--accent);
+  position:relative;
+}
+.pageband::after {
+  content:""; position:absolute; left:0; bottom:-1.65px; width: 13.17mm; height:1.65px; background: var(--gold);
+}
+.pageband .pageband-course { color: var(--accent-dark); font-weight:700; }
+
+.footer {
+  position: absolute; bottom: calc(var(--bleed) + 9mm); left: var(--pad-left); right: var(--pad-right);
+  display:flex; justify-content:space-between; align-items:center;
+  font-size: 6.17pt; color: var(--ink-faint); font-weight:600;
+  border-top: 0.82px solid var(--line);
+  padding-top: 1.67mm;
+}
+.footer .fnum {
+  font-weight:700; color: #fff; background: var(--accent);
+  padding: 0.64px 4.49px; border-radius: 999px; font-size: 6.25pt;
+}
+
+/* ---------- İçindekiler ---------- */
+.toc-kicker { font-size: 6.58pt; letter-spacing:1.48px; font-weight:700; color: var(--accent); text-transform:uppercase; }
+.toc-title { font-family:"DejaVu Serif",serif; font-size: 20.57pt; font-weight:700; margin-top: 1.65mm; color: var(--ink); }
+.toc-lede { font-size: 7.9pt; color: var(--ink-soft); margin-top:2.47mm; max-width: 150mm; line-height:1.6; }
+.toc-list { margin-top: 6.58mm; display:flex; flex-direction:column; gap: 0; }
+.toc-row {
+  display:flex; align-items:center; gap: 4.11mm;
+  padding: 3.79mm 2.47mm;
+  border-bottom: 0.82px solid var(--line-soft);
+  border-radius: 4.94px;
+  text-decoration: none; color: inherit;
+}
+.toc-row:first-child { border-top: 0.82px solid var(--line-soft); }
+.toc-num {
+  flex: 0 0 auto;
+  width: 7.74mm; height:7.74mm; border-radius:50%;
+  background: var(--accent-soft); color: var(--accent-dark);
+  font-weight:700; font-size: 7.9pt; font-family:"DejaVu Serif",serif;
+  display:flex; align-items:center; justify-content:center;
+  box-shadow: var(--shadow-sm);
+}
+.toc-num.alt { background: var(--accent-dark); color:#fff; }
+.toc-body { flex: 1 1 auto; }
+.toc-heading { font-size: 8.89pt; font-weight:700; color: var(--ink); }
+.toc-sub { font-size: 6.99pt; color: var(--ink-faint); margin-top: 0.66mm; }
+.toc-page { flex: 0 0 auto; font-size: 7.57pt; font-weight:700; color: var(--accent); background: var(--accent-tint); padding: 1.32mm 2.47mm; border-radius: 4.94px; }
+
+/* ---------- Genel Bakış ---------- */
+.ov-hero {
+  background: linear-gradient(125deg, var(--accent-dark), var(--accent) 88%);
+  color: #fff; border-radius: 9.88px;
+  padding: 5.35mm 6.17mm; margin-top:1.65mm;
+  font-size: 7.98pt; line-height:1.6;
+  box-shadow: var(--shadow-md);
+  position:relative; overflow:hidden;
+}
+.ov-hero::after {
+  content:""; position:absolute; right:-8.23mm; top:-14.81mm; width:37.85mm; height:37.85mm; border-radius:50%;
+  border: 0.82px solid rgba(255,255,255,0.15);
+}
+.ov-hero b { color: var(--gold); }
+.ov-grid { display:grid; grid-template-columns: repeat(3, 1fr); gap: 3.46mm; margin-top: 4.94mm; }
+.ov-card {
+  border: 0.82px solid var(--line); border-radius: 7.41px; padding: 3.79mm 4.11mm;
+  background: var(--paper); box-shadow: var(--shadow-sm);
+  border-top: 2.14px solid var(--accent);
+}
+.ov-card-title { font-size: 7.82pt; font-weight:700; color: var(--accent-dark); margin-bottom:1.48mm; font-family:"DejaVu Serif",serif; }
+.ov-card-text { font-size: 6.99pt; color: var(--ink-soft); line-height:1.5; }
+
+.ov-flow { display:flex; align-items:stretch; gap: 0; margin-top: 4.94mm; }
+.ov-flow-step {
+  flex:1; background: linear-gradient(160deg, var(--accent-tint), var(--paper)); border: 0.82px solid var(--line);
+  border-radius: 7.41px; padding: 3.46mm 2.96mm; text-align:center; box-shadow: var(--shadow-sm);
+  /* Dar sayfada (5 adımda sütun ~22mm) uzun tek kelimeler kutuyu taşırıyordu:
+     flex öğesi min-content'in altına inemez, bu yüzden min-width:0 + kelime
+     kırma şart. Yoksa "Varoluşçuluğa" gibi kelimeler kart kenarından taşar. */
+  min-width: 0;
+  overflow-wrap: break-word;
+}
+.ov-flow-step b { display:block; font-size: 7.32pt; color: var(--accent-dark); margin-bottom: 0.82mm; font-family:"DejaVu Serif",serif; }
+.ov-flow-step span { font-size: 6.75pt; color: var(--ink-soft); }
+.ov-flow-arrow { flex: 0 0 5.76mm; display:flex; align-items:center; justify-content:center; color: var(--accent); }
+
+/* ================= BÖLÜM BANNER ================= */
+.chbanner {
+  background: linear-gradient(128deg, var(--accent-dark), var(--accent) 85%);
+  color:#fff; border-radius: 9.88px;
+  padding: 5.76mm 6.99mm; position:relative; overflow:hidden;
+  box-shadow: var(--shadow-lg);
+}
+.chbanner::before {
+  content:"";
+  position:absolute; inset:0;
+  background-image: radial-gradient(circle, rgba(255,255,255,0.12) 0.6px, transparent 0.6px);
+  background-size: 3.6mm 3.6mm; mix-blend-mode: overlay;
+}
+.chbanner::after {
+  content:""; position:absolute; right:-13.17mm; top:-13.17mm; width:46.08mm; height:46.08mm;
+  border-radius:50%; border: 0.82px solid rgba(255,255,255,0.22);
+}
+.chbanner-deco { position:absolute; right:8.23mm; bottom:-6.58mm; font-family:"DejaVu Serif",serif; font-size:49.38pt; font-weight:700; color: rgba(255,255,255,0.08); }
+.chbanner-kicker { font-size: 6.42pt; letter-spacing:1.65px; font-weight:700; text-transform:uppercase; color: var(--gold); position:relative; }
+.chbanner-title { font-family:"DejaVu Serif",serif; font-size: 16.46pt; font-weight:700; margin-top: 1.48mm; line-height:1.15; position:relative; }
+.chbanner-subtitle { font-size: 7.49pt; color: rgba(255,255,255,0.88); margin-top: 1.81mm; max-width: 150mm; line-height:1.5; position:relative; }
+
+/* ---------- 4'lü anahtar terim grid'i ---------- */
+.terms-grid { display:grid; grid-template-columns: 1fr 1fr; gap: 2.8mm; margin-top: 4.53mm; }
+.term-box {
+  border: 0.82px solid var(--line); border-left: 2.88px solid var(--accent);
+  border-radius: 5.76px; padding: 2.8mm 3.46mm; background: var(--paper);
+  box-shadow: var(--shadow-sm);
+}
+.term-box .term-name { font-size: 7.65pt; font-weight:700; color: var(--accent-dark); margin-bottom: 0.91mm; font-family:"DejaVu Serif",serif; }
+.term-box .term-def { font-size: 6.83pt; color: var(--ink-soft); line-height:1.45; }
+
+/* ---------- Kişi kartı ---------- */
+.person-card {
+  display:flex; gap: 3.46mm; align-items:flex-start;
+  margin-top: 4.53mm; padding: 3.46mm 4.11mm;
+  background: linear-gradient(155deg, var(--accent-tint), var(--paper));
+  border: 0.82px solid var(--line); border-radius: 7.41px;
+  box-shadow: var(--shadow-sm);
+}
+.person-avatar {
+  flex: 0 0 auto; width: 11.11mm; height:11.11mm; border-radius:50%;
+  background: linear-gradient(150deg, var(--accent), var(--accent-dark));
+  color:#fff; font-weight:700; font-size: 8.64pt; font-family:"DejaVu Serif",serif;
+  display:flex; align-items:center; justify-content:center;
+  box-shadow: var(--shadow-sm);
+}
+.person-name { font-size: 8.72pt; font-weight:700; color: var(--ink); font-family:"DejaVu Serif",serif; }
+.person-tag { font-size: 6.34pt; letter-spacing:.4.94px; text-transform:uppercase; font-weight:700; color: var(--accent-dark); margin: 0.58mm 0 1.4mm; }
+.person-bio { font-size: 6.83pt; color: var(--ink-soft); line-height:1.5; }
+.person-row { display:flex; gap: 4.94mm; margin-top:4.53mm; }
+.person-row .person-card { flex:1; margin-top:0; }
+
+/* ---------- Numaralı içerik blokları ---------- */
+.block { margin-top: 4.77mm; }
+.block-head { display:flex; align-items:baseline; gap: 2.3mm; margin-bottom: 2.14mm; }
+.block-num {
+  flex:0 0 auto; width: 5.27mm; height:5.27mm; border-radius:50%;
+  background: var(--accent-dark); color:#fff; font-size: 6.5pt; font-weight:700;
+  display:flex; align-items:center; justify-content:center; box-shadow: var(--shadow-sm);
+}
+.block-title { font-size: 8.89pt; font-weight:700; color: var(--ink); font-family:"DejaVu Serif",serif; }
+.block-subtitle { font-size: 6.75pt; color: var(--ink-faint); margin-top: -0.99mm; margin-bottom:1.65mm; margin-left: 7.57mm; font-style:italic; }
+.block ul { margin-left: 7.57mm; }
+.block li { font-size: 7.32pt; color: var(--ink-soft); margin-bottom: 1.4mm; line-height:1.5; list-style: none; position:relative; }
+.block li::before { content:"–"; position:absolute; left:-3.46mm; color: var(--accent); font-weight:700; }
+.block li b, .block li strong { color: var(--ink); font-weight:700; }
+
+/* ---------- Callout kutuları (gerçek SVG ikonlarla) ---------- */
+.callout { border-radius: 7.41px; padding: 3.13mm 3.95mm; margin-top: 4.28mm; display:flex; gap: 2.8mm; box-shadow: var(--shadow-sm); }
+.callout-icon { flex:0 0 auto; width: 5.76mm; height:5.76mm; border-radius:50%; display:flex; align-items:center; justify-content:center; }
+.callout-icon svg { width: 3.13mm; height:3.13mm; }
+.callout-title { font-size: 6.99pt; font-weight:700; text-transform:uppercase; letter-spacing:.4.11px; margin-bottom: 0.91mm; }
+.callout-text { font-size: 7.16pt; line-height:1.5; }
+
+.callout.focus { background: var(--focus-bg); border: 0.82px solid #eecf8a; }
+.callout.focus .callout-icon { background:#f0dba0; color: var(--focus-ink); }
+.callout.focus .callout-title, .callout.focus .callout-text { color: var(--focus-ink); }
+
+.callout.caution { background: var(--caution-bg); border: 0.82px solid #b9cdf2; }
+.callout.caution .callout-icon { background:#c3d3f5; color: var(--caution-ink); }
+.callout.caution .callout-title, .callout.caution .callout-text { color: var(--caution-ink); }
+
+.callout.insight { background: var(--insight-bg); border: 0.82px solid #1c2c4d; }
+.callout.insight .callout-icon { background: rgba(255,255,255,0.16); color: var(--insight-accent); }
+.callout.insight .callout-title { color: var(--insight-accent); }
+.callout.insight .callout-text { color: rgba(255,255,255,0.94); }
+
+.callout.route { background: var(--route-bg); border: 0.82px solid #c9bcf2; }
+.callout.route .callout-icon { background:#d6cdf5; color: var(--route-ink); }
+.callout.route .callout-title, .callout.route .callout-text { color: var(--route-ink); }
+
+/* ---------- Akış / süreç diyagramı ---------- */
+.flowdiag { display:flex; align-items:stretch; gap:0; margin-top: 4.77mm; }
+.flowdiag .fstep {
+  flex:1; background: var(--paper); border: 0.82px solid var(--line); border-top: 2.47px solid var(--accent);
+  border-radius: 6.58px; padding: 2.96mm 2.47mm; text-align:center; box-shadow: var(--shadow-sm);
+  min-width: 0; overflow-wrap: break-word;    /* bkz. .ov-flow-step notu */
+}
+.flowdiag .fstep-title { font-size: 6.99pt; font-weight:700; color: var(--ink); margin-bottom: 0.82mm; font-family:"DejaVu Serif",serif; }
+.flowdiag .fstep-text { font-size: 6.25pt; color: var(--ink-faint); line-height:1.35; }
+.flowdiag .farrow { flex: 0 0 5.35mm; display:flex; align-items:center; justify-content:center; color: var(--accent); }
+.flowdiag .farrow svg { width:3.29mm; height:3.29mm; }
+.flow-caption { font-size: 6.34pt; color: var(--ink-faint); margin-top: 1.48mm; font-style: italic; }
+
+/* ---------- Karşılaştırma tablosu ---------- */
+.ctable-wrap { margin-top: 4.77mm; }
+.ctable-caption { font-size: 7.16pt; font-weight:700; color: var(--accent-dark); margin-bottom: 1.81mm; font-family:"DejaVu Serif",serif; }
+table.ctable { width:100%; border-collapse: collapse; border-radius: 5.76px; overflow:hidden; box-shadow: var(--shadow-sm); }
+table.ctable th {
+  background: linear-gradient(120deg, var(--accent-dark), var(--accent));
+  color:#fff; font-size: 6.67pt; text-align:left;
+  padding: 2.3mm 2.96mm; font-weight:700; letter-spacing:.1.65px;
+}
+table.ctable td {
+  font-size: 6.75pt; color: var(--ink-soft); padding: 2.3mm 2.96mm;
+  border-bottom: 0.82px solid var(--line-soft); vertical-align: top; line-height:1.4;
+}
+table.ctable tr:nth-child(even) td { background: var(--accent-tint); }
+table.ctable td:first-child { font-weight:700; color: var(--ink); }
+
+/* ---------- Bilgi kartları (küçük istatistik grid) ---------- */
+.info-grid { display:grid; grid-template-columns: repeat(3, 1fr); gap: 2.8mm; margin-top: 4.77mm; }
+.info-card { border: 0.82px solid var(--line); border-radius:6.58px; padding: 2.8mm 3.13mm; position:relative; background: var(--paper); box-shadow: var(--shadow-sm); }
+.info-card .badge {
+  position:absolute; top:2.14mm; right:2.3mm; width: 4.44mm; height:4.44mm; border-radius:50%;
+  background: var(--accent-soft); color: var(--accent-dark);
+  font-size: 6.58pt; font-weight:700; font-family:"DejaVu Serif",serif;
+  display:flex; align-items:center; justify-content:center;
+}
+.info-card .ic-title { font-size: 6.99pt; font-weight:700; color: var(--ink); margin-bottom: 0.91mm; padding-right: 4.94mm; font-family:"DejaVu Serif",serif; }
+.info-card .ic-text { font-size: 6.5pt; color: var(--ink-soft); line-height:1.4; }
+
+/* ---------- Bölüm özeti ---------- */
+.chsummary {
+  margin-top: 5.1mm; background: linear-gradient(120deg, var(--accent-dark), var(--accent) 130%); color:#fff; border-radius: 7.41px;
+  padding: 3.62mm 4.28mm; font-size: 7.24pt; line-height:1.55; box-shadow: var(--shadow-md);
+}
+.chsummary b { color: var(--gold); text-transform:uppercase; font-size:6.34pt; letter-spacing:.4.94px; display:block; margin-bottom:1.23mm; }
+
+/* ---------- Ayet-i Kerime kartları (Arapça orijinal + meal + etimoloji) ---------- */
+.ayat-section-title { font-size: 7.08pt; font-weight:700; color: var(--accent-dark); margin-bottom: 1.81mm; margin-top: 4.77mm; font-family:"DejaVu Serif",serif; }
+.ayah-card {
+  border: 0.82px solid var(--line); border-left: 2.88px solid var(--gold);
+  border-radius: 6.58px; padding: 3.29mm 3.79mm; margin-top: 2.63mm;
+  background: linear-gradient(160deg, var(--accent-tint), var(--paper));
+  box-shadow: var(--shadow-sm);
+}
+.ayah-ref {
+  font-size: 6.25pt; font-weight:700; letter-spacing:.3.29px; text-transform:uppercase;
+  color: var(--gold-ink); margin-bottom: 1.65mm;
+}
+.ayah-arabic {
+  direction: rtl; text-align: right; unicode-bidi: isolate;
+  font-family: "DejaVu Sans", sans-serif;
+  font-size: 12.34pt; line-height: 2; color: var(--ink);
+  margin-bottom: 2.14mm; word-spacing: 1.23px;
+}
+.ayah-meal { font-size: 6.99pt; color: var(--ink-soft); line-height:1.5; font-style:italic; }
+.ayah-meal::before { content: "" ; }
+.ayah-etym { font-size: 6.58pt; color: var(--ink-faint); line-height:1.4; margin-top: 1.48mm; padding-top: 1.48mm; border-top: 0.82px solid var(--line-soft); }
+
+/* ================= SÖZLÜK ================= */
+.gloss-grid { display:grid; grid-template-columns: 1fr 1fr; gap: 2.63mm 4.53mm; margin-top: 4.94mm; }
+.gloss-item { border-bottom: 0.82px solid var(--line-soft); padding-bottom: 2.3mm; }
+.gloss-term { font-size: 7.49pt; font-weight:700; color: var(--accent-dark); font-family:"DejaVu Serif",serif; }
+.gloss-def { font-size: 6.75pt; color: var(--ink-soft); line-height:1.42; margin-top: 0.74mm; }
+.gloss-ref { font-size: 6.01pt; color: var(--ink-faint); margin-top: 0.74mm; font-style:italic; }
+
+/* ================= SINAV HAZIRLIK ================= */
+.dist-grid { display:grid; grid-template-columns: 1fr 1fr; gap: 2.96mm; margin-top: 4.28mm; }
+.dist-card { border: 0.82px solid var(--line); border-radius: 7.41px; padding: 3.13mm 3.62mm; background: var(--paper); box-shadow: var(--shadow-sm); }
+.dist-title { font-size: 7.32pt; font-weight:700; color: var(--accent-dark); margin-bottom:1.23mm; font-family:"DejaVu Serif",serif; }
+.dist-vs { color: var(--gold-ink); font-weight:700; }
+.dist-text { font-size: 6.75pt; color: var(--ink-soft); line-height:1.48; }
+
+.match-table-wrap { margin-top: 4.94mm; }
+table.matchtable { width:100%; border-collapse:collapse; box-shadow: var(--shadow-sm); }
+table.matchtable th { background: linear-gradient(120deg, var(--accent-dark), var(--accent)); color:#fff; font-size:6.5pt; padding:2.14mm 2.63mm; text-align:left; }
+table.matchtable td { font-size: 6.67pt; padding: 1.98mm 2.63mm; border-bottom:0.82px solid var(--line-soft); color: var(--ink-soft); }
+table.matchtable td:first-child { font-weight:700; color:var(--ink); }
+table.matchtable tr:nth-child(even) td { background: var(--accent-tint); }
+
+.qa-grid { display:grid; grid-template-columns: 1fr 1fr; gap: 2.63mm 4.94mm; margin-top: 4.94mm; }
+.qa-item { font-size: 6.83pt; border-left: 2.06px solid var(--accent-soft); padding-left: 2.47mm; }
+.qa-q { font-weight:700; color: var(--ink); margin-bottom: 0.74mm; }
+.qa-a { color: var(--accent-dark); }
+
+.checklist { margin-top: 4.94mm; display:grid; grid-template-columns: 1fr 1fr; gap: 1.98mm 4.94mm; }
+.check-item { display:flex; align-items:flex-start; gap: 1.98mm; font-size: 6.83pt; color: var(--ink-soft); }
+.check-box { flex:0 0 auto; width:3.13mm; height:3.13mm; border: 1.23px solid var(--accent); border-radius: 2.47px; margin-top: 0.49mm; }
+
+.section-kicker { font-size: 6.5pt; letter-spacing:1.48px; font-weight:700; color: var(--accent); text-transform:uppercase; }
+.section-title { font-family:"DejaVu Serif",serif; font-size: 17.28pt; font-weight:700; margin-top: 1.65mm; color: var(--ink); }
+.section-lede { font-size: 7.41pt; color: var(--ink-soft); margin-top: 2.14mm; }
+
+/* ================= TEST (20 Soruluk Değerlendirme) ================= */
+.test-chip-row { display:flex; gap: 2.8mm; margin-top: 4.53mm; }
+.test-chip {
+  flex:1; text-align:center; background: var(--accent-tint); border: 0.82px solid var(--line);
+  border-radius: 6.58px; padding: 2.47mm 1.65mm;
+}
+.test-chip b { display:block; font-family:"DejaVu Serif",serif; font-size: 10.29pt; color: var(--accent-dark); }
+.test-chip span { font-size: 5.76pt; font-weight:700; letter-spacing:.3.29px; text-transform:uppercase; color: var(--ink-faint); }
+.test-instructions {
+  margin-top: 3.29mm; background: var(--caution-bg); border: 0.82px solid #b9cdf2; color: var(--caution-ink);
+  border-radius: 6.58px; padding: 2.47mm 3.29mm; font-size: 6.91pt; line-height:1.5;
+}
+.tq-list { margin-top: 4.94mm; column-count: 2; column-gap: 6.58mm; column-fill: balance; }
+.tq { break-inside: avoid; -webkit-column-break-inside: avoid; margin-bottom: 4.53mm; }
+.tq-head { display:flex; align-items:flex-start; gap: 2.3mm; margin-bottom: 1.81mm; }
+.tq-num {
+  flex:0 0 auto; width: 5.27mm; height:5.27mm; border-radius:4.94px;
+  background: var(--accent-dark); color:#fff; font-size: 6.91pt; font-weight:700;
+  display:flex; align-items:center; justify-content:center; box-shadow: var(--shadow-sm); font-family:"DejaVu Serif",serif;
+}
+.tq-stem { font-size: 7.49pt; font-weight:700; color: var(--ink); line-height:1.4; padding-top:0.33mm; }
+.tq-options { margin-left: 7.57mm; display:flex; flex-direction:column; gap: 1.32mm; }
+.tq-options li { list-style:none; display:flex; gap: 1.98mm; align-items:flex-start; font-size: 7.08pt; color: var(--ink-soft); line-height:1.4; }
+.opt-letter {
+  flex:0 0 auto; width:3.79mm; height:3.79mm; border-radius:50%; border: 1.07px solid var(--accent);
+  color: var(--accent-dark); font-size: 5.6pt; font-weight:700;
+  display:flex; align-items:center; justify-content:center; margin-top: 0.16mm;
+}
+
+/* ================= CEVAP ANAHTARI VE ÇÖZÜMLER ================= */
+.ans-list { margin-top: 4.94mm; column-count: 2; column-gap: 6.58mm; column-fill: balance; }
+.ans-item { display:flex; gap: 2.47mm; break-inside: avoid; -webkit-column-break-inside: avoid; margin-bottom: 2.3mm; }
+.ans-num {
+  flex:0 0 auto; width: 5.27mm; height:5.27mm; border-radius:4.94px;
+  background: var(--accent-soft); color: var(--accent-dark); font-size: 6.91pt; font-weight:700;
+  display:flex; align-items:center; justify-content:center; font-family:"DejaVu Serif",serif; border: 0.82px solid var(--line);
+}
+.ans-correct {
+  display:inline-block; background:#e7f5ec; color:#1e7e42; font-weight:700; font-size:6.25pt;
+  letter-spacing:.2.47px; padding: 0.82mm 2.14mm; border-radius:999px; margin-bottom: 0.99mm;
+}
+.ans-explain { font-size: 6.99pt; color: var(--ink-soft); line-height:1.45; }
+.ans-explain b { color: var(--ink); }
+
+/* çok-sayfa: bölüm içi devam sayfası başlığı */
+.chcontinue { display:flex; align-items:flex-start; gap: 2.63mm; margin-bottom: 4.53mm; }
+.chcontinue .tag {
+  flex: 0 0 auto; margin-top: 0.49mm;
+  font-size: 6.17pt; font-weight:700; letter-spacing:.4.94px; text-transform:uppercase;
+  background: var(--accent-dark); color: #fff; padding: 1.48mm 2.8mm; border-radius: 999px;
+}
+.chcontinue .cctitle { font-family:"DejaVu Serif",serif; font-size: 11.52pt; font-weight:700; color: var(--ink); line-height:1.25; }
+
+/* ============================================================
+   KİTAP ÖN KISMI (build_kitap.py — ana kapak, künye, önsöz,
+   sayfa rehberi, ana içindekiler, ders haritası)
+   Sadece birleşik kitapta kullanılır; tek ders çıktısını etkilemez.
+   ============================================================ */
+
+/* --- Künye --- */
+.imprint-grid { margin-top: 5.76mm; border-top: 0.82px solid var(--line); }
+.imprint-row { display:flex; gap: 4.94mm; padding: 2.8mm 0.82mm; border-bottom: 0.82px solid var(--line-soft); }
+.imprint-label {
+  flex: 0 0 34.56mm; font-size: 6.58pt; font-weight:700; letter-spacing:0.91px;
+  text-transform:uppercase; color: var(--ink-faint);
+}
+.imprint-value { flex:1; font-size: 7.74pt; color: var(--ink); line-height:1.5; }
+.imprint-value b { color: var(--accent-dark); }
+.imprint-note {
+  margin-top: 5.76mm; font-size: 7.24pt; color: var(--ink-soft); line-height:1.6;
+  border-left: 2.14px solid var(--accent); padding: 0.82mm 0 0.82mm 4.11mm;
+}
+
+/* --- Önsöz --- */
+.pref-grid { display:grid; grid-template-columns: repeat(2, 1fr); gap: 4.11mm; margin-top: 5.76mm; }
+.pref-card {
+  border: 0.82px solid var(--line); border-top: 2.14px solid var(--accent);
+  border-radius: 7.41px; padding: 4.11mm 4.44mm; background: var(--paper); box-shadow: var(--shadow-sm);
+}
+.pref-card-title {
+  font-family:"DejaVu Serif",serif; font-size: 8.56pt; font-weight:700;
+  color: var(--accent-dark); margin-bottom: 1.98mm;
+}
+.pref-card-text { font-size: 7.24pt; color: var(--ink-soft); line-height:1.58; }
+.pref-card-text b { color: var(--ink); }
+
+/* --- Sayfa rehberi (legend) --- */
+.guide-grid { display:grid; grid-template-columns: repeat(2, 1fr); gap: 4.11mm 4.94mm; margin-top: 4.94mm; }
+.guide-item { display:flex; flex-direction:column; gap: 1.81mm; }
+.guide-cap {
+  font-size: 6.58pt; font-weight:700; letter-spacing:.7.41px; text-transform:uppercase;
+  color: var(--accent-dark);
+}
+.guide-cap span { display:block; text-transform:none; letter-spacing:0; font-weight:400; font-size:6.75pt; color: var(--ink-soft); margin-top:0.66mm; line-height:1.45; }
+.guide-demo { border: 0.82px dashed var(--line); border-radius: 6.58px; padding: 2.47mm; background: var(--paper-tint); }
+.guide-demo .callout { margin: 0; }
+.guide-demo .term-box { margin: 0; }
+.guide-demo .chsummary { margin: 0; }
+
+/* --- Ana içindekiler (ders listesi) --- */
+.btoc-list { margin-top: 4.94mm; display:flex; flex-direction:column; }
+.btoc-row {
+  display:flex; align-items:center; gap: 3.7mm;
+  padding: 3.29mm 2.47mm; border-bottom: 0.82px solid var(--line-soft);
+  text-decoration:none; color: inherit; border-radius: 4.94px;
+}
+.btoc-row:first-child { border-top: 0.82px solid var(--line-soft); }
+.btoc-chip {
+  flex: 0 0 auto; width: 8.64mm; height: 8.64mm; border-radius: 6.58px;
+  display:flex; align-items:center; justify-content:center;
+  font-family:"DejaVu Serif",serif; font-weight:700; font-size: 9.05pt; color:#fff;
+  box-shadow: var(--shadow-sm);
+}
+.btoc-body { flex: 1 1 auto; min-width: 0; }
+.btoc-name { font-size: 9.05pt; font-weight:700; color: var(--ink); }
+.btoc-sub { font-size: 6.83pt; color: var(--ink-faint); margin-top: 0.66mm; }
+.btoc-meta { flex: 0 0 auto; font-size: 6.42pt; color: var(--ink-faint); text-align:right; line-height:1.5; }
+.btoc-range {
+  flex: 0 0 auto; font-size: 7.57pt; font-weight:700; color: #fff;
+  padding: 1.48mm 2.63mm; border-radius: 4.94px; min-width: 20mm; text-align:center;
+}
+
+/* --- Ders haritası (sırt görünümü) --- */
+.map-note { font-size: 7.24pt; color: var(--ink-soft); line-height:1.6; margin-top: 2.47mm; }
+.map-list { margin-top: 5.76mm; display:flex; flex-direction:column; gap: 2.63mm; }
+.map-row { display:flex; align-items:center; gap: 3.29mm; }
+.map-name { flex: 0 0 42.79mm; font-size: 7.24pt; font-weight:700; color: var(--ink); }
+.map-track { flex: 1 1 auto; height: 5.43mm; background: var(--paper-tint); border: 0.82px solid var(--line); border-radius: 999px; overflow:hidden; }
+.map-fill { height: 100%; border-radius: 999px; display:flex; align-items:center; justify-content:flex-end; padding-right: 1.98mm; }
+.map-fill span { font-size: 6.09pt; font-weight:700; color: #fff; }
+.map-range { flex: 0 0 19.75mm; text-align:right; font-size: 6.75pt; font-weight:700; color: var(--ink-faint); }
+
+/* ===== build.py tarafından üretildi — elle düzenlemeyin ===================
+   Trim 175mm x 250mm · bleed 3mm ·
+   kenarlar: üst 11mm / alt 19mm /
+   iç 14mm / dış 9mm ·
+   tek sayfa sırtı: left
+   ========================================================================= */
+@page { size: 181mm 256mm; margin: 0; }
+:root {
+  --trim-w: 175mm;
+  --trim-h: 250mm;
+  --bleed: 3mm;
+  --page-w: 181mm;
+  --page-h: 256mm;
+  --mg-top: 11mm;
+  --mg-bottom: 19mm;
+  --mg-inner: 14mm;
+  --mg-outer: 9mm;
+  --pad-top: 14mm;
+  --pad-bottom: 22mm;
+  --pad-inner: 17mm;
+  --pad-outer: 12mm;
+}
+/* Ayna simetri — tek sayfada sırt left, çift sayfada right */
+body > section.page:nth-of-type(odd) {
+  --pad-left: var(--pad-inner);
+  --pad-right: var(--pad-outer);
+}
+body > section.page:nth-of-type(even) {
+  --pad-left: var(--pad-outer);
+  --pad-right: var(--pad-inner);
+}
+</style>
+<style>:root {
+  --accent: #194E7D;
+  --accent-dark: #0C2943;
+  --accent-soft: #EEF4F9;
+  --accent-tint: #F6F9FB;
+  --cover-grad-1: #061B2D;
+  --cover-grad-2: #144168;
+  --cover-grad-3: #2968A0;
+  --gold: #d9b466;
+  --gold-ink: #6b5210;
+  --paper: #FCFDFD;
+  --paper-tint: #F4F7F9;
+  --line: #E0E7EE;
+  --line-soft: #ECF0F5;
+}</style>
+</head>
+<body class="theme-custom">
+
+
+
+<section class="page cover" id="cover">
+  <div class="cover-corner tl"></div>
+  <div class="cover-corner tr"></div>
+  <div class="cover-corner bl"></div>
+  <div class="cover-corner br"></div>
+  <div class="cover-top">
+    <div class="cover-kicker">Görsel Ders Notu Kitabı · Final Özeti</div>
+    <div class="cover-emblem">
+      <div class="ring-outer"></div>
+      <div class="ring-mid"></div>
+      
+      <div class="tick major" style="transform: translateX(-50%) rotate(0deg);"></div>
+      
+      <div class="tick" style="transform: translateX(-50%) rotate(30deg);"></div>
+      
+      <div class="tick" style="transform: translateX(-50%) rotate(60deg);"></div>
+      
+      <div class="tick major" style="transform: translateX(-50%) rotate(90deg);"></div>
+      
+      <div class="tick" style="transform: translateX(-50%) rotate(120deg);"></div>
+      
+      <div class="tick" style="transform: translateX(-50%) rotate(150deg);"></div>
+      
+      <div class="tick major" style="transform: translateX(-50%) rotate(180deg);"></div>
+      
+      <div class="tick" style="transform: translateX(-50%) rotate(210deg);"></div>
+      
+      <div class="tick" style="transform: translateX(-50%) rotate(240deg);"></div>
+      
+      <div class="tick major" style="transform: translateX(-50%) rotate(270deg);"></div>
+      
+      <div class="tick" style="transform: translateX(-50%) rotate(300deg);"></div>
+      
+      <div class="tick" style="transform: translateX(-50%) rotate(330deg);"></div>
+      
+      <div class="ring-inner"><span>İ</span></div>
+    </div>
+  </div>
+  <div class="cover-mid">
+    <div class="cover-motif">İ</div>
+    <div class="cover-code">İSL. TARİHİ III</div>
+    <div class="cover-title">İslam Tarihi<span class="accent-word"> III</span></div>
+    <div class="cover-subtitle">Hârezmşâhlardan Moğol İstilasına: Türk-İslam Devletleri</div>
+    <div class="cover-rule"></div>
+    <div class="cover-desc">Ceyhun Nehri'nin bereketli sularından beslenen bir vilayetten devasa bir imparatorluğa dönüşen Hârezmşâhlar ile başlayıp, Anadolu'nun Türkleşmesine, Mısır'daki Memlük direnişine, Hindistan'daki Delhi ve Bâbürlü ihtişamına ve nihayet Moğol kasırgasına kadar uzanan; Türk-İslam medeniyetinin kılıç ve kalemle yazılmış serüveninin final sınavı özeti.</div>
+  </div>
+  <div class="cover-bottom">
+    <div class="cover-stats">
+      <div class="cover-stat"><b>5</b>Bölüm</div>
+      <div class="cover-stat"><b>36</b>Anahtar Kavram</div>
+      <div class="cover-stat"><b>Final</b>Sınav Hazırlık</div>
+    </div>
+    <div class="cover-foot">
+      <div>Ders Notu Serisi</div>
+      <div>5 Bölüm · Final Sınavı Hazırlığı</div>
+    </div>
+  </div>
+</section>
+
+
+
+
+<section class="page body-page">
+  <div class="pageband"><div>İslam Tarihi<span class="accent-word"> III</span></div><div class="pageband-course">İSL. TARİHİ III</div></div>
+  
+  <div class="toc-kicker">Kitap Planı</div>
+  <div class="toc-title">İçindekiler</div>
+  <div class="toc-lede">Hârezmşâhlardan Moğol İstilasına: Türk-İslam Devletleri — bölüm bölüm takip edilecek çalışma haritası.</div>
+  
+  <div class="toc-list">
+    
+    <a class="toc-row" href="#ch-1">
+      <div class="toc-num">1</div>
+      <div class="toc-body">
+        <div class="toc-heading">Hârezm'de Türk-Müslüman Hânedanı</div>
+        <div class="toc-sub">Hârezmşâhlar: Ceyhun kıyısındaki bir vilayetten imparatorluğa, Otrar'dan Yassıçimen'e</div>
+      </div>
+      <div class="toc-page">s.4</div>
+    </a>
+    
+    <a class="toc-row" href="#ch-2">
+      <div class="toc-num">2</div>
+      <div class="toc-body">
+        <div class="toc-heading">Anadolu'nun İslamlaşması ve Türkler</div>
+        <div class="toc-sub">Emevî akınlarından Malazgirt'e, beyliklerden dervişlere: bir yurdun kalıcı dönüşümü</div>
+      </div>
+      <div class="toc-page">s.8</div>
+    </a>
+    
+    <a class="toc-row" href="#ch-3">
+      <div class="toc-num">3</div>
+      <div class="toc-body">
+        <div class="toc-heading">Bilâdü'ş-Şâm'da Türkler: Memlükler</div>
+        <div class="toc-sub">Zengîlerden Eyyûbîlere, kölelikten sultanlığa: Haçlı ve Moğollara karşı üç asırlık kalkan</div>
+      </div>
+      <div class="toc-page">s.12</div>
+    </a>
+    
+    <a class="toc-row" href="#ch-4">
+      <div class="toc-num">4</div>
+      <div class="toc-body">
+        <div class="toc-heading">Hindistan'da Türkler</div>
+        <div class="toc-sub">Delhi Sultanlığı ve Bâbürlüler: Moğol fırtınasından korunan bir medeniyet vahası</div>
+      </div>
+      <div class="toc-page">s.15</div>
+    </a>
+    
+    <a class="toc-row" href="#ch-5">
+      <div class="toc-num">5</div>
+      <div class="toc-body">
+        <div class="toc-heading">Moğollar ve Yeni Dünya Düzeni</div>
+        <div class="toc-sub">Cengiz Han'dan dört hanlığa: kıyametten Pax Mongolica'ya uzanan çift yönlü miras</div>
+      </div>
+      <div class="toc-page">s.18</div>
+    </a>
+    
+    <a class="toc-row" href="#glossary">
+      <div class="toc-num alt">A</div>
+      <div class="toc-body">
+        <div class="toc-heading">Anahtar Kavramlar Sözlüğü</div>
+        <div class="toc-sub">Tanımlı ve bağlamlandırılmış 36 kavram</div>
+      </div>
+      <div class="toc-page">s.23</div>
+    </a>
+    
+    <a class="toc-row" href="#exam">
+      <div class="toc-num alt">B</div>
+      <div class="toc-body">
+        <div class="toc-heading">Genel Değerlendirme Testi</div>
+        <div class="toc-sub">20 soruluk çoktan seçmeli test ve çözümlü cevap anahtarı</div>
+      </div>
+      <div class="toc-page">s.25</div>
+    </a>
+    
+  </div>
+  
+<div class="footer">
+  <div>İslam Tarihi<span class="accent-word"> III</span></div>
+  <div class="fnum">2</div>
+</div>
+
+</section>
+
+
+
+
+<section class="page body-page">
+  <div class="pageband"><div>İslam Tarihi<span class="accent-word"> III</span></div><div class="pageband-course">İSL. TARİHİ III</div></div>
+  <div class="toc-kicker">Dersin Büyük Resmi</div>
+  <div class="toc-title">Genel Bakış</div>
+
+  <div class="ov-hero">Bu ders; <b>Hârezmşâhların</b> Ceyhun kıyısındaki yükselişi ve Otrar Faciası'yla gelen çöküşünden başlayarak, <b>Anadolu'nun Türkleşmesine</b>, Mısır'daki <b>Memlük kalkanına</b>, Hindistan'daki <b>Delhi ve Bâbürlü ihtişamına</b> ve nihayet dünyanın haritasını yeniden çizen <b>Moğol kasırgasına</b> uzanan beş temel durağı bir bütün olarak sunar.</div>
+
+  <div class="ov-grid">
+    
+    <div class="ov-card">
+      <div class="ov-card-title">Hârezmşâhlar</div>
+      <div class="ov-card-text">Taşt-dâr Anûştegin'in soyundan imparatorluğa; Otrar Faciası'ndan Yassıçimen yıkımına.</div>
+    </div>
+    
+    <div class="ov-card">
+      <div class="ov-card-title">Anadolu'nun Dönüşümü</div>
+      <div class="ov-card-text">Emevî akınlarından Malazgirt'e, iktâ beyliklerinden dervişlerin manevi fethine.</div>
+    </div>
+    
+    <div class="ov-card">
+      <div class="ov-card-title">Memlükler</div>
+      <div class="ov-card-text">Zengî-Eyyûbî mirasından doğan köle-asker sınıfının üç asırlık koruyucu kalkanı.</div>
+    </div>
+    
+    <div class="ov-card">
+      <div class="ov-card-title">Hindistan'da Türkler</div>
+      <div class="ov-card-text">Delhi Sultanlığı'nın Moğol kalkanı ve Bâbürlülerin Tâc Mahal'e uzanan ihtişamı.</div>
+    </div>
+    
+    <div class="ov-card">
+      <div class="ov-card-title">Cengiz Han ve Teşkilat</div>
+      <div class="ov-card-text">Onlu sistem, Muhafız Tümeni, Cengiz Yasası ve Uygur bürokrasisiyle kurulan cihan devleti.</div>
+    </div>
+    
+    <div class="ov-card">
+      <div class="ov-card-title">Dört Hanlık ve Pax Mongolica</div>
+      <div class="ov-card-text">Yuan, Altın Orda, Çağatay ve İlhanlılar; yıkımın ardından gelen Moğol Barışı.</div>
+    </div>
+    
+  </div>
+
+  
+  <div class="section-kicker" style="margin-top:3.5mm;">Çalışma Akışı</div>
+  <div class="ov-flow">
+    
+    
+    <div class="ov-flow-step"><b>Hârezmşâhlar</b><span>Ceyhun'dan imparatorluğa (1097–1231)</span></div>
+    
+    <div class="ov-flow-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="19" y2="12"/><polyline points="13 6 19 12 13 18"/></svg></div>
+    <div class="ov-flow-step"><b>Anadolu</b><span>Malazgirt ve Türkleşme (1071 sonrası)</span></div>
+    
+    <div class="ov-flow-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="19" y2="12"/><polyline points="13 6 19 12 13 18"/></svg></div>
+    <div class="ov-flow-step"><b>Memlükler</b><span>Aynicâlût kalkanı (1250–1517)</span></div>
+    
+    <div class="ov-flow-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="19" y2="12"/><polyline points="13 6 19 12 13 18"/></svg></div>
+    <div class="ov-flow-step"><b>Hindistan</b><span>Delhi ve Bâbürlüler (1206–1858)</span></div>
+    
+    <div class="ov-flow-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="19" y2="12"/><polyline points="13 6 19 12 13 18"/></svg></div>
+    <div class="ov-flow-step"><b>Moğollar</b><span>Cengiz Han'dan Pax Mongolica'ya</span></div>
+    
+  </div>
+  
+
+  
+  <div class="callout caution" style="margin-top:3.5mm;">
+    <div class="callout-icon">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.5"/><line x1="12" y1="11" x2="12" y2="16.5"/><circle cx="12" cy="7.5" r="0.6" fill="currentColor" stroke="none"/></svg>
+
+</div>
+    <div><div class="callout-title">Sınavda Ana Ayrım</div><div class="callout-text">Sınavda en çok karıştırılan yer, <b>Moğol istilasının dört farklı coğrafyadaki zıt sonuçlarıdır</b>: aynı istila Hârezmşâhları <b>yıkmış</b>, Anadolu'yu Türkmen göçleriyle <b>Türkleştirmiş</b>, Memlükleri Aynicâlût zaferiyle <b>İslam dünyasının lideri yapmış</b> ve Hindistan'ı mülteci âlim-sanatkâr akınıyla <b>zenginleştirmiştir</b>.</div></div>
+  </div>
+  
+
+  
+<div class="footer">
+  <div>İslam Tarihi<span class="accent-word"> III</span></div>
+  <div class="fnum">3</div>
+</div>
+
+</section>
+
+
+
+
+  
+  
+  <section class="page body-page" data-ch="1" data-cp="0" id="ch-1">
+    <div class="pageband"><div>İslam Tarihi<span class="accent-word"> III</span></div><div class="pageband-course">Bölüm 1</div></div>
+
+    
+      <div class="chbanner">
+        <div class="chbanner-kicker">1. Bölüm</div>
+        <div class="chbanner-title">Hârezm'de Türk-Müslüman Hânedanı</div>
+        <div class="chbanner-subtitle">Hârezmşâhlar: Ceyhun kıyısındaki bir vilayetten imparatorluğa, Otrar'dan Yassıçimen'e</div>
+      </div>
+    
+
+    <!--item 0 terms-->
+  
+<div class="terms-grid">
+  
+  <div class="term-box">
+    <div class="term-name">Hârezm</div>
+    <div class="term-def">Hazar Denizi'nin doğusunda, Ceyhun (Amû-Deryâ) Nehri'nin aşağı mecrasının her iki tarafında yer alan bereketli ve stratejik ticaret bölgesi.</div>
+  </div>
+  
+  <div class="term-box">
+    <div class="term-name">Taşt-dâr</div>
+    <div class="term-def">Hükümdar elini yıkarken leğen ve ibrik tutan, saray temizliğinden sorumlu görevli; Anûştegin bu makamla yükselmiştir.</div>
+  </div>
+  
+  <div class="term-box">
+    <div class="term-name">Otrar Faciası (1218)</div>
+    <div class="term-def">Otrar valisi İnalcık'ın Moğol ticaret kervanını yağmalayıp tüccarları öldürmesi; Moğol istilasının fitilini ateşleyen olay.</div>
+  </div>
+  
+  <div class="term-box">
+    <div class="term-name">Yassıçimen Savaşı (1230)</div>
+    <div class="term-def">Erzincan Yassıçimen Ovası'nda Hârezmşâh ordusunun Selçuklu-Eyyubî ittifakına yenilerek yıkıma sürüklendiği meydan savaşı.</div>
+  </div>
+  
+</div>
+
+  
+<!--item 1 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">1</div>
+    <div class="block-title">Coğrafi Bağlam ve Haritalandırma</div>
+  </div>
+  
+  <ul>
+    <li><b>Hârezm:</b> Hazar Denizi'nin doğusunda, Ceyhun (Amû-Deryâ) Nehri'nin aşağı mecrasının her iki tarafında yer alan, bereketli ve stratejik ticaret bölgesidir.</li><li><b>Gürgenç (Gürgânc-Ürgenç):</b> Bölgenin ve Hârezmşâhlar Devleti'nin efsanevi başkentidir.</li><li><b>Otrar:</b> Moğol kervanının yağmalanarak dünya tarihinin seyrinin değiştiği sınır şehridir.</li><li><b>Yassıçimen (Erzincan):</b> Hârezmşâhların, Selçuklu ve Eyyubî ittifak ordusuna karşı varlık yokluk mücadelesi verip yıkıma sürüklendiği ovadır.</li>
+  </ul>
+</div>
+
+  
+<!--item 2 person-->
+  
+<div class="person-card">
+  <div class="person-avatar">AN</div>
+  <div>
+    <div class="person-name">Anûştegin</div>
+    <div class="person-tag">ö. 1097 öncesi · Hânedanın Atası, Köle-Askerlikten Taşt-dârlığa</div>
+    <div class="person-bio">Aslen bir Türk <b>memlûku</b> (köle-asker) olup Selçuklu Emîri Bilge Tegin tarafından satın alınarak Selçuklu sarayına getirilmiş; zekâsı ve çalışkanlığıyla yükselerek <b>Taşt-dâr</b> olmuş ve Hârezm bölgesinin gelirlerinden yararlanmıştır. Hânedan onun adıyla anılır.</div>
+  </div>
+</div>
+
+  
+<!--item 3 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">2</div>
+    <div class="block-title">Köken, Kuruluş ve Hânedanlar</div>
+  </div>
+  
+  <ul>
+    <li>Hârezm bölgesine hâkim olan veya burayı idare eden yöneticilere <b>"Hârezmşâh"</b> unvanı verilirdi; tarihçiler bu unvanı taşıyanları dört esas döneme ayırır.</li><li>Selçuklu Sultanı <b>Alp Arslan</b> döneminde (1063–1072) Hârezm zapt edilmiş, buranın gelirleri sarayda görev yapan <b>Taşt-dâr</b>'ların tahsisatına ayrılmıştı.</li><li>Devletin fiilî kuruluşu <b>1097</b>'de, Selçuklu Sultanı Berkyaruk zamanında Anûştegin'in oğlu <b>Kutbeddîn Muhammed</b>'in Hârezmşâh tayin edilmesiyle gerçekleşmiştir.</li>
+  </ul>
+</div>
+
+  
+
+
+    
+<div class="footer">
+  <div>İslam Tarihi<span class="accent-word"> III</span></div>
+  <div class="fnum">4</div>
+</div>
+
+  </section>
+  
+  
+  
+  <section class="page body-page" data-ch="1" data-cp="1">
+    <div class="pageband"><div>İslam Tarihi<span class="accent-word"> III</span></div><div class="pageband-course">Bölüm 1</div></div>
+
+    
+
+    <!--item 0 table-->
+  
+<div class="ctable-wrap">
+  <div class="ctable-caption">Hârezmşâh Unvanını Taşıyan Dört Dönem</div>
+  <table class="ctable">
+    <thead><tr><th>Hânedan</th><th>Dönemi ve Niteliği</th></tr></thead>
+    <tbody>
+      
+      <tr><td>Afrigîler</td><td>İslam öncesinden 995'e kadar süren en eski dönem.</td></tr>
+      
+      <tr><td>Me'mûnîler</td><td>995–1017 arası kısa fakat kültürel açıdan parlak dönem.</td></tr>
+      
+      <tr><td>Altıntaş ve oğulları</td><td>1017–1041 arası Gazneli nüfuzu altındaki idare.</td></tr>
+      
+      <tr><td>Hârezmşâhlar Devleti</td><td>1097–1231; İslam tarihine damga vuran asıl hânedan.</td></tr>
+      
+    </tbody>
+  </table>
+</div>
+
+  
+<!--item 1 person-->
+  
+<div class="person-card">
+  <div class="person-avatar">AZ</div>
+  <div>
+    <div class="person-name">Atsız</div>
+    <div class="person-tag">1128–1156 · Bağımsızlığın İlk Adımlarını Atan Hârezmşâh</div>
+    <div class="person-bio">Başlangıçta Büyük Selçuklu Sultanı <b>Sencer</b>'e sadakatle bağlı kalmış, sonradan Cend ve Mangışlak gibi stratejik askerî merkezleri ele geçirerek bağımsızlık emareleri göstermiş; 1141 <b>Katvan Savaşı</b>'nda Sencer'in zayıflamasından yararlanıp Merv ve Nişâbûr'u zapt etmiştir.</div>
+  </div>
+</div>
+
+  
+<!--item 2 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">3</div>
+    <div class="block-title">Siyasi Gelişim: Atsız ve İl-Arslan Dönemleri</div>
+  </div>
+  
+  <ul>
+    <li>Atsız'ın Cend ve Mangışlak'ı ele geçirip nüfuzunu artırması, Sultan Sencer'in <b>1138</b>'de Hârezm'e sefere çıkıp onu mağlup etmesine neden olmuştur.</li><li>Atsız geri dönmüş, <b>1141 Katvan Savaşı</b>'nda Sencer'in zayıflamasından faydalanarak Merv ve Nişâbûr'u zapt etmiştir.</li><li>Yerine geçen oğlu <b>İl-Arslan</b> (1156–1172), Kara-Hıtayların saldırılarını su bentlerini açıp araziyi sular altında bırakarak dâhiyane bir taktikle durdurmuştur.</li>
+  </ul>
+</div>
+
+  
+<!--item 3 person-->
+  
+<div class="person-card">
+  <div class="person-avatar">AT</div>
+  <div>
+    <div class="person-name">Alâeddîn Tekiş</div>
+    <div class="person-tag">1172–1200 · Devleti İmparatorluğa Dönüştüren Sultan</div>
+    <div class="person-bio">Üvey annesi Terken Hâtûn'un oğlu Sultan-şâh'ı tahta çıkarması üzerine Kara-Hıtaylara sığınmış, onlardan aldığı orduyla savaşmadan Gürgenç'e girip tahta oturmuştur. <b>1194</b>'te Irak Selçuklu Sultanı III. Tuğrul'u Rey civarında ağır bir yenilgiye uğratarak bu devleti ortadan kaldırmıştır.</div>
+  </div>
+</div>
+
+  
+<!--item 4 callout-->
+  
+<div class="callout caution">
+  <div class="callout-icon">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.5"/><line x1="12" y1="11" x2="12" y2="16.5"/><circle cx="12" cy="7.5" r="0.6" fill="currentColor" stroke="none"/></svg>
+
+</div>
+  <div>
+    <div class="callout-title">Dikkat / Püf Noktası: Otrar Faciası ve Yıkımın Başlangıcı</div>
+    <div class="callout-text">Tekiş'ten sonra başa geçen Sultan <b>Alâeddîn Muhammed</b> (1200–1220) zamanında devlet en geniş sınırlarına ulaşmış olsa da, dünya tarihinin kaderini değiştiren bir siyasi hata yapılmıştır. Başlangıçta Cengiz Han ile barış ve ticari münasebetler kurulmuşken, Otrar'a gelen Moğol ticaret kervanının vali <b>İnalcık</b> tarafından yağmalanıp tüccarların öldürülmesi (1218) yıkımın fitilini ateşlemiştir.</div>
+  </div>
+</div>
+
+  
+
+
+    
+<div class="footer">
+  <div>İslam Tarihi<span class="accent-word"> III</span></div>
+  <div class="fnum">5</div>
+</div>
+
+  </section>
+  
+  
+  
+  <section class="page body-page" data-ch="1" data-cp="2">
+    <div class="pageband"><div>İslam Tarihi<span class="accent-word"> III</span></div><div class="pageband-course">Bölüm 1</div></div>
+
+    
+
+    <!--item 0 flow-->
+  
+<div class="flowdiag">
+  
+  
+  <div class="fstep">
+    <div class="fstep-title">Otrar Yağması</div>
+    <div class="fstep-text">Vali İnalcık kervanı yağmalatır</div>
+  </div>
+  
+  <div class="farrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="19" y2="12"/><polyline points="13 6 19 12 13 18"/></svg></div>
+  <div class="fstep">
+    <div class="fstep-title">Kibirli Ret</div>
+    <div class="fstep-text">Suçluların teslimi talebi reddedilir</div>
+  </div>
+  
+  <div class="farrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="19" y2="12"/><polyline points="13 6 19 12 13 18"/></svg></div>
+  <div class="fstep">
+    <div class="fstep-title">Moğol Seferi</div>
+    <div class="fstep-text">Devasa orduyla saldırı, yüz binlerce ölü</div>
+  </div>
+  
+  <div class="farrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="19" y2="12"/><polyline points="13 6 19 12 13 18"/></svg></div>
+  <div class="fstep">
+    <div class="fstep-title">Medeniyet Yıkımı</div>
+    <div class="fstep-text">Kütüphane, şehir ve eserler harabeye döner</div>
+  </div>
+  
+</div>
+<div class="flow-caption">Çöküş Süreci: Bir Diplomatik Hatadan Küresel Felakete</div>
+
+  
+<!--item 1 person-->
+  
+<div class="person-card">
+  <div class="person-avatar">CH</div>
+  <div>
+    <div class="person-name">Celâleddîn Hârezmşâh</div>
+    <div class="person-tag">ö. 1231 · Moğollara Karşı Son Direniş, Yassıçimen'in Mağlubu</div>
+    <div class="person-bio">Babası Sultan Alâeddîn Muhammed'in ölümünden sonra Moğollara karşı direnişi devralmış, kahramanca savaşmasına rağmen diplomatik hatalar yapmıştır: 1230'da <b>Ahlat</b>'ı kuşatıp tahrip etmesi, Türkiye Selçukluları ve Eyyubîlerin ona karşı birleşmesine yol açmıştır.</div>
+  </div>
+</div>
+
+  
+<!--item 2 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">4</div>
+    <div class="block-title">Son Direniş: Celâleddîn Hârezmşâh</div>
+  </div>
+  
+  <ul>
+    <li>Moğollara karşı birleşmek yerine <b>1230</b>'da Ahlat'ı kuşatıp tahrip etmesi, Türkiye Selçuklu Sultanı I. Alâeddin Keykubad ve Eyyubîlerin ona karşı birleşmesine sebep olmuştur.</li><li><b>1230 Ağustos</b>'unda Erzincan Yassıçimen Ovası'nda yapılan savaşta Hârezmşâh ordusu ağır bir bozguna uğramış; zayıflayan Celâleddîn'in ölümüyle (<b>1231</b>) devlet tarih sahnesinden silinmiştir.</li>
+  </ul>
+</div>
+
+  
+<!--item 3 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">5</div>
+    <div class="block-title">Zaman Çizelgesi: Hârezmşâhların Serüveni</div>
+  </div>
+  
+  <ul>
+    <li><b>1097:</b> Kutbeddîn Muhammed'in Hârezmşâh tayin edilmesi (kuruluş).</li><li><b>1141:</b> Katvan Savaşı; Atsız'ın Merv ile Nişâbûr'u zapt etmesi.</li><li><b>1172:</b> Alâeddîn Tekiş'in Gürgenç'te tahtı ele geçirmesi.</li><li><b>1194:</b> Tekiş'in Irak Selçuklularını ortadan kaldırması.</li><li><b>1218:</b> Otrar Faciası. — <b>1230:</b> Ahlat kuşatması ve Yassıçimen bozgunu.</li>
+  </ul>
+</div>
+
+  
+<!--item 4 table-->
+  
+<div class="ctable-wrap">
+  <div class="ctable-caption">Medeniyet ve Kurumlar: Hârezmşâh İdarî, Askerî ve Adlî Teşkilatı</div>
+  <table class="ctable">
+    <thead><tr><th>Kurum / Makam</th><th>Görev ve Açıklaması</th></tr></thead>
+    <tbody>
+      
+      <tr><td>Büyük Divan</td><td>Vezirin başkanlığında hükümet idaresinin en yüksek organı.</td></tr>
+      
+      <tr><td>Dîvân-ı İnşâ / İstifâ / İşraf / 'Arz</td><td>Sırasıyla idarî, malî, teftiş ve ordu maaş/kayıt divanları.</td></tr>
+      
+      <tr><td>Hassa ve Eyalet Askerleri</td><td>İktâ sahiplerinden müteşekkil düzenli süvari birlikleri.</td></tr>
+      
+      <tr><td>Haşar</td><td>Şehir ve kalelerin savunmasında kullanılan gönüllü kuvvetler.</td></tr>
+      
+      <tr><td>Akza'l-kuzât (Baş Kadı)</td><td>Hükümdar tarafından atanan, şer'î yargı mekanizmasının başındaki âlim.</td></tr>
+      
+      <tr><td>Örfî Mahkemeler</td><td>Asayişi bozanları ve kanunlara itaat etmeyenleri cezalandıran dünyevi mahkemeler.</td></tr>
+      
+    </tbody>
+  </table>
+</div>
+
+  
+
+
+    
+<div class="footer">
+  <div>İslam Tarihi<span class="accent-word"> III</span></div>
+  <div class="fnum">6</div>
+</div>
+
+  </section>
+  
+  
+  
+  <section class="page body-page" data-ch="1" data-cp="3">
+    <div class="pageband"><div>İslam Tarihi<span class="accent-word"> III</span></div><div class="pageband-course">Bölüm 1</div></div>
+
+    
+
+    <!--item 0 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">6</div>
+    <div class="block-title">İlim, Kültür ve Tasavvuf Hayatı</div>
+  </div>
+  
+  <ul>
+    <li>XII. yüzyılda Hârezm'de ilim ve sanat büyük bir gelişme göstermiş; başkent <b>Gürgenç</b> ve Merv, Horasan'ın büyük şehirleriyle boy ölçüşecek seviyeye gelmiştir.</li><li><b>Tasavvuf:</b> Meşhur şeyh <b>Necmeddîn Kübrâ</b> (1145–1221) büyük nüfuz kazanmış; Mecdeddîn Bağdadî, Sadeddîn Hamûyî ve (Mevlânâ'nın babası) <b>Bahâeddîn Veled</b> gibi halefler yetiştirmiştir.</li><li><b>İlim:</b> Kadı Ebu'l-Fazl Kirmânî, "Fahr-ı Hârezm" lakaplı <b>Zemahşerî</b>, şair Reşîd Vatvat, Fahreddîn Râzî ve tarihçi <b>Nesevî</b> bu dönemin armağanlarıdır.</li><li><b>Mimari:</b> Moğol fırtınası yüzünden günümüze yalnızca Aksaray-ding kümbeti ile Gürgenç'teki Fahreddîn Râzî ve Sultan Tekiş kümbetleri kalabilmiştir.</li>
+  </ul>
+</div>
+
+  
+<!--item 1 callout-->
+  
+<div class="callout insight">
+  <div class="callout-icon">
+<svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 1.5 L14.6 9 L22 9 L15.9 13.6 L18.2 21 L12 16.6 L5.8 21 L8.1 13.6 L2 9 L9.4 9 Z"/></svg>
+
+</div>
+  <div>
+    <div class="callout-title">Kritik Çıkarım</div>
+    <div class="callout-text">Hârezmşâhlar, İslam dünyası ile Orta Asya stepleri arasında güçlü bir kültürel, ticari ve askerî <b>kalkan (tampon)</b> vazifesi görmüşlerdir. Ancak Sultan Alâeddin'in diplomatik kibri ve Moğolların gücünü yanlış okuması, ardından Celâleddin'in İslamî ittifaklar kurmak yerine Yassıçimen'de Selçuklu ve Eyyubîlerle savaşması, bu savunma hattının kendi kendini yok etmesine ve Moğol istilasının Ortadoğu'ya engelsizce akmasına neden olmuştur.</div>
+  </div>
+</div>
+
+  
+<!--item 2 summary-->
+  
+<div class="chsummary"><b>Bölüm Özeti</b>Ceyhun kıyısındaki bir vilayette Selçuklu sarayının Taşt-dâr'ı Anûştegin'in soyundan doğan Hârezmşâhlar, Atsız'ın bağımsızlık hamleleri ve Tekiş'in fetihleriyle devasa bir imparatorluğa dönüşmüş; Sencer devrini örnek alan güçlü bir divan-iktâ teşkilatı ve Necmeddîn Kübrâ ile Zemahşerî gibi isimlerin yetiştiği parlak bir ilim hayatı kurmuştur. Ne var ki Otrar Faciası'yla başlayan diplomatik körlük ve Celâleddîn'in Yassıçimen'deki ittifak hatası, İslam dünyasının bu doğu kalkanını 1231'de tarih sahnesinden silmiştir.</div>
+
+  
+
+
+    
+<div class="footer">
+  <div>İslam Tarihi<span class="accent-word"> III</span></div>
+  <div class="fnum">7</div>
+</div>
+
+  </section>
+  
+  
+
+  
+  
+  <section class="page body-page" data-ch="2" data-cp="0" id="ch-2">
+    <div class="pageband"><div>İslam Tarihi<span class="accent-word"> III</span></div><div class="pageband-course">Bölüm 2</div></div>
+
+    
+      <div class="chbanner">
+        <div class="chbanner-kicker">2. Bölüm</div>
+        <div class="chbanner-title">Anadolu'nun İslamlaşması ve Türkler</div>
+        <div class="chbanner-subtitle">Emevî akınlarından Malazgirt'e, beyliklerden dervişlere: bir yurdun kalıcı dönüşümü</div>
+      </div>
+    
+
+    <!--item 0 terms-->
+  
+<div class="terms-grid">
+  
+  <div class="term-box">
+    <div class="term-name">Thema Anatolikon</div>
+    <div class="term-def">Bizans'ın başkente göre doğuda kalan idarî birimi; Grekçe 'doğu' anlamındaki Anatole'den türeyip halk ağzında Natolia → Anadolu formuna evrilmiştir.</div>
+  </div>
+  
+  <div class="term-box">
+    <div class="term-name">Savâif ve Şevâtî</div>
+    <div class="term-def">Emevîler döneminde Bizans'ı yıpratmak için yılda iki kez düzenlenen yaz (savâif) ve kış (şevâtî) seferleri.</div>
+  </div>
+  
+  <div class="term-box">
+    <div class="term-name">Avâsım ve Suğûr</div>
+    <div class="term-def">Abbâsîlerin sınır güvenliği için Tarsus-Maraş hattında kurduğu askerî valilikler (avâsım) ve en ön saftaki uç bölgeler (suğûr).</div>
+  </div>
+  
+  <div class="term-box">
+    <div class="term-name">Hilal (Turan) Taktiği</div>
+    <div class="term-def">Malazgirt'te uygulanan, sahte geri çekilmeyle düşman merkezini kuşatıp imha etmeye dayanan klasik Türk savaş taktiği.</div>
+  </div>
+  
+</div>
+
+  
+<!--item 1 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">1</div>
+    <div class="block-title">İsim Kökeni ve Coğrafi Bağlam</div>
+  </div>
+  
+  <ul>
+    <li><b>Anatolia / Anatole:</b> Grekçe "doğu" anlamındaki Anatole'den türemiştir. Bizans döneminde başkente göre doğuda kalan bölgeye idarî terim olarak <b>Thema Anatolikon</b> denmiş; bu isim halk ağzında Natolia ve nihayet Anadolu formuna evrilmiştir.</li><li><b>Minor Asia:</b> Antik çağda kullanılan, coğrafyanın büyük Asya kıtasının bir parçası olduğunu vurgulayan "Küçük Asya" tanımıdır.</li><li><b>Rûm Merkezli İsimlendirmeler:</b> Klasik İslam literatüründe bölge Doğu Roma egemenliğinde olduğu için "Rûm" kavramıyla anılmıştır: <b>Bilâd-ı Rûm</b>, <b>Diyar-ı Rûm</b> ve <b>Arz-ı Rûm</b>.</li><li><b>Folklorik Etimoloji (Ana-Dolu):</b> "Kırmızı Ebe" efsanesinde askerlere ayran dağıtan ve tası hiç boşalmayan yaşlı kadına "Ana, dolu!" denmesiyle adın türediğine inanılır — Anadolu'nun şefkat, bereket ve misafirperver bir <b>ana</b> figürüyle özdeşleştirilmesidir.</li>
+  </ul>
+</div>
+
+  
+<!--item 2 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">2</div>
+    <div class="block-title">Arap-İslam Fetihleri Dönemi</div>
+  </div>
+  
+  <ul>
+    <li>Müslümanların Anadolu'ya gelişi Selçuklulardan yüzyıllar önce başlamıştır. Emevîler döneminde hızlı İslamlaştırma yerini <b>yıpratma savaşlarına</b> bırakmış; sert iklim ve coğrafyayı aşmak için yılda iki kez <b>Savâif</b> (yaz) ve <b>Şevâtî</b> (kış) seferleri düzenlenmiştir.</li><li>Abbâsîler devrinde sınır güvenliği için Tarsus-Maraş hattında <b>Avâsım</b> (askerî valilikler) kurulmuş, ön saftaki <b>Suğûr</b> (uç bölgeler) tahkim edilerek Bizans vergiye bağlanmıştır.</li><li>Ancak Abbâsîler bölgeyi yalnızca askerî harekât sahası olarak kullanmış, kalıcı bir <b>iskân (yerleşim)</b> politikası gütmedikleri için tam bir İslamlaşma sağlanamamıştır.</li>
+  </ul>
+</div>
+
+  
+
+
+    
+<div class="footer">
+  <div>İslam Tarihi<span class="accent-word"> III</span></div>
+  <div class="fnum">8</div>
+</div>
+
+  </section>
+  
+  
+  
+  <section class="page body-page" data-ch="2" data-cp="1">
+    <div class="pageband"><div>İslam Tarihi<span class="accent-word"> III</span></div><div class="pageband-course">Bölüm 2</div></div>
+
+    
+
+    <!--item 0 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">3</div>
+    <div class="block-title">Zaman Çizelgesi: Anadolu'ya Yönelik İslam ve Türk Akınları</div>
+  </div>
+  
+  <ul>
+    <li><b>634–636:</b> Hz. Ömer dönemi Ecnâdeyn ve Yermük zaferleriyle Suriye/Filistin fethedilmiş, Bizans Toros Dağları'nın gerisine püskürtülerek doğal sınır oluşturulmuştur.</li><li><b>669–670:</b> Emevîler döneminde karadan ve denizden desteklenen ilk büyük İstanbul kuşatması yapılmış, <b>Ebû Eyyûb el-Ensârî</b> surlar önünde şehit düşmüştür.</li><li><b>838:</b> Abbâsî Halifesi Mu'tasım devrinde Türk komutanların önderliğinde Ankara ve en müstahkem kalelerden <b>Ammuriye</b> (Amorion/Emirdağ) fethedilmiştir.</li><li><b>1018:</b> Selçuklu şehzadesi Çağrı Bey'in 3.000 kişilik atlı okçu birliğiyle yaptığı keşif seferi.</li><li><b>1048:</b> <b>Pasinler Savaşı</b> — İbrahim Yınal ve Kutalmış'ın Bizans'a karşı kazandığı ilk büyük meydan savaşı.</li><li><b>1064:</b> Alp Arslan'ın "asla düşmez" denilen <b>Ani Kalesi</b>'ni fethetmesi.</li><li><b>1071:</b> <b>Malazgirt Meydan Muharebesi</b> ve Anadolu kapılarının Türklere kesin olarak açılması.</li>
+  </ul>
+</div>
+
+  
+<!--item 1 person-->
+  
+<div class="person-card">
+  <div class="person-avatar">ÇB</div>
+  <div>
+    <div class="person-name">Çağrı Bey</div>
+    <div class="person-tag">Keşif seferi: 1018 · Anadolu'yu Türklere Rapor Eden Selçuklu Şehzadesi</div>
+    <div class="person-bio">3.000 kişilik atlı okçu birliğiyle Anadolu'ya yaptığı uzun soluklu keşif seferinde, ağır zırhlı Bizans piyadeleri karşısında <b>vur-kaç</b> taktiğinin etkisini görmüş; Tuğrul Bey'e sunduğu rapor Selçuklu'nun Anadolu politikasını belirlemiştir.</div>
+  </div>
+</div>
+
+  
+<!--item 2 callout-->
+  
+<div class="callout focus">
+  <div class="callout-icon">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.5"/><line x1="12" y1="7.5" x2="12" y2="13"/><circle cx="12" cy="16.5" r="0.6" fill="currentColor" stroke="none"/></svg>
+
+</div>
+  <div>
+    <div class="callout-title">Dikkat / Püf Noktası: Çağrı Bey'in Raporu ve Vur-Kaç Taktiği</div>
+    <div class="callout-text">Türklerin Anadolu'ya sistemli yönelişindeki en önemli kırılma, 1018'deki uzun soluklu keşif seferidir. Ağır zırhlı Bizans piyadeleri karşısında mobil atlı okçuların <b>vur-kaç</b> taktikleri Bizans'ı şaşırtıp felç etmiştir. Çağrı Bey'in Tuğrul Bey'e sunduğu rapor Selçuklu'nun devlet politikasını belirlemiştir: <b>"Burada bize karşı koyabilecek bir güç yoktur; bu topraklar hem iklimi hem de otlaklarıyla halkımız için ideal bir vatandır."</b></div>
+  </div>
+</div>
+
+  
+<!--item 3 person-->
+  
+<div class="person-card">
+  <div class="person-avatar">SA</div>
+  <div>
+    <div class="person-name">Sultan Alp Arslan</div>
+    <div class="person-tag">1063–1072 · Malazgirt'in Fatihi, Anadolu'nun Kapılarını Açan Sultan</div>
+    <div class="person-bio">Hârezm bölgesini zapt eden ve 1064'te 'asla düşmez' denilen <b>Ani Kalesi</b>'ni fetheden sultandır. 1071 <b>Malazgirt</b>'te 40.000 kişilik ordusuyla 200.000'i aşan Bizans ordusunu Hilal Taktiği'yle imha etmiş, İmparator Romanos Diogenes'i esir almıştır.</div>
+  </div>
+</div>
+
+  
+<!--item 4 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">4</div>
+    <div class="block-title">Malazgirt Meydan Muharebesi (1071)</div>
+  </div>
+  
+  <ul>
+    <li>Sultan Alp Arslan, Halep kuşatmasındayken İmparator <b>Romanos Diogenes</b>'in devasa bir orduyla Anadolu'ya girdiğini öğrenip hızla geri dönmüştür. 200.000'i aşan Frank, Ermeni, Rum ve paralı askerden oluşan Bizans ordusuna karşı <b>40.000 kişilik</b> Selçuklu ordusu çıkmıştır.</li><li><b>Kritik gelişme:</b> Savaşın kaderini değiştiren temel sebep, Bizans ordusundaki <b>Peçenek ve Uz (Guz)</b> Türklerinin karşılarındakilerin kendi soydaşları olduğunu anlayarak Selçuklu safına geçmesidir.</li><li><b>Taktik ve sonuç:</b> <b>Hilal (Turan) Taktiği</b> ile Bizans merkez kuvvetleri kuşatılıp imha edilmiş, İmparator Diogenes esir alınmıştır. Alp Arslan'ın komutanlarına verdiği emir asırlar sürecek Türkleşmenin fitilini ateşlemiştir: <b>"Fethettiğiniz yerler sizin kılıcınızın hakkıdır."</b></li>
+  </ul>
+</div>
+
+  
+
+
+    
+<div class="footer">
+  <div>İslam Tarihi<span class="accent-word"> III</span></div>
+  <div class="fnum">9</div>
+</div>
+
+  </section>
+  
+  
+  
+  <section class="page body-page" data-ch="2" data-cp="2">
+    <div class="pageband"><div>İslam Tarihi<span class="accent-word"> III</span></div><div class="pageband-course">Bölüm 2</div></div>
+
+    
+
+    <!--item 0 table-->
+  
+<div class="ctable-wrap">
+  <div class="ctable-caption">Birinci Beylikler Dönemi (Malazgirt Sonrası): Kılıç Hakkı Olarak İktâ</div>
+  <table class="ctable">
+    <thead><tr><th>Beylik</th><th>Bölgesi</th><th>Tarihî ve Stratejik Önemi</th></tr></thead>
+    <tbody>
+      
+      <tr><td>Saltuklular</td><td>Erzurum ve çevresi</td><td>Malazgirt sonrası kurulan <b>ilk</b> Türk beyliğidir. Mama Hatun Külliyesi ve Çifte Minareli Medrese eserlerindendir.</td></tr>
+      
+      <tr><td>Dânişmendliler</td><td>Sivas, Tokat, Malatya</td><td>Dönemin <b>en güçlü</b> beyliğidir. Anadolu'nun ilk medresesi olan Yağıbasan Medresesi'ni inşa etmişlerdir.</td></tr>
+      
+      <tr><td>Mengücekliler</td><td>Erzincan, Kemah, Divriği</td><td>Dönemin mimari şaheseri sayılan Divriği Ulu Camii ve Darüşşifası'nı bırakmışlardır.</td></tr>
+      
+      <tr><td>Artuklular</td><td>Diyarbakır, Mardin, Hasankeyf</td><td>Kudüs fatihi Artuk Bey'in soyundan gelenler kurmuştur; taş işçiliğinde zirveye ulaşmışlardır.</td></tr>
+      
+      <tr><td>Dilmaçoğulları</td><td>Bitlis, Erzen</td><td>300 yıl varlığını sürdürmüş, Haçlılar ve Gürcülere karşı Doğu Anadolu'yu savunmuştur.</td></tr>
+      
+    </tbody>
+  </table>
+</div>
+
+  
+<!--item 1 callout-->
+  
+<div class="callout route">
+  <div class="callout-icon">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.5"/><polygon points="15.5 8.5 13.2 13.2 8.5 15.5 10.8 10.8 15.5 8.5" fill="currentColor" stroke="none"/></svg>
+
+</div>
+  <div>
+    <div class="callout-title">İkinci Beylikler Dönemi (Kösedağ Sonrası)</div>
+    <div class="callout-text"><b>1243 Kösedağ</b> yenilgisi sonrası Moğol tahakkümü altındaki Selçuklu otoritesinin çökmesiyle, Bizans sınırındaki <b>"Uç"</b> bölgelerinde yığılan Türkmenlerin bağımsızlığını ilan etmesiyle oluşmuştur: Karamanoğulları, Osmanoğulları, Aydınoğulları ve diğerleri.</div>
+  </div>
+</div>
+
+  
+<!--item 2 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">5</div>
+    <div class="block-title">Türkleşme ve İslamlaşma Süreci: Demografik ve Kültürel Dönüşüm</div>
+  </div>
+  
+  <ul>
+    <li>Anadolu'nun Türkleşmesi askerî bir işgal değil; <b>göç, iskân ve kültürel dönüşüm</b> sürecidir. XI. yüzyılda Anadolu nüfusu yoğun değildi; Sâsânî-Bizans savaşları ve Bizans'ın ağır vergileri yüzünden köyler harap olmuş ("viran", "ören", "höyük") durumdaydı.</li><li><b>Oğuz boyları</b> dalgalar hâlinde aileleri ve hayvanlarıyla gelerek kırsal alanlara yerleşmiş, harap şehirleri yeniden imar etmiş, kervansaraylar kurarak ticareti ve tarımı (pamuk, pirinç) canlandırmışlardır.</li>
+  </ul>
+</div>
+
+  
+<!--item 3 flow-->
+  
+<div class="flowdiag">
+  
+  
+  <div class="fstep">
+    <div class="fstep-title">Muhaceret</div>
+    <div class="fstep-text">Moğol istilasından kaçan Türk-Müslüman kitleler sığınır</div>
+  </div>
+  
+  <div class="farrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="19" y2="12"/><polyline points="13 6 19 12 13 18"/></svg></div>
+  <div class="fstep">
+    <div class="fstep-title">Alp + Gazâ Sentezi</div>
+    <div class="fstep-text">Savaşçı 'alp' ruhu mücahit anlayışıyla birleşir</div>
+  </div>
+  
+  <div class="farrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="19" y2="12"/><polyline points="13 6 19 12 13 18"/></svg></div>
+  <div class="fstep">
+    <div class="fstep-title">Derviş Diplomasisi</div>
+    <div class="fstep-text">Sıcak sosyal-ticari ilişkiler, kiliselerin camiye dönüşü</div>
+  </div>
+  
+  <div class="farrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="19" y2="12"/><polyline points="13 6 19 12 13 18"/></svg></div>
+  <div class="fstep">
+    <div class="fstep-title">Kalıcı İslamlaşma</div>
+    <div class="fstep-text">Adil vergi sistemi Hristiyan ahaliyi entegre eder</div>
+  </div>
+  
+</div>
+<div class="flow-caption">İslamlaşma Dinamiği: Kılıçtan Çok İskân, Ticaret ve Tasavvuf</div>
+
+  
+
+
+    
+<div class="footer">
+  <div>İslam Tarihi<span class="accent-word"> III</span></div>
+  <div class="fnum">10</div>
+</div>
+
+  </section>
+  
+  
+  
+  <section class="page body-page" data-ch="2" data-cp="3">
+    <div class="pageband"><div>İslam Tarihi<span class="accent-word"> III</span></div><div class="pageband-course">Bölüm 2</div></div>
+
+    
+
+    <!--item 0 table-->
+  
+<div class="ctable-wrap">
+  <div class="ctable-caption">Manevi Fatihler: Anadolu'nun Dinî ve Sosyal Mimarları</div>
+  <table class="ctable">
+    <thead><tr><th>Zümre</th><th>Akademik / Kavramsal Açıklama</th></tr></thead>
+    <tbody>
+      
+      <tr><td>Gaziyân-ı Rûm (Alperenler)</td><td>Eski Türklerdeki "alp"lık (savaşçılık) ruhunu İslam'ın "mücahitlik" anlayışıyla sentezleyen, dervişlikle askerliği harmanlayan zümre.</td></tr>
+      
+      <tr><td>Abdâlân-ı Rûm (Abdallar)</td><td>Kendilerini Allah yoluna adayan, dünyevi ilgilerden uzaklaşarak manevi fethi gerçekleştiren derviş topluluğu (Geyikli Baba, Abdal Musa).</td></tr>
+      
+      <tr><td>Ahiyân-ı Rûm (Ahiler)</td><td>Ticari ve ekonomik hayatı ahlaki-dinî bir zemine oturtarak toplumsal dayanışmayı ve huzuru sağlayan esnaf teşkilatı.</td></tr>
+      
+      <tr><td>Tasavvuf Erbabı</td><td>Hacı Bektaş-ı Velî, Mevlânâ ve Yunus Emre gibi halkı motive eden, hoşgörü aşılayan ve sivil toplumu rehabilite eden manevi rehberler.</td></tr>
+      
+    </tbody>
+  </table>
+</div>
+
+  
+<!--item 1 callout-->
+  
+<div class="callout insight">
+  <div class="callout-icon">
+<svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 1.5 L14.6 9 L22 9 L15.9 13.6 L18.2 21 L12 16.6 L5.8 21 L8.1 13.6 L2 9 L9.4 9 Z"/></svg>
+
+</div>
+  <div>
+    <div class="callout-title">Kritik Çıkarım</div>
+    <div class="callout-text">Anadolu'nun Türkleşmesi ve İslamlaşması birbirini tamamlayan <b>paralel süreçlerdir</b>. Sadece kılıçla yapılan fetihlerle değil; Oğuz boylarının sistematik iskânı, Ahilik teşkilatının ekonomik adaleti sağlaması, dervişlerin tekke/zaviyeler üzerinden inşa ettiği sosyal rehabilitasyon ve Bizans'ın ağır vergilerinden bunalan yerli halkın hoşgörülü Selçuklu sistemine gösterdiği uyum sayesinde kalıcı bir medeniyet inşası gerçekleşmiştir.</div>
+  </div>
+</div>
+
+  
+<!--item 2 summary-->
+  
+<div class="chsummary"><b>Bölüm Özeti</b>Anadolu, Grekçe "doğu" anlamındaki Anatole'den adını alan bir Bizans temasından, Emevî-Abbâsî akınlarıyla tanışıp Çağrı Bey'in 1018 raporu ve 1071 Malazgirt zaferiyle Türklere açılmıştır. Malazgirt sonrası kılıç hakkı olarak dağıtılan iktâlarla kurulan Birinci Beylikler, 1243 Kösedağ sonrasında uçlarda doğan İkinci Beylikler dönemine evrilmiş; Oğuz göçleri, Ahilik teşkilatı ve Gaziyân/Abdâlân/Ahiyân zümrelerinin manevi fethi sayesinde Anadolu askerî bir işgalle değil, organik bir kültürel dönüşümle kalıcı Türk-İslam yurdu hâline gelmiştir.</div>
+
+  
+
+
+    
+<div class="footer">
+  <div>İslam Tarihi<span class="accent-word"> III</span></div>
+  <div class="fnum">11</div>
+</div>
+
+  </section>
+  
+  
+
+  
+  
+  <section class="page body-page" data-ch="3" data-cp="0" id="ch-3">
+    <div class="pageband"><div>İslam Tarihi<span class="accent-word"> III</span></div><div class="pageband-course">Bölüm 3</div></div>
+
+    
+      <div class="chbanner">
+        <div class="chbanner-kicker">3. Bölüm</div>
+        <div class="chbanner-title">Bilâdü'ş-Şâm'da Türkler: Memlükler</div>
+        <div class="chbanner-subtitle">Zengîlerden Eyyûbîlere, kölelikten sultanlığa: Haçlı ve Moğollara karşı üç asırlık kalkan</div>
+      </div>
+    
+
+    <!--item 0 terms-->
+  
+<div class="terms-grid">
+  
+  <div class="term-box">
+    <div class="term-name">Memlük</div>
+    <div class="term-def">Köle pazarlarından satın alınıp askerî eğitimle yetiştirilen Türk atlı birlikleri; 'köle-asker / kölemen' anlamındadır.</div>
+  </div>
+  
+  <div class="term-box">
+    <div class="term-name">İktâ</div>
+    <div class="term-def">Devlet topraklarının gelirlerinin asker ve memurlara maaş karşılığı tahsis edilmesi sistemi; Selçuklu ve Zengîlerden devralınmıştır.</div>
+  </div>
+  
+  <div class="term-box">
+    <div class="term-name">Bahrî Memlükler</div>
+    <div class="term-def">1250–1382 arası I. dönem; Nil Nehri (Bahr) üzerindeki Ravza Adası'na yerleştirilen ağırlıklı olarak Türk memlükleri.</div>
+  </div>
+  
+  <div class="term-box">
+    <div class="term-name">Burcî Memlükler</div>
+    <div class="term-def">1382–1517 arası II. dönem; Sultan Kalavun'un Kahire kalesinin burçlarına yerleştirdiği ağırlıklı olarak Çerkez memlükleri.</div>
+  </div>
+  
+</div>
+
+  
+<!--item 1 person_row-->
+  
+<div class="person-row">
+  
+  <div class="person-card">
+    <div class="person-avatar">İZ</div>
+    <div>
+      <div class="person-name">İmâdüddin Zengî</div>
+      <div class="person-tag">Zengîler: 1127–1233 · Haçlılara Karşı İlk Büyük Zaferin Sahibi</div>
+      <div class="person-bio">Irak Selçuklu Sultanı Mahmud tarafından 1127'de Musul valiliğine atanarak devletini kurmuş; Haçlılara karşı mücadeleyi temel amaç edinmiş ve <b>1144</b>'te Urfa'yı alarak buradaki Haçlı idaresine son vermesiyle İslam dünyasının kahramanı olmuştur.</div>
+    </div>
+  </div>
+  
+  <div class="person-card">
+    <div class="person-avatar">SE</div>
+    <div>
+      <div class="person-name">Selâhaddin Eyyûbî</div>
+      <div class="person-tag">Eyyûbîler: 1171–1462 · Kudüs'ün Fatihi, Fâtımî Hilafetinin Sonu</div>
+      <div class="person-bio">Amcası Şîrkûh ile birlikte Mısır'daki Şiî-İsmâilî <b>Fâtımî</b> hilafetine son vererek bölgeyi Sünni-Zengî nüfuzuna sokmuş (1171); Nureddin Zengî'nin ölümünden (1174) sonra bağımsızlığını ilan etmiş ve <b>1187 Hıttin</b> zaferiyle Kudüs'ü 88 yıllık işgalden kurtarmıştır.</div>
+    </div>
+  </div>
+  
+</div>
+
+  
+<!--item 2 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">1</div>
+    <div class="block-title">Coğrafi ve Tarihsel Bağlam: Zengîler ve Eyyûbîler Mirası</div>
+  </div>
+  
+  <ul>
+    <li>Orta Doğu (Mısır, Suriye ve Cezîre) coğrafyasında Haçlılar ve Moğollara karşı İslam dünyasını savunan Türk-İslam devletleri, birbirinin içinden doğan <b>kesintisiz bir tarihsel silsile</b> oluşturmuştur: Zengîler temeli atmış, Eyyûbîler devralıp genişletmiş, nihayet ordudaki köle-askerler yönetimi tamamen ele geçirmiştir.</li><li><b>Zengîler (1127–1233):</b> Kurucusu İmâdüddin Zengî'nin oğlu <b>Nureddin Mahmud Zengî</b>, Mısır, Suriye ve Cezîre'yi birleştirerek Haçlılara karşı çok daha kuvvetli bir birlik oluşturmuştur.</li><li><b>Eyyûbîler (1171–1462):</b> Aile kökeni Arap-Kürt-Türk karışımı olsa da, <b>yönetim şekli ve komuta kadrosu bakımından tam bir Türk devleti</b> niteliğindedir.</li>
+  </ul>
+</div>
+
+  
+<!--item 3 callout-->
+  
+<div class="callout focus">
+  <div class="callout-icon">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.5"/><line x1="12" y1="7.5" x2="12" y2="13"/><circle cx="12" cy="16.5" r="0.6" fill="currentColor" stroke="none"/></svg>
+
+</div>
+  <div>
+    <div class="callout-title">Dikkat / Püf Noktası: Hıttin Savaşı (1187)</div>
+    <div class="callout-text">Eyyûbîler tarihinin en önemli kırılma noktası, Selâhaddin Eyyûbî'nin Haçlı ordusunu büyük bir bozguna uğrattığı <b>Hıttin Savaşı</b>'dır. I. Haçlı Seferi (1099) ile kaybedilen <b>Kudüs</b>, 88 yıllık işgalin ardından tekrar Müslümanların kontrolüne geçmiş; bu zafer Batı'da şok etkisi yaratarak İngiliz Kralı <b>Aslan Yürekli Richard</b> komutasındaki III. Haçlı Seferi'nin başlamasına neden olmuştur.</div>
+  </div>
+</div>
+
+  
+
+
+    
+<div class="footer">
+  <div>İslam Tarihi<span class="accent-word"> III</span></div>
+  <div class="fnum">12</div>
+</div>
+
+  </section>
+  
+  
+  
+  <section class="page body-page" data-ch="3" data-cp="1">
+    <div class="pageband"><div>İslam Tarihi<span class="accent-word"> III</span></div><div class="pageband-course">Bölüm 3</div></div>
+
+    
+
+    <!--item 0 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">2</div>
+    <div class="block-title">Memlüklerin Doğuşu: Kölelikten Efendiliğe Geçiş</div>
+  </div>
+  
+  <ul>
+    <li>Eyyûbîler, büyük bir ordu kurabilmek adına Selçuklu ve Zengîlerden devraldıkları <b>İktâ</b> sistemini yaygınlaştırdılar; bu ordunun belkemiğini köle pazarlarından satın alınan Türk atlı birlikleri, yani <b>Memlükler</b> oluşturuyordu.</li><li>Mısır Eyyûbî Sultanı <b>el-Melikü's-Sâlih</b> (1240–1249) döneminde Türk memlüklerinin ordudaki etkinliği ve sayısı zirveye çıkmıştır.</li>
+  </ul>
+</div>
+
+  
+<!--item 1 flow-->
+  
+<div class="flowdiag">
+  
+  
+  <div class="fstep">
+    <div class="fstep-title">Tasfiye Girişimi</div>
+    <div class="fstep-text">Turan Şah memlükleri saf dışı bırakmak ister</div>
+  </div>
+  
+  <div class="farrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="19" y2="12"/><polyline points="13 6 19 12 13 18"/></svg></div>
+  <div class="fstep">
+    <div class="fstep-title">İsyan (1250)</div>
+    <div class="fstep-text">Baybars öncülüğünde Turan Şah öldürülür</div>
+  </div>
+  
+  <div class="farrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="19" y2="12"/><polyline points="13 6 19 12 13 18"/></svg></div>
+  <div class="fstep">
+    <div class="fstep-title">Şecerüddürr</div>
+    <div class="fstep-text">Tahta bir kadın sultan çıkarılır</div>
+  </div>
+  
+  <div class="farrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="19" y2="12"/><polyline points="13 6 19 12 13 18"/></svg></div>
+  <div class="fstep">
+    <div class="fstep-title">Aybek ve Yeni Çağ</div>
+    <div class="fstep-text">Şecerüddürr saltanattan feragat eder, Memlükler Çağı başlar</div>
+  </div>
+  
+</div>
+<div class="flow-caption">İktidar Değişimi (1250): Eyyûbî Yönetiminin Sonu</div>
+
+  
+<!--item 2 table-->
+  
+<div class="ctable-wrap">
+  <div class="ctable-caption">Memlük Devletinin İki Dönemi</div>
+  <table class="ctable">
+    <thead><tr><th>Dönem</th><th>İsim ve Etimolojik Kökeni</th><th>Etnik Yapı</th></tr></thead>
+    <tbody>
+      
+      <tr><td>I. Dönem (1250–1382)</td><td><b>Bahrî Memlükler:</b> Nil Nehri (Bahr) üzerindeki Ravza Adası'na yerleştirilmelerinden dolayı bu ismi almışlardır.</td><td>Türk memlükleri</td></tr>
+      
+      <tr><td>II. Dönem (1382–1517)</td><td><b>Burcî Memlükler:</b> Sultan Kalavun'un özel birliklerini Kahire kalesinin burçlarına yerleştirmesinden dolayı bu ismi almışlardır.</td><td>Çerkez memlükleri</td></tr>
+      
+    </tbody>
+  </table>
+</div>
+
+  
+<!--item 3 callout-->
+  
+<div class="callout caution">
+  <div class="callout-icon">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.5"/><line x1="12" y1="11" x2="12" y2="16.5"/><circle cx="12" cy="7.5" r="0.6" fill="currentColor" stroke="none"/></svg>
+
+</div>
+  <div>
+    <div class="callout-title">Dikkat / Püf Noktası: Veraset Değil, Liyakat</div>
+    <div class="callout-text">Memlük devlet yapısında geleneksel Türk veraset sistemi (babadan oğula geçiş) çoğunlukla <b>uygulanmamış</b>; orduda yetişen ve gücü elinde bulunduran <b>"en güçlü emîrler"</b> arasından çıkan kişiler sultan olmuştur.</div>
+  </div>
+</div>
+
+  
+<!--item 4 person-->
+  
+<div class="person-card">
+  <div class="person-avatar">BE</div>
+  <div>
+    <div class="person-name">Baybars el-Bundukdârî</div>
+    <div class="person-tag">Memlük Sultanı: 1260–1277 · Hilafeti İhya Eden Memlük Sultanı</div>
+    <div class="person-bio">Turan Şah'ın memlükleri tasfiye girişimine karşı isyanın öncüsü olmuş; sultanlığı döneminde, Moğolların 1258'de Bağdat'ı yıkmasıyla ortadan kalkan <b>Abbâsî hilafetini Mısır'da yeniden tesis ederek</b> İslam dünyasının manevi liderliğini kurtarmıştır.</div>
+  </div>
+</div>
+
+  
+<!--item 5 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">3</div>
+    <div class="block-title">İslam Dünyasının Kaderini Değiştiren Üç Başarı</div>
+  </div>
+  
+  <ul>
+    <li><b>Moğol İlerleyişinin Durdurulması (1260):</b> Komutan <b>Kutuz</b> idaresindeki Memlük ordusu, <b>Aynicâlût Savaşı</b>'nda Moğollara tarihî bir mağlubiyet yaşatarak onların Orta Doğu'daki yenilmezlik efsanesini yıkmış ve ilerleyişlerini kesin olarak durdurmuştur.</li><li><b>Hilafetin İhyası:</b> 1258'de Moğolların Bağdat'ı yıkarak Abbâsî hilafetini ortadan kaldırması üzerine Sultan <b>Baybars</b>, hilafeti Mısır'da (sembolik ve dinî bir mahiyette de olsa) yeniden tesis ederek İslam dünyasının manevi liderliğini kurtarmıştır.</li><li><b>Haçlı Varlığının Kesin Sonu (1291):</b> Sultan <b>el-Melikü'l-Eşref Halîl</b>, Akkâ kalesini ele geçirerek bölgedeki iki asırlık Haçlı işgaline tamamen son vermiştir.</li>
+  </ul>
+</div>
+
+  
+
+
+    
+<div class="footer">
+  <div>İslam Tarihi<span class="accent-word"> III</span></div>
+  <div class="fnum">13</div>
+</div>
+
+  </section>
+  
+  
+  
+  <section class="page body-page" data-ch="3" data-cp="2">
+    <div class="pageband"><div>İslam Tarihi<span class="accent-word"> III</span></div><div class="pageband-course">Bölüm 3</div></div>
+
+    
+
+    <!--item 0 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">4</div>
+    <div class="block-title">Zaman Çizelgesi: Zengîlerden Memlüklere Kritik Olaylar</div>
+  </div>
+  
+  <ul>
+    <li><b>1144:</b> İmâdüddin Zengî'nin Urfa'yı Haçlılardan geri alması.</li><li><b>1171:</b> Şîrkûh ve Selâhaddin Eyyûbî'nin Mısır'daki Fâtımî hilafetine son vermesi.</li><li><b>1187:</b> Hıttin Savaşı ve Kudüs'ün Selâhaddin Eyyûbî tarafından fethedilmesi.</li><li><b>1250:</b> İzzeddin Aybek'in tahta geçmesiyle Memlükler döneminin başlaması.</li><li><b>1260:</b> Aynicâlût Savaşı ile Moğolların ilerleyişinin durdurulması.</li><li><b>1291:</b> Akkâ'nın fethi ve Orta Doğu'daki Haçlı varlığının sona ermesi.</li><li><b>1516–1517:</b> Mercidâbık ve Ridâniye savaşlarında Yavuz Sultan Selim'in Memlükleri mağlup ederek Mısır, Suriye ve Kutsal Toprakları Osmanlı idaresine katması ve devletin yıkılışı.</li>
+  </ul>
+</div>
+
+  
+<!--item 1 callout-->
+  
+<div class="callout insight">
+  <div class="callout-icon">
+<svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 1.5 L14.6 9 L22 9 L15.9 13.6 L18.2 21 L12 16.6 L5.8 21 L8.1 13.6 L2 9 L9.4 9 Z"/></svg>
+
+</div>
+  <div>
+    <div class="callout-title">Kritik Çıkarım</div>
+    <div class="callout-text">Zengîler ve Eyyûbîler devrinde kurumsallaşan <b>iktâ ve memlük sistemi</b>, Mısır coğrafyasında öylesine güçlü bir askerî sınıf yaratmıştır ki bu sınıf en sonunda kendi efendilerini devirerek devleti ele geçirmiştir. Kurdukları <b>"güçlünün tahta geçtiği"</b> liyakat ve bilek gücüne dayalı sistem sayesinde Memlükler; hem Moğolları hem Haçlıları Orta Doğu'dan söküp atarak üç asır boyunca Sünnî İslam medeniyetinin yegâne koruyucu kalkanı olmuşlardır.</div>
+  </div>
+</div>
+
+  
+<!--item 2 summary-->
+  
+<div class="chsummary"><b>Bölüm Özeti</b>1127'de Musul'da kurulan Zengîler Urfa'yı geri alarak Haçlı karşıtı mücadelenin temelini atmış, Selâhaddin Eyyûbî Fâtımî hilafetine son verip 1187 Hıttin'de Kudüs'ü kurtarmıştır. Eyyûbîlerin yaygınlaştırdığı iktâ sistemiyle güçlenen köle-asker sınıfı 1250'de yönetimi ele geçirmiş; Bahrî ve Burcî dönemleri boyunca 1260 Aynicâlût'ta Moğolları durduran, hilafeti Mısır'da ihya eden ve 1291'de Akkâ ile Haçlı varlığını bitiren Memlükler, 1517 Ridâniye'ye kadar İslam dünyasının yegâne koruyucu gücü olmuştur.</div>
+
+  
+
+
+    
+<div class="footer">
+  <div>İslam Tarihi<span class="accent-word"> III</span></div>
+  <div class="fnum">14</div>
+</div>
+
+  </section>
+  
+  
+
+  
+  
+  <section class="page body-page" data-ch="4" data-cp="0" id="ch-4">
+    <div class="pageband"><div>İslam Tarihi<span class="accent-word"> III</span></div><div class="pageband-course">Bölüm 4</div></div>
+
+    
+      <div class="chbanner">
+        <div class="chbanner-kicker">4. Bölüm</div>
+        <div class="chbanner-title">Hindistan'da Türkler</div>
+        <div class="chbanner-subtitle">Delhi Sultanlığı ve Bâbürlüler: Moğol fırtınasından korunan bir medeniyet vahası</div>
+      </div>
+    
+
+    <!--item 0 terms-->
+  
+<div class="terms-grid">
+  
+  <div class="term-box">
+    <div class="term-name">Hint Alt Kıtası</div>
+    <div class="term-def">Asya'nın güneyinde yer alan, Moğol istilasından korunmayı başaran ve İslam dünyasının en güvenli sığınaklarından biri hâline gelen bereketli coğrafya.</div>
+  </div>
+  
+  <div class="term-box">
+    <div class="term-name">Delhi Sultanlığı</div>
+    <div class="term-def">Kutbeddîn Aybeg'in 1206'da kurduğu, üç asırdan uzun süre Türk komutan ve hânedanların elinde kalan (1206–1526) devlet.</div>
+  </div>
+  
+  <div class="term-box">
+    <div class="term-name">Panipat Savaşı (1526)</div>
+    <div class="term-def">Bâbür Şah'ın ateşli silahlar ve taktik üstünlüğüyle Delhi Sultanlığı'na son verip Bâbürlü İmparatorluğu'nu başlattığı savaş.</div>
+  </div>
+  
+  <div class="term-box">
+    <div class="term-name">Bâbürnâme</div>
+    <div class="term-def">Bâbür Şah'ın Türkçe kaleme aldığı otobiyografik eser; dönemin Hindistan coğrafyasını, siyasi ve sosyal yapısını anlatan en önemli kaynaklardandır.</div>
+  </div>
+  
+</div>
+
+  
+<!--item 1 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">1</div>
+    <div class="block-title">Coğrafi Bağlam ve Moğol İstilasının Ters Etkisi</div>
+  </div>
+  
+  <ul>
+    <li><b>Hint Alt Kıtası:</b> Asya'nın güneyinde yer alan, Moğol istilasından korunmayı başaran ve bu sayede İslam dünyasının en güvenli sığınaklarından biri hâline gelen devasa ve bereketli coğrafya.</li><li><b>Delhi:</b> Türk komutanların kurduğu sultanlığa başkentlik yapan, asırlar boyunca İslam dünyasının en önemli ilim, kültür ve siyaset merkezlerinden birine dönüşen stratejik şehir.</li><li>Hindistan'daki kalıcı Türk tarihi, dışarıdaki bir felaketin — Moğol istilasının — <b>demografik bir avantaja</b> dönüşmesiyle ivme kazanmıştır.</li>
+  </ul>
+</div>
+
+  
+<!--item 2 flow-->
+  
+<div class="flowdiag">
+  
+  
+  <div class="fstep">
+    <div class="fstep-title">Moğol Yıkımı</div>
+    <div class="fstep-text">Orta Asya, Hârezm ve İran yakılıp yıkılır</div>
+  </div>
+  
+  <div class="farrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="19" y2="12"/><polyline points="13 6 19 12 13 18"/></svg></div>
+  <div class="fstep">
+    <div class="fstep-title">Güneye Göç</div>
+    <div class="fstep-text">Komutan, âlim ve sanatkârlar sığınak arar</div>
+  </div>
+  
+  <div class="farrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="19" y2="12"/><polyline points="13 6 19 12 13 18"/></svg></div>
+  <div class="fstep">
+    <div class="fstep-title">Açık Kapı</div>
+    <div class="fstep-text">Hindistan mülteci kitlelere kapılarını açar</div>
+  </div>
+  
+  <div class="farrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="19" y2="12"/><polyline points="13 6 19 12 13 18"/></svg></div>
+  <div class="fstep">
+    <div class="fstep-title">Kültürel Sıçrama</div>
+    <div class="fstep-text">Türk/Müslüman nüfus ve birikim muazzam artar</div>
+  </div>
+  
+</div>
+<div class="flow-caption">Demografik Dönüşüm: Felaketin Avantaja Çevrilmesi</div>
+
+  
+<!--item 3 person-->
+  
+<div class="person-card">
+  <div class="person-avatar">KA</div>
+  <div>
+    <div class="person-name">Kutbeddîn Aybeg</div>
+    <div class="person-tag">Delhi Sultanlığı: 1206–1526 · Hindistan'da Türk Hâkimiyetinin Kurucusu</div>
+    <div class="person-bio">Gûrluların Hindistan'daki fetihlerinin ardından bölgedeki kontrolü sağlayan Türk komutan olarak <b>1206</b>'da Delhi merkezli bağımsız bir devletin temellerini atmıştır. Kurduğu sultanlık üç asırdan uzun süre Türk komutanların ve köklü hânedanların elinde kalmıştır.</div>
+  </div>
+</div>
+
+  
+
+
+    
+<div class="footer">
+  <div>İslam Tarihi<span class="accent-word"> III</span></div>
+  <div class="fnum">15</div>
+</div>
+
+  </section>
+  
+  
+  
+  <section class="page body-page" data-ch="4" data-cp="1">
+    <div class="pageband"><div>İslam Tarihi<span class="accent-word"> III</span></div><div class="pageband-course">Bölüm 4</div></div>
+
+    
+
+    <!--item 0 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">2</div>
+    <div class="block-title">Delhi Sultanlığı (1206–1526): Türk Hâkimiyetinin Kökleşmesi</div>
+  </div>
+  
+  <ul>
+    <li>Gûrluların Hindistan'daki fetihlerinin ardından bölgedeki kontrolü sağlayan Kutbeddîn Aybeg, 1206'da Delhi merkezli bağımsız bir devletin temellerini atmış; bu sultanlık üç asırdan uzun süre <b>Mu'izzîler, Halacîler, Tuğluklular</b> gibi köklü hânedanların elinde kalmıştır.</li><li><b>Moğol Kalkanı:</b> Devletin İslam tarihi açısından en büyük askerî başarısı, Asya'yı kasıp kavuran Moğol tehdidini Hindistan sınırlarında savuşturarak buradaki İslam birikiminin yok edilmesine izin vermemesidir.</li><li><b>İlim ve Kültür Merkezi:</b> Sığınmacı âlimlerin ve mutasavvıfların katkısıyla Delhi, İslam dünyasının en önemli ilim ve kültür merkezlerinden biri hâline getirilmiştir.</li>
+  </ul>
+</div>
+
+  
+<!--item 1 person-->
+  
+<div class="person-card">
+  <div class="person-avatar">BŞ</div>
+  <div>
+    <div class="person-name">Bâbür Şah</div>
+    <div class="person-tag">Bâbürlüler: 1526–1858 · Hindistan'daki İhtişamın Kurucusu, Şair-Sultan</div>
+    <div class="person-bio">Timur hânedanından gelen, çok yönlü bir devlet adamı, usta bir komutan ve parlak bir edebiyatçıdır. <b>1526 Panipat Savaşı</b>'nın ardından Delhi'ye girerek Delhi Sultanlığı'na son vermiş; Türkçe kaleme aldığı otobiyografik eseri <b>Bâbürnâme</b> dönemin en önemli kaynaklarındandır.</div>
+  </div>
+</div>
+
+  
+<!--item 2 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">3</div>
+    <div class="block-title">Bâbürlüler İmparatorluğu (1526–1858): İhtişamın Zirvesi</div>
+  </div>
+  
+  <ul>
+    <li><b>Zirve Dönemleri:</b> İmparatorluk, bilhassa mimariye büyük önem veren <b>Şah Cihan</b> ve sınırları en uç noktalara taşıyan oğlu <b>Evrengzib (Âlemgîr)</b> dönemlerinde altın çağını yaşamış, Hindistan'ın neredeyse tamamında mutlak hâkimiyet kurmuştur.</li><li><b>Çöküş ve İngiliz Sömürgesi:</b> Bu devasa Türk imparatorluğu 18. yüzyıldan itibaren iç isyanlar, zayıf yöneticiler ve Batılı güçlerin sızmasıyla zayıflamış; <b>1858</b>'de Hindistan'ın tamamen İngiliz sömürgesi hâline gelmesiyle tarih sahnesinden trajik biçimde çekilmiştir.</li>
+  </ul>
+</div>
+
+  
+<!--item 3 callout-->
+  
+<div class="callout focus">
+  <div class="callout-icon">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.5"/><line x1="12" y1="7.5" x2="12" y2="13"/><circle cx="12" cy="16.5" r="0.6" fill="currentColor" stroke="none"/></svg>
+
+</div>
+  <div>
+    <div class="callout-title">Dikkat / Püf Noktası: Kılıçtan Ziyade Sığınak Olma Avantajı</div>
+    <div class="callout-text">Hindistan'da kalıcı bir Türk-İslam medeniyetinin tesis edilmesindeki <b>temel sebep</b>, sadece askerî fetihler değil; Hindistan'ın <b>Moğol teröründen azade bir vaha</b> olarak kalmasıdır. Moğol istilasından kaçan nitelikli Türk-İslam aydınının, sanatkârının ve devlet adamının buraya akması, sıfırdan bir medeniyet inşa etmek yerine <b>Orta Asya'daki köklü medeniyetin transfer edilmesini</b> ve Hindistan'ın İslamlaşmasını büyük ölçüde kolaylaştırmıştır.</div>
+  </div>
+</div>
+
+  
+<!--item 4 table-->
+  
+<div class="ctable-wrap">
+  <div class="ctable-caption">Hindistan'daki İki Büyük Türk Devleti</div>
+  <table class="ctable">
+    <thead><tr><th>Devlet (Kurucu / Tarih)</th><th>Temel Başarısı ve Misyonu</th><th>Yıkılış Sebebi</th></tr></thead>
+    <tbody>
+      
+      <tr><td><b>Delhi Sultanlığı</b><br>Kutbeddîn Aybeg (1206)</td><td>Moğol akınlarını durdurarak Hindistan'ı istiladan korumuş, Delhi'yi İslamî ilimlerin beşiği yapmıştır.</td><td>Bâbür Şah'ın ateşli silahlar ve taktik üstünlüğüyle Panipat'ta galip gelmesi.</td></tr>
+      
+      <tr><td><b>Bâbürlü İmparatorluğu</b><br>Bâbür Şah (1526)</td><td>Hindistan'ın tamamına yakınında hâkimiyet kurarak Türk-İslam mimarisini ve sanatını (Tâc Mahal vb.) zirveye taşımıştır.</td><td>İç taht kavgaları ve 19. yüzyılda İngiliz sömürgeciliğinin Hindistan'ı işgal etmesi.</td></tr>
+      
+    </tbody>
+  </table>
+</div>
+
+  
+
+
+    
+<div class="footer">
+  <div>İslam Tarihi<span class="accent-word"> III</span></div>
+  <div class="fnum">16</div>
+</div>
+
+  </section>
+  
+  
+  
+  <section class="page body-page" data-ch="4" data-cp="2">
+    <div class="pageband"><div>İslam Tarihi<span class="accent-word"> III</span></div><div class="pageband-course">Bölüm 4</div></div>
+
+    
+
+    <!--item 0 callout-->
+  
+<div class="callout insight">
+  <div class="callout-icon">
+<svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 1.5 L14.6 9 L22 9 L15.9 13.6 L18.2 21 L12 16.6 L5.8 21 L8.1 13.6 L2 9 L9.4 9 Z"/></svg>
+
+</div>
+  <div>
+    <div class="callout-title">Kritik Çıkarım</div>
+    <div class="callout-text">Hint Alt Kıtası, İslam coğrafyasının geri kalanının Moğol atları altında ezildiği bir dönemde <b>izole kalabilme avantajını</b> çok iyi kullanmıştır. Delhi Sultanlığı'nın kurduğu güçlü siyasi/askerî altyapı ve ardından Bâbürlülerin inşa ettiği emsalsiz ihtişam sayesinde Hindistan, asırlar boyunca Türk-İslam medeniyetinin doğudaki en güçlü, en estetik ve en kalabalık kalesi olma misyonunu başarıyla yerine getirmiştir.</div>
+  </div>
+</div>
+
+  
+<!--item 1 summary-->
+  
+<div class="chsummary"><b>Bölüm Özeti</b>Moğol istilasının Orta Asya'yı yakıp yıkması, nitelikli Türk-İslam nüfusunu Hindistan'a sürerek bu coğrafyayı bir medeniyet sığınağına çevirmiştir. Kutbeddîn Aybeg'in 1206'da kurduğu Delhi Sultanlığı Moğol tehdidini sınırda durdurup Delhi'yi ilim merkezi yapmış; 1526 Panipat Savaşı'yla gelen Bâbür Şah ise Bâbürnâme'siyle kaynak, Şah Cihan ve Evrengzib dönemleriyle ihtişam bırakmıştır. Bu üç asırlık zirve, 1858'de İngiliz sömürgeciliğiyle son bulmuştur.</div>
+
+  
+
+
+    
+<div class="footer">
+  <div>İslam Tarihi<span class="accent-word"> III</span></div>
+  <div class="fnum">17</div>
+</div>
+
+  </section>
+  
+  
+
+  
+  
+  <section class="page body-page" data-ch="5" data-cp="0" id="ch-5">
+    <div class="pageband"><div>İslam Tarihi<span class="accent-word"> III</span></div><div class="pageband-course">Bölüm 5</div></div>
+
+    
+      <div class="chbanner">
+        <div class="chbanner-kicker">5. Bölüm</div>
+        <div class="chbanner-title">Moğollar ve Yeni Dünya Düzeni</div>
+        <div class="chbanner-subtitle">Cengiz Han'dan dört hanlığa: kıyametten Pax Mongolica'ya uzanan çift yönlü miras</div>
+      </div>
+    
+
+    <!--item 0 terms-->
+  
+<div class="terms-grid">
+  
+  <div class="term-box">
+    <div class="term-name">Kurultay</div>
+    <div class="term-def">Moğol ve Türk devlet geleneğinde han seçimi ile büyük kararların alındığı meclis; 1206'da Temuçin burada 'Cengiz' unvanını almıştır.</div>
+  </div>
+  
+  <div class="term-box">
+    <div class="term-name">Cengiz Yasası (Yasa/Yasağ)</div>
+    <div class="term-def">Alınan kuralların yazılı hâle getirilip 'Mavi Defter' (Kıoko Debter) adıyla kanunlaştırıldığı, mutlak disiplini sağlayan hukuk düzeni.</div>
+  </div>
+  
+  <div class="term-box">
+    <div class="term-name">Kösedağ Savaşı (1243)</div>
+    <div class="term-def">Anadolu Selçuklu Devleti'nin Moğollara yenilerek İlhanlılara tâbi hâle geldiği, İkinci Beylikler dönemini başlatan savaş.</div>
+  </div>
+  
+  <div class="term-box">
+    <div class="term-name">Pax Mongolica</div>
+    <div class="term-def">Moğol hâkimiyetinin kurduğu asayiş ağı sayesinde doğu-batı ticaretinin (İpek Yolu) doruğa ulaştığı 'Moğol Barışı' çağı.</div>
+  </div>
+  
+</div>
+
+  
+<!--item 1 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">1</div>
+    <div class="block-title">Coğrafi Bağlam ve Haritalandırma</div>
+  </div>
+  
+  <ul>
+    <li><b>Onon ve Kerulen Nehirleri:</b> Cengiz Han'dan önce dağınık Moğol kabilelerinin yaşadığı ve 1206'da devletin kuruluşunun ilan edildiği anayurt.</li><li><b>Burhan-Haldun Dağı:</b> Cengiz Han'ın mezarının gizlendiğine inanılan, nehirlerin kaynaklarında bulunan kutsal dağ.</li><li><b>Karakurum:</b> Moğol İmparatorluğu'nun Mengü Han dönemine kadar yönetildiği tek ve merkezî başkent.</li><li><b>Bağdat:</b> 1258'de Hülâgû tarafından yerle bir edilerek 500 yıllık Sünnî Abbâsî hilafetinin sona erdirildiği, nehirlerinden günlerce mürekkep aktığı söylenen ilim başkenti.</li>
+  </ul>
+</div>
+
+  
+<!--item 2 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">2</div>
+    <div class="block-title">Kavramsal Kökler: "Moğol" mu, "Tatar" mı?</div>
+  </div>
+  
+  <ul>
+    <li>Başlangıçta hem Moğol hem Türk toplulukları arasında <b>ayrı birer boy adı</b> olan "Tatar" (Orhon yazıtlarında Otuz Tatar, Tokuz Tatar), Çinliler tarafından Moğolca konuşan tüm boyları genelleyici bir terim olan <b>"Ta-ta"</b> olarak kullanılmıştır.</li><li>Çinliler bu toplulukları medeniyet seviyelerine göre <b>Ak Tatarlar, Kara Tatarlar ve Yabanî Tatarlar</b> olarak üçe ayırmıştır; Cengiz Han'ın mensup olduğu <b>Börçeginler</b> kolu "Kara Tatarlar" arasında yer alıyordu.</li>
+  </ul>
+</div>
+
+  
+<!--item 3 flow-->
+  
+<div class="flowdiag">
+  
+  
+  <div class="fstep">
+    <div class="fstep-title">İntikam</div>
+    <div class="fstep-text">Cengiz, babasını zehirleyen Tatar boyunu dağıtıp yok eder</div>
+  </div>
+  
+  <div class="farrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="19" y2="12"/><polyline points="13 6 19 12 13 18"/></svg></div>
+  <div class="fstep">
+    <div class="fstep-title">İsim Yaşar</div>
+    <div class="fstep-text">Çin, Rus ve İslam dünyası tüm Moğollara 'Tatar' demeye devam eder</div>
+  </div>
+  
+  <div class="farrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="19" y2="12"/><polyline points="13 6 19 12 13 18"/></svg></div>
+  <div class="fstep">
+    <div class="fstep-title">Türk Çoğunluk</div>
+    <div class="fstep-text">İmparatorluk nüfusunun çoğunluğu Kıpçak ve Uygur Türkleridir</div>
+  </div>
+  
+  <div class="farrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="19" y2="12"/><polyline points="13 6 19 12 13 18"/></svg></div>
+  <div class="fstep">
+    <div class="fstep-title">Türk Kimliği</div>
+    <div class="fstep-text">Moğollar bu kitlede erir; 'Tatar' bir Türk boyunun adı olur</div>
+  </div>
+  
+</div>
+<div class="flow-caption">"Tatar" Kimliğinin Türkleşmesi: Bir İsmin Sahip Değiştirmesi</div>
+
+  
+
+
+    
+<div class="footer">
+  <div>İslam Tarihi<span class="accent-word"> III</span></div>
+  <div class="fnum">18</div>
+</div>
+
+  </section>
+  
+  
+  
+  <section class="page body-page" data-ch="5" data-cp="1">
+    <div class="pageband"><div>İslam Tarihi<span class="accent-word"> III</span></div><div class="pageband-course">Bölüm 5</div></div>
+
+    
+
+    <!--item 0 table-->
+  
+<div class="ctable-wrap">
+  <div class="ctable-caption">Karşılaştırmalı Tablo: Türkler ve Moğollar</div>
+  <table class="ctable">
+    <thead><tr><th>Özellik</th><th>Türkler</th><th>Moğollar</th></tr></thead>
+    <tbody>
+      
+      <tr><td>Köken ve Dil</td><td>Altay dil ailesi; Türkçe konuşurlar.</td><td>Altay dil ailesi; Moğolca konuşurlar. İki dil birbirini doğrudan anlayamaz.</td></tr>
+      
+      <tr><td>Yayılım Alanı</td><td>Erken dönemde Batı'ya (Mâverâünnehir, Anadolu, Avrupa) yönelmiş, yerli halklarla (Fars, Rum, Slav) kaynaşmışlardır.</td><td>Çekirdek coğrafyalarında kalmış, daha çok Doğu Asya (Çin, Tibet) hattıyla etkileşime girmişlerdir.</td></tr>
+      
+      <tr><td>İnanç Sistemi</td><td>Başlangıçta Gök Tanrı inancı; 8. ve 10. yy'dan itibaren kitleler hâlinde İslamiyet'i benimsemişlerdir.</td><td>Başlangıçta Gök Tanrı (Tengrizm); sonrasında Budizm ve bir kısmı İslamiyet'i benimsemiştir.</td></tr>
+      
+      <tr><td>Ortak Bozkır Kültürü</td><td>Atlı göçebe yaşam, çadır kültürü, onluk askerî sistem ortaktır.</td><td>Aynı unsurlara ek olarak binlerce ortak askerî/siyasi kelime (kağan, kurultay, ulus) mevcuttur.</td></tr>
+      
+    </tbody>
+  </table>
+</div>
+
+  
+<!--item 1 person-->
+  
+<div class="person-card">
+  <div class="person-avatar">CG</div>
+  <div>
+    <div class="person-name">Cengiz Han (Temuçin)</div>
+    <div class="person-tag">Kuruluş: 1206 — ö. 1227 · Bozkır Kabilelerini Cihan İmparatorluğuna Dönüştüren Han</div>
+    <div class="person-bio">Naymanlar, Kereyitler, Merkitler ve Tatarlar gibi dağınık boyları tek tek bertaraf ettikten sonra 1206 baharında Onon Nehri kaynağında topladığı <b>Kurultay</b>'da dokuz parçalı tuğ dikilerek 'Büyük Han' ilan edilmiş; deniz/okyanus ve evrensel anlamına gelen <b>Cengiz</b> unvanını almıştır.</div>
+  </div>
+</div>
+
+  
+<!--item 2 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">3</div>
+    <div class="block-title">Kuruluş ve Cihan Devleti Telakkisi</div>
+  </div>
+  
+  <ul>
+    <li>Moğollar, Temuçin'den önce kendi aralarında sürekli rekabet hâlinde olan <b>Naymanlar, Kereyitler, Merkitler ve Tatarlar</b> gibi dağınık boylardan oluşuyordu.</li><li>Temuçin, rakiplerini tek tek bertaraf ettikten sonra <b>1206</b> baharında Onon Nehri'nin kaynağında büyük bir <b>Kurultay</b> topladı; dokuz parçalı tuğ dikilerek "Büyük Han" ilan edildi ve deniz/okyanus ile evrensel anlamına gelen <b>Cengiz (Çingiz)</b> unvanını aldı.</li>
+  </ul>
+</div>
+
+  
+<!--item 3 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">4</div>
+    <div class="block-title">Cihan İmparatorluğuna Giden Dört Stratejik Teşkilat</div>
+  </div>
+  
+  <ul>
+    <li><b>Onlu Askerî Sistem:</b> Ordu onbaşı, yüzbaşı, binbaşı, tümenbaşı şeklinde teşkilatlandırıldı.</li><li><b>Muhafız Tümeni (Gündüz ve Gece Bekçileri):</b> Kendi güvenliğini sağlamak ve komutanların çocuklarını rehin tutarak itaati garantilemek için 10.000 kişilik seçme bir birlik kuruldu.</li><li><b>Cengiz Yasası (Yasa/Yasağ):</b> Alınan kurallar yazılı hâle getirilip <b>"Mavi Defter" (Kıoko Debter)</b> adıyla kanunlaştırıldı; mutlak disiplin sağlandı.</li><li><b>Uygur Bürokrasisi:</b> Kendi yazıları olmayan Moğollar, medeniyetçe üstün olan <b>Uygur Türklerini</b> itaat altına alarak onların kâtiplerini ve alfabesini devlet bürokrasisinde kullandılar.</li>
+  </ul>
+</div>
+
+  
+
+
+    
+<div class="footer">
+  <div>İslam Tarihi<span class="accent-word"> III</span></div>
+  <div class="fnum">19</div>
+</div>
+
+  </section>
+  
+  
+  
+  <section class="page body-page" data-ch="5" data-cp="2">
+    <div class="pageband"><div>İslam Tarihi<span class="accent-word"> III</span></div><div class="pageband-course">Bölüm 5</div></div>
+
+    
+
+    <!--item 0 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">5</div>
+    <div class="block-title">Zaman Çizelgesi: Bozkırdan Cihana Seferler</div>
+  </div>
+  
+  <ul>
+    <li><b>1209 / 1225–1227 (Tangut Seferleri):</b> İpek Yolu üzerindeki zengin Tangut Krallığı hedef alındı; ihanetleri üzerine ikinci sefer düzenlendi ve Cengiz Han'ın ölüm döşeğindeki emriyle bu halk tamamen yeryüzünden silindi.</li><li><b>1211–1215 (Kuzey Çin / Jin Hanedanlığı):</b> Kendisine kibirle yaklaşan Çin imparatoru mağlup edildi; 1215'te Pekin zapt edilip saray yerle bir edildi.</li><li><b>1218 (Karahitay Devleti):</b> Doğu Türkistan'da Müslümanlara baskı yapan Nayman prensi <b>Küçlüg</b>'ün üzerine Cebe Noyan gönderildi; <b>dinî serbestî taktiğiyle</b> bölge tek kurşun atılmadan fethedildi.</li><li><b>1219–1223 (Hârezmşâhlar ve İslam Dünyasının Yıkımı):</b> Otrar Faciası üzerine devasa bir orduyla Türkistan'a girildi; Otrar, Buhara, Semerkant ve Ürgenç düşürüldü, milyonlarca insan kılıçtan geçirildi.</li><li><b>1222–1224 (Kafkasya ve Kalka Zaferi):</b> Kuzey Kafkasya'daki Kıpçak-Rus ittifakı, Kalka Nehri civarında <b>sahte geri çekilme</b> taktiğiyle darmadağın edilerek Doğu Avrupa Moğollara açıldı.</li>
+  </ul>
+</div>
+
+  
+<!--item 1 callout-->
+  
+<div class="callout route">
+  <div class="callout-icon">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.5"/><polygon points="15.5 8.5 13.2 13.2 8.5 15.5 10.8 10.8 15.5 8.5" fill="currentColor" stroke="none"/></svg>
+
+</div>
+  <div>
+    <div class="callout-title">Cengiz Han'ın Ölümü ve Büyük Sırrı</div>
+    <div class="callout-text">Ağustos 1227'de hastalanan Cengiz Han şu vasiyeti bırakmıştır: <b>"Ölümümü kimsenin öğrenmesine izin vermeyin. Hiçbir zaman ağlamayın ve yas tutmayın, böylece düşmanlarımızın hiçbir şeyden haberi olmaz."</b> Mezarının yeri bugün bile çözülememiş bir sırdır; <b>Moğolların Gizli Tarihi</b> adlı ana kaynakta dahi ölümü geçmez. Efsaneye göre Burhan-Haldun Dağı'na gömülmüş, defin kafilesini gören herkes öldürülmüş, mezarın üzerinden binlerce at geçirilmiş ve bir nehrin yönü değiştirilerek mezar sular altında bırakılmıştır.</div>
+  </div>
+</div>
+
+  
+<!--item 2 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">6</div>
+    <div class="block-title">Cengiz Han Sonrası Bölünme</div>
+  </div>
+  
+  <ul>
+    <li>Ölümünden sonra imparatorluk parçalanmamış, oğulları (<b>Cuci, Çağatay, Ögedey, Tuluy</b>) devleti iki katına çıkarmıştır.</li><li>Ancak <b>Mengü Han</b>'ın 1259'da ölümünden sonra çıkan taht kavgası (Kubilay - Arık Böke) merkezî otoriteyi parçalamış ve imparatorluk devasa <b>dört bağımsız hanlığa</b> bölünmüştür.</li>
+  </ul>
+</div>
+
+  
+<!--item 3 person-->
+  
+<div class="person-card">
+  <div class="person-avatar">HH</div>
+  <div>
+    <div class="person-name">Hülâgû Han</div>
+    <div class="person-tag">İlhanlılar: 1256–1353 · Bağdat'ı Yıkan, Abbâsî Hilafetini Bitiren Han</div>
+    <div class="person-bio">Haşhaşîlerin <b>Alamut</b> kalesini (1256) ve Abbâsî başkenti <b>Bağdat</b>'ı (1258) yıkarak 500 yıllık Sünnî hilafete son vermiştir; kurduğu İlhanlı Devleti, Gazân Han devrinde İslamiyet'i resmen benimseyerek Anadolu'yu da hâkimiyeti altına almıştır.</div>
+  </div>
+</div>
+
+  
+
+
+    
+<div class="footer">
+  <div>İslam Tarihi<span class="accent-word"> III</span></div>
+  <div class="fnum">20</div>
+</div>
+
+  </section>
+  
+  
+  
+  <section class="page body-page" data-ch="5" data-cp="3">
+    <div class="pageband"><div>İslam Tarihi<span class="accent-word"> III</span></div><div class="pageband-course">Bölüm 5</div></div>
+
+    
+
+    <!--item 0 table-->
+  
+<div class="ctable-wrap">
+  <div class="ctable-caption">Cengiz Han Sonrası Dört Büyük Hanlık</div>
+  <table class="ctable">
+    <thead><tr><th>Hanlık (Kuruluş)</th><th>Bölge ve Etkin Lider</th><th>Temel Özellik ve Yıkılış</th></tr></thead>
+    <tbody>
+      
+      <tr><td>Yuan Hanedanlığı (1271)</td><td>Çin ve Moğolistan — <b>Kubilay Han</b></td><td>Çin'i tamamen fethedip merkezi Pekin'e taşıdı; Çin kültürü ve Budizm etkisinde kaldılar. 1368'de isyanla yıkılıp bozkıra döndüler.</td></tr>
+      
+      <tr><td>Altın Orda Hanlığı (1227)</td><td>Rusya ve Deşt-i Kıpçak — <b>Batu Han</b></td><td>Rus knezliklerini vergiye bağladı. Berke ve Özbek Han dönemlerinde İslam'ı kabul edip Kıpçaklaşarak (Türkleşerek) eridiler.</td></tr>
+      
+      <tr><td>Çağatay Hanlığı (1227)</td><td>Türkistan ve Mâverâünnehir — <b>Çağatay soyu</b></td><td>Tarmaşirin Han vasıtasıyla İslam'ı benimsedi. Zamanla Türkmen kitleleri içinde eriyerek yerini Timur İmparatorluğu'na bıraktı.</td></tr>
+      
+      <tr><td>İlhanlılar (1256)</td><td>İran, Irak ve Anadolu — <b>Hülâgû Han</b></td><td>Haşhaşîlerin Alamut kalesini (1256) ve Abbâsî başkenti Bağdat'ı (1258) yıktı. Gazân Han devrinde İslamiyet'i resmen benimsediler.</td></tr>
+      
+    </tbody>
+  </table>
+</div>
+
+  
+<!--item 1 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">7</div>
+    <div class="block-title">Moğolların İslam Dünyasındaki Çift Yönlü Etkisi</div>
+  </div>
+  
+  <ul>
+    <li><b>Fiziksel ve İlmî Çöküş:</b> 1258'de Bağdat'ın düşüp Halife <b>Musta'sım</b>'ın öldürülmesiyle 500 yıllık Abbâsî hilafeti yıkıldı. Milyonlarca insan, asırlık kütüphaneler (<b>Beytülhikme</b>) ve tarımsal altyapılar yok edildi; rasyonel ilimler geriledi, çaresizlik psikolojisi tasavvufî ve mistik hareketlerin yükselmesine zemin hazırladı.</li><li><b>Siyasi Merkezin Kayması:</b> Sünnî otoritenin Irak'ta sarsılması ve Şiî nüfuzunun artması, Ortadoğu'daki liderliği <b>1260 Aynicâlût</b> Savaşı'nda Moğolları durduran Mısır'daki <b>Memlüklere</b> kaydırmıştır.</li>
+  </ul>
+</div>
+
+  
+<!--item 2 callout-->
+  
+<div class="callout focus">
+  <div class="callout-icon">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.5"/><line x1="12" y1="7.5" x2="12" y2="13"/><circle cx="12" cy="16.5" r="0.6" fill="currentColor" stroke="none"/></svg>
+
+</div>
+  <div>
+    <div class="callout-title">Dikkat / Püf Noktası: Pax Mongolica</div>
+    <div class="callout-text">Başlangıçta yıkım getiren Moğollar (özellikle <b>Altın Orda ve İlhanlılar</b>) zamanla İslam'ı kabul ettiler. Kurdukları asayiş ağı sayesinde Asya ile Avrupa arasında doğu-batı ticareti (İpek Yolu) doruğa ulaştı. Yıktıkları yerleri imar ettiler; <b>Tebriz, Sultâniye</b> gibi yeni merkezler ve İslam dünyasının en büyük rasathanelerinden <b>Merâga Rasathanesi</b>'ni kurarak bilime katkı sağladılar.</div>
+  </div>
+</div>
+
+  
+<!--item 3 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">8</div>
+    <div class="block-title">İlhanlı Hâkimiyetinde Anadolu'nun Dönüşümü</div>
+  </div>
+  
+  <ul>
+    <li><b>1243 Kösedağ Savaşı</b>'nda Anadolu Selçuklu Devleti'nin mağlup olmasıyla Anadolu, İlhanlı Devleti'ne tâbi hâle geldi.</li><li><b>Demografik Türk Göçü:</b> Moğol önünden kaçan Uygur, Kıpçak ve yoğun Oğuz-Türkmen boyları Anadolu uçlarına yığıldı; bu, Anadolu'nun hızla ve kalıcı olarak Türkleşmesini ve ilerideki Osmanlı'nın demografik tabanının oluşmasını sağladı.</li><li><b>İran Kültürünün Tesiri:</b> Devlet hizmetine giren mülteci İranlı bürokrat ve aydınlar sayesinde Anadolu'da Farsça ve İran mimarisi (örn. <b>Sivas Gök Medrese</b>) kökleşti.</li><li><b>Tasavvufî Rehabilitasyon:</b> Güvensizlik kaosunda <b>Yunus Emre</b> ve <b>Mevlânâ</b> gibi isimler halka psikolojik direnç verirken; Ahiler, Alperenler ve <b>Bacıyân-ı Rûm</b> sivil savunma ve İslamlaştırma misyonunu üstlendi.</li><li><b>Devlet Teşkilatında İzler:</b> "Kurultay", "ulus", "yasak" gibi Moğolca kelimeler ve idarî gelenekler Anadolu beyliklerine miras kaldı.</li>
+  </ul>
+</div>
+
+  
+
+
+    
+<div class="footer">
+  <div>İslam Tarihi<span class="accent-word"> III</span></div>
+  <div class="fnum">21</div>
+</div>
+
+  </section>
+  
+  
+  
+  <section class="page body-page" data-ch="5" data-cp="4">
+    <div class="pageband"><div>İslam Tarihi<span class="accent-word"> III</span></div><div class="pageband-course">Bölüm 5</div></div>
+
+    
+
+    <!--item 0 callout-->
+  
+<div class="callout insight">
+  <div class="callout-icon">
+<svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 1.5 L14.6 9 L22 9 L15.9 13.6 L18.2 21 L12 16.6 L5.8 21 L8.1 13.6 L2 9 L9.4 9 Z"/></svg>
+
+</div>
+  <div>
+    <div class="callout-title">Kritik Çıkarım</div>
+    <div class="callout-text">Moğol istilası, Orta Çağ İslam dünyası için bir <b>kıyamet senaryosu</b> olarak başlamış; asırlık ilim merkezlerini ve Abbâsî hilafetini yok etmiştir. Ancak bu büyük yıkım, devasa Türkmen göçlerini Anadolu'ya iterek buranın ebedî bir Türk yurdu olmasına sebep olmuş ve Moğolların da zamanla Türkleşip İslamlaşmasıyla <b>"Pax Mongolica"</b> (Moğol Barışı) denilen küresel ticaret ve kültür entegrasyonu çağını başlatmıştır.</div>
+  </div>
+</div>
+
+  
+<!--item 1 summary-->
+  
+<div class="chsummary"><b>Bölüm Özeti</b>Onon ve Kerulen kıyılarındaki dağınık boyları 1206 Kurultayı'nda birleştiren Temuçin, onlu askerî sistem, Muhafız Tümeni, Cengiz Yasası ve Uygur bürokrasisiyle bir cihan imparatorluğu kurmuş; Tangut, Çin, Karahitay, Hârezm ve Kalka seferleriyle dünyanın haritasını değiştirmiştir. Mengü Han'ın ölümüyle Yuan, Altın Orda, Çağatay ve İlhanlı olmak üzere dört hanlığa bölünen imparatorluk; 1258'de Bağdat'ı yıkarak Abbâsî hilafetine son verirken liderliği Memlüklere devretmiş, ancak Türkmen göçlerini Anadolu'ya iterek Osmanlı'nın demografik tabanını hazırlamış ve Pax Mongolica ile küresel bir ticaret çağı açmıştır.</div>
+
+  
+
+
+    
+<div class="footer">
+  <div>İslam Tarihi<span class="accent-word"> III</span></div>
+  <div class="fnum">22</div>
+</div>
+
+  </section>
+  
+  
+
+
+
+
+
+<section class="page body-page" id="glossary">
+  <div class="pageband"><div>İslam Tarihi<span class="accent-word"> III</span></div><div class="pageband-course">Genel Tekrar</div></div>
+  
+    <div class="section-kicker">Genel Tekrar</div>
+    <div class="section-title">Anahtar Kavramlar Sözlüğü</div>
+    <div class="section-lede">Her kavram, kısa tanımı ve geldiği bölümle birlikte listelenmiştir — hızlı tekrar ve eşleştirme için.</div>
+  
+  <div class="gloss-grid">
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Hârezmşâh</div>
+      <div class="gloss-def">Hârezm bölgesine hâkim olan veya burayı idare eden yöneticilere verilen unvan.</div>
+      <div class="gloss-ref">Hârezmşâhlar · 1. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Taşt-dâr</div>
+      <div class="gloss-def">Hükümdar elini yıkarken leğen ve ibrik tutan, saray temizliğinden sorumlu görevli.</div>
+      <div class="gloss-ref">Anûştegin · 1. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Gürgenç</div>
+      <div class="gloss-def">Hârezm bölgesinin ve Hârezmşâhlar Devleti'nin efsanevi başkenti (Gürgânc-Ürgenç).</div>
+      <div class="gloss-ref">Hârezmşâhlar · 1. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Katvan Savaşı (1141)</div>
+      <div class="gloss-def">Sultan Sencer'in zayıflamasından yararlanan Atsız'ın Merv ve Nişâbûr'u zapt ettiği dönemeç.</div>
+      <div class="gloss-ref">Atsız · 1. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Otrar Faciası (1218)</div>
+      <div class="gloss-def">Vali İnalcık'ın Moğol ticaret kervanını yağmalayıp tüccarları öldürmesi; istilanın fitili.</div>
+      <div class="gloss-ref">Alâeddîn Muhammed · 1. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Yassıçimen Savaşı (1230)</div>
+      <div class="gloss-def">Hârezmşâh ordusunun Selçuklu-Eyyubî ittifakına yenilerek yıkıma sürüklendiği savaş.</div>
+      <div class="gloss-ref">Celâleddîn Hârezmşâh · 1. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Haşar</div>
+      <div class="gloss-def">Şehir ve kalelerin savunmasında kullanılan gönüllü kuvvetler.</div>
+      <div class="gloss-ref">Hârezmşâh teşkilatı · 1. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Akza'l-kuzât</div>
+      <div class="gloss-def">Hükümdar tarafından atanan, şer'î yargı mekanizmasının başındaki baş kadı.</div>
+      <div class="gloss-ref">Hârezmşâh teşkilatı · 1. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Thema Anatolikon</div>
+      <div class="gloss-def">Bizans'ın doğu idarî birimi; Anatole → Natolia → Anadolu evriminin kaynağı.</div>
+      <div class="gloss-ref">Anadolu adlandırması · 2. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Bilâd-ı Rûm</div>
+      <div class="gloss-def">Klasik İslam literatüründe Doğu Roma egemenliğindeki Anadolu için kullanılan ad.</div>
+      <div class="gloss-ref">Anadolu adlandırması · 2. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Savâif ve Şevâtî</div>
+      <div class="gloss-def">Emevîlerin Bizans'ı yıpratmak için yılda iki kez düzenlediği yaz ve kış seferleri.</div>
+      <div class="gloss-ref">Emevî dönemi · 2. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Avâsım</div>
+      <div class="gloss-def">Abbâsîlerin sınır güvenliği için Tarsus-Maraş hattında kurduğu askerî valilikler.</div>
+      <div class="gloss-ref">Abbâsî dönemi · 2. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Suğûr</div>
+      <div class="gloss-def">Avâsım'ın önündeki, tahkim edilmiş uç bölgeler / sınır hatları.</div>
+      <div class="gloss-ref">Abbâsî dönemi · 2. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Hilal (Turan) Taktiği</div>
+      <div class="gloss-def">Sahte geri çekilmeyle düşman merkezini kuşatıp imha etmeye dayanan Türk savaş taktiği.</div>
+      <div class="gloss-ref">Malazgirt 1071 · 2. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Gaziyân-ı Rûm</div>
+      <div class="gloss-def">Alp'lık ruhunu mücahitlikle sentezleyen, dervişlikle askerliği harmanlayan zümre.</div>
+      <div class="gloss-ref">Manevi fatihler · 2. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Abdâlân-ı Rûm</div>
+      <div class="gloss-def">Dünyevi ilgilerden uzaklaşıp manevi fethi gerçekleştiren derviş topluluğu.</div>
+      <div class="gloss-ref">Manevi fatihler · 2. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Ahiyân-ı Rûm</div>
+      <div class="gloss-def">Ekonomik hayatı ahlaki-dinî zemine oturtan, dayanışmayı sağlayan esnaf teşkilatı.</div>
+      <div class="gloss-ref">Manevi fatihler · 2. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Kösedağ Savaşı (1243)</div>
+      <div class="gloss-def">Anadolu Selçuklu'nun Moğollara yenilip İlhanlılara tâbi olduğu, beyliklerin doğduğu savaş.</div>
+      <div class="gloss-ref">İlhanlı hâkimiyeti · 2. Bölüm</div>
+    </div>
+    
+  </div>
+  
+<div class="footer">
+  <div>İslam Tarihi<span class="accent-word"> III</span></div>
+  <div class="fnum">23</div>
+</div>
+
+</section>
+
+
+<section class="page body-page">
+  <div class="pageband"><div>İslam Tarihi<span class="accent-word"> III</span></div><div class="pageband-course">Genel Tekrar</div></div>
+  
+    <div class="chcontinue"><div class="tag">Sözlük · Devam</div><div class="cctitle">Anahtar Kavramlar (devamı)</div></div>
+  
+  <div class="gloss-grid">
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Memlük</div>
+      <div class="gloss-def">Köle pazarlarından satın alınıp askerî eğitimle yetiştirilen Türk atlı birlikleri.</div>
+      <div class="gloss-ref">Memlükler · 3. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">İktâ</div>
+      <div class="gloss-def">Devlet topraklarının gelirlerinin asker ve memurlara maaş karşılığı tahsis edilmesi.</div>
+      <div class="gloss-ref">Selçuklu-Zengî mirası · 3. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Bahrî Memlükler</div>
+      <div class="gloss-def">1250–1382 arası, Nil (Bahr) üzerindeki Ravza Adası'na yerleştirilen Türk memlükleri.</div>
+      <div class="gloss-ref">Memlükler I. dönem · 3. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Burcî Memlükler</div>
+      <div class="gloss-def">1382–1517 arası, Kahire kalesinin burçlarına yerleştirilen Çerkez memlükleri.</div>
+      <div class="gloss-ref">Memlükler II. dönem · 3. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Hıttin Savaşı (1187)</div>
+      <div class="gloss-def">Selâhaddin Eyyûbî'nin Haçlıları bozguna uğratıp Kudüs'ü 88 yıl sonra geri aldığı savaş.</div>
+      <div class="gloss-ref">Selâhaddin Eyyûbî · 3. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Aynicâlût Savaşı (1260)</div>
+      <div class="gloss-def">Kutuz idaresindeki Memlüklerin Moğol yenilmezlik efsanesini yıktığı savaş.</div>
+      <div class="gloss-ref">Memlükler · 3. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Şecerüddürr</div>
+      <div class="gloss-def">1250'de memlüklerin tahta çıkardığı, Aybek ile evlenip saltanattan feragat eden kadın sultan.</div>
+      <div class="gloss-ref">İktidar değişimi 1250 · 3. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Akkâ'nın Fethi (1291)</div>
+      <div class="gloss-def">el-Melikü'l-Eşref Halîl'in iki asırlık Haçlı işgaline son verdiği fetih.</div>
+      <div class="gloss-ref">Memlükler · 3. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Delhi Sultanlığı</div>
+      <div class="gloss-def">Kutbeddîn Aybeg'in 1206'da kurduğu, Moğol tehdidini sınırda durduran Türk devleti.</div>
+      <div class="gloss-ref">Hindistan · 4. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Gûrlular</div>
+      <div class="gloss-def">Hindistan'daki fetihleriyle Delhi Sultanlığı'nın önünü açan hânedan.</div>
+      <div class="gloss-ref">Hindistan · 4. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Panipat Savaşı (1526)</div>
+      <div class="gloss-def">Bâbür Şah'ın ateşli silah üstünlüğüyle Delhi Sultanlığı'na son verdiği savaş.</div>
+      <div class="gloss-ref">Bâbür Şah · 4. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Bâbürnâme</div>
+      <div class="gloss-def">Bâbür Şah'ın Türkçe kaleme aldığı, dönemin Hindistan'ını anlatan otobiyografik eser.</div>
+      <div class="gloss-ref">Bâbür Şah · 4. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Evrengzib (Âlemgîr)</div>
+      <div class="gloss-def">Bâbürlü sınırlarını en uç noktalara taşıyan, Şah Cihan'ın oğlu hükümdar.</div>
+      <div class="gloss-ref">Bâbürlüler · 4. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Kurultay</div>
+      <div class="gloss-def">Han seçimi ve büyük kararların alındığı meclis; 1206'da Cengiz unvanı burada verilmiştir.</div>
+      <div class="gloss-ref">Cengiz Han · 5. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Cengiz Yasası (Yasağ)</div>
+      <div class="gloss-def">Yazılı hâle getirilip 'Mavi Defter' adıyla kanunlaşan, mutlak disiplini sağlayan hukuk düzeni.</div>
+      <div class="gloss-ref">Cengiz Han · 5. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Muhafız Tümeni</div>
+      <div class="gloss-def">Komutanların çocuklarını rehin tutarak itaati garantileyen 10.000 kişilik seçme birlik.</div>
+      <div class="gloss-ref">Cengiz Han · 5. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Kalka Savaşı (1223)</div>
+      <div class="gloss-def">Kıpçak-Rus ittifakının sahte geri çekilmeyle dağıtıldığı, Doğu Avrupa'yı açan zafer.</div>
+      <div class="gloss-ref">Moğol seferleri · 5. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Pax Mongolica</div>
+      <div class="gloss-def">Moğol asayiş ağı sayesinde İpek Yolu ticaretinin doruğa ulaştığı 'Moğol Barışı' çağı.</div>
+      <div class="gloss-ref">Moğol mirası · 5. Bölüm</div>
+    </div>
+    
+  </div>
+  
+<div class="footer">
+  <div>İslam Tarihi<span class="accent-word"> III</span></div>
+  <div class="fnum">24</div>
+</div>
+
+</section>
+
+
+
+
+
+
+
+
+
+<section class="page body-page" id="exam">
+  <div class="pageband"><div>İslam Tarihi<span class="accent-word"> III</span></div><div class="pageband-course">Sınav</div></div>
+  
+    <div class="section-kicker">Sınav</div>
+    <div class="section-title">Genel Değerlendirme Testi</div>
+    <div class="section-lede">Hârezmşâhlardan Pax Mongolica'ya, İslam Tarihi III üzerine kapsamlı çoktan seçmeli test</div>
+    <div class="test-chip-row">
+      
+      <div class="test-chip"><b>20</b><span>Soru</span></div>
+      
+      <div class="test-chip"><b>Çoktan</b><span>Seçmeli</span></div>
+      
+      <div class="test-chip"><b>5</b><span>Seçenek (A-E)</span></div>
+      
+    </div>
+    <div class="test-instructions">Aşağıdaki sorularda beş seçenekten yalnızca birini işaretleyiniz. Süre: 30 dakika.</div>
+  
+  <div class="tq-list">
+    
+<div class="tq">
+  <div class="tq-head">
+    <div class="tq-num">1</div>
+    <div class="tq-stem">Hârezmşâhlar Devleti'nin fiilî kuruluşu, 1097'de hangi Selçuklu sultanı zamanında Kutbeddîn Muhammed'in Hârezmşâh tayin edilmesiyle gerçekleşmiştir?</div>
+  </div>
+  <ul class="tq-options">
+    
+    <li><span class="opt-letter">A</span><span>Alp Arslan</span></li>
+    
+    <li><span class="opt-letter">B</span><span>Melikşah</span></li>
+    
+    <li><span class="opt-letter">C</span><span>Berkyaruk</span></li>
+    
+    <li><span class="opt-letter">D</span><span>Sencer</span></li>
+    
+    <li><span class="opt-letter">E</span><span>III. Tuğrul</span></li>
+    
+  </ul>
+</div>
+
+<div class="tq">
+  <div class="tq-head">
+    <div class="tq-num">2</div>
+    <div class="tq-stem">Hânedanın atası Anûştegin'in Selçuklu sarayında yükseldiği, hükümdar elini yıkarken leğen ve ibrik tutan görev hangisidir?</div>
+  </div>
+  <ul class="tq-options">
+    
+    <li><span class="opt-letter">A</span><span>Akza'l-kuzât</span></li>
+    
+    <li><span class="opt-letter">B</span><span>Taşt-dâr</span></li>
+    
+    <li><span class="opt-letter">C</span><span>Haşar</span></li>
+    
+    <li><span class="opt-letter">D</span><span>Dîvân-ı İşraf</span></li>
+    
+    <li><span class="opt-letter">E</span><span>Emîr-i Hâcib</span></li>
+    
+  </ul>
+</div>
+
+<div class="tq">
+  <div class="tq-head">
+    <div class="tq-num">3</div>
+    <div class="tq-stem">Atsız'ın Merv ve Nişâbûr'u zapt etmesine imkân veren, Sultan Sencer'in zayıflamasıyla sonuçlanan 1141 tarihli savaş hangisidir?</div>
+  </div>
+  <ul class="tq-options">
+    
+    <li><span class="opt-letter">A</span><span>Katvan Savaşı</span></li>
+    
+    <li><span class="opt-letter">B</span><span>Pasinler Savaşı</span></li>
+    
+    <li><span class="opt-letter">C</span><span>Yassıçimen Savaşı</span></li>
+    
+    <li><span class="opt-letter">D</span><span>Malazgirt Savaşı</span></li>
+    
+    <li><span class="opt-letter">E</span><span>Kösedağ Savaşı</span></li>
+    
+  </ul>
+</div>
+
+<div class="tq">
+  <div class="tq-head">
+    <div class="tq-num">4</div>
+    <div class="tq-stem">Moğol istilasının fitilini ateşleyen Otrar Faciası'nda (1218) Moğol ticaret kervanını yağmalatan vali kimdir?</div>
+  </div>
+  <ul class="tq-options">
+    
+    <li><span class="opt-letter">A</span><span>Küçlüg</span></li>
+    
+    <li><span class="opt-letter">B</span><span>Cebe Noyan</span></li>
+    
+    <li><span class="opt-letter">C</span><span>Sultan-şâh</span></li>
+    
+    <li><span class="opt-letter">D</span><span>İnalcık</span></li>
+    
+    <li><span class="opt-letter">E</span><span>Bilge Tegin</span></li>
+    
+  </ul>
+</div>
+
+<div class="tq">
+  <div class="tq-head">
+    <div class="tq-num">5</div>
+    <div class="tq-stem">Celâleddîn Hârezmşâh'ın 1230'da Ahlat'ı kuşatıp tahrip etmesinin doğrudan sonucu aşağıdakilerden hangisidir?</div>
+  </div>
+  <ul class="tq-options">
+    
+    <li><span class="opt-letter">A</span><span>Kara-Hıtayların Hârezm'e saldırması</span></li>
+    
+    <li><span class="opt-letter">B</span><span>Türkiye Selçuklu ve Eyyubîlerin ona karşı birleşmesi</span></li>
+    
+    <li><span class="opt-letter">C</span><span>Irak Selçuklularının ortadan kalkması</span></li>
+    
+    <li><span class="opt-letter">D</span><span>Moğollarla barış antlaşması imzalanması</span></li>
+    
+    <li><span class="opt-letter">E</span><span>Bağdat'ta hilafetin yeniden tesisi</span></li>
+    
+  </ul>
+</div>
+
+<div class="tq">
+  <div class="tq-head">
+    <div class="tq-num">6</div>
+    <div class="tq-stem">"Anadolu" adının kökeni olan, Bizans'ın başkente göre doğuda kalan idarî birimine verilen ad nedir?</div>
+  </div>
+  <ul class="tq-options">
+    
+    <li><span class="opt-letter">A</span><span>Minor Asia</span></li>
+    
+    <li><span class="opt-letter">B</span><span>Arz-ı Rûm</span></li>
+    
+    <li><span class="opt-letter">C</span><span>Thema Anatolikon</span></li>
+    
+    <li><span class="opt-letter">D</span><span>Diyar-ı Rûm</span></li>
+    
+    <li><span class="opt-letter">E</span><span>Bilâd-ı Rûm</span></li>
+    
+  </ul>
+</div>
+
+  </div>
+  
+<div class="footer">
+  <div>İslam Tarihi<span class="accent-word"> III</span></div>
+  <div class="fnum">25</div>
+</div>
+
+</section>
+
+
+<section class="page body-page">
+  <div class="pageband"><div>İslam Tarihi<span class="accent-word"> III</span></div><div class="pageband-course">Test · Devam</div></div>
+  
+    <div class="chcontinue"><div class="tag">Test · Devam</div><div class="cctitle">Genel Değerlendirme Testi</div></div>
+  
+  <div class="tq-list">
+    
+<div class="tq">
+  <div class="tq-head">
+    <div class="tq-num">7</div>
+    <div class="tq-stem">Abbâsîlerin sınır güvenliğini sağlamak amacıyla Tarsus ve Maraş hattında kurduğu askerî valiliklere ne ad verilir?</div>
+  </div>
+  <ul class="tq-options">
+    
+    <li><span class="opt-letter">A</span><span>Suğûr</span></li>
+    
+    <li><span class="opt-letter">B</span><span>Savâif</span></li>
+    
+    <li><span class="opt-letter">C</span><span>Şevâtî</span></li>
+    
+    <li><span class="opt-letter">D</span><span>Avâsım</span></li>
+    
+    <li><span class="opt-letter">E</span><span>İktâ</span></li>
+    
+  </ul>
+</div>
+
+<div class="tq">
+  <div class="tq-head">
+    <div class="tq-num">8</div>
+    <div class="tq-stem">Malazgirt Meydan Muharebesi'nin kaderini değiştiren temel gelişme aşağıdakilerden hangisidir?</div>
+  </div>
+  <ul class="tq-options">
+    
+    <li><span class="opt-letter">A</span><span>Bizans ordusundaki Peçenek ve Uz Türklerinin Selçuklu safına geçmesi</span></li>
+    
+    <li><span class="opt-letter">B</span><span>Alp Arslan'ın Halep kuşatmasını sürdürmesi</span></li>
+    
+    <li><span class="opt-letter">C</span><span>Ani Kalesi'nin daha önce fethedilmiş olması</span></li>
+    
+    <li><span class="opt-letter">D</span><span>Haçlıların Bizans'a yardıma gelmemesi</span></li>
+    
+    <li><span class="opt-letter">E</span><span>Bizans ordusunun sayıca az olması</span></li>
+    
+  </ul>
+</div>
+
+<div class="tq">
+  <div class="tq-head">
+    <div class="tq-num">9</div>
+    <div class="tq-stem">Malazgirt sonrası kurulan ilk Türk beyliği ve merkezî bölgesi hangi seçenekte doğru verilmiştir?</div>
+  </div>
+  <ul class="tq-options">
+    
+    <li><span class="opt-letter">A</span><span>Dânişmendliler — Sivas</span></li>
+    
+    <li><span class="opt-letter">B</span><span>Artuklular — Mardin</span></li>
+    
+    <li><span class="opt-letter">C</span><span>Saltuklular — Erzurum</span></li>
+    
+    <li><span class="opt-letter">D</span><span>Mengücekliler — Divriği</span></li>
+    
+    <li><span class="opt-letter">E</span><span>Dilmaçoğulları — Bitlis</span></li>
+    
+  </ul>
+</div>
+
+<div class="tq">
+  <div class="tq-head">
+    <div class="tq-num">10</div>
+    <div class="tq-stem">Anadolu'nun ilk medresesi olan Yağıbasan Medresesi'ni inşa eden, dönemin en güçlü beyliği hangisidir?</div>
+  </div>
+  <ul class="tq-options">
+    
+    <li><span class="opt-letter">A</span><span>Saltuklular</span></li>
+    
+    <li><span class="opt-letter">B</span><span>Dânişmendliler</span></li>
+    
+    <li><span class="opt-letter">C</span><span>Mengücekliler</span></li>
+    
+    <li><span class="opt-letter">D</span><span>Artuklular</span></li>
+    
+    <li><span class="opt-letter">E</span><span>Karamanoğulları</span></li>
+    
+  </ul>
+</div>
+
+<div class="tq">
+  <div class="tq-head">
+    <div class="tq-num">11</div>
+    <div class="tq-stem">Ticari ve ekonomik hayatı ahlaki-dinî bir zemine oturtarak toplumsal dayanışmayı sağlayan esnaf teşkilatı hangi zümredir?</div>
+  </div>
+  <ul class="tq-options">
+    
+    <li><span class="opt-letter">A</span><span>Gaziyân-ı Rûm</span></li>
+    
+    <li><span class="opt-letter">B</span><span>Abdâlân-ı Rûm</span></li>
+    
+    <li><span class="opt-letter">C</span><span>Ahiyân-ı Rûm</span></li>
+    
+    <li><span class="opt-letter">D</span><span>Bacıyân-ı Rûm</span></li>
+    
+    <li><span class="opt-letter">E</span><span>Tasavvuf Erbabı</span></li>
+    
+  </ul>
+</div>
+
+<div class="tq">
+  <div class="tq-head">
+    <div class="tq-num">12</div>
+    <div class="tq-stem">1144'te Urfa'yı Haçlılardan geri alarak İslam dünyasının kahramanı olan devlet adamı kimdir?</div>
+  </div>
+  <ul class="tq-options">
+    
+    <li><span class="opt-letter">A</span><span>Nureddin Mahmud Zengî</span></li>
+    
+    <li><span class="opt-letter">B</span><span>İmâdüddin Zengî</span></li>
+    
+    <li><span class="opt-letter">C</span><span>Selâhaddin Eyyûbî</span></li>
+    
+    <li><span class="opt-letter">D</span><span>Şîrkûh</span></li>
+    
+    <li><span class="opt-letter">E</span><span>Baybars</span></li>
+    
+  </ul>
+</div>
+
+<div class="tq">
+  <div class="tq-head">
+    <div class="tq-num">13</div>
+    <div class="tq-stem">Memlüklerin I. dönemine "Bahrî" denmesinin sebebi nedir?</div>
+  </div>
+  <ul class="tq-options">
+    
+    <li><span class="opt-letter">A</span><span>Kahire kalesinin burçlarına yerleştirilmeleri</span></li>
+    
+    <li><span class="opt-letter">B</span><span>Çerkez kökenli olmaları</span></li>
+    
+    <li><span class="opt-letter">C</span><span>Nil Nehri (Bahr) üzerindeki Ravza Adası'na yerleştirilmeleri</span></li>
+    
+    <li><span class="opt-letter">D</span><span>Deniz seferleriyle ün kazanmaları</span></li>
+    
+    <li><span class="opt-letter">E</span><span>Bahreyn'den getirilmiş olmaları</span></li>
+    
+  </ul>
+</div>
+
+  </div>
+  
+<div class="footer">
+  <div>İslam Tarihi<span class="accent-word"> III</span></div>
+  <div class="fnum">26</div>
+</div>
+
+</section>
+
+
+<section class="page body-page">
+  <div class="pageband"><div>İslam Tarihi<span class="accent-word"> III</span></div><div class="pageband-course">Test · Devam</div></div>
+  
+    <div class="chcontinue"><div class="tag">Test · Devam</div><div class="cctitle">Genel Değerlendirme Testi</div></div>
+  
+  <div class="tq-list">
+    
+<div class="tq">
+  <div class="tq-head">
+    <div class="tq-num">14</div>
+    <div class="tq-stem">1250'de Turan Şah'ın öldürülmesinden sonra tahta çıkarılan ve Memlük emîri İzzeddin Aybek ile evlenerek saltanattan onun lehine feragat eden kişi kimdir?</div>
+  </div>
+  <ul class="tq-options">
+    
+    <li><span class="opt-letter">A</span><span>Terken Hâtûn</span></li>
+    
+    <li><span class="opt-letter">B</span><span>Şecerüddürr</span></li>
+    
+    <li><span class="opt-letter">C</span><span>Mama Hatun</span></li>
+    
+    <li><span class="opt-letter">D</span><span>Bacıyân-ı Rûm</span></li>
+    
+    <li><span class="opt-letter">E</span><span>el-Melikü's-Sâlih</span></li>
+    
+  </ul>
+</div>
+
+<div class="tq">
+  <div class="tq-head">
+    <div class="tq-num">15</div>
+    <div class="tq-stem">Moğolların Orta Doğu'daki yenilmezlik efsanesini yıkan 1260 tarihli savaş ve Memlük komutanı hangi seçenekte doğru eşleştirilmiştir?</div>
+  </div>
+  <ul class="tq-options">
+    
+    <li><span class="opt-letter">A</span><span>Hıttin — Selâhaddin</span></li>
+    
+    <li><span class="opt-letter">B</span><span>Kalka — Cebe Noyan</span></li>
+    
+    <li><span class="opt-letter">C</span><span>Aynicâlût — Kutuz</span></li>
+    
+    <li><span class="opt-letter">D</span><span>Panipat — Bâbür Şah</span></li>
+    
+    <li><span class="opt-letter">E</span><span>Ridâniye — Yavuz Sultan Selim</span></li>
+    
+  </ul>
+</div>
+
+<div class="tq">
+  <div class="tq-head">
+    <div class="tq-num">16</div>
+    <div class="tq-stem">Hindistan'da kalıcı bir Türk-İslam medeniyetinin tesis edilmesindeki temel sebep aşağıdakilerden hangisidir?</div>
+  </div>
+  <ul class="tq-options">
+    
+    <li><span class="opt-letter">A</span><span>Yalnızca askerî fetihlerin başarısı</span></li>
+    
+    <li><span class="opt-letter">B</span><span>Hindistan'ın Moğol teröründen azade bir vaha olarak kalması</span></li>
+    
+    <li><span class="opt-letter">C</span><span>İngilizlerin bölgeden çekilmesi</span></li>
+    
+    <li><span class="opt-letter">D</span><span>Fâtımî hilafetinin desteği</span></li>
+    
+    <li><span class="opt-letter">E</span><span>Delhi'nin deniz ticaret yolları üzerinde bulunması</span></li>
+    
+  </ul>
+</div>
+
+<div class="tq">
+  <div class="tq-head">
+    <div class="tq-num">17</div>
+    <div class="tq-stem">Bâbür Şah'ın Türkçe kaleme aldığı, dönemin Hindistan coğrafyasını ve sosyal yapısını anlatan otobiyografik eseri hangisidir?</div>
+  </div>
+  <ul class="tq-options">
+    
+    <li><span class="opt-letter">A</span><span>Moğolların Gizli Tarihi</span></li>
+    
+    <li><span class="opt-letter">B</span><span>Mavi Defter</span></li>
+    
+    <li><span class="opt-letter">C</span><span>Bâbürnâme</span></li>
+    
+    <li><span class="opt-letter">D</span><span>Tâc Mahal</span></li>
+    
+    <li><span class="opt-letter">E</span><span>Kıoko Debter</span></li>
+    
+  </ul>
+</div>
+
+<div class="tq">
+  <div class="tq-head">
+    <div class="tq-num">18</div>
+    <div class="tq-stem">Cengiz Han'ın, kendi yazıları olmayan Moğolların devlet bürokrasisini kurmak için kâtiplerinden ve alfabesinden yararlandığı Türk topluluğu hangisidir?</div>
+  </div>
+  <ul class="tq-options">
+    
+    <li><span class="opt-letter">A</span><span>Kıpçaklar</span></li>
+    
+    <li><span class="opt-letter">B</span><span>Naymanlar</span></li>
+    
+    <li><span class="opt-letter">C</span><span>Uygurlar</span></li>
+    
+    <li><span class="opt-letter">D</span><span>Kereyitler</span></li>
+    
+    <li><span class="opt-letter">E</span><span>Merkitler</span></li>
+    
+  </ul>
+</div>
+
+<div class="tq">
+  <div class="tq-head">
+    <div class="tq-num">19</div>
+    <div class="tq-stem">Aşağıdaki hanlık-lider eşleştirmelerinden hangisi yanlıştır?</div>
+  </div>
+  <ul class="tq-options">
+    
+    <li><span class="opt-letter">A</span><span>Yuan Hanedanlığı — Kubilay Han</span></li>
+    
+    <li><span class="opt-letter">B</span><span>Altın Orda Hanlığı — Batu Han</span></li>
+    
+    <li><span class="opt-letter">C</span><span>İlhanlılar — Hülâgû Han</span></li>
+    
+    <li><span class="opt-letter">D</span><span>Çağatay Hanlığı — Tarmaşirin Han</span></li>
+    
+    <li><span class="opt-letter">E</span><span>Altın Orda Hanlığı — Gazân Han</span></li>
+    
+  </ul>
+</div>
+
+<div class="tq">
+  <div class="tq-head">
+    <div class="tq-num">20</div>
+    <div class="tq-stem">Moğol istilasının İslam dünyasındaki uzun vadeli etkileriyle ilgili aşağıdakilerden hangisi söylenemez?</div>
+  </div>
+  <ul class="tq-options">
+    
+    <li><span class="opt-letter">A</span><span>Abbâsî hilafetinin yıkılmasıyla siyasi liderlik Memlüklere kaymıştır</span></li>
+    
+    <li><span class="opt-letter">B</span><span>Türkmen göçleri Anadolu'nun kalıcı Türkleşmesini hızlandırmıştır</span></li>
+    
+    <li><span class="opt-letter">C</span><span>Pax Mongolica ile İpek Yolu ticareti doruğa ulaşmıştır</span></li>
+    
+    <li><span class="opt-letter">D</span><span>Rasyonel ilimler gerilemiş, tasavvufî hareketler güçlenmiştir</span></li>
+    
+    <li><span class="opt-letter">E</span><span>Moğollar İslam'ı hiçbir zaman benimsememiş, Budizm'de kalmışlardır</span></li>
+    
+  </ul>
+</div>
+
+  </div>
+  
+<div class="footer">
+  <div>İslam Tarihi<span class="accent-word"> III</span></div>
+  <div class="fnum">27</div>
+</div>
+
+</section>
+
+
+
+
+
+<section class="page body-page" id="answer-key">
+  <div class="pageband"><div>İslam Tarihi<span class="accent-word"> III</span></div><div class="pageband-course">Cevap Anahtarı</div></div>
+  
+    <div class="section-kicker">Çözümler</div>
+    <div class="section-title">Cevap Anahtarı ve Çözümler</div>
+    <div class="section-lede">Her sorunun doğru cevabı ve kısa gerekçesi aşağıda yer almaktadır.</div>
+  
+  <div class="ans-list">
+    
+<div class="ans-item">
+  <div class="ans-num">1</div>
+  <div>
+    <span class="ans-correct">Doğru Cevap: C</span>
+    <div class="ans-explain">Devletin fiilî kuruluşu <b>1097</b>'de, Selçuklu Sultanı <b>Berkyaruk</b> zamanında Anûştegin'in oğlu Kutbeddîn Muhammed'in Hârezmşâh tayin edilmesiyle gerçekleşmiştir.</div>
+  </div>
+</div>
+
+<div class="ans-item">
+  <div class="ans-num">2</div>
+  <div>
+    <span class="ans-correct">Doğru Cevap: B</span>
+    <div class="ans-explain"><b>Taşt-dâr</b>, hükümdar elini yıkarken leğen ve ibrik tutan, saray temizliğinden sorumlu görevlidir; Anûştegin bu makamla Hârezm gelirlerinden yararlanmıştır.</div>
+  </div>
+</div>
+
+<div class="ans-item">
+  <div class="ans-num">3</div>
+  <div>
+    <span class="ans-correct">Doğru Cevap: A</span>
+    <div class="ans-explain"><b>1141 Katvan Savaşı</b>'nda Sencer'in zayıflamasından faydalanan Atsız, Merv ve Nişâbûr'u zapt etmiştir.</div>
+  </div>
+</div>
+
+<div class="ans-item">
+  <div class="ans-num">4</div>
+  <div>
+    <span class="ans-correct">Doğru Cevap: D</span>
+    <div class="ans-explain">Otrar valisi <b>İnalcık</b>, Moğol ticaret kervanını yağmalatıp tüccarları öldürtmüş; bu olay (Otrar Faciası, 1218) istilanın fitilini ateşlemiştir.</div>
+  </div>
+</div>
+
+<div class="ans-item">
+  <div class="ans-num">5</div>
+  <div>
+    <span class="ans-correct">Doğru Cevap: B</span>
+    <div class="ans-explain">Moğollara karşı birleşmek yerine Ahlat'ı tahrip etmesi, <b>I. Alâeddin Keykubad ve Eyyubîlerin</b> ona karşı savaş açmasına ve Yassıçimen bozgununa yol açmıştır.</div>
+  </div>
+</div>
+
+<div class="ans-item">
+  <div class="ans-num">6</div>
+  <div>
+    <span class="ans-correct">Doğru Cevap: C</span>
+    <div class="ans-explain">Grekçe "doğu" anlamındaki Anatole'den türeyen <b>Thema Anatolikon</b>, halk ağzında Natolia ve nihayet Anadolu formuna evrilmiştir.</div>
+  </div>
+</div>
+
+<div class="ans-item">
+  <div class="ans-num">7</div>
+  <div>
+    <span class="ans-correct">Doğru Cevap: D</span>
+    <div class="ans-explain"><b>Avâsım</b> askerî valilikleri, <b>Suğûr</b> ise onların önündeki uç bölgeler/sınır hatlarıdır; Savâif ve Şevâtî ise Emevî yaz-kış seferleridir.</div>
+  </div>
+</div>
+
+<div class="ans-item">
+  <div class="ans-num">8</div>
+  <div>
+    <span class="ans-correct">Doğru Cevap: A</span>
+    <div class="ans-explain">Bizans ordusundaki <b>Peçenek ve Uz (Guz)</b> Türklerinin karşılarındakilerin soydaşları olduğunu anlayıp Selçuklu safına geçmesi savaşın kaderini belirlemiştir.</div>
+  </div>
+</div>
+
+<div class="ans-item">
+  <div class="ans-num">9</div>
+  <div>
+    <span class="ans-correct">Doğru Cevap: C</span>
+    <div class="ans-explain"><b>Saltuklular</b> (Erzurum ve çevresi), Malazgirt sonrası kurulan ilk Türk beyliğidir; Mama Hatun Külliyesi ve Çifte Minareli Medrese eserlerindendir.</div>
+  </div>
+</div>
+
+<div class="ans-item">
+  <div class="ans-num">10</div>
+  <div>
+    <span class="ans-correct">Doğru Cevap: B</span>
+    <div class="ans-explain">Anadolu'nun ilk medresesi olan <b>Yağıbasan Medresesi</b>'ni, dönemin en güçlü beyliği olan Dânişmendliler inşa etmiştir.</div>
+  </div>
+</div>
+
+<div class="ans-item">
+  <div class="ans-num">11</div>
+  <div>
+    <span class="ans-correct">Doğru Cevap: C</span>
+    <div class="ans-explain"><b>Ahiyân-ı Rûm (Ahiler)</b>, ekonomik hayatı ahlaki-dinî bir zemine oturtan esnaf teşkilatıdır; Gaziyân savaşçı, Abdâlân ise derviş zümresidir.</div>
+  </div>
+</div>
+
+<div class="ans-item">
+  <div class="ans-num">12</div>
+  <div>
+    <span class="ans-correct">Doğru Cevap: B</span>
+    <div class="ans-explain">1127'de Musul valiliğine atanan <b>İmâdüddin Zengî</b>, 1144'te Urfa'yı alarak buradaki Haçlı idaresine son vermiştir.</div>
+  </div>
+</div>
+
+<div class="ans-item">
+  <div class="ans-num">13</div>
+  <div>
+    <span class="ans-correct">Doğru Cevap: C</span>
+    <div class="ans-explain">I. dönem memlükleri, Nil Nehri (<b>Bahr</b>) üzerindeki Ravza Adası'na yerleştirildikleri için "Bahrî" adını almışlardır; Burcî ise kale burçlarından gelir.</div>
+  </div>
+</div>
+
+<div class="ans-item">
+  <div class="ans-num">14</div>
+  <div>
+    <span class="ans-correct">Doğru Cevap: B</span>
+    <div class="ans-explain"><b>Şecerüddürr</b> tahta çıkarılmış, ardından Memlük emîri İzzeddin Aybek ile evlenip saltanattan onun lehine feragat etmiştir.</div>
+  </div>
+</div>
+
+<div class="ans-item">
+  <div class="ans-num">15</div>
+  <div>
+    <span class="ans-correct">Doğru Cevap: C</span>
+    <div class="ans-explain">Komutan <b>Kutuz</b> idaresindeki Memlük ordusu <b>1260 Aynicâlût Savaşı</b>'nda Moğolların yenilmezlik efsanesini yıkmıştır.</div>
+  </div>
+</div>
+
+<div class="ans-item">
+  <div class="ans-num">16</div>
+  <div>
+    <span class="ans-correct">Doğru Cevap: B</span>
+    <div class="ans-explain">Temel sebep askerî fetihler değil, Hindistan'ın <b>Moğol teröründen azade bir vaha</b> kalarak Orta Asya medeniyetinin buraya transfer edilmesini sağlamasıdır.</div>
+  </div>
+</div>
+
+<div class="ans-item">
+  <div class="ans-num">17</div>
+  <div>
+    <span class="ans-correct">Doğru Cevap: C</span>
+    <div class="ans-explain"><b>Bâbürnâme</b>, Bâbür Şah'ın Türkçe kaleme aldığı otobiyografik eserdir; Moğolların Gizli Tarihi ve Mavi Defter Moğollara aittir.</div>
+  </div>
+</div>
+
+<div class="ans-item">
+  <div class="ans-num">18</div>
+  <div>
+    <span class="ans-correct">Doğru Cevap: C</span>
+    <div class="ans-explain">Kendi yazıları olmayan Moğollar, medeniyetçe üstün olan <b>Uygur Türklerini</b> itaat altına alarak kâtiplerini ve alfabelerini bürokraside kullanmışlardır.</div>
+  </div>
+</div>
+
+<div class="ans-item">
+  <div class="ans-num">19</div>
+  <div>
+    <span class="ans-correct">Doğru Cevap: E</span>
+    <div class="ans-explain"><b>Gazân Han</b> Altın Orda'nın değil <b>İlhanlıların</b> hükümdarıdır; Altın Orda'da İslamlaşma Berke ve Özbek Han dönemlerinde gerçekleşmiştir.</div>
+  </div>
+</div>
+
+<div class="ans-item">
+  <div class="ans-num">20</div>
+  <div>
+    <span class="ans-correct">Doğru Cevap: E</span>
+    <div class="ans-explain">Moğollar, özellikle <b>Altın Orda ve İlhanlılar</b> üzerinden zamanla İslam'ı kabul etmişlerdir; bu yüzden E seçeneği yanlıştır.</div>
+  </div>
+</div>
+
+  </div>
+  
+<div class="footer">
+  <div>İslam Tarihi<span class="accent-word"> III</span></div>
+  <div class="fnum">28</div>
+</div>
+
+</section>
+
+
+
+
+
+
+
+</body>
+</html>

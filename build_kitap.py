@@ -3,10 +3,14 @@
 DERS ÜRETİM SİSTEMİ — build_kitap.py  (BİRLEŞİK KİTAP)
 ======================================================
 Kullanım:
-    python build_kitap.py                # content/kitap.py'deki ders sırasını kullanır
-    python build_kitap.py content.kitap  # (aynısı, açıkça)
+    python build_kitap.py --sinif 2 --donem 2 --sinav final
 
-content/kitap.py'de listelenen derslerin hepsini TEK bir HTML'e dizip tek
+Sınıf/dönem/sınav VARSAYILAN DEĞİLDİR: verilmezse sorulur (bkz. donem.py).
+Kitap tanımı, seçilen dönemin src/kitap.py dosyasından okunur; çıktı aynı
+dönemin ders_ozetleri/ klasörüne yazılır. Yani her sınav dönemi KENDİ
+birleşik kitabına sahiptir, dönemler birbirine karışmaz.
+
+src/kitap.py'de listelenen derslerin hepsini TEK bir HTML'e dizip tek
 seferde 175x250mm (+3mm bleed) PDF/X-4 CMYK dosyaya render eder. build.py ile aynı şablon gövdesini
 (_ders_govde.html.j2) ve aynı sayfalama fonksiyonlarını kullanır; tek fark,
 her derse bir SAYFA OFFSET'i verilmesidir:
@@ -22,7 +26,7 @@ içindekiler/ders haritası) kadar kaydırılmış olarak başlar.
 """
 
 import sys
-import importlib
+import argparse
 from pathlib import Path
 from jinja2 import Environment, FileSystemLoader
 
@@ -34,6 +38,7 @@ ROOT = Path(__file__).parent
 sys.path.insert(0, str(ROOT))
 
 import build as B                       # noqa: E402  (sayfalama/render/validate tek kaynak)
+import donem as donem_mod               # noqa: E402
 from theme_engine import resolve_theme_css, generate_theme_vars_from_hex   # noqa: E402
 
 
@@ -89,7 +94,7 @@ def collect_courses(book, offset: int = 0, css: str = "") -> list[dict]:
     courses = []
     fixed = theme_accents_from_css(css) if css else {}
     for i, module_name in enumerate(book.course_modules, start=1):
-        pack = importlib.import_module(module_name).get_pack()
+        pack = B.DONEM.import_ders(module_name).get_pack()
 
         # Tema kapsamı: theme_color veren dersler kendi .ders-N sınıfını alır;
         # LEGACY dersler (theme_color'ı olmayan) style.css'teki sabit
@@ -234,8 +239,12 @@ def verify_page_numbers(courses: list[dict], pdf_path: Path, fm: dict):
     return problems
 
 
-def build_book(module_name: str = "content.kitap"):
-    book = importlib.import_module(module_name).get_book()
+def build_book(module_name: str = "kitap", d: "donem_mod.Donem | None" = None):
+    if d is not None:
+        B.set_donem(d)
+    if B.DONEM is None:
+        B.out_dir()    # dönem seçilmediyse burada net hatayla durur
+    book = B.DONEM.import_ders(module_name).get_book()
     # Kitap KENDİ geometri config'ini kullanır (B.BOOK_GEOMETRY); tekil ders
     # build'inin config'inden (B.SINGLE_GEOMETRY) bağımsızdır.
     css = B.load_css(B.BOOK_GEOMETRY)
@@ -263,8 +272,8 @@ def build_book(module_name: str = "content.kitap"):
     )
 
     slug = B.slugify(book.title)
-    html_path = B.OUTPUT / f"{slug}.html"
-    pdf_path = B.OUTPUT / f"{slug}.pdf"
+    html_path = B.out_dir() / f"{slug}.html"
+    pdf_path = B.out_dir() / f"{slug}.pdf"
     html_path.write_text(html, encoding="utf-8")
     print(f"[kitap] HTML yazıldı: {html_path} ({len(html) // 1024} KB)")
 
@@ -283,4 +292,16 @@ def build_book(module_name: str = "content.kitap"):
 
 
 if __name__ == "__main__":
-    build_book(sys.argv[1] if len(sys.argv) > 1 else "content.kitap")
+    ap = argparse.ArgumentParser(
+        prog="build_kitap.py",
+        description="Bir sınav dönemindeki tüm dersleri tek ciltte birleştirir.",
+        epilog="Örnek: python build_kitap.py --sinif 2 --donem 2 --sinav final",
+    )
+    ap.add_argument("kitap", nargs="?", default="kitap",
+                    help="Kitap tanım modülü (varsayılan: kitap -> src/kitap.py)")
+    donem_mod.add_args(ap)
+    args = ap.parse_args()
+
+    d = donem_mod.resolve(args)
+    print(f"[kitap] Dönem: {d}  ({d.etiket})")
+    build_book(args.kitap, d)

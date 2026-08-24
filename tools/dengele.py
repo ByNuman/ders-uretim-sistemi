@@ -3,14 +3,15 @@
 DERS ÜRETİM SİSTEMİ — tools/dengele.py  (SAYFA DENGELEME)
 ==========================================================
 `tools/olcum.py`'nin ölçtüğü GERÇEK blok yüksekliklerini kullanarak bir dersin
-`content/<slug>.py` dosyasındaki `ChapterPage` bölünmelerini yeniden dağıtır.
+Seçilen dönemin `src/<slug>.py` dosyasındaki `ChapterPage` bölünmelerini
+yeniden dağıtır.
 
 Ne YAPAR:
   * Bir bölümün tüm `.add_*()` bloklarını sırasıyla toplar,
   * sayfa sınırını aşmayacak ve mümkün olan EN AZ sayfaya sığacak şekilde
     yeniden gruplar (eşit dolulukta kalsınlar diye artan boşluğun karesi
     minimize edilir; son sayfa cezalandırılmaz — CLAUDE.md adım 6b),
-  * `content/<slug>.py`'yi bu yeni gruplamayla yeniden yazar.
+  * o dönemin `src/<slug>.py`'sini bu yeni gruplamayla yeniden yazar.
 
 Ne YAPMAZ (kasıtlı):
   * Blokların İÇİNİ değiştirmez — metin birebir taşınır, tek bir madde bile
@@ -22,18 +23,21 @@ Ne YAPMAZ (kasıtlı):
 (bkz. CLAUDE.md "Bilinen tuzaklar" #4/#9), taşındıklarında yanıltıcı olurlar.
 
 Kullanım:
-    python tools/dengele.py content.psikoloji          # uygula
-    python tools/dengele.py content.psikoloji --kuru   # sadece raporla
+    python tools/dengele.py psikoloji --sinif 2 --donem 2 --sinav final
+    python tools/dengele.py psikoloji --kuru --sinif 2 --donem 2 --sinav final
+    python tools/dengele.py --hepsi --sinif 2 --donem 2 --sinav final
     python tools/dengele.py --hepsi
 """
 
-import importlib
 import re
 import sys
+import argparse
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
+
+import donem as donem_mod   # noqa: E402
 
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8")
@@ -264,7 +268,7 @@ def balance(module_name: str, dry: bool = False) -> bool:
     for pages in by_ch.values():
         pages.sort(key=lambda p: p["cp"])
 
-    path = ROOT / "content" / (module_name.split(".")[-1] + ".py")
+    path = B.DONEM.src / (module_name.split(".")[-1] + ".py")
     lines = path.read_text(encoding="utf-8").split("\n")
     blocks = parse_pages(lines)
 
@@ -327,12 +331,24 @@ def balance(module_name: str, dry: bool = False) -> bool:
 
 
 def main():
-    dry = "--kuru" in sys.argv
-    args = [a for a in sys.argv[1:] if not a.startswith("--")]
-    if "--hepsi" in sys.argv:
-        modules = importlib.import_module("content.kitap").get_book().course_modules
+    ap = argparse.ArgumentParser(prog="tools/dengele.py")
+    ap.add_argument("dersler", nargs="*", help="dengelenecek ders modülleri")
+    ap.add_argument("--kuru", action="store_true", help="uygulama, sadece raporla")
+    ap.add_argument("--hepsi", action="store_true",
+                    help="dönemin kitap.py'sindeki tüm dersleri dengele")
+    donem_mod.add_args(ap)
+    a = ap.parse_args()
+
+    d = donem_mod.resolve(a)
+    B.set_donem(d)
+    print(f"[dengele] Dönem: {d}  ({d.etiket})")
+    dry = a.kuru
+    if a.hepsi:
+        modules = d.import_ders("kitap").get_book().course_modules
+    elif a.dersler:
+        modules = a.dersler
     else:
-        modules = args or ["content.psikoloji"]
+        raise SystemExit("[hata] dengelenecek ders verilmedi (ya da --hepsi kullanın)")
     for m in modules:
         balance(m, dry=dry)
 

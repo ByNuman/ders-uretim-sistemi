@@ -11,11 +11,14 @@ Kural:
   TAMAMEN AYRI, birbirini tetiklemeyen iki iştir.
 - Bir ders için "işle", "anlat", "görsel not hazırla" gibi bir istek
   geldiğinde, sonucu sadece o dersin kendi PDF'i olarak üret ve
-  outputs klasörüne koy. Birleştirme scriptine (merge/combine script)
-  DOKUNMA.
+  ilgili sınav döneminin `ders_ozetleri/` klasörüne koy. Birleştirme
+  scriptine (merge/combine script) DOKUNMA.
 - Birleşik kitaba bir dersin eklenmesi/çıkarılması/yeniden sıralanması
   SADECE kullanıcı açıkça "birleşik kitaba ekle", "kitabı güncelle",
   "birleştirmeyi çalıştır" gibi bir talimat verdiğinde yapılır.
+- Bu yasak HER SINAV DÖNEMİ İÇİN AYRI AYRI geçerlidir: her dönemin kendi
+  `src/kitap.py`'si ve kendi birleşik kitabı vardır; bir dönemin kitabını
+  derlemek başka bir dönemi etkilemez, ama hiçbiri otomatik tetiklenmez.
 - Emin değilsen (istek belirsizse), birleştirmeyi ÇALIŞTIRMADAN ÖNCE
   kullanıcıya sor: "Bu dersi birleşik kitaba da eklememi ister misiniz?"
 - Yeni bir ders üretirken sayfa boyutu (trim) ayarı olarak varsayılan
@@ -28,6 +31,85 @@ Bu dosya, bu repodaki "Görsel Ders Notu Kitabı" üretim sistemini kullanarak
 yeni bir ders işlerken Claude Code'un izlemesi gereken talimatları içerir.
 Kullanıcı sana bir ders özeti (PDF/metin) verip "bunu görsel ders notuna
 çevir" dediğinde, bu dosyadaki süreci baştan sona uygula.
+
+## KRİTİK KURAL 2: Sınav Dönemi Varsayılmaz — Her Zaman Sorulur
+
+Bu repo artık dosyaları **sınıf / dönem / sınav dönemi** ağacında tutar.
+Hiçbir script'in varsayılan dönemi YOKTUR ve sen de varsayma:
+
+- Kullanıcı bir ders işlemeni isterken sınıf/dönem/sınav belirtmediyse
+  **derlemeden ÖNCE sor**: "Bu ders hangi sınıf / dönem / sınav dönemine
+  ait? (ör. 3. sınıf · 1. dönem · vize)".
+- Tahmin etme, "en son hangisini kullandıysak" deme, `2-sinif/2-donem/final`
+  varsayma. Yanlış döneme yazılan bir ders, sessizce yanlış birleşik kitaba
+  girer — geri alması zordur.
+- Her komut üç parametreyi birlikte alır: `--sinif {2,3} --donem {1,2}
+  --sinav {vize,final}`. Parametre verilmezse script interaktif sorar;
+  soramıyorsa (TTY yok) net bir hatayla durur, asla varsayıma düşmez.
+- Aynı ders adı farklı dönemlerde ayrı ayrı bulunabilir ve bunlar birbirinden
+  TAMAMEN bağımsızdır (ayrı `src/`, ayrı çıktı, ayrı birleşik kitap).
+
+## Klasör yapısı: sınıf / dönem / sınav
+
+```
+<sinif>-sinif/<donem>-donem/<sinav>/
+├── kaynaklar/
+│   ├── ders_kaynaklari/     # GİRDİ: ham ders metinleri / özet PDF'leri
+│   └── ogretmen_notlari/    # GİRDİ: öğretmenin dağınık dikte notları
+├── src/                     # <ders_slug>.py içerik modülleri + kitap.py
+├── ders_ozetleri/           # ÇIKTI: build.py / build_kitap.py -> .pdf + .html
+├── calisma_rehberleri/      # ÇIKTI: ders-anlatim skill'i Mod 2
+└── ders_anlatimlari/        # ÇIKTI: ders-anlatim skill'i Mod 1
+```
+
+`<sinif>` ∈ {2, 3} · `<donem>` ∈ {1, 2} · `<sinav>` ∈ {vize, final} —
+şu an 8 dönem klasörünün hepsi mevcut (çoğu boş, `.gitkeep` ile tutuluyor).
+
+**İsimlendirmeye dikkat:** `ders_ozetleri/` bu yapıda **üretilmiş çıktıyı**
+tutar (ham kaynağı değil). Ham ders özetleri `kaynaklar/ders_kaynaklari/`
+içindedir. Eski yapıdaki `kaynaklar/ders_ozetleri/` klasörü kalktı.
+
+### Neyin nerede olduğu
+
+| Ne | Nerede |
+|---|---|
+| Ham ders özeti / ders metni (girdi) | `<dönem>/kaynaklar/ders_kaynaklari/` |
+| Öğretmenin ham dikte notu (girdi) | `<dönem>/kaynaklar/ogretmen_notlari/` |
+| Dersin Python içerik modülü | `<dönem>/src/<ders_slug>.py` |
+| Birleşik kitap tanımı | `<dönem>/src/kitap.py` |
+| Üretilmiş ders PDF/HTML | `<dönem>/ders_ozetleri/` |
+| Üretilmiş birleşik kitap | `<dönem>/ders_ozetleri/` |
+
+### Kökte kalan paylaşılan altyapı (döneme ait DEĞİL, asla kopyalanmaz)
+
+```
+build.py · build_kitap.py · donem.py · content_model.py · theme_engine.py
+pdfx.py · arabic_reshape.py · templates/ · tools/ · fonts/ · assets/
+```
+
+Bu dosyalar TÜM dönemler tarafından paylaşılır. `templates/style.css` veya
+`templates/_ders_govde.html.j2` üzerinde bir düzeltme yaparsan **her sınıfın
+her döneminin** çıktısını etkilersin — bu kasıtlıdır (tasarım tek kaynaktır),
+ama dönem-özel bir "düzeltme" yapmaya çalışma.
+
+### Ders modülleri neden noktalı yolla import edilmiyor?
+
+`2-sinif` geçerli bir Python paket adı değildir, bu yüzden eski
+`content.kelam_tarihi` biçimi artık kullanılamaz. `donem.py`, seçilen dönemin
+`src/` klasörünü `sys.path`'in başına koyar ve modül **çıplak adıyla**
+(`kelam_tarihi`) import edilir. Eski noktalı yazım yine de kabul edilir
+(önek atılır), ama yeni kodda çıplak ad kullan.
+
+Bir `src/*.py` dosyasının başındaki
+
+```python
+sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
+```
+
+satırı proje köküne (`content_model.py`'nin bulunduğu yere) çıkar —
+`src/ -> <sinav> -> <donem> -> <sinif> -> KÖK` = 4 seviye. Yeni bir ders
+dosyası yazarken bu satırı olduğu gibi kopyala; `parents[1]` yazarsan
+`content_model` bulunamaz.
 
 ## Sistemin amacı
 
@@ -49,7 +131,9 @@ içindedir ve tek ders PDF'i ile birleşik kitap ONU ortak kullanır — düzelt
 oraya yapınca her iki çıktı birden düzelir.)
 
 Ayrıca tüm dersleri **tek bir cilt** halinde birleştiren ikinci bir çıktı
-vardır: `python build_kitap.py` (bkz. aşağıdaki "Birleşik Kitap" bölümü).
+vardır: `python build_kitap.py --sinif X --donem Y --sinav Z`
+(bkz. aşağıdaki "Birleşik Kitap" bölümü). Birleştirme HER ZAMAN tek bir
+sınav dönemi içindedir; dönemler asla tek ciltte karışmaz.
 
 ## Sayfa boyutu, taşma payı ve kenar boşlukları (BASKI GEOMETRİSİ)
 
@@ -81,8 +165,8 @@ KRİTİK KURAL). `build.py`'nin başındaki `PageGeometry` dataclass'ından iki
 
 | Config | Kullanan | Şu anki trim |
 |---|---|---|
-| `SINGLE_GEOMETRY` | `python build.py content.<slug>` (tekil ders) | 175 × 250 mm |
-| `BOOK_GEOMETRY` | `python build_kitap.py` (birleşik kitap) | 175 × 250 mm |
+| `SINGLE_GEOMETRY` | `python build.py <slug> --sinif X --donem Y --sinav Z` (tekil ders) | 175 × 250 mm |
+| `BOOK_GEOMETRY` | `python build_kitap.py --sinif X --donem Y --sinav Z` (birleşik kitap) | 175 × 250 mm |
 
 Değerleri şu an aynıdır ama TEK BİR GLOBAL SABİT DEĞİLDİR: birini
 değiştirmek diğerini etkilemez. `page_geometry_css(geo)` verilen config'ten
@@ -98,8 +182,8 @@ Bir çıktının ölçüsünü değiştirecekseniz SADECE ilgili config'i düzen
 sonra mutlaka:
 
 ```bash
-python tools/kalibre.py        # sözlük/test/cevap sabitlerini yeniden ölçer
-python tools/dengele.py --hepsi   # bölüm sayfalarını yeni ölçüye göre dağıtır
+python tools/kalibre.py --sinif X --donem Y --sinav Z        # sabitleri yeniden ölçer
+python tools/dengele.py --hepsi --sinif X --donem Y --sinav Z   # sayfaları yeniden dağıtır
 ```
 
 Sırtın hangi tarafta olduğunu değiştirmek için tek satır yeter:
@@ -116,7 +200,7 @@ TrimBox VEYA ArtBox ister, ikisini birden değil.)
 `build.py` ve `build_kitap.py`, PDF'i üretip yer imlerini ekledikten hemen
 sonra `pdfx.convert_or_warn()` çağırır: çıktı Ghostscript ile **RGB'den
 PDF/X-4 (DeviceCMYK)**'ya çevrilir. Ara RGB dosya geçici klasörde kalır ve
-silinir — kullanıcının elindeki `output/<slug>.pdf` doğrudan CMYK'dır.
+silinir — kullanıcının elindeki `<D>/ders_ozetleri/<slug>.pdf` doğrudan CMYK'dır.
 
 * **Ghostscript kurulu değilse build DURMAZ**: işletim sistemine göre kurulum
   komutunu içeren net bir uyarı basılır ve dosya RGB bırakılır
@@ -134,93 +218,118 @@ silinir — kullanıcının elindeki `output/<slug>.pdf` doğrudan CMYK'dır.
 ## Dizin yapısı
 
 ```
-ders_sistemi/
-├── content_model.py       # Veri şeması (dataclass'lar) — API referansı aşağıda
+ders-uretim-sistemi/
+│
+│  ── PAYLAŞILAN ALTYAPI (döneme ait değil) ────────────────────────────────
+├── donem.py                # SINIF/DÖNEM/SINAV çözümleyici — tüm scriptlerin ortak girişi
+├── content_model.py        # Veri şeması (dataclass'lar) — API referansı aşağıda
 ├── build.py                # TEK DERS: HTML üret → PDF render → küçült → bookmark → kutular → CMYK
-├── build_kitap.py          # BİRLEŞİK KİTAP: tüm dersleri tek ciltte birleştirir
+├── build_kitap.py          # BİRLEŞİK KİTAP: bir dönemin tüm derslerini tek ciltte birleştirir
 ├── pdfx.py                 # BASKI ÖNCESİ: TrimBox/BleedBox + Ghostscript ile PDF/X-4 CMYK
 ├── theme_engine.py         # Sınırsız renk teması motoru (tek hex'ten tam tema üretir)
 ├── tools/
 │   ├── olcum.py            # Her bloğun GERÇEK yüksekliğini (mm) Chromium'da ölçer
 │   ├── dengele.py          # Ölçüme göre ChapterPage bölünmelerini yeniden dağıtır
 │   └── kalibre.py          # Sözlük/Test/Cevap sayfa başına öğe sabitlerini kalibre eder
-├── assets/icc/             # FOGRA39 ("ISO Coated v2") ICC profili buraya konur (bkz. README)
-├── kaynaklar/
-│   ├── ders_ozetleri/        # Görsel PDF sisteminin girdisi (bkz. Adım 0) — bu dosyadaki süreç bunu kullanır
-│   │   ├── sosyoloji-ozet.pdf
-│   │   └── psikoloji-ozet.pdf
-│   ├── ders_kaynaklari/      # ders-anlatim skill'i Mod 1 girdisi (bu sistemden bağımsız, bkz. .claude/skills/ders-anlatim/)
-│   └── ogretmen_notlari/     # ders-anlatim skill'i Mod 2 girdisi (bu sistemden bağımsız)
 ├── templates/
 │   ├── _ders_govde.html.j2      # BİR DERSİN GÖVDESİ — asıl şablon, tek kaynak (sabit)
 │   ├── master.html.j2            # Tek ders sarmalayıcısı (13 satır — _ders_govde'yi çağırır)
 │   ├── kitap.html.j2             # Kitap sarmalayıcısı (ön kısım + tüm dersler)
 │   ├── _kitap_on_kisim.html.j2   # Kitabın kapak/künye/önsöz/rehber/içindekiler/harita sayfaları
 │   └── style.css                  # Tasarım sistemi (sabit — dokunma, sadece bug varsa düzelt)
-├── content/
-│   ├── __init__.py
-│   ├── kitap.py             # BİRLEŞİK KİTAP tanımı: ders sırası + kitabın ön kısım metinleri
-│   ├── psikoloji.py         # Örnek: tamamlanmış bir ders (indigo tema, Test+Cevap Anahtarı formatı)
-│   ├── sosyoloji.py         # Örnek (forest tema, Test+Cevap Anahtarı formatı)
-│   ├── cagdas_felsefe.py    # Örnek (theme_color #1C5C69, Test+Cevap Anahtarı formatı)
-│   ├── edebiyat.py          # Örnek (theme_color #5A6732, Test+Cevap Anahtarı formatı)
-│   ├── felsefe_tarihi_2.py  # Örnek (theme_color #724C31, Test+Cevap Anahtarı formatı)
-│   ├── ogretim_teknolojileri.py  # Örnek (slate tema, LEGACY Sınav Hazırlık formatı)
-│   ├── sanat_tarihi.py      # Örnek (burgundy tema, LEGACY Sınav Hazırlık formatı)
-│   ├── islam_tarihi_3.py    # Örnek (theme_color #1D4E79, Test+Cevap Anahtarı formatı)
-│   ├── ogretim_ilke_yontem.py    # Örnek (theme_color #863C5E, Test+Cevap Anahtarı formatı)
-│   └── tefsir2.py           # Örnek: Arapça ayet içeren ders (theme_color #246038, add_ayat + Test/Cevap Anahtarı)
-└── output/                  # build.py çıktıları buraya yazılır (.html + .pdf)
+├── assets/icc/             # FOGRA39 ("ISO Coated v2") ICC profili buraya konur (bkz. README)
+├── fonts/
+│
+│  ── DÖNEM AĞAÇLARI (8 sınav dönemi) ──────────────────────────────────────
+├── 2-sinif/{1,2}-donem/{vize,final}/
+└── 3-sinif/{1,2}-donem/{vize,final}/
+        ├── kaynaklar/
+        │   ├── ders_kaynaklari/   # GİRDİ: ham ders özetleri / ders metinleri
+        │   └── ogretmen_notlari/  # GİRDİ: öğretmenin ham dikte notları
+        ├── src/                   # ders modülleri + kitap.py (bu dönemin)
+        ├── ders_ozetleri/         # ÇIKTI: <slug>.pdf + <slug>.html
+        ├── calisma_rehberleri/    # ÇIKTI: ders-anlatim Mod 2
+        └── ders_anlatimlari/      # ÇIKTI: ders-anlatim Mod 1
 ```
 
-Her ders, `content/` altında kendi Python dosyasında yaşar ve tek bir
-`get_pack() -> CoursePack` fonksiyonu dışa verir.
+Şu an **yalnızca `2-sinif/2-donem/final/` doludur** (11 ders); diğer 7 dönem
+klasörü boş iskelet olarak hazır bekliyor.
+
+```
+2-sinif/2-donem/final/src/
+├── __init__.py
+├── kitap.py                 # BİRLEŞİK KİTAP tanımı: ders sırası + kitabın ön kısım metinleri
+├── psikoloji.py             # Örnek: tamamlanmış bir ders (indigo tema, Test+Cevap Anahtarı formatı)
+├── sosyoloji.py             # Örnek (forest tema, Test+Cevap Anahtarı formatı)
+├── cagdas_felsefe.py        # Örnek (theme_color #1C5C69, Test+Cevap Anahtarı formatı)
+├── edebiyat.py              # Örnek (theme_color #5A6732, Test+Cevap Anahtarı formatı)
+├── felsefe_tarihi_2.py      # Örnek (theme_color #724C31, Test+Cevap Anahtarı formatı)
+├── kelam_tarihi.py          # Örnek (Test+Cevap Anahtarı formatı)
+├── islam_tarihi_3.py        # Örnek (theme_color #1D4E79, Test+Cevap Anahtarı formatı)
+├── ogretim_ilke_yontem.py   # Örnek (theme_color #863C5E, Test+Cevap Anahtarı formatı)
+├── tefsir2.py               # Örnek: Arapça ayet içeren ders (theme_color #246038, add_ayat)
+├── ogretim_teknolojileri.py # Örnek (slate tema, LEGACY Sınav Hazırlık formatı)
+└── sanat_tarihi.py          # Örnek (burgundy tema, LEGACY Sınav Hazırlık formatı)
+```
+
+Her ders, ilgili dönemin `src/` klasöründe kendi Python dosyasında yaşar ve
+tek bir `get_pack() -> CoursePack` fonksiyonu dışa verir.
 
 **Not — iki nesil örnek var:** `psikoloji.py`/`sosyoloji.py`/`cagdas_felsefe.py`/
-`edebiyat.py`/`felsefe_tarihi_2.py`/`islam_tarihi_3.py`/`ogretim_ilke_yontem.py`/
-`tefsir2.py` GÜNCEL standardı (Test + Cevap Anahtarı,
+`edebiyat.py`/`felsefe_tarihi_2.py`/`kelam_tarihi.py`/`islam_tarihi_3.py`/
+`ogretim_ilke_yontem.py`/`tefsir2.py` GÜNCEL standardı (Test + Cevap Anahtarı,
 sınırsız renk teması) kullanır; kalan 2 örnek (`ogretim_teknolojileri.py`,
 `sanat_tarihi.py`) henüz eski "Sınav Hazırlık"
 (distinctions/match_table/qa_items) formatındadır ve geriye dönük uyumluluk
 için bozulmadan çalışmaya devam eder (bkz. aşağıdaki "Test + Cevap Anahtarı"
 ve "Renk Teması" bölümleri). **Yeni bir ders yazarken her zaman GÜNCEL
-gruptaki dosyalardan birini şablon alın, LEGACY 3'ünü değil.**
+gruptaki dosyalardan birini şablon alın, LEGACY 2'sini değil.**
 
 ## Uçtan uca iş akışı
 
 Kullanıcı sana bir ders PDF'i / ham metni verdiğinde (ya da sadece bir ders
 adı söylediğinde) şu adımları sırayla uygula:
 
-### 0. Kaynağı bul: `kaynaklar/ders_ozetleri/` klasörüne bak
+### 0. Dönemi belirle, sonra kaynağı bul
+**Önce dönem** (bkz. KRİTİK KURAL 2): kullanıcı sınıf/dönem/sınav
+belirtmediyse SOR. Bundan sonraki her komutta `--sinif X --donem Y --sinav Z`
+kullan; dönemin kökünü kısaca `<D>` diye anacağız:
+
+```
+<D> = <sinif>-sinif/<donem>-donem/<sinav>
+```
+
 Kullanıcı bir dosya eklemeden sadece bir ders adı söylerse (ör. "sosyoloji
-dersini işle" veya "tarih özetini görsel not yap"), önce PDF/metin eklenip
-eklenmediğini kontrol et; eklenmediyse **kullanıcıya sormadan önce**
-`kaynaklar/ders_ozetleri/` klasörünü tara:
+dersini işle"), önce PDF/metin eklenip eklenmediğini kontrol et; eklenmediyse
+**kullanıcıya sormadan önce** o dönemin girdi klasörlerini tara:
 ```bash
-ls kaynaklar/ders_ozetleri/
+ls "<D>/kaynaklar/ders_kaynaklari/"
+ls "<D>/kaynaklar/ogretmen_notlari/"
 ```
 Ders adıyla eşleşen (esnek eşleştir — büyük/küçük harf, Türkçe karakter,
 "-özet"/"-ozet" gibi ekleri göz ardı ederek) bir dosya varsa onu kaynak
-olarak kullan, kullanıcıya tekrar sorma. Eşleşen dosya yoksa kullanıcıdan
-PDF'i ya sürükle-bırak yapmasını ya da `kaynaklar/ders_ozetleri/` klasörüne
-koyup dosya adını söylemesini iste.
+olarak kullan, kullanıcıya tekrar sorma. Eşleşen dosya yoksa **başka
+dönemlere bakma** (yanlış dönemin kaynağını kullanmak sessiz bir hatadır);
+kullanıcıdan PDF'i ya sürükle-bırak yapmasını ya da doğru dönemin
+`kaynaklar/ders_kaynaklari/` klasörüne koyup dosya adını söylemesini iste.
 
-`kaynaklar/ders_ozetleri/` klasörü, kullanıcının ham ders özetlerini tek tek
+`kaynaklar/ders_kaynaklari/` klasörü, kullanıcının ham ders özetlerini tek tek
 her seferinde sohbete eklemek zorunda kalmadan biriktirdiği yerdir — dosya
 adı serbesttir ama tutarlı bir kalıp (`<ders-slug>-ozet.pdf` gibi) aramayı
 kolaylaştırır. İşlenen bir dersin kaynağını bu klasörden SİLME — kullanıcı
 ileride revizyon isteyebilir.
 
-(Not: `kaynaklar/` altında ayrıca `ders_kaynaklari/` ve `ogretmen_notlari/`
-alt klasörleri de var — bunlar bu görsel PDF sistemine değil, tamamen ayrı
-çalışan `ders-anlatim` skill'ine ait girdilerdir, bkz.
-`.claude/skills/ders-anlatim/SKILL.md`.)
+(Not: `kaynaklar/ogretmen_notlari/` ve `<D>/calisma_rehberleri/` +
+`<D>/ders_anlatimlari/` klasörleri bu görsel PDF sistemine değil, tamamen
+ayrı çalışan `ders-anlatim` skill'ine aittir, bkz.
+`.claude/skills/ders-anlatim/SKILL.md`. Aynı dönem ağacını paylaşırlar ama
+birbirlerini tetiklemezler.)
 
 ### 1. Ham içeriği oku ve Arapça kontrolü yap
 ```bash
 python3 -c "
 import pdfplumber
-with pdfplumber.open('kaynaklar/ders_ozetleri/<bulunan-dosya>.pdf') as pdf:
+with pdfplumber.open('<D>/kaynaklar/ders_kaynaklari/<bulunan-dosya>.pdf') as pdf:
     for i, page in enumerate(pdf.pages):
         print(f'=== SAYFA {i+1} ===')
         print(page.extract_text())
@@ -228,7 +337,7 @@ with pdfplumber.open('kaynaklar/ders_ozetleri/<bulunan-dosya>.pdf') as pdf:
 ```
 Metnin TAMAMINI oku (görme aracıyla dosyayı görüntüle, kesme). Arapça karakter
 (ayet, hadis) varsa sorun değil — sistem `add_ayat()` ile bunu destekliyor
-(bkz. aşağıdaki API referansı ve `content/tefsir2.py` örneği).
+(bkz. aşağıdaki API referansı ve `<D>/src/tefsir2.py` örneği).
 
 **Arapça (RTL) metinde pdfplumber'a GÜVENME.** pdfplumber bu tür PDF'lerde
 Arapçayı harf harf ters çıkarabilir; aynı sayfayı PyMuPDF ile de çıkar ve
@@ -236,7 +345,7 @@ karşılaştır:
 ```bash
 python -c "
 import pymupdf, io
-d = pymupdf.open('kaynaklar/ders_ozetleri/<dosya>.pdf')
+d = pymupdf.open('<D>/kaynaklar/ders_kaynaklari/<dosya>.pdf')
 out = io.open('cikti.txt','w',encoding='utf-8')   # Windows konsolu Arapça basamaz
 for i in range(len(d)): out.write(f'=== SAYFA {i+1} ===\n' + d[i].get_text('text') + '\n')
 out.close()"
@@ -256,9 +365,9 @@ zaman bir bölüm özeti planla. Bölüm başına ortalama 2 sayfa hedefle (1-3 
 arası kabul edilebilir) — çok yoğun bölümleri en baştan 2-3 `ChapterPage`'e
 böl, tek dev sayfaya sıkıştırmaya çalışma.
 
-### 3. `content/<ders_slug>.py` dosyasını yaz
+### 3. `<D>/src/<ders_slug>.py` dosyasını yaz
 Aşağıdaki "content_model.py API Referansı" bölümüne birebir uyarak yaz.
-Mevcut derslerden birini (`content/sosyoloji.py` iyi bir orta-karmaşıklıkta
+Mevcut derslerden birini (`2-sinif/2-donem/final/src/sosyoloji.py` iyi bir orta-karmaşıklıkta
 örnektir) şablon olarak kopyalayıp değiştirmek en hızlı yoldur.
 
 Her ders için ayrıca:
@@ -269,7 +378,7 @@ Her ders için ayrıca:
   (`from theme_engine import PALETTE_HUES, generate_theme_vars` ile
   önizleyip hex'e çevirebilir ya da doğrudan `theme_color=` alanına
   istediğiniz herhangi bir hex'i yazabilirsiniz). Zaten kullanılmış
-  renklere çok yakın bir ton seçmeyin — `content/` dizinindeki diğer
+  renklere çok yakın bir ton seçmeyin — AYNI DÖNEMİN `src/` dizinindeki diğer
   dosyalara bakıp görsel olarak ayrışan bir renk seçin. `theme=` alanı
   (ör. `"forest"`) hâlâ zorunludur (geriye dönük uyumluluk ve `body`
   class'ı için) ama `theme_color` verildiğinde onun ürettiği renkler
@@ -289,7 +398,7 @@ Her ders için ayrıca:
 
 ### 4. Derle
 ```bash
-cd ders_sistemi && python3 build.py content.<ders_slug>
+python build.py <ders_slug> --sinif X --donem Y --sinav Z
 ```
 Bu tek komut şunları otomatik yapar: HTML üretir → tutarlılık denetimi
 (`validate()`: bölüm numaraları ardışık mı, sözlük referansları geçerli mi,
@@ -308,13 +417,14 @@ ya da:
 [TAŞMA UYARISI] N sayfa A4 sınırını aşıyor -- içerik kesiliyor olabilir:
     - Sayfa (fiziksel sıra) X: ~Ymm taşma
 ```
-Taşma varsa **önce `python tools/dengele.py content.<slug>` çalıştır** — bu araç
+Taşma varsa **önce `python tools/dengele.py <slug> --sinif X --donem Y --sinav Z`
+çalıştır** — bu araç
 her bloğun gerçek yüksekliğini Chromium'da ölçer ve `ChapterPage`
 bölünmelerini taşmayacak EN AZ sayfaya, boşluğu sona iterek yeniden dağıtır
 (blokların içine ve sırasına dokunmaz, içerik uydurmaz). `--kuru` ile önce
 sadece raporlatabilirsin. Elle karar vermen gerekirse PDF'i sayfa numarasına
-göre PNG'ye çevirip (`pdftoppm -png -r 100 -f X -l X output/<slug>.pdf
-output/preview/pgX`) görme aracıyla incele, aşırı yüklü `ChapterPage`'i ikiye
+göre PNG'ye çevirip (`pdftoppm -png -r 100 -f X -l X "<D>/ders_ozetleri/<slug>.pdf"
+"<D>/ders_ozetleri/preview/pgX"`) görme aracıyla incele, aşırı yüklü `ChapterPage`'i ikiye
 (gerekirse üçe) böl, yeniden derle. "✓" görene kadar tekrarla. Asla taşma
 uyarısını görmezden gelip devam etme — bu, üretilen PDF'in sessizce içerik
 kaybettiği anlamına gelir.
@@ -419,7 +529,7 @@ bir israf noktasına çevirmeyen) değişiklikleri kalıcı yap.
 ```bash
 python3 -c "
 from pypdf import PdfReader
-r = PdfReader('output/<slug>.pdf')
+r = PdfReader('<D>/ders_ozetleri/<slug>.pdf')
 for it in r.outline:
     print(it.title, '->', r.get_destination_page_number(it)+1)
 annots = r.pages[1].get('/Annots')
@@ -474,7 +584,7 @@ from content_model import (
   (Arapça glyph desteği bizzat görsel olarak doğrulanmıştır — harfler doğru
   bitişiyor, harekeler doğru yerleşiyor; tereddüt etmeden kullan).
   `ChapterPage.add_ayat(başlık, [Ayah(...), ...])` ile eklenir. Örnek kullanım
-  için `content/tefsir2.py` dosyasına bak. Ham Arapça Unicode metni doğrudan
+  için o dönemin `src/tefsir2.py` dosyasına bak. Ham Arapça Unicode metni doğrudan
   `arabic=` alanına yaz — ekstra bir işlem gerekmez.
 
   > **Not:** Repoda `arabic_reshape.py` ve `fonts/ArabicExtracted-*.ttf`
@@ -587,7 +697,7 @@ oluyorsa o dersin hue'sunu birkaç derece kaydırmayı deneyin.
 (banner + 3'lü bilgi çubuğu "20 Soru / Çoktan Seçmeli / 5 Seçenek" + talimat
 kutusu + numaralı sorular; ardından ayrı bir "Cevap Anahtarı ve Çözümler"
 bölümü). 20 soru standarttır ama sayı serbesttir. Her soru 4 veya 5 seçenekli
-olabilir. `content/sosyoloji.py` ve `content/psikoloji.py`'deki
+olabilir. Aynı dönemin `src/sosyoloji.py` ve `src/psikoloji.py`'sindeki
 `test_questions`/`answer_key_items` listelerini şablon olarak kullanın.
 
 `pack.test_questions` boş bırakılırsa (yazmazsanız) şablon otomatik olarak
@@ -693,11 +803,11 @@ tanedir.
 
 Tek tek üretilen derslerin hepsini, **kesintisiz sayfa numaralarına sahip tek
 bir cilt** halinde birleştirir. Dersleri kopyalamaz — her dersin
-`content/<slug>.py` dosyasını taze okur; bir derste düzeltme yapıp kitabı
+aynı dönemin `src/<slug>.py` dosyasını taze okur; bir derste düzeltme yapıp kitabı
 yeniden derlemek, tüm numaraları/içindekileri/yer imlerini otomatik günceller.
 
 ```bash
-python build_kitap.py            # content/kitap.py'deki ders sırasına göre
+python build_kitap.py --sinif X --donem Y --sinav Z   # o dönemin src/kitap.py sırasına göre
 ```
 
 ### Kitaba yeni ders eklemek
@@ -705,12 +815,13 @@ python build_kitap.py            # content/kitap.py'deki ders sırasına göre
 > birleştirmeyi çalıştır" dediğinde uygulanır (bkz. en üstteki KRİTİK KURAL).
 > Bir ders üretmek, bu adımı kendiliğinden TETİKLEMEZ.
 
-`content/kitap.py` içindeki `COURSE_MODULES` listesine **tek satır** ekle:
+İLGİLİ DÖNEMİN `src/kitap.py` dosyasındaki `COURSE_MODULES` listesine
+**tek satır** ekle (çıplak modül adı, `content.` öneki YOK):
 ```python
 COURSE_MODULES = [
-    "content.tefsir2",
+    "tefsir2",
     ...
-    "content.yeni_ders",     # <- eklenen
+    "yeni_ders",     # <- eklenen
 ]
 ```
 Başka hiçbir yeri elle güncellemek gerekmez (sayfa numaraları, ana
@@ -729,7 +840,7 @@ hesaplanır, çünkü ilk dersin sayfa offset'i buna bağlıdır.
 
 ### Kitabın metinleri
 Kapak başlığı, künye satırları, önsöz kartları, rehber ve harita açıklamaları
-`content/kitap.py` içindeki `BookPack` alanlarındadır. Ders içeriğiyle
+o dönemin `src/kitap.py` dosyasındaki `BookPack` alanlarındadır. Ders içeriğiyle
 karıştırma — orada bir dersin bilgisi DEĞİL, kitabın kendi tanıtımı yazılır.
 
 ### Mimari: iki çıktı, tek şablon
@@ -927,29 +1038,29 @@ Bunlar `templates/style.css` içinde zaten düzeltilmiş durumda — sadece
 
 ```bash
 # Tek dersi derle (PDF/X-4 CMYK çıktı dahil)
-cd ders_sistemi && python3 build.py content.<slug>
+python build.py <slug> --sinif X --donem Y --sinav Z
 
 # Sayfa doluluğunu ölç / bölüm sayfalarını yeniden dağıt / sabitleri kalibre et
-python tools/olcum.py content.<slug>
-python tools/dengele.py content.<slug>     # --kuru = sadece raporla
-python tools/kalibre.py                    # sayfa boyutu değiştiyse
+python tools/olcum.py <slug> --sinif X --donem Y --sinav Z
+python tools/dengele.py <slug> --sinif X --donem Y --sinav Z   # --kuru = sadece raporla
+python tools/kalibre.py --sinif X --donem Y --sinav Z          # sayfa boyutu değiştiyse
 
 # Ghostscript + ICC profili teşhisi
 python pdfx.py
 
-# TÜM dersleri tek kitap halinde derle (content/kitap.py'deki sıraya göre)
-python build_kitap.py
+# BİR DÖNEMİN tüm derslerini tek kitap halinde derle (src/kitap.py sırasına göre)
+python build_kitap.py --sinif X --donem Y --sinav Z
 
 # Belirli sayfaları PNG'ye çevirip incele
-pdftoppm -png -r 100 -f <ilk> -l <son> output/<slug>.pdf output/preview/pg
+pdftoppm -png -r 100 -f <ilk> -l <son> "<D>/ders_ozetleri/<slug>.pdf" "<D>/ders_ozetleri/preview/pg"
 
 # Tüm sayfaları çevir
-pdftoppm -png -r 100 output/<slug>.pdf output/preview/pg
+pdftoppm -png -r 100 "<D>/ders_ozetleri/<slug>.pdf" "<D>/ders_ozetleri/preview/pg"
 
 # Bookmark/link doğrulaması
 python3 -c "
 from pypdf import PdfReader
-r = PdfReader('output/<slug>.pdf')
+r = PdfReader('<D>/ders_ozetleri/<slug>.pdf')
 for it in r.outline: print(it.title, '->', r.get_destination_page_number(it)+1)
 "
 
@@ -959,17 +1070,20 @@ python3 theme_engine.py
 
 ## Özet — bir ders eklerken zihinsel kontrol listesi
 
-- [ ] Kaynak eklenmediyse `kaynaklar/ders_ozetleri/` klasöründe ders adıyla
-      eşleşen dosyayı aradım (yoksa kullanıcıdan istedim)
+- [ ] Sınıf/dönem/sınav'ı kullanıcıya SORDUM (varsaymadım)
+- [ ] Kaynak eklenmediyse o dönemin `kaynaklar/ders_kaynaklari/` (ve
+      `ogretmen_notlari/`) klasöründe ders adıyla eşleşen dosyayı aradım
+      (yoksa kullanıcıdan istedim — başka döneme BAKMADIM)
 - [ ] Ham metni tamamen okudum (atlamadım)
 - [ ] 5-7 bölüme, ham içeriğin doğal yapısını takip ederek ayırdım
-- [ ] Kullanılmamış bir renk seçtim (`theme_color=` hex, `content/`
-      dizinindeki diğer derslerden görsel olarak ayrışan), tek harfli
+- [ ] Kullanılmamış bir renk seçtim (`theme_color=` hex, aynı dönemin
+      `src/` dizinindeki diğer derslerden görsel olarak ayrışan), tek harfli
       Latin `icon_text` verdim
-- [ ] `content/<slug>.py` yazdım, `content_model.py` API'sine birebir uydum
+- [ ] `<D>/src/<slug>.py` yazdım, `content_model.py` API'sine birebir uydum
+      (başındaki `sys.path` satırı `parents[4]` olmalı)
 - [ ] 20 soruluk `test_questions` + eşleşen `answer_key_items` yazdım
       (LEGACY `distinctions`/`match_table`/`qa_items` DEĞİL)
-- [ ] `python3 build.py content.<slug>` çalıştırdım
+- [ ] `python build.py <slug> --sinif X --donem Y --sinav Z` çalıştırdım
 - [ ] "[TAŞMA UYARISI]" çıkmayana kadar `tools/dengele.py` çalıştırıp
       yeniden derledim (gerekirse elle sayfa böldüm)
 - [ ] Konsoldaki "[SONUÇ] Bitmiş (trim) ölçü : 175 x 250 mm" satırını ve
@@ -985,7 +1099,8 @@ python3 theme_engine.py
 - [ ] Bookmark/link sayısını doğruladım
 - [ ] (SADECE kullanıcı açıkça istediyse — bkz. en üstteki KRİTİK KURAL;
       istemediyse bu adımı ATLA ve kitaba dokunma) Yeni dersi
-      `content/kitap.py` içindeki `COURSE_MODULES` listesine ekledim ve
-      `python build_kitap.py` ile birleşik kitabı yeniden derledim; taşma,
+      O DÖNEMİN `src/kitap.py` dosyasındaki `COURSE_MODULES` listesine
+      çıplak adıyla ekledim ve `python build_kitap.py --sinif X --donem Y --sinav Z`
+      ile o dönemin birleşik kitabını yeniden derledim; taşma,
       sayfa zinciri ve render doğrulamalarının hepsi "✓" verdi
 - [ ] PDF'i kullanıcıya sundum

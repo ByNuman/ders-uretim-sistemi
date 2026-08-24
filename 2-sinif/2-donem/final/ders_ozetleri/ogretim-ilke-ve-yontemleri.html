@@ -1,0 +1,3673 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<title>Öğretim <span class="accent-word">İlke</span> ve Yöntemleri</title>
+<style>/* ============================================================
+   DERS ÜRETİM SİSTEMİ — Görsel Tasarım Sistemi v2
+   175x250mm trim (PUR Amerikan cilt), 3mm bleed, print-ready,
+   tema-parametrik.
+   Sistem fontlarına dayanır: gövde DejaVu Sans, başlıklar DejaVu Serif
+   (kitap/akademik karakter için) — harici font çağrısı yok, bu yüzden
+   her ortamda birebir aynı render garantidir.
+   ============================================================ */
+
+/* --- SAYFA GEOMETRİSİ ---------------------------------------------------
+   DİKKAT: aşağıdaki değerler yalnızca VARSAYILAN'dır. Gerçek kaynak
+   build.py içindeki TRIM_W_MM / TRIM_H_MM / BLEED_MM / MARGIN_*_MM
+   sabitleridir; build.py bu blogun aynısını page_geometry_css() ile
+   üretip style.css'in SONUNA ekler ve buradakileri ezer. Boyut
+   değiştirecekseniz build.py'yi düzenleyin, burayı değil. */
+@page { size: 181mm 256mm; margin: 0; }
+
+:root {
+  /* Bitmiş (kesilmiş) sayfa ölçüsü */
+  --trim-w: 175mm;
+  --trim-h: 250mm;
+  /* Taşma payı: tam sayfa zemin rengi / kapak gradyanı kenardan taşsın */
+  --bleed: 3mm;
+  /* Fiziksel render ölçüsü = trim + her iki yandan bleed */
+  --page-w: 181mm;
+  --page-h: 256mm;
+  /* Kenar boşlukları — TRIM kenarından ölçülür */
+  --mg-top: 11mm;
+  --mg-bottom: 19mm;    /* sayfa numarası payı dahil */
+  --mg-inner: 14mm;     /* sırt/gutter tarafı — PUR cilt payı */
+  --mg-outer: 9mm;
+  /* Render kutusunun (bleed box) kenarından ölçülen gerçek padding'ler */
+  --pad-top: 14mm;
+  --pad-bottom: 22mm;
+  --pad-inner: 17mm;
+  --pad-outer: 12mm;
+  /* Ayna simetri: sayfa tekliği/çiftliğine göre aşağıda yeniden atanır */
+  --pad-left: var(--pad-inner);
+  --pad-right: var(--pad-outer);
+
+  /* --- Nötr paleti (tüm temalarda sabit) --- */
+  --ink:        #14161b;
+  --ink-soft:   #464b5b;
+  --ink-faint:  #5c6270;   /* WCAG AA: beyaz üzerinde 6.1:1 -- eski #7d8394 (3.79:1) yerine */
+  --paper:      #ffffff;   /* build.py / .theme-XXXX bunu tema tonuna çeker */
+  --paper-tint: #f7f7f9;
+  --line:       #e3e4ea;
+  --line-soft:  #edeef2;
+  --shadow-sm:  0 0.82px 1.65px rgba(20,22,30,0.05), 0 0.82px 0.82px rgba(20,22,30,0.04);
+  --shadow-md:  0 2.47px 8.23px rgba(20,22,30,0.07), 0 0.82px 2.47px rgba(20,22,30,0.06);
+  --shadow-lg:  0 8.23px 24.69px rgba(15,17,30,0.16), 0 2.47px 6.58px rgba(15,17,30,0.10);
+
+  /* --- Sabit semantik renkler (callout tipleri; tema fark etmez) --- */
+  --focus-bg:   #fff8e8;
+  --focus-line: #e8b83f;
+  --focus-ink:  #6b4f04;
+
+  --caution-bg:   #eef4ff;
+  --caution-line: #6f8fd6;
+  --caution-ink:  #1f3d78;
+
+  --insight-bg:   #0d1830;
+  --insight-ink:  #ffffff;
+  --insight-accent: #e3c37c;
+
+  --route-bg:   #f2f0ff;
+  --route-line: #8a78e0;
+  --route-ink:  #40337f;
+
+  /* --- Tema değişkenleri: aşağıdaki .theme-XXXX sınıfları bunları ezer --- */
+  --accent:       #3a4fb0;
+  --accent-dark:  #232f6e;
+  --accent-soft:  #eef0fc;
+  --accent-tint:  #f5f6fd;
+  --cover-grad-1: #171d42;
+  --cover-grad-2: #3a4fb0;
+  --cover-grad-3: #4a5fc7;
+  --gold:         #d9b25c;
+  --gold-ink:     #6b5310;   /* açık zeminlerde gold yerine kullanılan okunur koyu ton */
+}
+
+/* ---------- Tema paletleri ----------
+   Her paper tonu kasıtlı çok hafiftir (L≈98%) — beyazdan ayırt edilir ama
+   metin kontrastını bozmaz; --line de aynı ton ailesinden seçilmiştir. */
+.theme-indigo {
+  --accent: #3a4fb0; --accent-dark: #232f6e; --accent-soft: #eef0fc; --accent-tint: #f5f6fd;
+  --cover-grad-1: #12163a; --cover-grad-2: #33449e; --cover-grad-3: #5468d4; --gold: #dfba68; --gold-ink: #6b5310;
+  --paper: #fbfbfe; --paper-tint: #f3f4fb; --line: #e2e3f0; --line-soft: #ececf6;
+}
+.theme-burgundy {
+  --accent: #8c2a3c; --accent-dark: #5c1522; --accent-soft: #fbeef0; --accent-tint: #fdf6f6;
+  --cover-grad-1: #31090f; --cover-grad-2: #7a2433; --cover-grad-3: #a8394c; --gold: #d1ab5c; --gold-ink: #6b4f10;
+  --paper: #fefbfa; --paper-tint: #fcf4f3; --line: #f0dfdd; --line-soft: #f6ecea;
+}
+.theme-forest {
+  --accent: #14665a; --accent-dark: #0b3e37; --accent-soft: #e9f5f2; --accent-tint: #f4faf9;
+  --cover-grad-1: #041a15; --cover-grad-2: #0f5049; --cover-grad-3: #1c8272; --gold: #d3bd76; --gold-ink: #6b5710;
+  --paper: #fafefd; --paper-tint: #f2faf8; --line: #dcefe9; --line-soft: #e9f5f1;
+}
+.theme-slate {
+  --accent: #3d5568; --accent-dark: #24333f; --accent-soft: #edf2f5; --accent-tint: #f6f9fa;
+  --cover-grad-1: #0e161d; --cover-grad-2: #324556; --cover-grad-3: #52738c; --gold: #d0b476; --gold-ink: #6b5510;
+  --paper: #fafcfd; --paper-tint: #f2f6f8; --line: #e0e8ec; --line-soft: #edf2f4;
+}
+.theme-plum {
+  --accent: #6a3b8c; --accent-dark: #3f2255; --accent-soft: #f4eef9; --accent-tint: #faf7fc;
+  --cover-grad-1: #1c0d2e; --cover-grad-2: #59317a; --cover-grad-3: #8552ac; --gold: #d5b168; --gold-ink: #6b4f10;
+  --paper: #fdfaff; --paper-tint: #f7f2fb; --line: #eae0f2; --line-soft: #f2ebf8;
+}
+
+/* ---------- Reset & font sistemi ---------- */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  font-family: "DejaVu Sans", "Liberation Sans", Arial, sans-serif;
+  color: var(--ink);
+  font-size: 7.9pt;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+strong, b { font-weight: 700; }
+em { font-style: italic; }
+
+.serif { font-family: "DejaVu Serif", "Liberation Serif", Georgia, serif; }
+
+.page {
+  position: relative;
+  width: var(--page-w);
+  height: var(--page-h);
+  overflow: hidden;
+  background: var(--paper);
+  page-break-after: always;
+  break-after: page;
+  display: flex;
+  flex-direction: column;
+}
+.page:last-child { page-break-after: auto; }
+
+/* zemin dokusu: çok hafif nokta matrisi -- kağıt/kumaş hissi verir, metni etkilemez */
+.body-page::before {
+  content: "";
+  position: absolute; inset: 0;
+  background-image: radial-gradient(circle, rgba(20,22,30,0.05) 0.6px, transparent 0.6px);
+  background-size: 3.6mm 3.6mm;
+  opacity: 0.55;
+  pointer-events: none;
+  z-index: 0;
+}
+.body-page > * { position: relative; z-index: 1; flex-shrink: 0; }
+
+/* ================= KAPAK — çok katmanlı, dokulu, amblemli ================= */
+.cover {
+  color: #fff;
+  position: relative;
+  background:
+    radial-gradient(circle at 85% 6%, rgba(255,255,255,0.14), transparent 38%),
+    radial-gradient(ellipse 70% 45% at 18% 100%, rgba(0,0,0,0.35), transparent 60%),
+    linear-gradient(152deg, var(--cover-grad-1) 0%, var(--cover-grad-2) 62%, var(--cover-grad-3) 100%);
+  padding: var(--pad-top) var(--pad-right) var(--pad-bottom) var(--pad-left);
+  justify-content: space-between;
+}
+/* ince nokta dokusu -- kumaş/kağıt hissi */
+.cover::before {
+  content: "";
+  position: absolute; inset: 0;
+  background-image: radial-gradient(circle, rgba(255,255,255,0.10) 0.7px, transparent 0.7px);
+  background-size: 4.2mm 4.2mm;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+}
+/* iç çerçeve -- "cilt" hissi */
+.cover::after {
+  content: "";
+  position: absolute; inset: calc(var(--bleed) + 7mm);
+  border: 1px solid rgba(255,255,255,0.20);
+  pointer-events: none;
+}
+.cover-corner { position:absolute; width:7mm; height:7mm; pointer-events:none; }
+.cover-corner::before, .cover-corner::after { content:""; position:absolute; background: rgba(255,255,255,0.55); }
+.cover-corner.tl { top:calc(var(--bleed) + 7mm); left:calc(var(--bleed) + 7mm); }
+.cover-corner.tr { top:calc(var(--bleed) + 7mm); right:calc(var(--bleed) + 7mm); transform: scaleX(-1); }
+.cover-corner.bl { bottom:calc(var(--bleed) + 7mm); left:calc(var(--bleed) + 7mm); transform: scaleY(-1); }
+.cover-corner.br { bottom:calc(var(--bleed) + 7mm); right:calc(var(--bleed) + 7mm); transform: scale(-1,-1); }
+.cover-corner::before { top:-1px; left:-1px; width:4.5mm; height:1.4px; }
+.cover-corner::after { top:-1px; left:-1px; width:1.4px; height:4.5mm; }
+.cover-inner { position:relative; z-index:2; display:flex; flex-direction:column; height:100%; justify-content:space-between; }
+
+.cover-top { display:flex; justify-content: space-between; align-items:flex-start; flex-shrink: 0; }
+.cover-kicker {
+  display:inline-block;
+  font-size: 7.4pt; letter-spacing: 2px; font-weight:700; text-transform:uppercase;
+  border: 1px solid rgba(255,255,255,0.4);
+  border-radius: 999px;
+  padding: 5.5px 15px;
+  color: rgba(255,255,255,0.95);
+  background: rgba(255,255,255,0.06);
+}
+
+/* Amblem: çok katmanlı halka + iç dolgu + minik saat-noktaları + mühür dokusu */
+.cover-emblem { position:relative; width: 32mm; height:32mm; }
+.cover-emblem .ring-outer {
+  position:absolute; inset:0; border-radius:50%;
+  border: 1px solid rgba(255,255,255,0.32);
+}
+.cover-emblem .ring-outer::before {
+  content:""; position:absolute; inset:-2.6mm; border-radius:50%;
+  border: 1px solid rgba(255,255,255,0.14);
+}
+.cover-emblem .ring-mid {
+  position:absolute; inset:3.4mm; border-radius:50%;
+  border: 1px solid rgba(255,255,255,0.24);
+  background: repeating-conic-gradient(rgba(255,255,255,0.12) 0deg 0.7deg, transparent 0.7deg 9deg);
+}
+.cover-emblem .ring-inner {
+  position:absolute; inset:7.2mm; border-radius:50%;
+  background: radial-gradient(circle at 32% 28%, rgba(255,255,255,0.28), rgba(255,255,255,0.03) 72%);
+  border: 1px solid rgba(255,255,255,0.45);
+  display:flex; align-items:center; justify-content:center;
+  box-shadow: inset 0 1px 5px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.06);
+}
+.cover-emblem .ring-inner span {
+  font-family: "DejaVu Serif", serif; font-size: 13.5pt; font-weight:700; color: var(--gold);
+  text-shadow: 0 1px 3px rgba(0,0,0,0.35);
+}
+.cover-emblem .tick {
+  position:absolute; width:1.4px; height:2.6mm; background: rgba(255,255,255,0.6);
+  left: 50%; top: -1.3mm; transform-origin: 50% 17mm;
+}
+.cover-emblem .tick.major { height: 3.6mm; background: var(--gold); opacity:0.85; }
+
+.cover-mid { flex: 1; display:flex; flex-direction:column; justify-content:flex-end; padding-bottom: 8mm; position:relative; }
+.cover-motif {
+  position:absolute; left:-3mm; bottom: 32mm;
+  font-family: "DejaVu Serif", serif;
+  font-size: 150pt; font-weight:700; color: rgba(255,255,255,0.075);
+  letter-spacing: -6px; line-height:1; z-index:0;
+  text-shadow: 0 0 40px rgba(255,255,255,0.04);
+}
+.cover-code { font-size: 8.6pt; letter-spacing:2.4px; color: var(--gold); font-weight:700; margin-bottom: 4.5mm; text-transform:uppercase; position:relative; }
+.cover-code::before { content:"—  "; color: rgba(255,255,255,0.5); }
+.cover-title {
+  font-family: "DejaVu Serif", "Liberation Serif", Georgia, serif;
+  font-size: 34pt; font-weight:700; line-height:1.08; letter-spacing: -0.3px;
+  position:relative; text-shadow: 0 2px 18px rgba(0,0,0,0.25);
+}
+.cover-title .accent-word { color: var(--gold); }
+.cover-subtitle { font-size: 13pt; font-weight:400; color: rgba(255,255,255,0.9); margin-top:5mm; max-width: 148mm; line-height:1.45; position:relative; }
+.cover-rule { width: 28mm; height:2.6px; background: linear-gradient(90deg, var(--gold), rgba(255,255,255,0.15)); margin: 7mm 0 6mm; border-radius:2px; position:relative; }
+.cover-desc { font-size: 9.7pt; color: rgba(255,255,255,0.82); max-width: 132mm; line-height:1.68; position:relative; }
+
+.cover-bottom { position:relative; flex-shrink: 0; }
+.cover-stats { display:flex; gap: 5mm; margin-bottom: 7mm; }
+.cover-stat {
+  flex:1;
+  border: 1px solid rgba(255,255,255,0.24);
+  border-top: 1px solid rgba(255,255,255,0.55);
+  border-radius: 9px;
+  padding: 4.2mm 5mm;
+  font-size: 8.4pt; font-weight:700; letter-spacing:.3px;
+  color: rgba(255,255,255,0.95);
+  background: linear-gradient(165deg, rgba(255,255,255,0.13), rgba(255,255,255,0.02) 60%);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.22), inset 0 1px 0 rgba(255,255,255,0.08);
+  position: relative; overflow: hidden;
+}
+.cover-stat::before {
+  content:""; position:absolute; top:0; left:0; right:0; height:1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent);
+}
+.cover-stat b { display:block; font-family:"DejaVu Serif",serif; font-size: 14pt; color: var(--gold); font-weight:700; margin-bottom:1.3mm; }
+.cover-foot {
+  display:flex; justify-content:space-between; align-items:center;
+  border-top: 1px solid rgba(255,255,255,0.25);
+  padding-top: 4mm;
+  font-size: 7.7pt; letter-spacing:1.2px; text-transform:uppercase; color: rgba(255,255,255,0.75);
+}
+
+/* ================= SAYFA GÖVDESİ (kapak-dışı tüm sayfalar) ================= */
+.body-page { padding: var(--pad-top) var(--pad-right) var(--pad-bottom) var(--pad-left); }
+
+.pageband {
+  display:flex; justify-content:space-between; align-items:center;
+  font-size: 6.09pt; letter-spacing: 0.99px; text-transform:uppercase; font-weight:700;
+  color: var(--ink-faint);
+  padding-bottom: 1.93mm; margin-bottom: 3.85mm;
+  border-bottom: 1.65px solid var(--accent);
+  position:relative;
+}
+.pageband::after {
+  content:""; position:absolute; left:0; bottom:-1.65px; width: 13.17mm; height:1.65px; background: var(--gold);
+}
+.pageband .pageband-course { color: var(--accent-dark); font-weight:700; }
+
+.footer {
+  position: absolute; bottom: calc(var(--bleed) + 9mm); left: var(--pad-left); right: var(--pad-right);
+  display:flex; justify-content:space-between; align-items:center;
+  font-size: 6.17pt; color: var(--ink-faint); font-weight:600;
+  border-top: 0.82px solid var(--line);
+  padding-top: 1.67mm;
+}
+.footer .fnum {
+  font-weight:700; color: #fff; background: var(--accent);
+  padding: 0.64px 4.49px; border-radius: 999px; font-size: 6.25pt;
+}
+
+/* ---------- İçindekiler ---------- */
+.toc-kicker { font-size: 6.58pt; letter-spacing:1.48px; font-weight:700; color: var(--accent); text-transform:uppercase; }
+.toc-title { font-family:"DejaVu Serif",serif; font-size: 20.57pt; font-weight:700; margin-top: 1.65mm; color: var(--ink); }
+.toc-lede { font-size: 7.9pt; color: var(--ink-soft); margin-top:2.47mm; max-width: 150mm; line-height:1.6; }
+.toc-list { margin-top: 6.58mm; display:flex; flex-direction:column; gap: 0; }
+.toc-row {
+  display:flex; align-items:center; gap: 4.11mm;
+  padding: 3.79mm 2.47mm;
+  border-bottom: 0.82px solid var(--line-soft);
+  border-radius: 4.94px;
+  text-decoration: none; color: inherit;
+}
+.toc-row:first-child { border-top: 0.82px solid var(--line-soft); }
+.toc-num {
+  flex: 0 0 auto;
+  width: 7.74mm; height:7.74mm; border-radius:50%;
+  background: var(--accent-soft); color: var(--accent-dark);
+  font-weight:700; font-size: 7.9pt; font-family:"DejaVu Serif",serif;
+  display:flex; align-items:center; justify-content:center;
+  box-shadow: var(--shadow-sm);
+}
+.toc-num.alt { background: var(--accent-dark); color:#fff; }
+.toc-body { flex: 1 1 auto; }
+.toc-heading { font-size: 8.89pt; font-weight:700; color: var(--ink); }
+.toc-sub { font-size: 6.99pt; color: var(--ink-faint); margin-top: 0.66mm; }
+.toc-page { flex: 0 0 auto; font-size: 7.57pt; font-weight:700; color: var(--accent); background: var(--accent-tint); padding: 1.32mm 2.47mm; border-radius: 4.94px; }
+
+/* ---------- Genel Bakış ---------- */
+.ov-hero {
+  background: linear-gradient(125deg, var(--accent-dark), var(--accent) 88%);
+  color: #fff; border-radius: 9.88px;
+  padding: 5.35mm 6.17mm; margin-top:1.65mm;
+  font-size: 7.98pt; line-height:1.6;
+  box-shadow: var(--shadow-md);
+  position:relative; overflow:hidden;
+}
+.ov-hero::after {
+  content:""; position:absolute; right:-8.23mm; top:-14.81mm; width:37.85mm; height:37.85mm; border-radius:50%;
+  border: 0.82px solid rgba(255,255,255,0.15);
+}
+.ov-hero b { color: var(--gold); }
+.ov-grid { display:grid; grid-template-columns: repeat(3, 1fr); gap: 3.46mm; margin-top: 4.94mm; }
+.ov-card {
+  border: 0.82px solid var(--line); border-radius: 7.41px; padding: 3.79mm 4.11mm;
+  background: var(--paper); box-shadow: var(--shadow-sm);
+  border-top: 2.14px solid var(--accent);
+}
+.ov-card-title { font-size: 7.82pt; font-weight:700; color: var(--accent-dark); margin-bottom:1.48mm; font-family:"DejaVu Serif",serif; }
+.ov-card-text { font-size: 6.99pt; color: var(--ink-soft); line-height:1.5; }
+
+.ov-flow { display:flex; align-items:stretch; gap: 0; margin-top: 4.94mm; }
+.ov-flow-step {
+  flex:1; background: linear-gradient(160deg, var(--accent-tint), var(--paper)); border: 0.82px solid var(--line);
+  border-radius: 7.41px; padding: 3.46mm 2.96mm; text-align:center; box-shadow: var(--shadow-sm);
+  /* Dar sayfada (5 adımda sütun ~22mm) uzun tek kelimeler kutuyu taşırıyordu:
+     flex öğesi min-content'in altına inemez, bu yüzden min-width:0 + kelime
+     kırma şart. Yoksa "Varoluşçuluğa" gibi kelimeler kart kenarından taşar. */
+  min-width: 0;
+  overflow-wrap: break-word;
+}
+.ov-flow-step b { display:block; font-size: 7.32pt; color: var(--accent-dark); margin-bottom: 0.82mm; font-family:"DejaVu Serif",serif; }
+.ov-flow-step span { font-size: 6.75pt; color: var(--ink-soft); }
+.ov-flow-arrow { flex: 0 0 5.76mm; display:flex; align-items:center; justify-content:center; color: var(--accent); }
+
+/* ================= BÖLÜM BANNER ================= */
+.chbanner {
+  background: linear-gradient(128deg, var(--accent-dark), var(--accent) 85%);
+  color:#fff; border-radius: 9.88px;
+  padding: 5.76mm 6.99mm; position:relative; overflow:hidden;
+  box-shadow: var(--shadow-lg);
+}
+.chbanner::before {
+  content:"";
+  position:absolute; inset:0;
+  background-image: radial-gradient(circle, rgba(255,255,255,0.12) 0.6px, transparent 0.6px);
+  background-size: 3.6mm 3.6mm; mix-blend-mode: overlay;
+}
+.chbanner::after {
+  content:""; position:absolute; right:-13.17mm; top:-13.17mm; width:46.08mm; height:46.08mm;
+  border-radius:50%; border: 0.82px solid rgba(255,255,255,0.22);
+}
+.chbanner-deco { position:absolute; right:8.23mm; bottom:-6.58mm; font-family:"DejaVu Serif",serif; font-size:49.38pt; font-weight:700; color: rgba(255,255,255,0.08); }
+.chbanner-kicker { font-size: 6.42pt; letter-spacing:1.65px; font-weight:700; text-transform:uppercase; color: var(--gold); position:relative; }
+.chbanner-title { font-family:"DejaVu Serif",serif; font-size: 16.46pt; font-weight:700; margin-top: 1.48mm; line-height:1.15; position:relative; }
+.chbanner-subtitle { font-size: 7.49pt; color: rgba(255,255,255,0.88); margin-top: 1.81mm; max-width: 150mm; line-height:1.5; position:relative; }
+
+/* ---------- 4'lü anahtar terim grid'i ---------- */
+.terms-grid { display:grid; grid-template-columns: 1fr 1fr; gap: 2.8mm; margin-top: 4.53mm; }
+.term-box {
+  border: 0.82px solid var(--line); border-left: 2.88px solid var(--accent);
+  border-radius: 5.76px; padding: 2.8mm 3.46mm; background: var(--paper);
+  box-shadow: var(--shadow-sm);
+}
+.term-box .term-name { font-size: 7.65pt; font-weight:700; color: var(--accent-dark); margin-bottom: 0.91mm; font-family:"DejaVu Serif",serif; }
+.term-box .term-def { font-size: 6.83pt; color: var(--ink-soft); line-height:1.45; }
+
+/* ---------- Kişi kartı ---------- */
+.person-card {
+  display:flex; gap: 3.46mm; align-items:flex-start;
+  margin-top: 4.53mm; padding: 3.46mm 4.11mm;
+  background: linear-gradient(155deg, var(--accent-tint), var(--paper));
+  border: 0.82px solid var(--line); border-radius: 7.41px;
+  box-shadow: var(--shadow-sm);
+}
+.person-avatar {
+  flex: 0 0 auto; width: 11.11mm; height:11.11mm; border-radius:50%;
+  background: linear-gradient(150deg, var(--accent), var(--accent-dark));
+  color:#fff; font-weight:700; font-size: 8.64pt; font-family:"DejaVu Serif",serif;
+  display:flex; align-items:center; justify-content:center;
+  box-shadow: var(--shadow-sm);
+}
+.person-name { font-size: 8.72pt; font-weight:700; color: var(--ink); font-family:"DejaVu Serif",serif; }
+.person-tag { font-size: 6.34pt; letter-spacing:.4.94px; text-transform:uppercase; font-weight:700; color: var(--accent-dark); margin: 0.58mm 0 1.4mm; }
+.person-bio { font-size: 6.83pt; color: var(--ink-soft); line-height:1.5; }
+.person-row { display:flex; gap: 4.94mm; margin-top:4.53mm; }
+.person-row .person-card { flex:1; margin-top:0; }
+
+/* ---------- Numaralı içerik blokları ---------- */
+.block { margin-top: 4.77mm; }
+.block-head { display:flex; align-items:baseline; gap: 2.3mm; margin-bottom: 2.14mm; }
+.block-num {
+  flex:0 0 auto; width: 5.27mm; height:5.27mm; border-radius:50%;
+  background: var(--accent-dark); color:#fff; font-size: 6.5pt; font-weight:700;
+  display:flex; align-items:center; justify-content:center; box-shadow: var(--shadow-sm);
+}
+.block-title { font-size: 8.89pt; font-weight:700; color: var(--ink); font-family:"DejaVu Serif",serif; }
+.block-subtitle { font-size: 6.75pt; color: var(--ink-faint); margin-top: -0.99mm; margin-bottom:1.65mm; margin-left: 7.57mm; font-style:italic; }
+.block ul { margin-left: 7.57mm; }
+.block li { font-size: 7.32pt; color: var(--ink-soft); margin-bottom: 1.4mm; line-height:1.5; list-style: none; position:relative; }
+.block li::before { content:"–"; position:absolute; left:-3.46mm; color: var(--accent); font-weight:700; }
+.block li b, .block li strong { color: var(--ink); font-weight:700; }
+
+/* ---------- Callout kutuları (gerçek SVG ikonlarla) ---------- */
+.callout { border-radius: 7.41px; padding: 3.13mm 3.95mm; margin-top: 4.28mm; display:flex; gap: 2.8mm; box-shadow: var(--shadow-sm); }
+.callout-icon { flex:0 0 auto; width: 5.76mm; height:5.76mm; border-radius:50%; display:flex; align-items:center; justify-content:center; }
+.callout-icon svg { width: 3.13mm; height:3.13mm; }
+.callout-title { font-size: 6.99pt; font-weight:700; text-transform:uppercase; letter-spacing:.4.11px; margin-bottom: 0.91mm; }
+.callout-text { font-size: 7.16pt; line-height:1.5; }
+
+.callout.focus { background: var(--focus-bg); border: 0.82px solid #eecf8a; }
+.callout.focus .callout-icon { background:#f0dba0; color: var(--focus-ink); }
+.callout.focus .callout-title, .callout.focus .callout-text { color: var(--focus-ink); }
+
+.callout.caution { background: var(--caution-bg); border: 0.82px solid #b9cdf2; }
+.callout.caution .callout-icon { background:#c3d3f5; color: var(--caution-ink); }
+.callout.caution .callout-title, .callout.caution .callout-text { color: var(--caution-ink); }
+
+.callout.insight { background: var(--insight-bg); border: 0.82px solid #1c2c4d; }
+.callout.insight .callout-icon { background: rgba(255,255,255,0.16); color: var(--insight-accent); }
+.callout.insight .callout-title { color: var(--insight-accent); }
+.callout.insight .callout-text { color: rgba(255,255,255,0.94); }
+
+.callout.route { background: var(--route-bg); border: 0.82px solid #c9bcf2; }
+.callout.route .callout-icon { background:#d6cdf5; color: var(--route-ink); }
+.callout.route .callout-title, .callout.route .callout-text { color: var(--route-ink); }
+
+/* ---------- Akış / süreç diyagramı ---------- */
+.flowdiag { display:flex; align-items:stretch; gap:0; margin-top: 4.77mm; }
+.flowdiag .fstep {
+  flex:1; background: var(--paper); border: 0.82px solid var(--line); border-top: 2.47px solid var(--accent);
+  border-radius: 6.58px; padding: 2.96mm 2.47mm; text-align:center; box-shadow: var(--shadow-sm);
+  min-width: 0; overflow-wrap: break-word;    /* bkz. .ov-flow-step notu */
+}
+.flowdiag .fstep-title { font-size: 6.99pt; font-weight:700; color: var(--ink); margin-bottom: 0.82mm; font-family:"DejaVu Serif",serif; }
+.flowdiag .fstep-text { font-size: 6.25pt; color: var(--ink-faint); line-height:1.35; }
+.flowdiag .farrow { flex: 0 0 5.35mm; display:flex; align-items:center; justify-content:center; color: var(--accent); }
+.flowdiag .farrow svg { width:3.29mm; height:3.29mm; }
+.flow-caption { font-size: 6.34pt; color: var(--ink-faint); margin-top: 1.48mm; font-style: italic; }
+
+/* ---------- Karşılaştırma tablosu ---------- */
+.ctable-wrap { margin-top: 4.77mm; }
+.ctable-caption { font-size: 7.16pt; font-weight:700; color: var(--accent-dark); margin-bottom: 1.81mm; font-family:"DejaVu Serif",serif; }
+table.ctable { width:100%; border-collapse: collapse; border-radius: 5.76px; overflow:hidden; box-shadow: var(--shadow-sm); }
+table.ctable th {
+  background: linear-gradient(120deg, var(--accent-dark), var(--accent));
+  color:#fff; font-size: 6.67pt; text-align:left;
+  padding: 2.3mm 2.96mm; font-weight:700; letter-spacing:.1.65px;
+}
+table.ctable td {
+  font-size: 6.75pt; color: var(--ink-soft); padding: 2.3mm 2.96mm;
+  border-bottom: 0.82px solid var(--line-soft); vertical-align: top; line-height:1.4;
+}
+table.ctable tr:nth-child(even) td { background: var(--accent-tint); }
+table.ctable td:first-child { font-weight:700; color: var(--ink); }
+
+/* ---------- Bilgi kartları (küçük istatistik grid) ---------- */
+.info-grid { display:grid; grid-template-columns: repeat(3, 1fr); gap: 2.8mm; margin-top: 4.77mm; }
+.info-card { border: 0.82px solid var(--line); border-radius:6.58px; padding: 2.8mm 3.13mm; position:relative; background: var(--paper); box-shadow: var(--shadow-sm); }
+.info-card .badge {
+  position:absolute; top:2.14mm; right:2.3mm; width: 4.44mm; height:4.44mm; border-radius:50%;
+  background: var(--accent-soft); color: var(--accent-dark);
+  font-size: 6.58pt; font-weight:700; font-family:"DejaVu Serif",serif;
+  display:flex; align-items:center; justify-content:center;
+}
+.info-card .ic-title { font-size: 6.99pt; font-weight:700; color: var(--ink); margin-bottom: 0.91mm; padding-right: 4.94mm; font-family:"DejaVu Serif",serif; }
+.info-card .ic-text { font-size: 6.5pt; color: var(--ink-soft); line-height:1.4; }
+
+/* ---------- Bölüm özeti ---------- */
+.chsummary {
+  margin-top: 5.1mm; background: linear-gradient(120deg, var(--accent-dark), var(--accent) 130%); color:#fff; border-radius: 7.41px;
+  padding: 3.62mm 4.28mm; font-size: 7.24pt; line-height:1.55; box-shadow: var(--shadow-md);
+}
+.chsummary b { color: var(--gold); text-transform:uppercase; font-size:6.34pt; letter-spacing:.4.94px; display:block; margin-bottom:1.23mm; }
+
+/* ---------- Ayet-i Kerime kartları (Arapça orijinal + meal + etimoloji) ---------- */
+.ayat-section-title { font-size: 7.08pt; font-weight:700; color: var(--accent-dark); margin-bottom: 1.81mm; margin-top: 4.77mm; font-family:"DejaVu Serif",serif; }
+.ayah-card {
+  border: 0.82px solid var(--line); border-left: 2.88px solid var(--gold);
+  border-radius: 6.58px; padding: 3.29mm 3.79mm; margin-top: 2.63mm;
+  background: linear-gradient(160deg, var(--accent-tint), var(--paper));
+  box-shadow: var(--shadow-sm);
+}
+.ayah-ref {
+  font-size: 6.25pt; font-weight:700; letter-spacing:.3.29px; text-transform:uppercase;
+  color: var(--gold-ink); margin-bottom: 1.65mm;
+}
+.ayah-arabic {
+  direction: rtl; text-align: right; unicode-bidi: isolate;
+  font-family: "DejaVu Sans", sans-serif;
+  font-size: 12.34pt; line-height: 2; color: var(--ink);
+  margin-bottom: 2.14mm; word-spacing: 1.23px;
+}
+.ayah-meal { font-size: 6.99pt; color: var(--ink-soft); line-height:1.5; font-style:italic; }
+.ayah-meal::before { content: "" ; }
+.ayah-etym { font-size: 6.58pt; color: var(--ink-faint); line-height:1.4; margin-top: 1.48mm; padding-top: 1.48mm; border-top: 0.82px solid var(--line-soft); }
+
+/* ================= SÖZLÜK ================= */
+.gloss-grid { display:grid; grid-template-columns: 1fr 1fr; gap: 2.63mm 4.53mm; margin-top: 4.94mm; }
+.gloss-item { border-bottom: 0.82px solid var(--line-soft); padding-bottom: 2.3mm; }
+.gloss-term { font-size: 7.49pt; font-weight:700; color: var(--accent-dark); font-family:"DejaVu Serif",serif; }
+.gloss-def { font-size: 6.75pt; color: var(--ink-soft); line-height:1.42; margin-top: 0.74mm; }
+.gloss-ref { font-size: 6.01pt; color: var(--ink-faint); margin-top: 0.74mm; font-style:italic; }
+
+/* ================= SINAV HAZIRLIK ================= */
+.dist-grid { display:grid; grid-template-columns: 1fr 1fr; gap: 2.96mm; margin-top: 4.28mm; }
+.dist-card { border: 0.82px solid var(--line); border-radius: 7.41px; padding: 3.13mm 3.62mm; background: var(--paper); box-shadow: var(--shadow-sm); }
+.dist-title { font-size: 7.32pt; font-weight:700; color: var(--accent-dark); margin-bottom:1.23mm; font-family:"DejaVu Serif",serif; }
+.dist-vs { color: var(--gold-ink); font-weight:700; }
+.dist-text { font-size: 6.75pt; color: var(--ink-soft); line-height:1.48; }
+
+.match-table-wrap { margin-top: 4.94mm; }
+table.matchtable { width:100%; border-collapse:collapse; box-shadow: var(--shadow-sm); }
+table.matchtable th { background: linear-gradient(120deg, var(--accent-dark), var(--accent)); color:#fff; font-size:6.5pt; padding:2.14mm 2.63mm; text-align:left; }
+table.matchtable td { font-size: 6.67pt; padding: 1.98mm 2.63mm; border-bottom:0.82px solid var(--line-soft); color: var(--ink-soft); }
+table.matchtable td:first-child { font-weight:700; color:var(--ink); }
+table.matchtable tr:nth-child(even) td { background: var(--accent-tint); }
+
+.qa-grid { display:grid; grid-template-columns: 1fr 1fr; gap: 2.63mm 4.94mm; margin-top: 4.94mm; }
+.qa-item { font-size: 6.83pt; border-left: 2.06px solid var(--accent-soft); padding-left: 2.47mm; }
+.qa-q { font-weight:700; color: var(--ink); margin-bottom: 0.74mm; }
+.qa-a { color: var(--accent-dark); }
+
+.checklist { margin-top: 4.94mm; display:grid; grid-template-columns: 1fr 1fr; gap: 1.98mm 4.94mm; }
+.check-item { display:flex; align-items:flex-start; gap: 1.98mm; font-size: 6.83pt; color: var(--ink-soft); }
+.check-box { flex:0 0 auto; width:3.13mm; height:3.13mm; border: 1.23px solid var(--accent); border-radius: 2.47px; margin-top: 0.49mm; }
+
+.section-kicker { font-size: 6.5pt; letter-spacing:1.48px; font-weight:700; color: var(--accent); text-transform:uppercase; }
+.section-title { font-family:"DejaVu Serif",serif; font-size: 17.28pt; font-weight:700; margin-top: 1.65mm; color: var(--ink); }
+.section-lede { font-size: 7.41pt; color: var(--ink-soft); margin-top: 2.14mm; }
+
+/* ================= TEST (20 Soruluk Değerlendirme) ================= */
+.test-chip-row { display:flex; gap: 2.8mm; margin-top: 4.53mm; }
+.test-chip {
+  flex:1; text-align:center; background: var(--accent-tint); border: 0.82px solid var(--line);
+  border-radius: 6.58px; padding: 2.47mm 1.65mm;
+}
+.test-chip b { display:block; font-family:"DejaVu Serif",serif; font-size: 10.29pt; color: var(--accent-dark); }
+.test-chip span { font-size: 5.76pt; font-weight:700; letter-spacing:.3.29px; text-transform:uppercase; color: var(--ink-faint); }
+.test-instructions {
+  margin-top: 3.29mm; background: var(--caution-bg); border: 0.82px solid #b9cdf2; color: var(--caution-ink);
+  border-radius: 6.58px; padding: 2.47mm 3.29mm; font-size: 6.91pt; line-height:1.5;
+}
+.tq-list { margin-top: 4.94mm; column-count: 2; column-gap: 6.58mm; column-fill: balance; }
+.tq { break-inside: avoid; -webkit-column-break-inside: avoid; margin-bottom: 4.53mm; }
+.tq-head { display:flex; align-items:flex-start; gap: 2.3mm; margin-bottom: 1.81mm; }
+.tq-num {
+  flex:0 0 auto; width: 5.27mm; height:5.27mm; border-radius:4.94px;
+  background: var(--accent-dark); color:#fff; font-size: 6.91pt; font-weight:700;
+  display:flex; align-items:center; justify-content:center; box-shadow: var(--shadow-sm); font-family:"DejaVu Serif",serif;
+}
+.tq-stem { font-size: 7.49pt; font-weight:700; color: var(--ink); line-height:1.4; padding-top:0.33mm; }
+.tq-options { margin-left: 7.57mm; display:flex; flex-direction:column; gap: 1.32mm; }
+.tq-options li { list-style:none; display:flex; gap: 1.98mm; align-items:flex-start; font-size: 7.08pt; color: var(--ink-soft); line-height:1.4; }
+.opt-letter {
+  flex:0 0 auto; width:3.79mm; height:3.79mm; border-radius:50%; border: 1.07px solid var(--accent);
+  color: var(--accent-dark); font-size: 5.6pt; font-weight:700;
+  display:flex; align-items:center; justify-content:center; margin-top: 0.16mm;
+}
+
+/* ================= CEVAP ANAHTARI VE ÇÖZÜMLER ================= */
+.ans-list { margin-top: 4.94mm; column-count: 2; column-gap: 6.58mm; column-fill: balance; }
+.ans-item { display:flex; gap: 2.47mm; break-inside: avoid; -webkit-column-break-inside: avoid; margin-bottom: 2.3mm; }
+.ans-num {
+  flex:0 0 auto; width: 5.27mm; height:5.27mm; border-radius:4.94px;
+  background: var(--accent-soft); color: var(--accent-dark); font-size: 6.91pt; font-weight:700;
+  display:flex; align-items:center; justify-content:center; font-family:"DejaVu Serif",serif; border: 0.82px solid var(--line);
+}
+.ans-correct {
+  display:inline-block; background:#e7f5ec; color:#1e7e42; font-weight:700; font-size:6.25pt;
+  letter-spacing:.2.47px; padding: 0.82mm 2.14mm; border-radius:999px; margin-bottom: 0.99mm;
+}
+.ans-explain { font-size: 6.99pt; color: var(--ink-soft); line-height:1.45; }
+.ans-explain b { color: var(--ink); }
+
+/* çok-sayfa: bölüm içi devam sayfası başlığı */
+.chcontinue { display:flex; align-items:flex-start; gap: 2.63mm; margin-bottom: 4.53mm; }
+.chcontinue .tag {
+  flex: 0 0 auto; margin-top: 0.49mm;
+  font-size: 6.17pt; font-weight:700; letter-spacing:.4.94px; text-transform:uppercase;
+  background: var(--accent-dark); color: #fff; padding: 1.48mm 2.8mm; border-radius: 999px;
+}
+.chcontinue .cctitle { font-family:"DejaVu Serif",serif; font-size: 11.52pt; font-weight:700; color: var(--ink); line-height:1.25; }
+
+/* ============================================================
+   KİTAP ÖN KISMI (build_kitap.py — ana kapak, künye, önsöz,
+   sayfa rehberi, ana içindekiler, ders haritası)
+   Sadece birleşik kitapta kullanılır; tek ders çıktısını etkilemez.
+   ============================================================ */
+
+/* --- Künye --- */
+.imprint-grid { margin-top: 5.76mm; border-top: 0.82px solid var(--line); }
+.imprint-row { display:flex; gap: 4.94mm; padding: 2.8mm 0.82mm; border-bottom: 0.82px solid var(--line-soft); }
+.imprint-label {
+  flex: 0 0 34.56mm; font-size: 6.58pt; font-weight:700; letter-spacing:0.91px;
+  text-transform:uppercase; color: var(--ink-faint);
+}
+.imprint-value { flex:1; font-size: 7.74pt; color: var(--ink); line-height:1.5; }
+.imprint-value b { color: var(--accent-dark); }
+.imprint-note {
+  margin-top: 5.76mm; font-size: 7.24pt; color: var(--ink-soft); line-height:1.6;
+  border-left: 2.14px solid var(--accent); padding: 0.82mm 0 0.82mm 4.11mm;
+}
+
+/* --- Önsöz --- */
+.pref-grid { display:grid; grid-template-columns: repeat(2, 1fr); gap: 4.11mm; margin-top: 5.76mm; }
+.pref-card {
+  border: 0.82px solid var(--line); border-top: 2.14px solid var(--accent);
+  border-radius: 7.41px; padding: 4.11mm 4.44mm; background: var(--paper); box-shadow: var(--shadow-sm);
+}
+.pref-card-title {
+  font-family:"DejaVu Serif",serif; font-size: 8.56pt; font-weight:700;
+  color: var(--accent-dark); margin-bottom: 1.98mm;
+}
+.pref-card-text { font-size: 7.24pt; color: var(--ink-soft); line-height:1.58; }
+.pref-card-text b { color: var(--ink); }
+
+/* --- Sayfa rehberi (legend) --- */
+.guide-grid { display:grid; grid-template-columns: repeat(2, 1fr); gap: 4.11mm 4.94mm; margin-top: 4.94mm; }
+.guide-item { display:flex; flex-direction:column; gap: 1.81mm; }
+.guide-cap {
+  font-size: 6.58pt; font-weight:700; letter-spacing:.7.41px; text-transform:uppercase;
+  color: var(--accent-dark);
+}
+.guide-cap span { display:block; text-transform:none; letter-spacing:0; font-weight:400; font-size:6.75pt; color: var(--ink-soft); margin-top:0.66mm; line-height:1.45; }
+.guide-demo { border: 0.82px dashed var(--line); border-radius: 6.58px; padding: 2.47mm; background: var(--paper-tint); }
+.guide-demo .callout { margin: 0; }
+.guide-demo .term-box { margin: 0; }
+.guide-demo .chsummary { margin: 0; }
+
+/* --- Ana içindekiler (ders listesi) --- */
+.btoc-list { margin-top: 4.94mm; display:flex; flex-direction:column; }
+.btoc-row {
+  display:flex; align-items:center; gap: 3.7mm;
+  padding: 3.29mm 2.47mm; border-bottom: 0.82px solid var(--line-soft);
+  text-decoration:none; color: inherit; border-radius: 4.94px;
+}
+.btoc-row:first-child { border-top: 0.82px solid var(--line-soft); }
+.btoc-chip {
+  flex: 0 0 auto; width: 8.64mm; height: 8.64mm; border-radius: 6.58px;
+  display:flex; align-items:center; justify-content:center;
+  font-family:"DejaVu Serif",serif; font-weight:700; font-size: 9.05pt; color:#fff;
+  box-shadow: var(--shadow-sm);
+}
+.btoc-body { flex: 1 1 auto; min-width: 0; }
+.btoc-name { font-size: 9.05pt; font-weight:700; color: var(--ink); }
+.btoc-sub { font-size: 6.83pt; color: var(--ink-faint); margin-top: 0.66mm; }
+.btoc-meta { flex: 0 0 auto; font-size: 6.42pt; color: var(--ink-faint); text-align:right; line-height:1.5; }
+.btoc-range {
+  flex: 0 0 auto; font-size: 7.57pt; font-weight:700; color: #fff;
+  padding: 1.48mm 2.63mm; border-radius: 4.94px; min-width: 20mm; text-align:center;
+}
+
+/* --- Ders haritası (sırt görünümü) --- */
+.map-note { font-size: 7.24pt; color: var(--ink-soft); line-height:1.6; margin-top: 2.47mm; }
+.map-list { margin-top: 5.76mm; display:flex; flex-direction:column; gap: 2.63mm; }
+.map-row { display:flex; align-items:center; gap: 3.29mm; }
+.map-name { flex: 0 0 42.79mm; font-size: 7.24pt; font-weight:700; color: var(--ink); }
+.map-track { flex: 1 1 auto; height: 5.43mm; background: var(--paper-tint); border: 0.82px solid var(--line); border-radius: 999px; overflow:hidden; }
+.map-fill { height: 100%; border-radius: 999px; display:flex; align-items:center; justify-content:flex-end; padding-right: 1.98mm; }
+.map-fill span { font-size: 6.09pt; font-weight:700; color: #fff; }
+.map-range { flex: 0 0 19.75mm; text-align:right; font-size: 6.75pt; font-weight:700; color: var(--ink-faint); }
+
+/* ===== build.py tarafından üretildi — elle düzenlemeyin ===================
+   Trim 175mm x 250mm · bleed 3mm ·
+   kenarlar: üst 11mm / alt 19mm /
+   iç 14mm / dış 9mm ·
+   tek sayfa sırtı: left
+   ========================================================================= */
+@page { size: 181mm 256mm; margin: 0; }
+:root {
+  --trim-w: 175mm;
+  --trim-h: 250mm;
+  --bleed: 3mm;
+  --page-w: 181mm;
+  --page-h: 256mm;
+  --mg-top: 11mm;
+  --mg-bottom: 19mm;
+  --mg-inner: 14mm;
+  --mg-outer: 9mm;
+  --pad-top: 14mm;
+  --pad-bottom: 22mm;
+  --pad-inner: 17mm;
+  --pad-outer: 12mm;
+}
+/* Ayna simetri — tek sayfada sırt left, çift sayfada right */
+body > section.page:nth-of-type(odd) {
+  --pad-left: var(--pad-inner);
+  --pad-right: var(--pad-outer);
+}
+body > section.page:nth-of-type(even) {
+  --pad-left: var(--pad-outer);
+  --pad-right: var(--pad-inner);
+}
+</style>
+<style>:root {
+  --accent: #8F335D;
+  --accent-dark: #5C1E3B;
+  --accent-soft: #F9EEF3;
+  --accent-tint: #FBF6F8;
+  --cover-grad-1: #290A18;
+  --cover-grad-2: #7C2C51;
+  --cover-grad-3: #AB4A77;
+  --gold: #d9b466;
+  --gold-ink: #6b5210;
+  --paper: #FDFCFC;
+  --paper-tint: #F9F4F7;
+  --line: #EEE0E6;
+  --line-soft: #F5ECF0;
+}</style>
+</head>
+<body class="theme-custom">
+
+
+
+<section class="page cover" id="cover">
+  <div class="cover-corner tl"></div>
+  <div class="cover-corner tr"></div>
+  <div class="cover-corner bl"></div>
+  <div class="cover-corner br"></div>
+  <div class="cover-top">
+    <div class="cover-kicker">Görsel Ders Notu Kitabı · Final Özeti</div>
+    <div class="cover-emblem">
+      <div class="ring-outer"></div>
+      <div class="ring-mid"></div>
+      
+      <div class="tick major" style="transform: translateX(-50%) rotate(0deg);"></div>
+      
+      <div class="tick" style="transform: translateX(-50%) rotate(30deg);"></div>
+      
+      <div class="tick" style="transform: translateX(-50%) rotate(60deg);"></div>
+      
+      <div class="tick major" style="transform: translateX(-50%) rotate(90deg);"></div>
+      
+      <div class="tick" style="transform: translateX(-50%) rotate(120deg);"></div>
+      
+      <div class="tick" style="transform: translateX(-50%) rotate(150deg);"></div>
+      
+      <div class="tick major" style="transform: translateX(-50%) rotate(180deg);"></div>
+      
+      <div class="tick" style="transform: translateX(-50%) rotate(210deg);"></div>
+      
+      <div class="tick" style="transform: translateX(-50%) rotate(240deg);"></div>
+      
+      <div class="tick major" style="transform: translateX(-50%) rotate(270deg);"></div>
+      
+      <div class="tick" style="transform: translateX(-50%) rotate(300deg);"></div>
+      
+      <div class="tick" style="transform: translateX(-50%) rotate(330deg);"></div>
+      
+      <div class="ring-inner"><span>İ</span></div>
+    </div>
+  </div>
+  <div class="cover-mid">
+    <div class="cover-motif">İ</div>
+    <div class="cover-code">İLKE & YÖNTEM</div>
+    <div class="cover-title">Öğretim <span class="accent-word">İlke</span> ve Yöntemleri</div>
+    <div class="cover-subtitle">Öğrenme Kuramlarından Öğretim Yöntem, Teknik ve Düşünme Biçimlerine Final Özeti</div>
+    <div class="cover-rule"></div>
+    <div class="cover-desc">Tam Öğrenme'den Programlı Öğrenmeye, Probleme Dayalı ve Proje Tabanlı Öğrenmeden Yapılandırmacılığa; İşbirlikli, Aktif ve Anlamlı Öğrenmeden Gagne ve Glasser'ın modellerine; Çoklu Zeka Kuramı'ndan Carroll, Slavin, Bandura ve Nunley'in modellerine; Anlatım, Tartışma ve Problem Çözme gibi öğretim yöntemlerinden Altı Şapkalı Düşünme, Beyin Fırtınası ve Mikro Öğretim gibi tekniklere ve son olarak Yaratıcı, Eleştirel, Yansıtıcı, Analitik ve Metabilişsel düşünme biçimlerine uzanan kapsamlı bir Öğretim İlke ve Yöntemleri final özeti.</div>
+  </div>
+  <div class="cover-bottom">
+    <div class="cover-stats">
+      <div class="cover-stat"><b>6</b>Bölüm</div>
+      <div class="cover-stat"><b>33</b>Anahtar Kavram</div>
+      <div class="cover-stat"><b>Final</b>Sınav Hazırlık</div>
+    </div>
+    <div class="cover-foot">
+      <div>Ders Notu Serisi</div>
+      <div>6 Bölüm · Final Sınavı Hazırlığı</div>
+    </div>
+  </div>
+</section>
+
+
+
+
+<section class="page body-page">
+  <div class="pageband"><div>Öğretim <span class="accent-word">İlke</span> ve Yöntemleri</div><div class="pageband-course">İLKE & YÖNTEM</div></div>
+  
+  <div class="toc-kicker">Kitap Planı</div>
+  <div class="toc-title">İçindekiler</div>
+  <div class="toc-lede">Öğrenme Kuramlarından Öğretim Yöntem, Teknik ve Düşünme Biçimlerine Final Özeti — bölüm bölüm takip edilecek çalışma haritası.</div>
+  
+  <div class="toc-list">
+    
+    <a class="toc-row" href="#ch-1">
+      <div class="toc-num">1</div>
+      <div class="toc-body">
+        <div class="toc-heading">Öğrenme-Öğretme Kuram ve Modelleri I</div>
+        <div class="toc-sub">Tam Öğrenme'den Programlı Öğrenme'ye, Probleme Dayalı Öğrenmeden Yapılandırmacılığa</div>
+      </div>
+      <div class="toc-page">s.5</div>
+    </a>
+    
+    <a class="toc-row" href="#ch-2">
+      <div class="toc-num">2</div>
+      <div class="toc-body">
+        <div class="toc-heading">Öğrenme-Öğretme Kuram ve Modelleri II</div>
+        <div class="toc-sub">İşbirliğine Dayalı ve Aktif Öğrenmeden, Gagne'nin Öğretim Durumlarına ve Glasser'ın Modeline</div>
+      </div>
+      <div class="toc-page">s.8</div>
+    </a>
+    
+    <a class="toc-row" href="#ch-3">
+      <div class="toc-num">3</div>
+      <div class="toc-body">
+        <div class="toc-heading">Öğrenme-Öğretme Kuram ve Modelleri III</div>
+        <div class="toc-sub">Yaşam Boyu ve Beyin Temelli Öğrenmeden, Çoklu Zeka'ya, Carroll/Slavin, Bandura ve Nunley'e</div>
+      </div>
+      <div class="toc-page">s.11</div>
+    </a>
+    
+    <a class="toc-row" href="#ch-4">
+      <div class="toc-num">4</div>
+      <div class="toc-body">
+        <div class="toc-heading">Öğretim Yöntemleri</div>
+        <div class="toc-sub">Anlatım'dan Tartışma ve Örnek Olay'a, Gösterip Yaptırma'dan Problem Çözme ve Proje'ye</div>
+      </div>
+      <div class="toc-page">s.15</div>
+    </a>
+    
+    <a class="toc-row" href="#ch-5">
+      <div class="toc-num">5</div>
+      <div class="toc-body">
+        <div class="toc-heading">Öğretim Teknikleri</div>
+        <div class="toc-sub">Grupla Öğretim Tekniklerinden Bilişsel Çıraklığa, Tersine Eğitime ve Bireysel Tekniklere</div>
+      </div>
+      <div class="toc-page">s.18</div>
+    </a>
+    
+    <a class="toc-row" href="#ch-6">
+      <div class="toc-num">6</div>
+      <div class="toc-body">
+        <div class="toc-heading">Düşünme Biçimleri</div>
+        <div class="toc-sub">Yaratıcı ve Eleştirel Düşünmeden, Yansıtıcı, Analitik ve Metabilişsel Düşünmeye</div>
+      </div>
+      <div class="toc-page">s.22</div>
+    </a>
+    
+    <a class="toc-row" href="#glossary">
+      <div class="toc-num alt">A</div>
+      <div class="toc-body">
+        <div class="toc-heading">Anahtar Kavramlar Sözlüğü</div>
+        <div class="toc-sub">Tanımlı ve bağlamlandırılmış 33 kavram</div>
+      </div>
+      <div class="toc-page">s.25</div>
+    </a>
+    
+  </div>
+  
+<div class="footer">
+  <div>Öğretim <span class="accent-word">İlke</span> ve Yöntemleri</div>
+  <div class="fnum">2</div>
+</div>
+
+</section>
+
+
+<section class="page body-page">
+  <div class="pageband"><div>Öğretim <span class="accent-word">İlke</span> ve Yöntemleri</div><div class="pageband-course">İçindekiler · Devam</div></div>
+  
+  <div class="toc-list">
+    
+    <a class="toc-row" href="#exam">
+      <div class="toc-num alt">B</div>
+      <div class="toc-body">
+        <div class="toc-heading">Genel Değerlendirme Testi</div>
+        <div class="toc-sub">20 soruluk çoktan seçmeli test ve çözümlü cevap anahtarı</div>
+      </div>
+      <div class="toc-page">s.27</div>
+    </a>
+    
+  </div>
+  
+<div class="footer">
+  <div>Öğretim <span class="accent-word">İlke</span> ve Yöntemleri</div>
+  <div class="fnum">3</div>
+</div>
+
+</section>
+
+
+
+
+<section class="page body-page">
+  <div class="pageband"><div>Öğretim <span class="accent-word">İlke</span> ve Yöntemleri</div><div class="pageband-course">İLKE & YÖNTEM</div></div>
+  <div class="toc-kicker">Dersin Büyük Resmi</div>
+  <div class="toc-title">Genel Bakış</div>
+
+  <div class="ov-hero">Bu ders, eğitimde başarının şans eseri değil doğru stratejilerin ürünü olduğu ilkesinden yola çıkarak; <b>öğrenme-öğretme kuram ve modellerinden</b> (Tam Öğrenme, Programlı Öğrenme, Yapılandırmacılık, Çoklu Zeka, Basamaklı Öğretim...), <b>öğretim yöntemlerine</b> (Anlatım, Tartışma, Problem Çözme, Proje...), <b>öğretim tekniklerine</b> (Altı Şapkalı Düşünme, Beyin Fırtınası, Mikro Öğretim, Keller Planı...) ve son olarak <b>düşünme biçimlerine</b> (Yaratıcı, Eleştirel, Yansıtıcı, Analitik, Metabilişsel) uzanan altı bölümlük kapsamlı bir sınav hazırlık rehberidir.</div>
+
+  <div class="ov-grid">
+    
+    <div class="ov-card">
+      <div class="ov-card-title">Öğrenme-Öğretme Kuram ve Modelleri I</div>
+      <div class="ov-card-text">Tam Öğrenme, Programlı Öğrenme, Probleme Dayalı ve Proje Tabanlı Öğrenme, Yapılandırmacılık.</div>
+    </div>
+    
+    <div class="ov-card">
+      <div class="ov-card-title">Öğrenme-Öğretme Kuram ve Modelleri II</div>
+      <div class="ov-card-text">İşbirlikli, Aktif ve Anlamlı Öğrenme; Gagne'nin Öğretim Durumları ve Glasser'ın Temel Öğretme Modeli.</div>
+    </div>
+    
+    <div class="ov-card">
+      <div class="ov-card-title">Öğrenme-Öğretme Kuram ve Modelleri III</div>
+      <div class="ov-card-text">Yaşam Boyu ve Beyin Temelli Öğrenme, Çoklu Zeka Kuramı, Carroll, Slavin, Bandura ve Nunley'in modelleri.</div>
+    </div>
+    
+    <div class="ov-card">
+      <div class="ov-card-title">Öğretim Yöntemleri</div>
+      <div class="ov-card-text">Anlatım, Tartışma, Soru-Cevap, Örnek Olay, Gösterip Yaptırma, Problem Çözme, Proje ve Laboratuvar yöntemleri.</div>
+    </div>
+    
+    <div class="ov-card">
+      <div class="ov-card-title">Öğretim Teknikleri</div>
+      <div class="ov-card-text">Altı Şapkalı Düşünme, Altı Ayakkabılı Uygulama, İstasyon, Beyin Fırtınası, Mikro Öğretim, Keller Planı ve Tutor Destekli Öğretim.</div>
+    </div>
+    
+    <div class="ov-card">
+      <div class="ov-card-title">Düşünme Biçimleri</div>
+      <div class="ov-card-text">Yaratıcı, Eleştirel, Yansıtıcı, Analitik ve Metabilişsel (Üstbiliş) düşünme biçimleri.</div>
+    </div>
+    
+  </div>
+
+  
+  <div class="section-kicker" style="margin-top:3.5mm;">Çalışma Akışı</div>
+  <div class="ov-flow">
+    
+    
+    <div class="ov-flow-step"><b>Kuram ve Modeller I</b><span>Tam Öğrenme, Programlı Öğrenme, Yapılandırmacılık</span></div>
+    
+    <div class="ov-flow-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="19" y2="12"/><polyline points="13 6 19 12 13 18"/></svg></div>
+    <div class="ov-flow-step"><b>Kuram ve Modeller II</b><span>İşbirlikli, Aktif, Anlamlı Öğrenme, Gagne, Glasser</span></div>
+    
+    <div class="ov-flow-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="19" y2="12"/><polyline points="13 6 19 12 13 18"/></svg></div>
+    <div class="ov-flow-step"><b>Kuram ve Modeller III</b><span>Çoklu Zeka, Carroll, Slavin, Bandura, Nunley</span></div>
+    
+    <div class="ov-flow-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="19" y2="12"/><polyline points="13 6 19 12 13 18"/></svg></div>
+    <div class="ov-flow-step"><b>Öğretim Yöntemleri</b><span>Anlatım, Tartışma, Problem Çözme, Proje</span></div>
+    
+    <div class="ov-flow-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="19" y2="12"/><polyline points="13 6 19 12 13 18"/></svg></div>
+    <div class="ov-flow-step"><b>Öğretim Teknikleri</b><span>Altı Şapka, Beyin Fırtınası, Mikro Öğretim</span></div>
+    
+    <div class="ov-flow-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="19" y2="12"/><polyline points="13 6 19 12 13 18"/></svg></div>
+    <div class="ov-flow-step"><b>Düşünme Biçimleri</b><span>Yaratıcı, Eleştirel, Yansıtıcı, Analitik, Metabilişsel</span></div>
+    
+  </div>
+  
+
+  
+  <div class="callout caution" style="margin-top:3.5mm;">
+    <div class="callout-icon">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.5"/><line x1="12" y1="11" x2="12" y2="16.5"/><circle cx="12" cy="7.5" r="0.6" fill="currentColor" stroke="none"/></svg>
+
+</div>
+    <div><div class="callout-title">Sınavda Ana Ayrım</div><div class="callout-text">Bu kitaptaki <b>mavi 'Dikkat / Püf Noktası'</b> kutucukları, sınavlarda en sık karıştırılan kavram çiftlerini (Tam Öğrenme ↔ Programlı Öğrenme, Proje Tabanlı ↔ Probleme Dayalı Öğrenme, Rol Oynama ↔ Drama, Benzetim ↔ Analoji, Altı Şapka ↔ Altı Ayakkabı gibi) işaretler; sınav sorularının büyük bölümü tam da bu ayrımlar üzerine kuruludur.</div></div>
+  </div>
+  
+
+  
+<div class="footer">
+  <div>Öğretim <span class="accent-word">İlke</span> ve Yöntemleri</div>
+  <div class="fnum">4</div>
+</div>
+
+</section>
+
+
+
+
+  
+  
+  <section class="page body-page" data-ch="1" data-cp="0" id="ch-1">
+    <div class="pageband"><div>Öğretim <span class="accent-word">İlke</span> ve Yöntemleri</div><div class="pageband-course">Bölüm 1</div></div>
+
+    
+      <div class="chbanner">
+        <div class="chbanner-kicker">1. Bölüm</div>
+        <div class="chbanner-title">Öğrenme-Öğretme Kuram ve Modelleri I</div>
+        <div class="chbanner-subtitle">Tam Öğrenme'den Programlı Öğrenme'ye, Probleme Dayalı Öğrenmeden Yapılandırmacılığa</div>
+      </div>
+    
+
+    <!--item 0 terms-->
+  
+<div class="terms-grid">
+  
+  <div class="term-box">
+    <div class="term-name">Tam Öğrenme</div>
+    <div class="term-def">Olumlu öğrenme koşulları sağlanırsa herhangi birinin öğrenebileceğini herkesin öğrenebileceğini savunan, grupla öğretim modeli (Bloom).</div>
+  </div>
+  
+  <div class="term-box">
+    <div class="term-name">Programlı Öğrenme</div>
+    <div class="term-def">Edimsel koşullanma ilkelerine dayanan, öğretimin bireyselleştirildiği, herkesin kendi hızında ilerlediği sistem (Skinner).</div>
+  </div>
+  
+  <div class="term-box">
+    <div class="term-name">Probleme Dayalı Öğrenme</div>
+    <div class="term-def">İlgi ve merak uyandıran bir problemle başlanan, öğrencinin süreci baştan sona yönettiği öğrenci merkezli yaklaşım (Dewey).</div>
+  </div>
+  
+  <div class="term-box">
+    <div class="term-name">Yapılandırmacılık</div>
+    <div class="term-def">Bilginin nesnel değil, bireyin kendi deneyimleriyle öznel olarak inşa ettiği bir şey olduğunu savunan kuram.</div>
+  </div>
+  
+</div>
+
+  
+<!--item 1 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">1</div>
+    <div class="block-title">Tam Öğrenme Modeli (B. Bloom)</div>
+  </div>
+  
+  <ul>
+    <li><b>'Tam öğrenme modeline göre işin başında olumlu öğrenme koşulları sağlanmış ise herhangi bir kişinin öğrenebileceği bir şeyi herkes öğrenebilir.'</b></li><li>Bloom'un bu modeli, okuldaki başarıyı %90'a çıkaran (alt limit %70) <b>grupla öğretim</b> sürecidir. Öğrenciye ihtiyacı kadar zaman verilir ve konular küçük birimlere (ünitelere) ayrılır; bir birim öğrenilmeden diğerine geçilmez.</li><li><b>Öğrenmeyi Etkileyen Değişkenler:</b> süreç temelde Öğrenci Nitelikleri, Öğretim Hizmeti ve Öğrenme Ürünleri olarak işler. Öğrenci nitelikleri ikiye ayrılır: <b>Bilişsel Giriş Davranışları (%50 Etkili)</b> — bilişsel alan düzeyi, hazırbulunuşluk ve öğrenme stilleri (örn: çarpma için toplamayı bilmek); <b>Duyuşsal Giriş Özellikleri (%25 Etkili)</b> — derse, öğretmene, okula karşı tutumlar, ilgi ve özgüven.</li><li><b>Öğretim Hizmetinin Niteliği (ÖÇFRE):</b> öğretim hizmeti Pekiştirme, İpucu, Dönüt ve Düzeltme, Etkin Katılım unsurlarından oluşur.</li>
+  </ul>
+</div>
+
+  
+<!--item 2 callout-->
+  
+<div class="callout caution">
+  <div class="callout-icon">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.5"/><line x1="12" y1="11" x2="12" y2="16.5"/><circle cx="12" cy="7.5" r="0.6" fill="currentColor" stroke="none"/></svg>
+
+</div>
+  <div>
+    <div class="callout-title">Dikkat / Püf Noktası</div>
+    <div class="callout-text">Tam öğrenme oldukça zaman alıcıdır ve bireysel farklar ihmal edilir. En büyük sınırlılığı, yavaş öğrenenlerin hızlı öğrenenleri engellemesi ve onları bekletmesidir. Ayrıca süreçte öğrenci-öğrenci etkileşimi yoktur; bu yüzden işbirlikli öğrenme ve tartışma gibi teknikler kullanılamaz.</div>
+  </div>
+</div>
+
+  
+<!--item 3 callout-->
+  
+<div class="callout insight">
+  <div class="callout-icon">
+<svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 1.5 L14.6 9 L22 9 L15.9 13.6 L18.2 21 L12 16.6 L5.8 21 L8.1 13.6 L2 9 L9.4 9 Z"/></svg>
+
+</div>
+  <div>
+    <div class="callout-title">Kritik Çıkarım</div>
+    <div class="callout-text">Zeka, kişilik, yetenek gibi faktörler değiştirilemeyen faktörlerken; zaman, ortam, bilişsel/duyuşsal özellikler değiştirilebilir faktörlerdir.</div>
+  </div>
+</div>
+
+  
+
+
+    
+<div class="footer">
+  <div>Öğretim <span class="accent-word">İlke</span> ve Yöntemleri</div>
+  <div class="fnum">5</div>
+</div>
+
+  </section>
+  
+  
+  
+  <section class="page body-page" data-ch="1" data-cp="1">
+    <div class="pageband"><div>Öğretim <span class="accent-word">İlke</span> ve Yöntemleri</div><div class="pageband-course">Bölüm 1</div></div>
+
+    
+
+    <!--item 0 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">2</div>
+    <div class="block-title">Programlı Öğrenme (B.F. Skinner)</div>
+  </div>
+  
+  <ul>
+    <li>Davranışçı kuramın edimsel koşullanma ilkelerine (Skinner) dayanan, öğretimin bireyselleştirildiği sistemdir. En önemli özelliği, bireysel farklılıkları dikkate almasıdır; herkes kendi potansiyeline göre ilerler.</li><li><b>Programlı Öğrenme İlkeleri (KEBAB):</b> <b>K</b>üçük Adımlar (konuların anlamlı, küçük parçalara bölünmesi), <b>E</b>tkin Katılım (öğrencinin sürece bizzat dahil olması), <b>B</b>aşarı (başarı durumunda pekiştireç kullanılması ve bir birim bitmeden diğerine geçilmemesi), <b>A</b>nında Düzeltme (hatanın anında düzeltilerek en aza indirgenmesi), <b>B</b>ireysel Hız (her öğrenciye kendi hızında ilerleme fırsatı verilmesi — Tam Öğrenmeden ayıran en belirgin fark).</li>
+  </ul>
+</div>
+
+  
+<!--item 1 table-->
+  
+<div class="ctable-wrap">
+  <div class="ctable-caption">Karşılaştırma: Tam Öğrenme vs. Programlı Öğrenme</div>
+  <table class="ctable">
+    <thead><tr><th>Özellik</th><th>Tam Öğrenme (Bloom)</th><th>Programlı Öğretim (Skinner)</th></tr></thead>
+    <tbody>
+      
+      <tr><td>Süreç Türü</td><td>Grupla öğretim</td><td>Bireysel öğrenme</td></tr>
+      
+      <tr><td>Parçalara Bölme</td><td>Konular ünitelere ayrılır</td><td>Üniteler çok daha küçük parçalara ayrılır (küçük adımlar)</td></tr>
+      
+      <tr><td>Dönüt / Düzeltme</td><td>Ünite sonlarındaki izleme testleriyle</td><td>Her bir küçük adımın sonunda anında</td></tr>
+      
+      <tr><td>Hız Faktörü</td><td>Hızlı öğrenenler, yavaşları beklemek zorundadır</td><td>Herkes kendi hızında ilerler (at yarışı gibidir)</td></tr>
+      
+      <tr><td>Bireysel Farklar</td><td>Ortadan kaldırır (deve kervanı gibidir)</td><td>Daha belirginleştirir (arttırır)</td></tr>
+      
+    </tbody>
+  </table>
+</div>
+
+  
+<!--item 2 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">3</div>
+    <div class="block-title">Probleme Dayalı Öğrenme (J. Dewey)</div>
+  </div>
+  
+  <ul>
+    <li>İlerlemecilik eğitim felsefesinin savunucusu John Dewey ve Piaget'in yapısalcı çalışmaları doğrultusunda ortaya çıkmıştır. Problemin ilgi ve merak uyandırıcı olması en önemli önkoşuldur; Piaget'ye göre bu <b>'şaşkınlık ortamı'</b> öğrenmeyi tetikler ve güdülenmeyi (motivasyonu) artırır.</li><li>Öğretime bir problem ile başlanır ve öğrencinin dünyasıyla bağlantı kurulur; problem disiplinler üzerinde değil, yalnızca konu üzerinde organize edilir.</li><li>Öğretmen organize eden kişidir (rehber); konuyu ve kaynak materyalleri öğrenciyle bulur. Öğrenciler problemi baştan sona yönetmede tam yetkilidir.</li><li><b>Aşamaları:</b> Problemi Hissetme → Problemi Tanımlama → Bilgi Toplama → Hipotez Üretme → Veri Toplama → Hipotezleri Test Etme → Sonuca Ulaşma.</li>
+  </ul>
+</div>
+
+  
+<!--item 3 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">4</div>
+    <div class="block-title">Proje Tabanlı Öğrenme</div>
+  </div>
+  
+  <ul>
+    <li>Birden fazla disiplinin (dersin) öğrenme hedeflerini kapsayan, eğitim programının küçük bilgiler yığını olarak öğretilmesine karşı çıkan çağdaş bir modeldir.</li><li>Esnek yapılı bir senaryo etrafında, küçük gruplarda işbirlikli öğrenmeyi temel alır; öğrenci yaratıcılık, bilgiye erişim ve yeniden harmanlama gibi üst düzey bilişsel aktiviteler yapar.</li><li>Öğretmen danışman/yönlendiricidir; kaynakları ve konuyu öğrencilerin kendisi bulur. Teknoloji ve bilgisayar hedef değil, yalnızca bir araç olarak görülür. Sürecin sonunda ortaya somut ve gerçekçi bir ürün (ürün/rapor) konur.</li>
+  </ul>
+</div>
+
+  
+
+
+    
+<div class="footer">
+  <div>Öğretim <span class="accent-word">İlke</span> ve Yöntemleri</div>
+  <div class="fnum">6</div>
+</div>
+
+  </section>
+  
+  
+  
+  <section class="page body-page" data-ch="1" data-cp="2">
+    <div class="pageband"><div>Öğretim <span class="accent-word">İlke</span> ve Yöntemleri</div><div class="pageband-course">Bölüm 1</div></div>
+
+    
+
+    <!--item 0 callout-->
+  
+<div class="callout caution">
+  <div class="callout-icon">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.5"/><line x1="12" y1="11" x2="12" y2="16.5"/><circle cx="12" cy="7.5" r="0.6" fill="currentColor" stroke="none"/></svg>
+
+</div>
+  <div>
+    <div class="callout-title">Dikkat / Püf Noktası — Proje Tabanlı ile Probleme Dayalı Öğrenme Farkı</div>
+    <div class="callout-text">Proje tabanlı öğrenme, öğrenmenin ürün boyutundan çok süreç boyutu üzerinde durur, ancak sürecin ayrılmaz bir parçası olarak mutlaka somut bir sonuç/ürün de hedeflenir. Probleme dayalı öğrenmede ise somut ürün yoktur, sadece problemi çözme (süreç) önemlidir.</div>
+  </div>
+</div>
+
+  
+<!--item 1 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">5</div>
+    <div class="block-title">Yapılandırmacılık</div>
+  </div>
+  
+  <ul>
+    <li>Öğrencinin belli bir konuda kendi anlayışını yaratmak için kendi deneyimlerini kullandığı, öğretimden çok 'bilgiyi öğrenmeyle' ilgili olan kuramdır. Bilgi nesnel değildir; bireylerin yarattığı şekilde var olur, yani sübjektif ve bireyseldir.</li><li>Piaget'in zihinsel gelişim kuramı üzerine kuruludur ve öğretmenin 'öğreten' değil, öğrencilerin 'öğrenmelerini sağlayan (rehber)' olduğu düşüncesi hakimdir. Evrensel mutlak gerçekler yoktur; bilgi işleyen hipotezlerdir. Daha çok Birincil Bilgi Kaynakları (öğrencinin kendi yaşantısıyla elde ettiği gözlem ve deneyimler) kullanılır.</li>
+  </ul>
+</div>
+
+  
+<!--item 2 table-->
+  
+<div class="ctable-wrap">
+  <div class="ctable-caption">Yapılandırmacı Yaklaşım Türleri</div>
+  <table class="ctable">
+    <thead><tr><th>Tür</th><th>Açıklama</th></tr></thead>
+    <tbody>
+      
+      <tr><td>Bilişsel Yapılandırmacılık</td><td>Bilginin oluşumunu Piaget'in özümleme, düzenleme ve denge ilkeleriyle açıklar.</td></tr>
+      
+      <tr><td>Radikal Yapılandırmacılık</td><td>Bilgi, doğru, gerçek gibi kavramların radikal değişimler geçirmesi gerektiğini savunur.</td></tr>
+      
+      <tr><td>Sosyal Yapılandırmacılık</td><td>Öğrenmede kültürün ve dilin büyük etkisi olduğunu, bilginin sosyal etkileşimle oluştuğunu savunur.</td></tr>
+      
+      <tr><td>Eleştirel Yapılandırmacılık</td><td>Bilginin oluştuğu çevreye eleştirel boyut katar; bireyin yapıyı oluşturma gerekçesini sorgular.</td></tr>
+      
+    </tbody>
+  </table>
+</div>
+
+  
+<!--item 3 callout-->
+  
+<div class="callout insight">
+  <div class="callout-icon">
+<svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 1.5 L14.6 9 L22 9 L15.9 13.6 L18.2 21 L12 16.6 L5.8 21 L8.1 13.6 L2 9 L9.4 9 Z"/></svg>
+
+</div>
+  <div>
+    <div class="callout-title">Kritik Çıkarım</div>
+    <div class="callout-text">Yapılandırmacılıkta program oldukça esnektir. Çünkü öğrencinin önceden var olan zihinsel yapılarıyla yeni bilgiyi nasıl anlamlandırıp yapılandıracağı baştan kesin olarak kestirilemez.</div>
+  </div>
+</div>
+
+  
+<!--item 4 summary-->
+  
+<div class="chsummary"><b>Bölüm Özeti</b>Bölüm 1, öğrenmeyi grup temelli ve zaman yoğun kılan Tam Öğrenme'den, bireysel hızı esas alan Programlı Öğrenme'ye; öğrenciyi problem çözme sürecinde tam yetkili kılan Probleme Dayalı Öğrenme'den, somut bir ürünle sonuçlanan Proje Tabanlı Öğrenme'ye ve bilginin öznel biçimde inşa edildiğini savunan Yapılandırmacılık'a uzanan beş temel kuram ve modeli ele alır.</div>
+
+  
+
+
+    
+<div class="footer">
+  <div>Öğretim <span class="accent-word">İlke</span> ve Yöntemleri</div>
+  <div class="fnum">7</div>
+</div>
+
+  </section>
+  
+  
+
+  
+  
+  <section class="page body-page" data-ch="2" data-cp="0" id="ch-2">
+    <div class="pageband"><div>Öğretim <span class="accent-word">İlke</span> ve Yöntemleri</div><div class="pageband-course">Bölüm 2</div></div>
+
+    
+      <div class="chbanner">
+        <div class="chbanner-kicker">2. Bölüm</div>
+        <div class="chbanner-title">Öğrenme-Öğretme Kuram ve Modelleri II</div>
+        <div class="chbanner-subtitle">İşbirliğine Dayalı ve Aktif Öğrenmeden, Gagne'nin Öğretim Durumlarına ve Glasser'ın Modeline</div>
+      </div>
+    
+
+    <!--item 0 terms-->
+  
+<div class="terms-grid">
+  
+  <div class="term-box">
+    <div class="term-name">İşbirliğine Dayalı Öğrenme</div>
+    <div class="term-def">Öğrencilerin ortak bir hedef doğrultusunda heterojen küçük gruplar halinde birlikte çalıştığı model (Kubaşık/Kooperatif Öğrenme).</div>
+  </div>
+  
+  <div class="term-box">
+    <div class="term-name">Aktif Öğrenme</div>
+    <div class="term-def">Öğrencinin dinlemekten çok derse katıldığı, öğrenme sürecinin sorumluluğunu taşıdığı süreç (Good).</div>
+  </div>
+  
+  <div class="term-box">
+    <div class="term-name">Anlamlı Öğrenme</div>
+    <div class="term-def">Bireyin kavramlar arasındaki ilişkiyi fark etmesini içeren, kavram haritalarıyla desteklenen öğretmen merkezli öğrenme (Ausubel).</div>
+  </div>
+  
+  <div class="term-box">
+    <div class="term-name">Öğretim Durumları Modeli</div>
+    <div class="term-def">8 aşamalı bir öğrenme türleri hiyerarşisi ve dersin işleniş sırasını tanımlayan model (Gagne).</div>
+  </div>
+  
+</div>
+
+  
+<!--item 1 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">1</div>
+    <div class="block-title">İşbirliğine Dayalı Öğrenme (Kubaşık - Kooperatif Öğrenme)</div>
+  </div>
+  
+  <ul>
+    <li>Öğrencilerin kişisel olarak kendi öğrenmelerini ve birbirlerinin öğrenmelerini artırmak amacıyla, ortak bir hedef doğrultusunda küçük gruplar halinde birlikte çalışmasıdır. Kurt Lewin, Deutsch, Dewey, Slavin, Vygotsky ve Piaget gibi birçok araştırmacı bu modele katkı sağlamıştır.</li><li><b>Temel Özellikleri:</b> gruplar 2-6 kişiliktir ve heterojendir (yetenek, cinsiyet, akademik başarı, sosyal beceri açısından farklı öğrencilerden oluşur); öğrencilerin gruplar halinde yüz yüze etkileşim kurabileceği küme düzeninde oturtulması en uygun olanıdır; öğrenciler birbirleriyle yardımlaşır, öğrendiklerini paylaşır, birbirini destekler ve güdüler. Bu model öğrencilere çok yönlü ve empatik düşünme becerisi kazandırır.</li>
+  </ul>
+</div>
+
+  
+<!--item 2 callout-->
+  
+<div class="callout caution">
+  <div class="callout-icon">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.5"/><line x1="12" y1="11" x2="12" y2="16.5"/><circle cx="12" cy="7.5" r="0.6" fill="currentColor" stroke="none"/></svg>
+
+</div>
+  <div>
+    <div class="callout-title">Dikkat / Püf Noktası</div>
+    <div class="callout-text">İşbirlikli öğrenmede liderlik rolü ya da tek başına inisiyatif alma yoktur; liderlik paylaşılır. Bireysellik geri plandadır. Öğrencilerin grubun tümünün başarısına etki ettiklerini kavramalarına <b>'olumlu bağlılık'</b> denir.</div>
+  </div>
+</div>
+
+  
+<!--item 3 table-->
+  
+<div class="ctable-wrap">
+  <div class="ctable-caption">Karşılaştırma: Küme Çalışması vs. İşbirliğine Dayalı Öğrenme</div>
+  <table class="ctable">
+    <thead><tr><th>Özellik</th><th>Küme Çalışmaları</th><th>İşbirliğine Dayalı Öğrenme</th></tr></thead>
+    <tbody>
+      
+      <tr><td>Grup Yapısı</td><td>Homojen gruptur.</td><td>Heterojen yetenekli gruptur.</td></tr>
+      
+      <tr><td>Bağımlılık Durumu</td><td>Bağımlılık yoktur.</td><td>Olumlu bağlılık vardır.</td></tr>
+      
+      <tr><td>Amaçlar</td><td>Bireysel amaçlar vardır.</td><td>Ortak grup amaçları vardır.</td></tr>
+      
+      <tr><td>Liderlik</td><td>Lider atanır.</td><td>Liderlik paylaşımı vardır.</td></tr>
+      
+      <tr><td>Sorumluluk</td><td>Rastgele ortaya çıkabilir.</td><td>Bireysel sorumluluk ön plandadır.</td></tr>
+      
+    </tbody>
+  </table>
+</div>
+
+  
+
+
+    
+<div class="footer">
+  <div>Öğretim <span class="accent-word">İlke</span> ve Yöntemleri</div>
+  <div class="fnum">8</div>
+</div>
+
+  </section>
+  
+  
+  
+  <section class="page body-page" data-ch="2" data-cp="1">
+    <div class="pageband"><div>Öğretim <span class="accent-word">İlke</span> ve Yöntemleri</div><div class="pageband-course">Bölüm 2</div></div>
+
+    
+
+    <!--item 0 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">2</div>
+    <div class="block-title">Aktif Öğrenme (Good)</div>
+  </div>
+  
+  <ul>
+    <li>Aktif öğrenme, öğrencinin dinlemekten çok derse katıldığı, karmaşık öğretimsel işlerle zihinsel yeteneklerini kullanmaya zorlandığı bir süreçtir.</li><li>Öğrenci, öğrenme sürecinin sorumluluğunu taşır; öğrenciye çeşitli yönlerle ilgili karar alma ve öz düzenleme yapma fırsatları verilir. Aktif olma, hem süreç hem de sonuçla ilgilidir; okuma, yazma ve tartışma gibi etkinliklerle desteklenir, öğrencilerin tutum ve değerleri dikkate alınır.</li>
+  </ul>
+</div>
+
+  
+<!--item 1 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">3</div>
+    <div class="block-title">Anlamlı Öğrenme (D. Ausubel)</div>
+  </div>
+  
+  <ul>
+    <li>Bireyin kavramlar arasındaki ilişkiyi fark etmesini içeren öğrenmedir. Öğretmen merkezlidir ve temel kavramların önce, ayrıntıların daha sonra öğretildiği tümdengelim yöntemi kullanılır.</li><li>İçeriğin iyi yapılandırılmasına, öğrencinin zihinsel hazır oluşuna ve zihnin çalışma prensiplerine dikkat edilir. Kavram öğrenme ve kavram etrafında öğrenmelerin gerçekleşmesi esastır; bu modelde en çok <b>kavram haritaları</b> kullanılır.</li>
+  </ul>
+</div>
+
+  
+<!--item 2 callout-->
+  
+<div class="callout insight">
+  <div class="callout-icon">
+<svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 1.5 L14.6 9 L22 9 L15.9 13.6 L18.2 21 L12 16.6 L5.8 21 L8.1 13.6 L2 9 L9.4 9 Z"/></svg>
+
+</div>
+  <div>
+    <div class="callout-title">Kritik Çıkarım</div>
+    <div class="callout-text">Anlamlı öğrenmenin gerçekleşmesi için en kritik şart, öğrencinin daha önceki öğrendikleri (bilişsel yapısı) ile yeni öğrenecekleri arasında mutlaka bağ kurulmasıdır.</div>
+  </div>
+</div>
+
+  
+<!--item 3 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">4</div>
+    <div class="block-title">Öğretim Durumları Modeli (Gagne)</div>
+  </div>
+  
+  <ul>
+    <li>Gagne, öğrenme sürecinde kazanılan beş temel davranıştan söz eder: Sözel bilgiler, Zihinsel beceriler, Psiko-motor beceriler, Tutumlar ve Bilişsel stratejiler. Zihinsel beceriler önemlidir ve basitten karmaşığa giden bir yol izlenir.</li><li><b>Öğrenme Türleri Hiyerarşisi:</b> ilk 5'i davranışçı kurama (klasik ve edimsel koşullanma), son 3'ü bilişsel kurama dayanan 8 aşamalı bir süreçtir: İşaret Öğrenme → Uyarıcı-Tepki Öğrenmesi → Zincirleme Öğrenme → Sözel Öğrenme → Ayırt Etmeyi Öğrenme → Kavram Öğrenme → İlke Öğrenme → Problem Çözme.</li><li><b>Dersin İşleniş Aşamaları (Uygulama Adımları):</b> Dikkat Çekme → Hedeften Haberdar Etme → Ön Bilgileri Hatırlatma → Uyarıcı Materyal Sunma → Öğrenciye Rehberlik Etme → Davranışı Ortaya Çıkarma → Geribildirim ve Düzeltme Verme → Performans Değerlendirme → Kalıcılığı ve Transferi Sağlama.</li>
+  </ul>
+</div>
+
+  
+<!--item 4 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">5</div>
+    <div class="block-title">Temel Öğretme Modeli (Glasser)</div>
+  </div>
+  
+  <ul>
+    <li>Okulda etkili öğretimi gerçekleştirmek için öğretme işinin öğretmen tarafından yapıldığını savunan ve dört temel öğeden oluşan bir modeldir.</li>
+  </ul>
+</div>
+
+  
+<!--item 5 flow-->
+  
+<div class="flowdiag">
+  
+  
+  <div class="fstep">
+    <div class="fstep-title">Hedefler Saptanır</div>
+    
+  </div>
+  
+  <div class="farrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="19" y2="12"/><polyline points="13 6 19 12 13 18"/></svg></div>
+  <div class="fstep">
+    <div class="fstep-title">Gerekli Giriş Davranışları Belirlenir</div>
+    
+  </div>
+  
+  <div class="farrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="19" y2="12"/><polyline points="13 6 19 12 13 18"/></svg></div>
+  <div class="fstep">
+    <div class="fstep-title">Öğretme-Öğrenme Ortamı</div>
+    <div class="fstep-text">Seçilir ve Düzenlenir</div>
+  </div>
+  
+  <div class="farrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="19" y2="12"/><polyline points="13 6 19 12 13 18"/></svg></div>
+  <div class="fstep">
+    <div class="fstep-title">Değerlendirme Yapılır</div>
+    
+  </div>
+  
+</div>
+<div class="flow-caption">Glasser'ın Temel Öğretme Modelinin Öğeleri (Akış Şeması)</div>
+
+  
+<!--item 6 callout-->
+  
+<div class="callout focus">
+  <div class="callout-icon">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.5"/><line x1="12" y1="7.5" x2="12" y2="13"/><circle cx="12" cy="16.5" r="0.6" fill="currentColor" stroke="none"/></svg>
+
+</div>
+  <div>
+    <div class="callout-title">Sınavda Ana Ayrım — Gagne ile Glasser</div>
+    <div class="callout-text">Gagne'nin modeli 8 aşamalı bir <b>öğrenme türleri hiyerarşisi</b> ve dersin işleniş sırasını tanımlarken; Glasser'ın modeli yalnızca 4 öğeden oluşan, öğretmenin hedef-giriş davranışı-ortam-değerlendirme sırasını izlediği daha sade bir akıştır.</div>
+  </div>
+</div>
+
+  
+
+
+    
+<div class="footer">
+  <div>Öğretim <span class="accent-word">İlke</span> ve Yöntemleri</div>
+  <div class="fnum">9</div>
+</div>
+
+  </section>
+  
+  
+  
+  <section class="page body-page" data-ch="2" data-cp="2">
+    <div class="pageband"><div>Öğretim <span class="accent-word">İlke</span> ve Yöntemleri</div><div class="pageband-course">Bölüm 2</div></div>
+
+    
+
+    <!--item 0 summary-->
+  
+<div class="chsummary"><b>Bölüm Özeti</b>Bölüm 2, öğrencilerin heterojen küçük gruplarda ortak hedef için çalıştığı İşbirliğine Dayalı Öğrenme'den, öğrencinin sürecin sorumluluğunu taşıdığı Aktif Öğrenme'ye; kavramlar arası ilişkiyi temel alan Ausubel'in Anlamlı Öğrenme'sinden, sekiz aşamalı hiyerarşisiyle Gagne'nin Öğretim Durumları Modeli'ne ve dört öğeli akışıyla Glasser'ın Temel Öğretme Modeli'ne uzanan beş kuram ve modeli ele alır.</div>
+
+  
+
+
+    
+<div class="footer">
+  <div>Öğretim <span class="accent-word">İlke</span> ve Yöntemleri</div>
+  <div class="fnum">10</div>
+</div>
+
+  </section>
+  
+  
+
+  
+  
+  <section class="page body-page" data-ch="3" data-cp="0" id="ch-3">
+    <div class="pageband"><div>Öğretim <span class="accent-word">İlke</span> ve Yöntemleri</div><div class="pageband-course">Bölüm 3</div></div>
+
+    
+      <div class="chbanner">
+        <div class="chbanner-kicker">3. Bölüm</div>
+        <div class="chbanner-title">Öğrenme-Öğretme Kuram ve Modelleri III</div>
+        <div class="chbanner-subtitle">Yaşam Boyu ve Beyin Temelli Öğrenmeden, Çoklu Zeka'ya, Carroll/Slavin, Bandura ve Nunley'e</div>
+      </div>
+    
+
+    <!--item 0 terms-->
+  
+<div class="terms-grid">
+  
+  <div class="term-box">
+    <div class="term-name">Yaşam Boyu Öğrenme</div>
+    <div class="term-def">Bireyin neyi öğreneceğine kendi karar verdiği, eğitimi 'kurumsal/okul' yapısının dışına taşıyan, öğrenmeyi öğrenmenin ürünü olan yaklaşım.</div>
+  </div>
+  
+  <div class="term-box">
+    <div class="term-name">Beyin Temelli Öğrenme</div>
+    <div class="term-def">Öğretime insan beyni ve fonksiyonları üzerinden, gelişimsel ve sosyo-kültürel açıdan bakan model.</div>
+  </div>
+  
+  <div class="term-box">
+    <div class="term-name">Çoklu Zeka Kuramı</div>
+    <div class="term-def">Tek tip zeka anlayışını yıkan, bireylerin 8-9 farklı zeka boyutuyla dünyaya geldiğini savunan kuram (H. Gardner).</div>
+  </div>
+  
+  <div class="term-box">
+    <div class="term-name">Basamaklı Öğretim Modeli</div>
+    <div class="term-def">Öğrenciyi pasif bilgi alıcıdan aktif bilgi üreticisine dönüştüren, C-B-A düzeylerinde ilerleyen sistem (Nunley).</div>
+  </div>
+  
+</div>
+
+  
+<!--item 1 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">1</div>
+    <div class="block-title">Yaşam Boyu Öğrenme Modeli</div>
+  </div>
+  
+  <ul>
+    <li>Bilgi, modern dönemde hızlı bilimsel ve teknolojik gelişmelerin yol açtığı devinimler sonucunda çok çabuk eskimektedir. Yaşam boyu öğrenme, aslında 'öğrenmeyi öğrenmenin' bir ürünüdür.</li><li>Birey neyi öğrenmesi gerektiğine bizzat kendisi karar verir, öğrenme sürecini kendisi yönlendirir ve eğitim olanaklarından kendi tercihiyle yararlanır. <b>7 temel ilkesi</b> vardır: Süreklilik, Değişim, Kendi Kendine Öğrenme, Araştırmacılık, Özdeğerlendirme, Sınıf Dışında Öğrenme ve Eğitimi Yönetme.</li>
+  </ul>
+</div>
+
+  
+<!--item 2 callout-->
+  
+<div class="callout insight">
+  <div class="callout-icon">
+<svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 1.5 L14.6 9 L22 9 L15.9 13.6 L18.2 21 L12 16.6 L5.8 21 L8.1 13.6 L2 9 L9.4 9 Z"/></svg>
+
+</div>
+  <div>
+    <div class="callout-title">Kritik Çıkarım</div>
+    <div class="callout-text">Yaşam boyu öğrenme yaklaşımı, öğrenme-öğretme sürecine yepyeni bir boyut kazandırmış ve eğitim-öğretimi 'kurumsal/okul' yapısının dışına çıkartarak tüm hayata yaymıştır.</div>
+  </div>
+</div>
+
+  
+<!--item 3 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">2</div>
+    <div class="block-title">Beyin Temelli Öğrenme Modeli</div>
+  </div>
+  
+  <ul>
+    <li>Öğretime gelişimsel ve sosyo-kültürel açıdan bakan, doğrudan insan beyni ve onun fonksiyonları üzerine temellendirilmiş bir modeldir.</li><li><b>İlkeleri:</b> her beyin tektir, bu yüzden öğrenme ortamları mutlaka bireysel farklılıklara yanıt verecek nitelikte düzenlenmelidir; beyin birçok işlevi aynı anda yapar, parça ve bütünleri eş zamanlı olarak işler; öğrenci için sunulan bilgi kesinlikle anlamlı olmalıdır; beyin, bilgileri anlamlaştırır ve bunları birbiriyle ilişkilendirerek zihinde örüntüler oluşturur.</li>
+  </ul>
+</div>
+
+  
+<!--item 4 callout-->
+  
+<div class="callout caution">
+  <div class="callout-icon">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.5"/><line x1="12" y1="11" x2="12" y2="16.5"/><circle cx="12" cy="7.5" r="0.6" fill="currentColor" stroke="none"/></svg>
+
+</div>
+  <div>
+    <div class="callout-title">Dikkat / Püf Noktası</div>
+    <div class="callout-text">Beyin temelli öğrenmede öğrenme süreci doğrudan insan fizyolojisi ile ilgilidir. Bu modeldeki en altın kural şudur: <b>öğrenme teşvikle (destekle) artar, korku (kaygı) ile azalır.</b></div>
+  </div>
+</div>
+
+  
+
+
+    
+<div class="footer">
+  <div>Öğretim <span class="accent-word">İlke</span> ve Yöntemleri</div>
+  <div class="fnum">11</div>
+</div>
+
+  </section>
+  
+  
+  
+  <section class="page body-page" data-ch="3" data-cp="1">
+    <div class="pageband"><div>Öğretim <span class="accent-word">İlke</span> ve Yöntemleri</div><div class="pageband-course">Bölüm 3</div></div>
+
+    
+
+    <!--item 0 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">3</div>
+    <div class="block-title">Çoklu Zeka Kuramı (H. Gardner)</div>
+  </div>
+  
+  <ul>
+    <li>Howard Gardner tarafından 1983 yılında geliştirilen ve geleneksel tek tip zeka anlayışını yıkan devrim niteliğinde bir kuramdır: <b>'Gardner'a göre zeka; problem çözme kapasitesi ya da değerli bir veya birden çok kültürel yapı ürününe şekil vermektir.'</b></li><li><b>Zekayı Etkileyen Faktörler:</b> zekanın oluşumunda hem biyolojik hem de çevresel etkenler (kaynaklara ulaşım şansı, kültürel, coğrafi, ailesel ve durumsal faktörler) rol oynar. Bireyler 8 farklı zeka boyutu ile dünyaya gelirler ve her bireyde bu yetenekler az çok bulunur.</li>
+  </ul>
+</div>
+
+  
+<!--item 1 table-->
+  
+<div class="ctable-wrap">
+  <div class="ctable-caption">Zeka Alanları ve Uygun Yöntemler</div>
+  <table class="ctable">
+    <thead><tr><th>Zeka Alanı</th><th>Özellik ve Uygun Yöntem</th></tr></thead>
+    <tbody>
+      
+      <tr><td>Sözel - Dilsel</td><td>Konuşmayı sever, kelime oyunlarıyla ilgilenir, hitabet gücü yüksektir. (Tartışma, Anlatım, Rol Oynama)</td></tr>
+      
+      <tr><td>Sosyal - Kişilerarası</td><td>Grup içinde başarılı ilişkiler kurar, doğal bir liderdir, empati yeteneği yüksektir. (İşbirlikli Öğrenme, Proje)</td></tr>
+      
+      <tr><td>Bedensel - Kinestetik</td><td>Beden dilini iyi kullanır, denge ve esneklikte başarılıdır, yaparak-dokunarak öğrenir. (Eğitsel Oyun, Gösterip Yaptırma)</td></tr>
+      
+      <tr><td>Görsel - Uzamsal</td><td>Zihinden resim çizmeyi, 3 boyutlu modellemeyi ve harita/tablo okumayı sever. (Resim Yapma, Tasarım)</td></tr>
+      
+      <tr><td>Özedönük - İçsel</td><td>Bağımsızlık duygusu güçlüdür, yalnız çalışmayı sever, özgüveni ve özsaygısı yüksektir. (Bireysel Çalışma, Günlük Yazma)</td></tr>
+      
+      <tr><td>Mantıksal - Matematiksel</td><td>Soyut düşünme, tümevarım/tümdengelimle çıkarım yapma ve sebep-sonuç ilişkisi kurmada ustadır. (Problem Çözme)</td></tr>
+      
+      <tr><td>Müzikal - Ritmik</td><td>Seslere duyarlıdır, ritim tutar ve müzik aleti çalar. (Şarkı Söyleme/Yazma)</td></tr>
+      
+      <tr><td>Doğacı</td><td>Hayvanları, bitkileri ve doğa olaylarını incelemekten hoşlanır. (Gezi, Gözlem)</td></tr>
+      
+      <tr><td>Varoluşçu (Yeni Eklenen 9. Boyut)</td><td>Varlığın başı ve sonuyla ilgilenen, 'Biz kimiz?', 'Neden ölürüz?' gibi evrensel sorulara cevap arayan zeka türüdür.</td></tr>
+      
+    </tbody>
+  </table>
+</div>
+
+  
+<!--item 2 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">4</div>
+    <div class="block-title">Okulda Öğrenme Modeli (Carroll)</div>
+  </div>
+  
+  <ul>
+    <li>Carroll, 1963 yılındaki makalesinde; her öğrenciye ihtiyaç duyduğu ek zaman verildiğinde tüm öğrencilerin hedeflenen öğrenme düzeyine ulaşabileceğini savunmuştur.</li><li>Her öğrenci aynı düzeyde öğrenebilir fakat hızlı ve yavaş öğrenen öğrenciler vardır; öğrenmede belirleyici olan en temel değişken <b>zamandır</b>. Dört önemli değişkeni vardır: Kaliteli Öğretim, Yetenek, Fırsat ve Sebat.</li>
+  </ul>
+</div>
+
+  
+
+
+    
+<div class="footer">
+  <div>Öğretim <span class="accent-word">İlke</span> ve Yöntemleri</div>
+  <div class="fnum">12</div>
+</div>
+
+  </section>
+  
+  
+  
+  <section class="page body-page" data-ch="3" data-cp="2">
+    <div class="pageband"><div>Öğretim <span class="accent-word">İlke</span> ve Yöntemleri</div><div class="pageband-course">Bölüm 3</div></div>
+
+    
+
+    <!--item 0 callout-->
+  
+<div class="callout insight">
+  <div class="callout-icon">
+<svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 1.5 L14.6 9 L22 9 L15.9 13.6 L18.2 21 L12 16.6 L5.8 21 L8.1 13.6 L2 9 L9.4 9 Z"/></svg>
+
+</div>
+  <div>
+    <div class="callout-title">Kritik Çıkarım</div>
+    <div class="callout-text">Carroll'un 'Okulda Öğrenme Modeli', kendisinden sonra gelen Bloom'un 'Tam Öğrenme Modeli'ne ve Slavin'in 'Etkili Öğretim Modeli'ne doğrudan esin kaynağı olmuştur.</div>
+  </div>
+</div>
+
+  
+<!--item 1 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">5</div>
+    <div class="block-title">Etkili Öğretim Modeli (Slavin)</div>
+  </div>
+  
+  <ul>
+    <li>Öğrenme düzeyini etkileyen değişkenlerin çözümlenmesi yoluyla, öğrenme başarısının artırılabileceği varsayımına dayanır. Carroll'un modeliyle büyük benzerlikler taşır.</li>
+  </ul>
+</div>
+
+  
+<!--item 2 table-->
+  
+<div class="ctable-wrap">
+  <div class="ctable-caption">Karşılaştırma: Carroll vs. Slavin</div>
+  <table class="ctable">
+    <thead><tr><th>Özellik</th><th>Okulda Öğrenme (Carroll)</th><th>Etkili Öğretim (Slavin)</th></tr></thead>
+    <tbody>
+      
+      <tr><td>Temel Vurgu</td><td>Zaman faktörü her şeyin merkezindedir.</td><td>Değişkenlerin çözümlenmesi başarının anahtarıdır.</td></tr>
+      
+      <tr><td>Ana Değişkenler</td><td>Yetenek, Fırsat, Sebat, Kaliteli Öğretim.</td><td>Öğretim Niteliği, Öğretim Düzeyine Uygunluk, Güdülenme, Zaman.</td></tr>
+      
+      <tr><td>Ortak Nokta</td><td>Öğretimin düzenlenmesiyle başarı artırılabilir.</td><td>Öğretimin düzenlenmesiyle başarı artırılabilir.</td></tr>
+      
+    </tbody>
+  </table>
+</div>
+
+  
+<!--item 3 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">6</div>
+    <div class="block-title">Model Alarak (Sosyal) Öğrenme Modeli (A. Bandura)</div>
+  </div>
+  
+  <ul>
+    <li>İnsanların diğer insanları gözleyerek öğrenebileceği (Platon ve Aristo'ya kadar uzanan) düşüncesini temel alır. Davranışçılardan Thorndike bu konuyu ilk kez deneysel açıklamış olsa da, süreci gözlem yollu öğrenme adıyla sistematik bir bütünlüğe ulaştıran kişi <b>Albert Bandura</b>'dır.</li><li>Öğrenmede temel kavramlar; taklit, gözlem ve model almadır. Birey başkalarını gözlemleyerek ve deneyim kazanarak sadece beceri değil, yeni inanç ve değerler de oluşturabilir.</li>
+  </ul>
+</div>
+
+  
+<!--item 4 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">7</div>
+    <div class="block-title">Basamaklı Öğretim Modeli (Nunley)</div>
+  </div>
+  
+  <ul>
+    <li>Bilgi çağı kaynakları dikkate alınarak geliştirilen, bireysel farklılıklara göre öğretimin planlanması gerektiğini savunan sistemdir. Öğrenciyi 'bilgiyi alan' pasif durumdan çıkarıp, 'bilgiye ulaşan ve yeni bilgi üreten' aktif duruma getirir. Süreç basitten karmaşığa 5 basamakta ve 3 düzeyde (C, B, A) gerçekleşir.</li>
+  </ul>
+</div>
+
+  
+<!--item 5 flow-->
+  
+<div class="flowdiag">
+  
+  
+  <div class="fstep">
+    <div class="fstep-title">1. Basamak</div>
+    <div class="fstep-text">Hedef Davranışların Sunulması ve Seçimi</div>
+  </div>
+  
+  <div class="farrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="19" y2="12"/><polyline points="13 6 19 12 13 18"/></svg></div>
+  <div class="fstep">
+    <div class="fstep-title">2. Basamak</div>
+    <div class="fstep-text">C Düzeyi</div>
+  </div>
+  
+  <div class="farrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="19" y2="12"/><polyline points="13 6 19 12 13 18"/></svg></div>
+  <div class="fstep">
+    <div class="fstep-title">3. Basamak</div>
+    <div class="fstep-text">B Düzeyi</div>
+  </div>
+  
+  <div class="farrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="19" y2="12"/><polyline points="13 6 19 12 13 18"/></svg></div>
+  <div class="fstep">
+    <div class="fstep-title">4. Basamak</div>
+    <div class="fstep-text">A Düzeyi</div>
+  </div>
+  
+  <div class="farrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="19" y2="12"/><polyline points="13 6 19 12 13 18"/></svg></div>
+  <div class="fstep">
+    <div class="fstep-title">5. Basamak</div>
+    <div class="fstep-text">Öğretmen Değerlendirmesi</div>
+  </div>
+  
+</div>
+<div class="flow-caption">Basamaklı Öğretimin Aşamaları</div>
+
+  
+
+
+    
+<div class="footer">
+  <div>Öğretim <span class="accent-word">İlke</span> ve Yöntemleri</div>
+  <div class="fnum">13</div>
+</div>
+
+  </section>
+  
+  
+  
+  <section class="page body-page" data-ch="3" data-cp="3">
+    <div class="pageband"><div>Öğretim <span class="accent-word">İlke</span> ve Yöntemleri</div><div class="pageband-course">Bölüm 3</div></div>
+
+    
+
+    <!--item 0 table-->
+  
+<div class="ctable-wrap">
+  <div class="ctable-caption">Öğrenme Düzeylerinin Özellikleri (Sınav Püf Noktası)</div>
+  <table class="ctable">
+    <thead><tr><th>Düzey</th><th>Açıklama ve Örnek</th></tr></thead>
+    <tbody>
+      
+      <tr><td>C Basamağı (Bilgi ve Kavrama)</td><td>Temel bilgilerin öğrenildiği aşamadır. (Örn: Öğrencinin İstanbul'un fethi ile ilgili salt bilgi edinmesi.)</td></tr>
+      
+      <tr><td>B Basamağı (Uygulama)</td><td>Kazanılan temel bilgilerin uygulandığı, farklı örnekler üzerinde kullanıldığı basamaktır. (Örn: Öğrencinin İstanbul'un fethi ile ilgili bir slayt hazırlayıp sınıfa sunması.)</td></tr>
+      
+      <tr><td>A Basamağı (Analiz, Sentez, Değerlendirme)</td><td>Yaratıcı ve eleştirel düşünme gibi üst düzey zihinsel süreçlerin kullanıldığı, sonuçların tartışıldığı en üst basamaktır. (Örn: Fethin çağın dünyası açısından önemi ile ilgili eleştirel bir makale yazması.)</td></tr>
+      
+    </tbody>
+  </table>
+</div>
+
+  
+<!--item 1 summary-->
+  
+<div class="chsummary"><b>Bölüm Özeti</b>Bölüm 3, bilgiyi kurumsal sınırların dışına taşıyan Yaşam Boyu Öğrenme ve beyin fizyolojisini merkeze alan Beyin Temelli Öğrenme'den; Gardner'ın 9 zeka alanını kapsayan Çoklu Zeka Kuramı'na, zaman faktörünü öne çıkaran Carroll ve Slavin modellerine, gözlem yoluyla öğrenmeyi açıklayan Bandura'nın Sosyal Öğrenme Modeli'ne ve C-B-A düzeyleriyle ilerleyen Nunley'in Basamaklı Öğretim Modeli'ne uzanan yedi kuram ve modeli ele alır.</div>
+
+  
+
+
+    
+<div class="footer">
+  <div>Öğretim <span class="accent-word">İlke</span> ve Yöntemleri</div>
+  <div class="fnum">14</div>
+</div>
+
+  </section>
+  
+  
+
+  
+  
+  <section class="page body-page" data-ch="4" data-cp="0" id="ch-4">
+    <div class="pageband"><div>Öğretim <span class="accent-word">İlke</span> ve Yöntemleri</div><div class="pageband-course">Bölüm 4</div></div>
+
+    
+      <div class="chbanner">
+        <div class="chbanner-kicker">4. Bölüm</div>
+        <div class="chbanner-title">Öğretim Yöntemleri</div>
+        <div class="chbanner-subtitle">Anlatım'dan Tartışma ve Örnek Olay'a, Gösterip Yaptırma'dan Problem Çözme ve Proje'ye</div>
+      </div>
+    
+
+    <!--item 0 terms-->
+  
+<div class="terms-grid">
+  
+  <div class="term-box">
+    <div class="term-name">Anlatım (Takrir) Yöntemi</div>
+    <div class="term-def">Eğitim tarihinin en yaygın ve en eski yöntemi; öğretmen merkezli, işiterek öğrenmeye dayanır, öğrenci pasiftir.</div>
+  </div>
+  
+  <div class="term-box">
+    <div class="term-name">Tartışma Yöntemi</div>
+    <div class="term-def">Öğrencilerin bir konu üzerinde düşünmesini, kendini ifade etmesini ve demokratik tutum kazanmasını sağlayan öğrenci merkezli yöntem.</div>
+  </div>
+  
+  <div class="term-box">
+    <div class="term-name">Örnek Olay Yöntemi</div>
+    <div class="term-def">Gerçek yaşamda karşılaşılan bir olayın sınıfa getirilip tartışılarak alternatif çözümler üretilmesini sağlayan yöntem.</div>
+  </div>
+  
+  <div class="term-box">
+    <div class="term-name">Gösterip Yaptırma</div>
+    <div class="term-def">Bir işin önce gösterilip sonra uygulatıldığı, psiko-motor becerilerin kazandırılmasında en etkili yöntem (Demonstrasyon ve Uygulama).</div>
+  </div>
+  
+</div>
+
+  
+<!--item 1 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">1</div>
+    <div class="block-title">Anlatım (Takrir) Yöntemi</div>
+  </div>
+  
+  <ul>
+    <li>Eğitim tarihinde ve günümüzde en yaygın kullanılan 'en eski' öğretim yöntemidir. Öğretmen merkezlidir ve işiterek öğrenme temeline dayanır. Öğrenciler pasif konumdadır ve konuyu dinleyip not alırlar.</li><li><b>Ne Zaman Kullanılır?</b> Kısa zamanda kalabalık gruplara organize bilgi sunmak isteniyorsa, dersin girişinde (dikkat çekme/güdüleme), özetleme aşamasında veya soyut/anlaşılması güç kavramların aktarılmasında en ideal yöntemdir.</li><li><b>Sınırlılıkları:</b> sadece dinlemenin öğrenmedeki etkisi %20'dir; bu nedenle tek başına kullanıldığında öğrenme düşük düzeyde gerçekleşir. Görmeye dayalı ve psiko-motor (devinişsel) becerilerin öğretiminde etkisizdir. 'Konuşarak bilgi aktarma ihtiyacı sürekli olacaktır.'</li><li><b>Alt Türleri:</b> Düz anlatım, Sunu (Brifing — üst kurula bilgi verme), Konferans (uzman açıklaması), Söylev (Nutuk — coşku ve duygu ağırlıklı) ve Demeç.</li>
+  </ul>
+</div>
+
+  
+<!--item 2 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">2</div>
+    <div class="block-title">Tartışma Yöntemi</div>
+  </div>
+  
+  <ul>
+    <li>Öğrencilerin bir konu üzerinde düşünmelerini, kendilerini ifade etmelerini ve başkalarının görüşlerine saygı duymalarını (demokratik tutum) sağlayan öğrenci merkezli bir yöntemdir.</li><li><b>Özellikleri:</b> öğretmen-öğrenci ve öğrenci-öğrenci etkileşimi yüksektir. Öğrenciler analiz, sentez ve değerlendirme gibi üst düzey bilişsel beceriler gösterirler.</li><li><b>Uygulama Kuralları:</b> öğrenciler, tartışılacak konu hakkında en az 'bilgi düzeyinde' ön bilgiye (hazırbulunuşluğa) sahip olmalıdır. Bilgi düzeyindeki (kesin olgusal) konular tartışma konusu yapılamaz. Dersin tamamı tartışmaya ayrılmamalı ve mutlaka sonuç özetlenmelidir.</li>
+  </ul>
+</div>
+
+  
+
+
+    
+<div class="footer">
+  <div>Öğretim <span class="accent-word">İlke</span> ve Yöntemleri</div>
+  <div class="fnum">15</div>
+</div>
+
+  </section>
+  
+  
+  
+  <section class="page body-page" data-ch="4" data-cp="1">
+    <div class="pageband"><div>Öğretim <span class="accent-word">İlke</span> ve Yöntemleri</div><div class="pageband-course">Bölüm 4</div></div>
+
+    
+
+    <!--item 0 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">3</div>
+    <div class="block-title">Soru - Cevap Yöntemi</div>
+  </div>
+  
+  <ul>
+    <li>Sokratik temellere dayanan, öğrencilerin bildiklerini/bilmediklerini ortaya çıkarmak ve onları düşünmeye sevk etmek için kullanılan tekniktir.</li><li><b>Uygulama Kuralları:</b> soru önce tüm sınıfa sorulmalı, herkesin düşünmesi için zaman (es payı) verilmeli, ardından cevaplayacak kişi seçilmelidir. Sorular numara/oturma sırasına göre değil, rastgele sorulmalıdır ki tüm sınıfın dikkati canlı kalsın.</li><li><b>Dönüt-Düzeltme:</b> doğru cevaplar anında pekiştirilmeli, yanlış cevaplarda ise öğrenci azarlanmamalı; doğruyu buldurucu ipuçları ve yan sorular kullanılmalıdır.</li>
+  </ul>
+</div>
+
+  
+<!--item 1 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">4</div>
+    <div class="block-title">Örnek Olay Yöntemi</div>
+  </div>
+  
+  <ul>
+    <li>Gerçek yaşamda karşılaşılan veya karşılaşılması olası sorun niteliğindeki bir olayın (senaryonun) sınıf ortamına getirilerek tartışılmasıdır.</li><li><b>Özellikleri:</b> öğrenci merkezlidir. Öğrencilerin kavradıkları bilgileri gerçek bir durumda kullanmalarını ve alternatif çözüm yolları üretmelerini sağlar.</li>
+  </ul>
+</div>
+
+  
+<!--item 2 callout-->
+  
+<div class="callout caution">
+  <div class="callout-icon">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.5"/><line x1="12" y1="11" x2="12" y2="16.5"/><circle cx="12" cy="7.5" r="0.6" fill="currentColor" stroke="none"/></svg>
+
+</div>
+  <div>
+    <div class="callout-title">Dikkat Edilmesi Gerekenler — Örnek Olay</div>
+    <div class="callout-text">Sınıfa getirilen örnek olayın tek bir çözümü olmamalıdır; çünkü amaç öğrencilerin farklı/alternatif çözümler üretmesidir. Kalabalık sınıflarda tüm sınıfın katılımı zor olduğundan, sınıf küçük gruplara bölünerek uygulanmalıdır.</div>
+  </div>
+</div>
+
+  
+<!--item 3 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">5</div>
+    <div class="block-title">Gösterip Yaptırma (Demonstrasyon ve Uygulama)</div>
+  </div>
+  
+  <ul>
+    <li>Öğrenciye bir işin 'nasıl yapılacağının' önce gösterilip, sonra uygulatılmasıdır. Psiko-motor (devinişsel) becerilerin (örn: beden eğitimi dersinde nefes alma, tıp fakültesinde dikiş atma) ve uygulama düzeyindeki davranışların kazandırılmasında en etkili yöntemdir.</li><li><b>Uygulama Aşamaları:</b> 1. Aşama (Öğretmen Merkezli) — işlemin öğretmen tarafından gösterilmesi ve açıklanması (Gösteri); 2. Aşama (Öğrenci Merkezli) — öğrencinin gözetim altında alıştırma ve uygulama yapması (Yaptırma).</li>
+  </ul>
+</div>
+
+  
+<!--item 4 callout-->
+  
+<div class="callout caution">
+  <div class="callout-icon">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.5"/><line x1="12" y1="11" x2="12" y2="16.5"/><circle cx="12" cy="7.5" r="0.6" fill="currentColor" stroke="none"/></svg>
+
+</div>
+  <div>
+    <div class="callout-title">Dikkat / Püf Noktası</div>
+    <div class="callout-text">Öğrenci uygulama yaparken yaptığı hatalar anında düzeltilmelidir ve bir beceri tam olarak anlaşılmadan kesinlikle diğerine geçilmemelidir. Yaparak-yaşayarak öğrenme temelli olduğu için öğrenme çok kalıcıdır, ancak materyal gerektirdiği için maliyetli ve zaman alıcıdır.</div>
+  </div>
+</div>
+
+  
+<!--item 5 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">6</div>
+    <div class="block-title">Problem Çözme Yöntemi</div>
+  </div>
+  
+  <ul>
+    <li>John Dewey'in ilerlemeci felsefesine dayanan, öğrencilere bilimsel düşünmeyi ve karşılaştıkları problemleri nasıl çözeceklerini öğreten yöntemdir. Üst düzey bilişsel fonksiyonlar (analiz, sentez) gerektirir.</li><li><b>Bilimsel Problem Çözme Basamakları:</b> Problemi Hissetme (Farkına Varma) → Problemi Tanımlama/Sınırlandırma → Veri Toplama → Hipotez (Denence) Kurma → Hipotezleri Test Etme → Sonuca Ulaşma ve Değerlendirme.</li>
+  </ul>
+</div>
+
+  
+
+
+    
+<div class="footer">
+  <div>Öğretim <span class="accent-word">İlke</span> ve Yöntemleri</div>
+  <div class="fnum">16</div>
+</div>
+
+  </section>
+  
+  
+  
+  <section class="page body-page" data-ch="4" data-cp="2">
+    <div class="pageband"><div>Öğretim <span class="accent-word">İlke</span> ve Yöntemleri</div><div class="pageband-course">Bölüm 4</div></div>
+
+    
+
+    <!--item 0 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">7</div>
+    <div class="block-title">Proje ve Laboratuvar Yöntemleri</div>
+  </div>
+  
+  <ul>
+    <li><b>Proje Yöntemi:</b> öğrencilerin bireysel veya gruplar halinde, kendi ilgi alanlarına göre seçtikleri bir konuda (disiplinlerarası bağ kurarak) araştırma yapmaları ve sonucunda somut bir ürün/rapor ortaya koymalarıdır. Okul ile gerçek hayat arasında bağ kurulmasını sağlar.</li><li><b>Laboratuvar Yöntemi:</b> öğrencilerin bilimsel bir bilgiyi gözlem ve deney yaparak, el becerilerini kullanarak elde ettikleri yöntemdir. Yaparak-yaşayarak öğrenme temellidir ve problem çözme becerisini geliştirir.</li>
+  </ul>
+</div>
+
+  
+<!--item 1 table-->
+  
+<div class="ctable-wrap">
+  <div class="ctable-caption">Öğretmen Merkezli vs. Öğrenci Merkezli Yöntemler</div>
+  <table class="ctable">
+    <thead><tr><th>Yöntem</th><th>Merkez / Odak Noktası</th><th>Etki Düzeyi</th></tr></thead>
+    <tbody>
+      
+      <tr><td>Anlatım</td><td>Öğretmen / İşiterek Öğrenme</td><td>Düşük (Pasif Dinleme)</td></tr>
+      
+      <tr><td>Gösterip Yaptırma</td><td>Öğretmen + Öğrenci / Yaparak-Yaşayarak</td><td>Yüksek (Psikomotor Beceriler)</td></tr>
+      
+      <tr><td>Tartışma</td><td>Öğrenci / İşiterek ve Söyleyerek</td><td>Orta-Yüksek (Demokratik Tutum)</td></tr>
+      
+      <tr><td>Örnek Olay</td><td>Öğrenci / Görerek, İşiterek, Söyleyerek</td><td>Yüksek (Alternatif Çözüm Üretme)</td></tr>
+      
+      <tr><td>Problem Çözme</td><td>Öğrenci / Yaparak-Yaşayarak</td><td>Çok Yüksek (Bilimsel Süreç)</td></tr>
+      
+    </tbody>
+  </table>
+</div>
+
+  
+<!--item 2 callout-->
+  
+<div class="callout insight">
+  <div class="callout-icon">
+<svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 1.5 L14.6 9 L22 9 L15.9 13.6 L18.2 21 L12 16.6 L5.8 21 L8.1 13.6 L2 9 L9.4 9 Z"/></svg>
+
+</div>
+  <div>
+    <div class="callout-title">Kritik Çıkarım — Hedef Düzeyine Göre Yöntem Seçimi</div>
+    <div class="callout-text">Dersin hedefleri 'Bilgi' düzeyinde (ezber) ise Anlatım; 'Kavrama' düzeyinde ise Tartışma/Örnek Olay; 'Uygulama' düzeyinde ise Gösterip Yaptırma; 'Analiz-Sentez' düzeyinde ise Problem Çözme / Proje yöntemleri tercih edilmelidir.</div>
+  </div>
+</div>
+
+  
+<!--item 3 summary-->
+  
+<div class="chsummary"><b>Bölüm Özeti</b>Bölüm 4, öğretmen merkezli ve pasif dinlemeye dayanan Anlatım'dan; öğrenci merkezli Tartışma, Soru-Cevap ve Örnek Olay yöntemlerine, psikomotor becerileri hedefleyen Gösterip Yaptırma'ya ve üst düzey bilişsel süreçler gerektiren Problem Çözme, Proje ve Laboratuvar yöntemlerine uzanan sekiz temel öğretim yöntemini, hedef düzeyine göre doğru yöntem seçimini vurgulayarak ele alır.</div>
+
+  
+
+
+    
+<div class="footer">
+  <div>Öğretim <span class="accent-word">İlke</span> ve Yöntemleri</div>
+  <div class="fnum">17</div>
+</div>
+
+  </section>
+  
+  
+
+  
+  
+  <section class="page body-page" data-ch="5" data-cp="0" id="ch-5">
+    <div class="pageband"><div>Öğretim <span class="accent-word">İlke</span> ve Yöntemleri</div><div class="pageband-course">Bölüm 5</div></div>
+
+    
+      <div class="chbanner">
+        <div class="chbanner-kicker">5. Bölüm</div>
+        <div class="chbanner-title">Öğretim Teknikleri</div>
+        <div class="chbanner-subtitle">Grupla Öğretim Tekniklerinden Bilişsel Çıraklığa, Tersine Eğitime ve Bireysel Tekniklere</div>
+      </div>
+    
+
+    <!--item 0 terms-->
+  
+<div class="terms-grid">
+  
+  <div class="term-box">
+    <div class="term-name">Altı Şapkalı Düşünme</div>
+    <div class="term-def">Öğrencilerin bir konuya çok farklı açılardan ve sistematik bakmalarını sağlayan, karar verme becerisini geliştiren teknik (E. De Bono).</div>
+  </div>
+  
+  <div class="term-box">
+    <div class="term-name">Beyin Fırtınası</div>
+    <div class="term-def">Eleştiri ve yargılamanın kesinlikle yasak olduğu, fikirlerin niceliğinin önemli olduğu yaratıcı düşünce üretme tekniği.</div>
+  </div>
+  
+  <div class="term-box">
+    <div class="term-name">Mikro Öğretim</div>
+    <div class="term-def">Hizmet öncesi öğretmen adaylarına uygulama olanağı ve mesleki deneyim kazandırmak için kullanılan, kayda alıp izlemeye dayanan teknik.</div>
+  </div>
+  
+  <div class="term-box">
+    <div class="term-name">Keller Planı</div>
+    <div class="term-def">Sınıfın tümüne değil, hızları ve öğrenme stilleri benzeyen homojen küçük gruplara eğitim verilen bireyselleştirilmiş öğretim tekniği.</div>
+  </div>
+  
+</div>
+
+  
+<!--item 1 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">1</div>
+    <div class="block-title">Görüş Geliştirme</div>
+  </div>
+  
+  <ul>
+    <li>Öğrencilerin ucu açık, zıt kutupları olan konularda (katılıyorum, katılmıyorum, kararsızım vb.) fikir belirtmelerini ve birbirlerini dinleyerek görüşlerini değiştirebilme becerilerini kazandırmayı amaçlar.</li><li>Öğrenciler neden o görüşü (seçeneği) seçtiklerini açıklarlar. Diğerlerini dinledikçe fikirleri değişebilir ve yer değiştirebilirler. Kazanan ya da kaybedeni (jürisi) yoktur; önemli olan alternatif ve esnek düşünebilmektir.</li>
+  </ul>
+</div>
+
+  
+<!--item 2 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">2</div>
+    <div class="block-title">Altı Şapkalı Düşünme (E. De Bono)</div>
+  </div>
+  
+  <ul>
+    <li>Öğrencilerin bir konuya çok farklı açılardan ve sistematik bakmalarını sağlayan, karar verme becerisini geliştiren bir tekniktir.</li>
+  </ul>
+</div>
+
+  
+<!--item 3 table-->
+  
+<div class="ctable-wrap">
+  <div class="ctable-caption">Altı Şapkalı Düşünme Teknikleri</div>
+  <table class="ctable">
+    <thead><tr><th>Şapka</th><th>Temsil Ettiği</th></tr></thead>
+    <tbody>
+      
+      <tr><td>Beyaz Şapka (Tarafsız / Objektif)</td><td>Tartışmasız kabul edilen net bilgileri ve sayıları temsil eder.</td></tr>
+      
+      <tr><td>Kırmızı Şapka (Duygusal / Sübjektif)</td><td>Tutkuları, hisleri ve sezgileri temsil eder.</td></tr>
+      
+      <tr><td>Siyah Şapka (Kötümser / Objektif)</td><td>Olumsuzlukları, tehlikeleri ve riskleri gösterir.</td></tr>
+      
+      <tr><td>Sarı Şapka (İyimser / Objektif)</td><td>Olayın avantajlarını, fırsatlarını ve yararlarını temsil eder.</td></tr>
+      
+      <tr><td>Yeşil Şapka (Yaratıcı / Sübjektif)</td><td>Üretkenliği, yepyeni fikirleri ve alternatifleri temsil eder.</td></tr>
+      
+      <tr><td>Mavi Şapka (Karar Verici / Serinkanlı)</td><td>Tüm süreci toparlayan, sonucu belirleyen ve durumu kontrol eden şapkadır.</td></tr>
+      
+    </tbody>
+  </table>
+</div>
+
+  
+
+
+    
+<div class="footer">
+  <div>Öğretim <span class="accent-word">İlke</span> ve Yöntemleri</div>
+  <div class="fnum">18</div>
+</div>
+
+  </section>
+  
+  
+  
+  <section class="page body-page" data-ch="5" data-cp="1">
+    <div class="pageband"><div>Öğretim <span class="accent-word">İlke</span> ve Yöntemleri</div><div class="pageband-course">Bölüm 5</div></div>
+
+    
+
+    <!--item 0 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">3</div>
+    <div class="block-title">Altı Ayakkabılı Uygulama (E. De Bono)</div>
+  </div>
+  
+  <ul>
+    <li>Bireyin olaylara belirli bir davranış tarzına takılmadan yaklaşmasını ve esnek uygulama biçimleri geliştirmesini sağlar.</li>
+  </ul>
+</div>
+
+  
+<!--item 1 table-->
+  
+<div class="ctable-wrap">
+  <div class="ctable-caption">Altı Ayakkabılı Uygulama</div>
+  <table class="ctable">
+    <thead><tr><th>Ayakkabı</th><th>Temsil Ettiği</th></tr></thead>
+    <tbody>
+      
+      <tr><td>Lacivert (Resmi)</td><td>Rutin işleri, kuralı ve resmiyeti temsil eder.</td></tr>
+      
+      <tr><td>Gri (Spor)</td><td>Rahatlığı, tarafsız bilgi toplamayı simgeler.</td></tr>
+      
+      <tr><td>Kahverengi (Yürüyüş)</td><td>Pratikliği, esnekliği ve inisiyatif kullanarak sonuca varmayı anlatır.</td></tr>
+      
+      <tr><td>Turuncu (Lastik Çizme)</td><td>Aciliyet, kriz ve tehlike anlarında odaklanmayı temsil eder.</td></tr>
+      
+      <tr><td>Pembe (Ev Terliği)</td><td>İnsancıllığı, sıcaklığı, koruma ve acıma duygusunu ifade eder.</td></tr>
+      
+      <tr><td>Mor (Binici Çizmesi)</td><td>Otoriteyi, kişinin kendi yeteneğinden ziyade makam/yetki gücünü temsil eder.</td></tr>
+      
+    </tbody>
+  </table>
+</div>
+
+  
+<!--item 2 callout-->
+  
+<div class="callout caution">
+  <div class="callout-icon">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.5"/><line x1="12" y1="11" x2="12" y2="16.5"/><circle cx="12" cy="7.5" r="0.6" fill="currentColor" stroke="none"/></svg>
+
+</div>
+  <div>
+    <div class="callout-title">Dikkat / Püf Noktası</div>
+    <div class="callout-text">Altı 'Şapka' kafaya takıldığı için zihinsel düşünme becerilerini; Altı 'Ayakkabı' ise eyleme (harekete) geçmeyi simgelediği için uygulama becerilerini geliştirir. Ayrıca Altı 'Madalya' ise madalya değer taşıdığı için değerler öğretiminde kullanılır.</div>
+  </div>
+</div>
+
+  
+<!--item 3 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">4</div>
+    <div class="block-title">İstasyon Tekniği</div>
+  </div>
+  
+  <ul>
+    <li>Sınıfın farklı köşelerinde kurulan 'istasyonlarda' (masalarda) öğrencilerin yarım bırakılan bir işi tamamlamayı, ona katkı sağlamayı ve süreç sonunda somut bir ürün (afiş, şiir vb.) ortaya koymayı öğrendikleri tekniktir. Çekingen öğrencilerin derse katılımını sağlar ve güdülenmeyi artırır.</li>
+  </ul>
+</div>
+
+  
+<!--item 4 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">5</div>
+    <div class="block-title">Beyin Fırtınası</div>
+  </div>
+  
+  <ul>
+    <li>Yaratıcı düşüncelerin ortaya çıkarılması amacıyla, eleştiri ve yargılamanın kesinlikle yasak olduğu, fikirlerin niteliğinden çok niceliğinin (sayısının) önemli olduğu tekniktir. Üç şekilde yapılabilir: <b>Benzerinden Yararlanma</b> (pamuk ırıştırma makinesinin kedinin tırnaklarından esinlenmesi), <b>Fikir Bağlantısı Kurma</b> (dikenlerden cırt cırt bantların icadı), <b>Zarardan Kâr Çıkarma</b> (beklemiş biradan hayvan yemi yapmak).</li>
+  </ul>
+</div>
+
+  
+<!--item 5 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">6</div>
+    <div class="block-title">Konuşma Halkası</div>
+  </div>
+  
+  <ul>
+    <li>Öğrencilerin bir öyküdeki kişinin (kahramanın) yerine kendilerini koyarak çember şeklinde oturdukları tekniktir. Temel amaç empati kurmayı sağlamak ve duygularla düşünceleri birbirinden ayırt etmeyi öğretmektir.</li>
+  </ul>
+</div>
+
+  
+<!--item 6 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">7</div>
+    <div class="block-title">Mikro Öğretim</div>
+  </div>
+  
+  <ul>
+    <li>Özellikle hizmet öncesi öğretmen adaylarına uygulama olanağı ve mesleki deneyim kazandırmak için kullanılır.</li>
+  </ul>
+</div>
+
+  
+
+
+    
+<div class="footer">
+  <div>Öğretim <span class="accent-word">İlke</span> ve Yöntemleri</div>
+  <div class="fnum">19</div>
+</div>
+
+  </section>
+  
+  
+  
+  <section class="page body-page" data-ch="5" data-cp="2">
+    <div class="pageband"><div>Öğretim <span class="accent-word">İlke</span> ve Yöntemleri</div><div class="pageband-course">Bölüm 5</div></div>
+
+    
+
+    <!--item 0 flow-->
+  
+<div class="flowdiag">
+  
+  
+  <div class="fstep">
+    <div class="fstep-title">Dersin Planlanması</div>
+    
+  </div>
+  
+  <div class="farrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="19" y2="12"/><polyline points="13 6 19 12 13 18"/></svg></div>
+  <div class="fstep">
+    <div class="fstep-title">Mikro Dersin Uygulanması</div>
+    <div class="fstep-text">ve Kayda Alınması (Video/Teyp)</div>
+  </div>
+  
+  <div class="farrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="19" y2="12"/><polyline points="13 6 19 12 13 18"/></svg></div>
+  <div class="fstep">
+    <div class="fstep-title">Kayıtların İzlenmesi</div>
+    <div class="fstep-text">ve Dönüt Verilmesi</div>
+  </div>
+  
+  <div class="farrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="19" y2="12"/><polyline points="13 6 19 12 13 18"/></svg></div>
+  <div class="fstep">
+    <div class="fstep-title">Dersin Yeniden Düzenlenmesi</div>
+    
+  </div>
+  
+  <div class="farrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="19" y2="12"/><polyline points="13 6 19 12 13 18"/></svg></div>
+  <div class="fstep">
+    <div class="fstep-title">Mikro Dersin Tekrar Uygulanması</div>
+    <div class="fstep-text">ve Kaydedilmesi</div>
+  </div>
+  
+</div>
+<div class="flow-caption">Mikro Öğretim Uygulama Basamakları</div>
+
+  
+<!--item 1 table-->
+  
+<div class="ctable-wrap">
+  <div class="ctable-caption">Karıştırılan Teknikler</div>
+  <table class="ctable">
+    <thead><tr><th>Karıştırılan Çift</th><th>Temel Farklılıklar (Püf Noktası)</th></tr></thead>
+    <tbody>
+      
+      <tr><td>Rol Oynama ↔ Drama</td><td>Rol oynamada başkasının kimliğine/penceresine bürünmek (kurgu) vardır. Drama ise öğrencinin kendi çözümünü/doğallığını katarak, gelecekte karşılaşacağı bir duruma çözüm bulması esastır.</td></tr>
+      
+      <tr><td>Benzetim (Simülasyon) ↔ Analoji</td><td>Benzetim, tehlikeli/maliyetli durumları öğretmek için gerçeğe birebir yapay ortam yaratmaktır (pilot, astronot eğitimi vb.). Analoji ise soyut/bilinmeyen bir kavramı, bilinen bir olaya/nesneye sözlü veya görsel benzetmektir (örn: kalbi su pompasına, kan dolaşımını şehir şebekesine benzetmek).</td></tr>
+      
+      <tr><td>Sokrat Tartışması ↔ Sokrat Semineri</td><td>Sokrat Tartışması; ironi ve doğurtmaca aşamalarından oluşan, öğrencilerin yanlış bildiklerinden şüphe duymasını sağlayıp sorularla içlerindeki doğruyu buldurma (tümdengelim) tekniğidir. Sokrat Semineri ise ağır bir metnin/makalenin derse getirilip incelenmesine ve eleştirel tartışılmasına dayanır.</td></tr>
+      
+    </tbody>
+  </table>
+</div>
+
+  
+<!--item 2 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">8</div>
+    <div class="block-title">Diğer Öğretim Teknikleri ve Yaklaşımları</div>
+  </div>
+  
+  <ul>
+    <li><b>Bilişsel Çıraklık:</b> öğrencinin bir 'uzmanın' (usta) gözetiminde bir işe başladığı ve zamanla uzmanın desteğini yavaş yavaş çektiği öğretim sürecidir. Tarihimizdeki 'Ahilik' teşkilatı buna en güzel örnektir.</li><li><b>Tersine Eğitim (Flipped Classroom):</b> sistemin tamamen ters yüz edilmesidir. Normalde okulda bilgi verilir, evde ödev yapılırken; tersine eğitimde öğrenci 'ön bilgiyi' evde dijital ortamdan öğrenir, okula ise sadece derinlemesine proje, ödev ve tartışma yapmak için gelir.</li><li><b>Buz Kıran:</b> birbirini tanımayan katılımcıların bulunduğu ortamlarda, ortamı ısındırmak, stresi ve başarısızlık korkusunu kırmak için kullanılan başlangıç tekniğidir.</li>
+  </ul>
+</div>
+
+  
+<!--item 3 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">9</div>
+    <div class="block-title">Bireysel Öğretim Teknikleri</div>
+  </div>
+  
+  <ul>
+    <li><b>Bireyselleştirilmiş Öğretim (Keller Planı):</b> sınıftaki tüm öğrencilerin aynı hızda ve aynı etkinliklerle öğrenemeyeceği varsayımına dayanır. Bu yüzden öğretmen, sınıfın tümüne değil; hızları ve öğrenme stilleri birbirine benzeyen 3-4 öğrenciden oluşan 'homojen' küçük gruplara eğitim verir.</li><li><b>Tutor Destekli Öğretim:</b> öğrencinin eksik kaldığı konularda, sınıf öğretmeni dışında; konuya hakim üst sınıftan bir öğrenciden, bir stajyer öğretmenden veya bir etüt öğretmeninden (Tutor / Özel Öğretmen) birebir özel destek alması esasına dayanır.</li>
+  </ul>
+</div>
+
+  
+<!--item 4 callout-->
+  
+<div class="callout insight">
+  <div class="callout-icon">
+<svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 1.5 L14.6 9 L22 9 L15.9 13.6 L18.2 21 L12 16.6 L5.8 21 L8.1 13.6 L2 9 L9.4 9 Z"/></svg>
+
+</div>
+  <div>
+    <div class="callout-title">Kritik Çıkarım</div>
+    <div class="callout-text">Öğretim teknikleri içerisinde 'bireysel hız' ön plana çıktığında Programlı Öğretim veya Keller Planı aranmalı; öğrenme engellerini ortadan kaldırmak için birebir destek vurgulandığında ise Tutor Destekli Öğretim akla gelmelidir.</div>
+  </div>
+</div>
+
+  
+
+
+    
+<div class="footer">
+  <div>Öğretim <span class="accent-word">İlke</span> ve Yöntemleri</div>
+  <div class="fnum">20</div>
+</div>
+
+  </section>
+  
+  
+  
+  <section class="page body-page" data-ch="5" data-cp="3">
+    <div class="pageband"><div>Öğretim <span class="accent-word">İlke</span> ve Yöntemleri</div><div class="pageband-course">Bölüm 5</div></div>
+
+    
+
+    <!--item 0 summary-->
+  
+<div class="chsummary"><b>Bölüm Özeti</b>Bölüm 5, sınıf içi grup dinamiklerini işleyen Görüş Geliştirme, Altı Şapkalı Düşünme, Altı Ayakkabılı Uygulama, İstasyon Tekniği, Beyin Fırtınası, Konuşma Halkası ve Mikro Öğretim gibi grupla öğretim tekniklerinden; Bilişsel Çıraklık ve Tersine Eğitim gibi yaklaşımlara, Keller Planı ve Tutor Destekli Öğretim gibi bireysel tekniklere uzanan geniş bir öğretim teknikleri yelpazesini, sık karıştırılan kavram çiftlerini netleştirerek ele alır.</div>
+
+  
+
+
+    
+<div class="footer">
+  <div>Öğretim <span class="accent-word">İlke</span> ve Yöntemleri</div>
+  <div class="fnum">21</div>
+</div>
+
+  </section>
+  
+  
+
+  
+  
+  <section class="page body-page" data-ch="6" data-cp="0" id="ch-6">
+    <div class="pageband"><div>Öğretim <span class="accent-word">İlke</span> ve Yöntemleri</div><div class="pageband-course">Bölüm 6</div></div>
+
+    
+      <div class="chbanner">
+        <div class="chbanner-kicker">6. Bölüm</div>
+        <div class="chbanner-title">Düşünme Biçimleri</div>
+        <div class="chbanner-subtitle">Yaratıcı ve Eleştirel Düşünmeden, Yansıtıcı, Analitik ve Metabilişsel Düşünmeye</div>
+      </div>
+    
+
+    <!--item 0 terms-->
+  
+<div class="terms-grid">
+  
+  <div class="term-box">
+    <div class="term-name">Yaratıcı Düşünme</div>
+    <div class="term-def">Bireyin yeni, farklı, orijinal, özgün (sentez düzeyi) ürünler veya düşünceler ortaya koymasıdır.</div>
+  </div>
+  
+  <div class="term-box">
+    <div class="term-name">Eleştirel Düşünme</div>
+    <div class="term-def">Sorgulayan bir yaklaşımla olayları ele alma, irdeleyici bir bakış açısıyla yorum yapma ve kanıt arama becerisidir.</div>
+  </div>
+  
+  <div class="term-box">
+    <div class="term-name">Yansıtıcı Düşünme</div>
+    <div class="term-def">Öğrencinin düşünerek ve araştırarak öğreneceği bilgi üzerinde durmasına olanak sağlayan, şüpheden aydınlanmaya uzanan düşünme yolu.</div>
+  </div>
+  
+  <div class="term-box">
+    <div class="term-name">Metabilişsel Düşünme</div>
+    <div class="term-def">Kişinin kendi düşünme süreçlerinin farkında olması ve bu süreçleri kontrol edebilmesi anlamına gelen üstbiliş becerisi.</div>
+  </div>
+  
+</div>
+
+  
+<!--item 1 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">1</div>
+    <div class="block-title">Yaratıcı Düşünme</div>
+  </div>
+  
+  <ul>
+    <li>Bireyin yeni, farklı, orijinal, özgün (sentez düzeyi), alternatifli ve ayrıştırıcı ürünler veya düşünceler ortaya koymasıdır.</li>
+  </ul>
+</div>
+
+  
+<!--item 2 flow-->
+  
+<div class="flowdiag">
+  
+  
+  <div class="fstep">
+    <div class="fstep-title">Hazırlık</div>
+    
+  </div>
+  
+  <div class="farrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="19" y2="12"/><polyline points="13 6 19 12 13 18"/></svg></div>
+  <div class="fstep">
+    <div class="fstep-title">Kuluçka</div>
+    
+  </div>
+  
+  <div class="farrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="19" y2="12"/><polyline points="13 6 19 12 13 18"/></svg></div>
+  <div class="fstep">
+    <div class="fstep-title">Aydınlanma</div>
+    
+  </div>
+  
+  <div class="farrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="19" y2="12"/><polyline points="13 6 19 12 13 18"/></svg></div>
+  <div class="fstep">
+    <div class="fstep-title">Değerlendirme</div>
+    
+  </div>
+  
+</div>
+<div class="flow-caption">Yaratıcı Düşünmenin Aşamaları</div>
+
+  
+<!--item 3 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">2</div>
+    <div class="block-title">Yaratıcı Düşünmenin Özellikleri ve Yolları</div>
+  </div>
+  
+  <ul>
+    <li><b>Temel Özellikleri:</b> Esnek Düşünme (farklı yollar düşünebilme ve bunları deneme), Orijinal Düşünme (ortaya atılan yolun yeni ve mevcutlardan farklı olması), Akılcı Düşünme (zihinsel süreçlerin çok yönlü ve üst düzey olması), Ayrıştırıcı Düşünme (benzerlikleri ve farklılıkları ayrıştırabilme).</li><li><b>Yaratıcı Düşünme Yolları:</b> Sentezleme (hipotez kurma, plan yapma, analojik düşünme, başka araştırmalardan yararlanma), Eklemleme (büyük düşünme, düşünceyi hızla değiştirme, somutlaştırma ve geniş düşünme), İmgelemek (akılcılık, kestirimde bulunma, kuramsal düşünme, hayal etme, sezgileme).</li>
+  </ul>
+</div>
+
+  
+<!--item 4 callout-->
+  
+<div class="callout insight">
+  <div class="callout-icon">
+<svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 1.5 L14.6 9 L22 9 L15.9 13.6 L18.2 21 L12 16.6 L5.8 21 L8.1 13.6 L2 9 L9.4 9 Z"/></svg>
+
+</div>
+  <div>
+    <div class="callout-title">Kritik Çıkarım</div>
+    <div class="callout-text">Yaratıcı düşünme, Bloom taksonomisinin sentez düzeyine denk gelir. Yeni bir ürün, yeni bir fikir veya orijinal bir sentez oluşturmayı temel alır.</div>
+  </div>
+</div>
+
+  
+<!--item 5 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">3</div>
+    <div class="block-title">Eleştirel Düşünme</div>
+  </div>
+  
+  <ul>
+    <li>Sorgulayan bir yaklaşımla olayları ve durumları ele alma, irdeleyici bir bakış açısıyla yorum yapma ve karar verme becerilerini içerir. Olayları olduğu gibi kabul etmez, kanıt arar.</li>
+  </ul>
+</div>
+
+  
+
+
+    
+<div class="footer">
+  <div>Öğretim <span class="accent-word">İlke</span> ve Yöntemleri</div>
+  <div class="fnum">22</div>
+</div>
+
+  </section>
+  
+  
+  
+  <section class="page body-page" data-ch="6" data-cp="1">
+    <div class="pageband"><div>Öğretim <span class="accent-word">İlke</span> ve Yöntemleri</div><div class="pageband-course">Bölüm 6</div></div>
+
+    
+
+    <!--item 0 table-->
+  
+<div class="ctable-wrap">
+  <div class="ctable-caption">Eleştirel Düşünme vs. Yaratıcı Düşünme</div>
+  <table class="ctable">
+    <thead><tr><th>Özellik</th><th>Eleştirel Düşünme</th><th>Yaratıcı Düşünme</th></tr></thead>
+    <tbody>
+      
+      <tr><td>Bilişsel Yapı</td><td>Sol beyin etkindir</td><td>Sağ beyin etkindir</td></tr>
+      
+      <tr><td>Yaklaşım Biçimi</td><td>Analitik, nesnel, dikey</td><td>Üretici, öznel, yatay</td></tr>
+      
+      <tr><td>Odak / Yayma</td><td>Odaklama (derinleşme)</td><td>Yayma (genişleme)</td></tr>
+      
+      <tr><td>İşlem Türü</td><td>Birleştirici, sözel</td><td>Ayırıcı, görsel</td></tr>
+      
+    </tbody>
+  </table>
+</div>
+
+  
+<!--item 1 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">4</div>
+    <div class="block-title">Yansıtıcı Düşünme</div>
+  </div>
+  
+  <ul>
+    <li>İlerlemeci eğitim yaklaşımına dayanan ve öğrenciyi merkeze alan bir düşünme yoludur. Öğrencinin düşünerek ve araştırarak öğreneceği bilgi üzerinde durmasına olanak sağlar. Yapılandırmacılık, probleme dayalı öğrenme, proje temelli öğrenme, mikro öğretim ve günlük yazma gibi birçok çağdaş yöntemle geliştirilir.</li><li><b>Oluşumundaki İki Temel Aşama (Akış):</b> 1) İçine girilen merak, kuşku ve duraksama (şüphe) durumu; 2) Bu kuşkuyu açıklığa kavuşturacak araştırma ve sorgulama eğilimi.</li>
+  </ul>
+</div>
+
+  
+<!--item 2 callout-->
+  
+<div class="callout insight">
+  <div class="callout-icon">
+<svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 1.5 L14.6 9 L22 9 L15.9 13.6 L18.2 21 L12 16.6 L5.8 21 L8.1 13.6 L2 9 L9.4 9 Z"/></svg>
+
+</div>
+  <div>
+    <div class="callout-title">Kritik Çıkarım</div>
+    <div class="callout-text">Yansıtıcı düşünme, kişinin kendi tecrübelerinden ders çıkarması ve bir şüphe durumundan araştırma yoluyla yeni bir anlamaya (aydınlanmaya) geçmesidir.</div>
+  </div>
+</div>
+
+  
+<!--item 3 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">5</div>
+    <div class="block-title">Analitik Düşünme</div>
+  </div>
+  
+  <ul>
+    <li>Bir bütündeki her bir parçanın tek tek analiz edilerek, bütünle veya sistemle olan ilişkilerinin incelendiği düşünme becerisidir. Doğrudan analiz becerisi ile ilişkilidir.</li><li><b>Analitik Düşünmeyi Geliştiren Örnek Uygulamalar:</b> Balık Kılçığı Yöntemi (bir sorunu — örn. KPSS sorunu — tek bir kütle olarak değil, onu oluşturan parçalara/neden ve alt nedenlere tek tek ayırarak incelemek); parça-bütün ilişkisini yorumlamayı gerektiren yap-bozlar (puzzle) yapmak; 'İki resim arasındaki 8 farkı bulun' tarzı detaycı etkinlikler uygulamak.</li>
+  </ul>
+</div>
+
+  
+<!--item 4 block-->
+  
+<div class="block">
+  <div class="block-head">
+    <div class="block-num">6</div>
+    <div class="block-title">Metabilişsel Düşünme (Üstbiliş)</div>
+  </div>
+  
+  <ul>
+    <li>Bilişsel psikoloji alanına 1970'li yıllarda John Flavell'in çalışmalarıyla girmiş olan en üst düzey düşünme becerilerinden biridir. En kısa tanımıyla kişinin 'kendi düşünme süreçlerinin farkında olması ve bu süreçleri kontrol edebilmesi' anlamına gelir.</li><li>Birey kendi bilişsel süreçlerinin nasıl işlediğini anlar, öğrenme süreçlerini denetim altına alır ve daha nitelikli bir öğrenme için zihinsel süreçlerini yeniden düzenleyerek en etkili biçimde kullanır.</li>
+  </ul>
+</div>
+
+  
+<!--item 5 callout-->
+  
+<div class="callout caution">
+  <div class="callout-icon">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.5"/><line x1="12" y1="11" x2="12" y2="16.5"/><circle cx="12" cy="7.5" r="0.6" fill="currentColor" stroke="none"/></svg>
+
+</div>
+  <div>
+    <div class="callout-title">Dikkat / Püf Noktası</div>
+    <div class="callout-text">Metabilişsel (üstbilişsel) düşünmede öğrencinin odaklandığı şey dışarıdaki ders konusu değil, bizzat kendi zihnidir. Kısacası öğrencinin 'Ben en iyi nasıl öğreniyorum?' sorusunun cevabını bilmesi ve kendi öğrenme stratejisini bizzat kendisinin yönetmesidir.</div>
+  </div>
+</div>
+
+  
+
+
+    
+<div class="footer">
+  <div>Öğretim <span class="accent-word">İlke</span> ve Yöntemleri</div>
+  <div class="fnum">23</div>
+</div>
+
+  </section>
+  
+  
+  
+  <section class="page body-page" data-ch="6" data-cp="2">
+    <div class="pageband"><div>Öğretim <span class="accent-word">İlke</span> ve Yöntemleri</div><div class="pageband-course">Bölüm 6</div></div>
+
+    
+
+    <!--item 0 summary-->
+  
+<div class="chsummary"><b>Bölüm Özeti</b>Bölüm 6, Bloom'un sentez düzeyine karşılık gelen Yaratıcı Düşünme'den, kanıt arayan ve sorgulayan Eleştirel Düşünme'ye; şüpheden aydınlanmaya uzanan Yansıtıcı Düşünme'den, bütünü parçalara ayırarak inceleyen Analitik Düşünme'ye ve kişinin kendi düşünme sürecini yönetmesini sağlayan Metabilişsel Düşünme'ye (üstbiliş) kadar beş temel düşünme biçimini ele alır.</div>
+
+  
+
+
+    
+<div class="footer">
+  <div>Öğretim <span class="accent-word">İlke</span> ve Yöntemleri</div>
+  <div class="fnum">24</div>
+</div>
+
+  </section>
+  
+  
+
+
+
+
+
+<section class="page body-page" id="glossary">
+  <div class="pageband"><div>Öğretim <span class="accent-word">İlke</span> ve Yöntemleri</div><div class="pageband-course">Genel Tekrar</div></div>
+  
+    <div class="section-kicker">Genel Tekrar</div>
+    <div class="section-title">Anahtar Kavramlar Sözlüğü</div>
+    <div class="section-lede">Her kavram, kısa tanımı ve geldiği bölümle birlikte listelenmiştir — hızlı tekrar ve eşleştirme için.</div>
+  
+  <div class="gloss-grid">
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Tam Öğrenme</div>
+      <div class="gloss-def">Olumlu koşullar sağlanırsa herkesin öğrenebileceğini savunan, %90'a varan başarı hedefleyen grupla öğretim modeli.</div>
+      <div class="gloss-ref">B. Bloom · 1. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Programlı Öğrenme (KEBAB)</div>
+      <div class="gloss-def">Küçük Adımlar, Etkin Katılım, Başarı, Anında Düzeltme, Bireysel Hız ilkelerine dayanan bireyselleştirilmiş öğretim sistemi.</div>
+      <div class="gloss-ref">B.F. Skinner · 1. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Probleme Dayalı Öğrenme</div>
+      <div class="gloss-def">İlgi ve merak uyandıran bir problemle başlanan, öğrencinin süreci yönettiği öğrenci merkezli yaklaşım.</div>
+      <div class="gloss-ref">J. Dewey · 1. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Proje Tabanlı Öğrenme</div>
+      <div class="gloss-def">Küçük gruplarda işbirlikli çalışılan, sonunda somut bir ürün/rapor ortaya konan çağdaş model.</div>
+      <div class="gloss-ref">Genel · 1. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Yapılandırmacılık</div>
+      <div class="gloss-def">Bilginin nesnel değil, bireyin kendi deneyimleriyle öznel olarak inşa ettiği bir şey olduğunu savunan kuram.</div>
+      <div class="gloss-ref">J. Piaget · 1. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">İşbirliğine Dayalı Öğrenme</div>
+      <div class="gloss-def">Heterojen küçük gruplarda ortak hedef için birlikte çalışma; 'olumlu bağlılık' kavramıyla tanımlanır.</div>
+      <div class="gloss-ref">Kubaşık Öğrenme · 2. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Aktif Öğrenme</div>
+      <div class="gloss-def">Öğrencinin öğrenme sürecinin sorumluluğunu taşıdığı, karar alma ve öz düzenleme fırsatları verilen süreç.</div>
+      <div class="gloss-ref">Good · 2. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Anlamlı Öğrenme</div>
+      <div class="gloss-def">Kavramlar arası ilişkinin fark edilmesine dayanan, kavram haritalarıyla desteklenen öğretmen merkezli öğrenme.</div>
+      <div class="gloss-ref">D. Ausubel · 2. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Öğretim Durumları Modeli</div>
+      <div class="gloss-def">8 aşamalı öğrenme türleri hiyerarşisi ve dersin işleniş sırasını tanımlayan model.</div>
+      <div class="gloss-ref">Gagne · 2. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Temel Öğretme Modeli</div>
+      <div class="gloss-def">Hedefler, giriş davranışları, ortam ve değerlendirmeden oluşan 4 öğeli öğretme modeli.</div>
+      <div class="gloss-ref">Glasser · 2. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Yaşam Boyu Öğrenme</div>
+      <div class="gloss-def">Bireyin öğrenme sürecini kendi yönlendirdiği, eğitimi okul yapısının dışına taşıyan yaklaşım.</div>
+      <div class="gloss-ref">Genel · 3. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Beyin Temelli Öğrenme</div>
+      <div class="gloss-def">Öğrenmeyi doğrudan insan beyni ve fizyolojisi üzerinden açıklayan, 'öğrenme teşvikle artar' ilkesine dayanan model.</div>
+      <div class="gloss-ref">Genel · 3. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Çoklu Zeka Kuramı</div>
+      <div class="gloss-def">Bireylerin 9 farklı zeka boyutuyla dünyaya geldiğini savunan, tek tip zeka anlayışını yıkan kuram.</div>
+      <div class="gloss-ref">H. Gardner · 3. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Okulda Öğrenme Modeli</div>
+      <div class="gloss-def">Öğrenmede belirleyici en temel değişkenin zaman olduğunu savunan model.</div>
+      <div class="gloss-ref">Carroll · 3. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Model Alarak (Sosyal) Öğrenme</div>
+      <div class="gloss-def">Taklit, gözlem ve model alma yoluyla öğrenmeyi açıklayan, gözlem yollu öğrenmeyi sistematikleştiren model.</div>
+      <div class="gloss-ref">A. Bandura · 3. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Basamaklı Öğretim Modeli</div>
+      <div class="gloss-def">Öğrenciyi pasif bilgi alıcıdan aktif bilgi üreticisine dönüştüren, C-B-A düzeylerinde ilerleyen sistem.</div>
+      <div class="gloss-ref">Nunley · 3. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Anlatım (Takrir) Yöntemi</div>
+      <div class="gloss-def">Öğretmen merkezli, işiterek öğrenmeye dayanan, en eski ve en yaygın öğretim yöntemi.</div>
+      <div class="gloss-ref">Öğretim Yöntemleri · 4. Bölüm</div>
+    </div>
+    
+  </div>
+  
+<div class="footer">
+  <div>Öğretim <span class="accent-word">İlke</span> ve Yöntemleri</div>
+  <div class="fnum">25</div>
+</div>
+
+</section>
+
+
+<section class="page body-page">
+  <div class="pageband"><div>Öğretim <span class="accent-word">İlke</span> ve Yöntemleri</div><div class="pageband-course">Genel Tekrar</div></div>
+  
+    <div class="chcontinue"><div class="tag">Sözlük · Devam</div><div class="cctitle">Anahtar Kavramlar (devamı)</div></div>
+  
+  <div class="gloss-grid">
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Tartışma Yöntemi</div>
+      <div class="gloss-def">Öğrencilerin en az bilgi düzeyinde ön bilgiye sahip olması gereken, demokratik tutum kazandıran öğrenci merkezli yöntem.</div>
+      <div class="gloss-ref">Öğretim Yöntemleri · 4. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Soru-Cevap Yöntemi</div>
+      <div class="gloss-def">Sokratik temellere dayanan, sorunun tüm sınıfa sorulup rastgele bir öğrenciye yöneltildiği teknik.</div>
+      <div class="gloss-ref">Öğretim Yöntemleri · 4. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Örnek Olay Yöntemi</div>
+      <div class="gloss-def">Gerçek yaşamdaki bir olayın sınıfa getirilip tek çözümü olmayan biçimde tartışılmasıdır.</div>
+      <div class="gloss-ref">Öğretim Yöntemleri · 4. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Gösterip Yaptırma</div>
+      <div class="gloss-def">Bir işin önce gösterilip sonra uygulatıldığı, psiko-motor becerilerin kazandırılmasında en etkili yöntem.</div>
+      <div class="gloss-ref">Öğretim Yöntemleri · 4. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Problem Çözme Yöntemi</div>
+      <div class="gloss-def">Bilimsel düşünmeyi ve problem çözme basamaklarını öğreten, üst düzey bilişsel fonksiyon gerektiren yöntem.</div>
+      <div class="gloss-ref">J. Dewey · 4. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Altı Şapkalı Düşünme</div>
+      <div class="gloss-def">Bir konuya beyaz, kırmızı, siyah, sarı, yeşil ve mavi şapka perspektifleriyle bakmayı sağlayan teknik.</div>
+      <div class="gloss-ref">E. De Bono · 5. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Altı Ayakkabılı Uygulama</div>
+      <div class="gloss-def">Bireyin olaylara farklı davranış tarzlarıyla (lacivert, gri, kahverengi, turuncu, pembe, mor) yaklaşmasını sağlayan teknik.</div>
+      <div class="gloss-ref">E. De Bono · 5. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Beyin Fırtınası</div>
+      <div class="gloss-def">Eleştirinin yasak olduğu, fikir niceliğinin önemli olduğu yaratıcı düşünce üretme tekniği.</div>
+      <div class="gloss-ref">Öğretim Teknikleri · 5. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Mikro Öğretim</div>
+      <div class="gloss-def">Dersin planlanıp kayda alındığı, izlenip dönüt verildiği ve yeniden uygulandığı öğretmen yetiştirme tekniği.</div>
+      <div class="gloss-ref">Öğretim Teknikleri · 5. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Bilişsel Çıraklık</div>
+      <div class="gloss-def">Öğrencinin bir uzmanın gözetiminde başladığı, desteğin zamanla azaltıldığı öğretim süreci (Ahilik örneği).</div>
+      <div class="gloss-ref">Öğretim Teknikleri · 5. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Tersine Eğitim (Flipped Classroom)</div>
+      <div class="gloss-def">Ön bilginin evde dijital ortamdan öğrenildiği, okulda ise proje/tartışma yapılan ters yüz edilmiş sistem.</div>
+      <div class="gloss-ref">Öğretim Teknikleri · 5. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Keller Planı</div>
+      <div class="gloss-def">Homojen 3-4 kişilik küçük gruplara, hız ve öğrenme stiline göre eğitim verilen bireyselleştirilmiş öğretim tekniği.</div>
+      <div class="gloss-ref">Bireysel Öğretim Teknikleri · 5. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Yaratıcı Düşünme</div>
+      <div class="gloss-def">Hazırlık-Kuluçka-Aydınlanma-Değerlendirme aşamalarıyla ilerleyen, Bloom'un sentez düzeyine karşılık gelen düşünme biçimi.</div>
+      <div class="gloss-ref">Düşünme Biçimleri · 6. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Eleştirel Düşünme</div>
+      <div class="gloss-def">Sol beyin etkinliğine dayanan, analitik ve kanıt arayan, olayları sorgulayarak ele alan düşünme biçimi.</div>
+      <div class="gloss-ref">Düşünme Biçimleri · 6. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Yansıtıcı Düşünme</div>
+      <div class="gloss-def">Şüphe durumundan araştırma yoluyla aydınlanmaya geçişi tanımlayan, öğrenciyi merkeze alan düşünme yolu.</div>
+      <div class="gloss-ref">Düşünme Biçimleri · 6. Bölüm</div>
+    </div>
+    
+    <div class="gloss-item">
+      <div class="gloss-term">Metabilişsel Düşünme (Üstbiliş)</div>
+      <div class="gloss-def">Kişinin kendi düşünme süreçlerinin farkında olması ve bu süreçleri kontrol edebilmesi.</div>
+      <div class="gloss-ref">J. Flavell · 6. Bölüm</div>
+    </div>
+    
+  </div>
+  
+<div class="footer">
+  <div>Öğretim <span class="accent-word">İlke</span> ve Yöntemleri</div>
+  <div class="fnum">26</div>
+</div>
+
+</section>
+
+
+
+
+
+
+
+
+
+<section class="page body-page" id="exam">
+  <div class="pageband"><div>Öğretim <span class="accent-word">İlke</span> ve Yöntemleri</div><div class="pageband-course">Sınav</div></div>
+  
+    <div class="section-kicker">Sınav</div>
+    <div class="section-title">Genel Değerlendirme Testi</div>
+    <div class="section-lede">Öğrenme kuramlarından öğretim yöntem, teknik ve düşünme biçimlerine kapsamlı çoktan seçmeli test</div>
+    <div class="test-chip-row">
+      
+      <div class="test-chip"><b>20</b><span>Soru</span></div>
+      
+      <div class="test-chip"><b>Çoktan</b><span>Seçmeli</span></div>
+      
+      <div class="test-chip"><b>5</b><span>Seçenek (A-E)</span></div>
+      
+    </div>
+    <div class="test-instructions">Aşağıdaki sorularda beş seçenekten yalnızca birini işaretleyiniz. Süre: 30 dakika.</div>
+  
+  <div class="tq-list">
+    
+<div class="tq">
+  <div class="tq-head">
+    <div class="tq-num">1</div>
+    <div class="tq-stem">Bloom'un Tam Öğrenme Modeli'ne göre, olumlu öğrenme koşulları sağlandığında okuldaki başarı hangi orana kadar çıkarılabilir?</div>
+  </div>
+  <ul class="tq-options">
+    
+    <li><span class="opt-letter">A</span><span>%50</span></li>
+    
+    <li><span class="opt-letter">B</span><span>%70</span></li>
+    
+    <li><span class="opt-letter">C</span><span>%80</span></li>
+    
+    <li><span class="opt-letter">D</span><span>%90</span></li>
+    
+    <li><span class="opt-letter">E</span><span>%100</span></li>
+    
+  </ul>
+</div>
+
+<div class="tq">
+  <div class="tq-head">
+    <div class="tq-num">2</div>
+    <div class="tq-stem">Programlı Öğrenmeyi (Skinner) Tam Öğrenmeden (Bloom) ayıran en belirgin fark aşağıdakilerden hangisidir?</div>
+  </div>
+  <ul class="tq-options">
+    
+    <li><span class="opt-letter">A</span><span>Konuların küçük birimlere ayrılması</span></li>
+    
+    <li><span class="opt-letter">B</span><span>Pekiştireç kullanılması</span></li>
+    
+    <li><span class="opt-letter">C</span><span>Bireysel hız ilkesi</span></li>
+    
+    <li><span class="opt-letter">D</span><span>Öğretim hizmetinin niteliği</span></li>
+    
+    <li><span class="opt-letter">E</span><span>Dönüt-düzeltme verilmesi</span></li>
+    
+  </ul>
+</div>
+
+<div class="tq">
+  <div class="tq-head">
+    <div class="tq-num">3</div>
+    <div class="tq-stem">Proje Tabanlı Öğrenme ile Probleme Dayalı Öğrenme arasındaki temel fark aşağıdakilerden hangisidir?</div>
+  </div>
+  <ul class="tq-options">
+    
+    <li><span class="opt-letter">A</span><span>Proje tabanlı öğrenmede somut bir ürün hedeflenirken, probleme dayalı öğrenmede yalnızca problemi çözme süreci önemlidir</span></li>
+    
+    <li><span class="opt-letter">B</span><span>Probleme dayalı öğrenmede grup çalışması yokken proje tabanlıda vardır</span></li>
+    
+    <li><span class="opt-letter">C</span><span>Proje tabanlı öğrenme öğretmen merkezlidir</span></li>
+    
+    <li><span class="opt-letter">D</span><span>Probleme dayalı öğrenmede teknoloji hedef kabul edilir</span></li>
+    
+    <li><span class="opt-letter">E</span><span>İkisi arasında hiçbir fark yoktur</span></li>
+    
+  </ul>
+</div>
+
+<div class="tq">
+  <div class="tq-head">
+    <div class="tq-num">4</div>
+    <div class="tq-stem">Yapılandırmacı yaklaşım türlerinden, öğrenmede kültürün ve dilin büyük etkisi olduğunu, bilginin sosyal etkileşimle oluştuğunu savunan tür hangisidir?</div>
+  </div>
+  <ul class="tq-options">
+    
+    <li><span class="opt-letter">A</span><span>Bilişsel Yapılandırmacılık</span></li>
+    
+    <li><span class="opt-letter">B</span><span>Radikal Yapılandırmacılık</span></li>
+    
+    <li><span class="opt-letter">C</span><span>Sosyal Yapılandırmacılık</span></li>
+    
+    <li><span class="opt-letter">D</span><span>Eleştirel Yapılandırmacılık</span></li>
+    
+    <li><span class="opt-letter">E</span><span>Davranışçı Yapılandırmacılık</span></li>
+    
+  </ul>
+</div>
+
+<div class="tq">
+  <div class="tq-head">
+    <div class="tq-num">5</div>
+    <div class="tq-stem">İşbirliğine Dayalı Öğrenmede, öğrencilerin grubun tümünün başarısına etki ettiklerini kavramalarına ne ad verilir?</div>
+  </div>
+  <ul class="tq-options">
+    
+    <li><span class="opt-letter">A</span><span>Olumlu bağlılık</span></li>
+    
+    <li><span class="opt-letter">B</span><span>Bireysel sorumluluk</span></li>
+    
+    <li><span class="opt-letter">C</span><span>Liderlik paylaşımı</span></li>
+    
+    <li><span class="opt-letter">D</span><span>Heterojen gruplaşma</span></li>
+    
+    <li><span class="opt-letter">E</span><span>Ortak amaç</span></li>
+    
+  </ul>
+</div>
+
+<div class="tq">
+  <div class="tq-head">
+    <div class="tq-num">6</div>
+    <div class="tq-stem">Ausubel'in Anlamlı Öğrenmesinin gerçekleşmesi için en kritik şart aşağıdakilerden hangisidir?</div>
+  </div>
+  <ul class="tq-options">
+    
+    <li><span class="opt-letter">A</span><span>Öğrencinin bireysel hızda ilerlemesi</span></li>
+    
+    <li><span class="opt-letter">B</span><span>Öğrencinin önceki bilişsel yapısı ile yeni bilgi arasında bağ kurulması</span></li>
+    
+    <li><span class="opt-letter">C</span><span>Sınıfın homojen gruplara ayrılması</span></li>
+    
+    <li><span class="opt-letter">D</span><span>Öğretmenin sadece anlatım yöntemini kullanması</span></li>
+    
+    <li><span class="opt-letter">E</span><span>Konunun küçük parçalara bölünmesi</span></li>
+    
+  </ul>
+</div>
+
+  </div>
+  
+<div class="footer">
+  <div>Öğretim <span class="accent-word">İlke</span> ve Yöntemleri</div>
+  <div class="fnum">27</div>
+</div>
+
+</section>
+
+
+<section class="page body-page">
+  <div class="pageband"><div>Öğretim <span class="accent-word">İlke</span> ve Yöntemleri</div><div class="pageband-course">Test · Devam</div></div>
+  
+    <div class="chcontinue"><div class="tag">Test · Devam</div><div class="cctitle">Genel Değerlendirme Testi</div></div>
+  
+  <div class="tq-list">
+    
+<div class="tq">
+  <div class="tq-head">
+    <div class="tq-num">7</div>
+    <div class="tq-stem">Gagne'nin 8 aşamalı Öğrenme Türleri Hiyerarşisi'nde ilk 5 aşama hangi kurama dayanır?</div>
+  </div>
+  <ul class="tq-options">
+    
+    <li><span class="opt-letter">A</span><span>Bilişsel kurama</span></li>
+    
+    <li><span class="opt-letter">B</span><span>Yapılandırmacı kurama</span></li>
+    
+    <li><span class="opt-letter">C</span><span>Davranışçı kurama</span></li>
+    
+    <li><span class="opt-letter">D</span><span>Hümanist kurama</span></li>
+    
+    <li><span class="opt-letter">E</span><span>Sosyal öğrenme kuramına</span></li>
+    
+  </ul>
+</div>
+
+<div class="tq">
+  <div class="tq-head">
+    <div class="tq-num">8</div>
+    <div class="tq-stem">Glasser'ın Temel Öğretme Modeli'nde ilk adım aşağıdakilerden hangisidir?</div>
+  </div>
+  <ul class="tq-options">
+    
+    <li><span class="opt-letter">A</span><span>Değerlendirme yapılır</span></li>
+    
+    <li><span class="opt-letter">B</span><span>Öğretme-öğrenme ortamı seçilir</span></li>
+    
+    <li><span class="opt-letter">C</span><span>Hedefler saptanır</span></li>
+    
+    <li><span class="opt-letter">D</span><span>Gerekli giriş davranışları belirlenir</span></li>
+    
+    <li><span class="opt-letter">E</span><span>Dönüt ve düzeltme verilir</span></li>
+    
+  </ul>
+</div>
+
+<div class="tq">
+  <div class="tq-head">
+    <div class="tq-num">9</div>
+    <div class="tq-stem">Beyin Temelli Öğrenme Modeli'ndeki 'en altın kural' aşağıdakilerden hangisidir?</div>
+  </div>
+  <ul class="tq-options">
+    
+    <li><span class="opt-letter">A</span><span>Öğrenme teşvikle (destekle) artar, korku (kaygı) ile azalır</span></li>
+    
+    <li><span class="opt-letter">B</span><span>Öğrenme yalnızca bireysel ortamda gerçekleşir</span></li>
+    
+    <li><span class="opt-letter">C</span><span>Beyin işlevleri sırayla, tek tek gerçekleşir</span></li>
+    
+    <li><span class="opt-letter">D</span><span>Bilgi mutlaka ezber yoluyla kalıcı hale gelir</span></li>
+    
+    <li><span class="opt-letter">E</span><span>Öğrenme sadece grup içinde gerçekleşebilir</span></li>
+    
+  </ul>
+</div>
+
+<div class="tq">
+  <div class="tq-head">
+    <div class="tq-num">10</div>
+    <div class="tq-stem">Gardner'ın Çoklu Zeka Kuramı'na sonradan eklenen 9. zeka boyutu, 'Biz kimiz?', 'Neden ölürüz?' gibi evrensel sorularla ilgilenen hangi zeka türüdür?</div>
+  </div>
+  <ul class="tq-options">
+    
+    <li><span class="opt-letter">A</span><span>Doğacı Zeka</span></li>
+    
+    <li><span class="opt-letter">B</span><span>Özedönük-İçsel Zeka</span></li>
+    
+    <li><span class="opt-letter">C</span><span>Varoluşçu Zeka</span></li>
+    
+    <li><span class="opt-letter">D</span><span>Mantıksal-Matematiksel Zeka</span></li>
+    
+    <li><span class="opt-letter">E</span><span>Sosyal-Kişilerarası Zeka</span></li>
+    
+  </ul>
+</div>
+
+<div class="tq">
+  <div class="tq-head">
+    <div class="tq-num">11</div>
+    <div class="tq-stem">Carroll'un Okulda Öğrenme Modeli'ne göre, öğrenmede belirleyici olan en temel değişken hangisidir?</div>
+  </div>
+  <ul class="tq-options">
+    
+    <li><span class="opt-letter">A</span><span>Yetenek</span></li>
+    
+    <li><span class="opt-letter">B</span><span>Fırsat</span></li>
+    
+    <li><span class="opt-letter">C</span><span>Sebat</span></li>
+    
+    <li><span class="opt-letter">D</span><span>Zaman</span></li>
+    
+    <li><span class="opt-letter">E</span><span>Kaliteli öğretim</span></li>
+    
+  </ul>
+</div>
+
+<div class="tq">
+  <div class="tq-head">
+    <div class="tq-num">12</div>
+    <div class="tq-stem">Gözlem yollu öğrenmeyi sistematik bir bütünlüğe ulaştıran, 'Model Alarak (Sosyal) Öğrenme Modeli'nin öncüsü kimdir?</div>
+  </div>
+  <ul class="tq-options">
+    
+    <li><span class="opt-letter">A</span><span>Thorndike</span></li>
+    
+    <li><span class="opt-letter">B</span><span>Albert Bandura</span></li>
+    
+    <li><span class="opt-letter">C</span><span>Piaget</span></li>
+    
+    <li><span class="opt-letter">D</span><span>Skinner</span></li>
+    
+    <li><span class="opt-letter">E</span><span>Vygotsky</span></li>
+    
+  </ul>
+</div>
+
+<div class="tq">
+  <div class="tq-head">
+    <div class="tq-num">13</div>
+    <div class="tq-stem">Nunley'in Basamaklı Öğretim Modeli'nde, öğrencinin 'İstanbul'un fethi ile ilgili bir slayt hazırlayıp sınıfa sunması' hangi düzeye örnektir?</div>
+  </div>
+  <ul class="tq-options">
+    
+    <li><span class="opt-letter">A</span><span>C Basamağı (Bilgi ve Kavrama)</span></li>
+    
+    <li><span class="opt-letter">B</span><span>B Basamağı (Uygulama)</span></li>
+    
+    <li><span class="opt-letter">C</span><span>A Basamağı (Analiz, Sentez, Değerlendirme)</span></li>
+    
+    <li><span class="opt-letter">D</span><span>Hedef Davranışların Sunulması</span></li>
+    
+    <li><span class="opt-letter">E</span><span>Öğretmen Değerlendirmesi</span></li>
+    
+  </ul>
+</div>
+
+  </div>
+  
+<div class="footer">
+  <div>Öğretim <span class="accent-word">İlke</span> ve Yöntemleri</div>
+  <div class="fnum">28</div>
+</div>
+
+</section>
+
+
+<section class="page body-page">
+  <div class="pageband"><div>Öğretim <span class="accent-word">İlke</span> ve Yöntemleri</div><div class="pageband-course">Test · Devam</div></div>
+  
+    <div class="chcontinue"><div class="tag">Test · Devam</div><div class="cctitle">Genel Değerlendirme Testi</div></div>
+  
+  <div class="tq-list">
+    
+<div class="tq">
+  <div class="tq-head">
+    <div class="tq-num">14</div>
+    <div class="tq-stem">Anlatım (Takrir) Yönteminde, sadece dinlemenin öğrenmedeki etkisi yaklaşık yüzde kaçtır?</div>
+  </div>
+  <ul class="tq-options">
+    
+    <li><span class="opt-letter">A</span><span>%10</span></li>
+    
+    <li><span class="opt-letter">B</span><span>%20</span></li>
+    
+    <li><span class="opt-letter">C</span><span>%40</span></li>
+    
+    <li><span class="opt-letter">D</span><span>%60</span></li>
+    
+    <li><span class="opt-letter">E</span><span>%80</span></li>
+    
+  </ul>
+</div>
+
+<div class="tq">
+  <div class="tq-head">
+    <div class="tq-num">15</div>
+    <div class="tq-stem">Soru-Cevap Yönteminin uygulama kurallarına göre, soru sorulduktan sonra cevaplayacak kişi nasıl seçilmelidir?</div>
+  </div>
+  <ul class="tq-options">
+    
+    <li><span class="opt-letter">A</span><span>Oturma sırasına göre</span></li>
+    
+    <li><span class="opt-letter">B</span><span>Numara sırasına göre</span></li>
+    
+    <li><span class="opt-letter">C</span><span>Rastgele</span></li>
+    
+    <li><span class="opt-letter">D</span><span>Her zaman gönüllü öğrenciler arasından</span></li>
+    
+    <li><span class="opt-letter">E</span><span>Sadece başarılı öğrenciler arasından</span></li>
+    
+  </ul>
+</div>
+
+<div class="tq">
+  <div class="tq-head">
+    <div class="tq-num">16</div>
+    <div class="tq-stem">Örnek Olay Yönteminde dikkat edilmesi gereken en önemli nokta aşağıdakilerden hangisidir?</div>
+  </div>
+  <ul class="tq-options">
+    
+    <li><span class="opt-letter">A</span><span>Olayın tek bir doğru çözümü olmalıdır</span></li>
+    
+    <li><span class="opt-letter">B</span><span>Olayın tek bir çözümü olmamalı, alternatif çözümler üretilmelidir</span></li>
+    
+    <li><span class="opt-letter">C</span><span>Olay mutlaka öğretmen tarafından çözülmelidir</span></li>
+    
+    <li><span class="opt-letter">D</span><span>Olay kalabalık sınıfta tek grup halinde tartışılmalıdır</span></li>
+    
+    <li><span class="opt-letter">E</span><span>Olay yalnızca bilgi düzeyinde ele alınmalıdır</span></li>
+    
+  </ul>
+</div>
+
+<div class="tq">
+  <div class="tq-head">
+    <div class="tq-num">17</div>
+    <div class="tq-stem">Altı Şapkalı Düşünme tekniğinde, tutkuları, hisleri ve sezgileri temsil eden şapka hangisidir?</div>
+  </div>
+  <ul class="tq-options">
+    
+    <li><span class="opt-letter">A</span><span>Beyaz Şapka</span></li>
+    
+    <li><span class="opt-letter">B</span><span>Kırmızı Şapka</span></li>
+    
+    <li><span class="opt-letter">C</span><span>Siyah Şapka</span></li>
+    
+    <li><span class="opt-letter">D</span><span>Sarı Şapka</span></li>
+    
+    <li><span class="opt-letter">E</span><span>Yeşil Şapka</span></li>
+    
+  </ul>
+</div>
+
+<div class="tq">
+  <div class="tq-head">
+    <div class="tq-num">18</div>
+    <div class="tq-stem">Rol Oynama ile Drama tekniği arasındaki temel fark aşağıdakilerden hangisidir?</div>
+  </div>
+  <ul class="tq-options">
+    
+    <li><span class="opt-letter">A</span><span>Rol oynamada başkasının kimliğine bürünme (kurgu) vardır; drama ise öğrencinin kendi çözümünü/doğallığını katmasına dayanır</span></li>
+    
+    <li><span class="opt-letter">B</span><span>Drama bireysel, rol oynama grupla yapılır</span></li>
+    
+    <li><span class="opt-letter">C</span><span>Rol oynama yalnızca yazılı olarak yapılır</span></li>
+    
+    <li><span class="opt-letter">D</span><span>İkisi arasında hiçbir fark yoktur</span></li>
+    
+    <li><span class="opt-letter">E</span><span>Drama yalnızca psiko-motor beceriler için kullanılır</span></li>
+    
+  </ul>
+</div>
+
+<div class="tq">
+  <div class="tq-head">
+    <div class="tq-num">19</div>
+    <div class="tq-stem">Keller Planı (Bireyselleştirilmiş Öğretim) hangi varsayıma dayanır?</div>
+  </div>
+  <ul class="tq-options">
+    
+    <li><span class="opt-letter">A</span><span>Tüm sınıfın aynı hızda ve aynı etkinliklerle öğrenebileceği</span></li>
+    
+    <li><span class="opt-letter">B</span><span>Sınıftaki tüm öğrencilerin aynı hızda öğrenemeyeceği</span></li>
+    
+    <li><span class="opt-letter">C</span><span>Öğrencilerin yalnızca grupla öğrenebileceği</span></li>
+    
+    <li><span class="opt-letter">D</span><span>Öğretmenin sınıfa hiç müdahale etmemesi gerektiği</span></li>
+    
+    <li><span class="opt-letter">E</span><span>Değerlendirmenin yalnızca yazılı sınavla yapılması gerektiği</span></li>
+    
+  </ul>
+</div>
+
+<div class="tq">
+  <div class="tq-head">
+    <div class="tq-num">20</div>
+    <div class="tq-stem">Eleştirel Düşünme ile Yaratıcı Düşünme karşılaştırıldığında, aşağıdakilerden hangisi Eleştirel Düşünme için doğrudur?</div>
+  </div>
+  <ul class="tq-options">
+    
+    <li><span class="opt-letter">A</span><span>Sağ beyin etkindir, yayma (genişleme) odaklıdır</span></li>
+    
+    <li><span class="opt-letter">B</span><span>Sol beyin etkindir, odaklama (derinleşme) esastır</span></li>
+    
+    <li><span class="opt-letter">C</span><span>Üretici ve özneldir</span></li>
+    
+    <li><span class="opt-letter">D</span><span>Görsel işlem türü baskındır</span></li>
+    
+    <li><span class="opt-letter">E</span><span>Sentez düzeyine karşılık gelir</span></li>
+    
+  </ul>
+</div>
+
+  </div>
+  
+<div class="footer">
+  <div>Öğretim <span class="accent-word">İlke</span> ve Yöntemleri</div>
+  <div class="fnum">29</div>
+</div>
+
+</section>
+
+
+
+
+
+<section class="page body-page" id="answer-key">
+  <div class="pageband"><div>Öğretim <span class="accent-word">İlke</span> ve Yöntemleri</div><div class="pageband-course">Cevap Anahtarı</div></div>
+  
+    <div class="section-kicker">Çözümler</div>
+    <div class="section-title">Cevap Anahtarı ve Çözümler</div>
+    <div class="section-lede">Her sorunun doğru cevabı ve kısa gerekçesi aşağıda yer almaktadır.</div>
+  
+  <div class="ans-list">
+    
+<div class="ans-item">
+  <div class="ans-num">1</div>
+  <div>
+    <span class="ans-correct">Doğru Cevap: D</span>
+    <div class="ans-explain">Bloom'un Tam Öğrenme Modeli, okuldaki başarıyı <b>%90'a</b> çıkaran (alt limit %70) bir grupla öğretim sürecidir.</div>
+  </div>
+</div>
+
+<div class="ans-item">
+  <div class="ans-num">2</div>
+  <div>
+    <span class="ans-correct">Doğru Cevap: C</span>
+    <div class="ans-explain"><b>Bireysel Hız</b> ilkesi (KEBAB'ın son öğesi), Programlı Öğrenmeyi Tam Öğrenmeden ayıran en belirgin farktır.</div>
+  </div>
+</div>
+
+<div class="ans-item">
+  <div class="ans-num">3</div>
+  <div>
+    <span class="ans-correct">Doğru Cevap: A</span>
+    <div class="ans-explain">Proje tabanlı öğrenme sürecin sonunda somut bir ürün/rapor hedeflerken, probleme dayalı öğrenmede somut ürün yoktur; yalnızca <b>problemi çözme süreci</b> önemlidir.</div>
+  </div>
+</div>
+
+<div class="ans-item">
+  <div class="ans-num">4</div>
+  <div>
+    <span class="ans-correct">Doğru Cevap: C</span>
+    <div class="ans-explain"><b>Sosyal Yapılandırmacılık</b>, öğrenmede kültürün ve dilin büyük etkisi olduğunu, bilginin sosyal etkileşimle oluştuğunu savunur.</div>
+  </div>
+</div>
+
+<div class="ans-item">
+  <div class="ans-num">5</div>
+  <div>
+    <span class="ans-correct">Doğru Cevap: A</span>
+    <div class="ans-explain">Öğrencilerin grubun tümünün başarısına etki ettiklerini kavramalarına <b>'olumlu bağlılık'</b> denir.</div>
+  </div>
+</div>
+
+<div class="ans-item">
+  <div class="ans-num">6</div>
+  <div>
+    <span class="ans-correct">Doğru Cevap: B</span>
+    <div class="ans-explain">Anlamlı öğrenmenin en kritik şartı, öğrencinin <b>önceki bilişsel yapısı ile yeni öğrenecekleri arasında bağ kurulmasıdır.</b></div>
+  </div>
+</div>
+
+<div class="ans-item">
+  <div class="ans-num">7</div>
+  <div>
+    <span class="ans-correct">Doğru Cevap: C</span>
+    <div class="ans-explain">Gagne'nin 8 aşamalı hiyerarşisinde ilk 5 aşama <b>davranışçı kurama</b> (klasik ve edimsel koşullanma), son 3 aşama ise bilişsel kurama dayanır.</div>
+  </div>
+</div>
+
+<div class="ans-item">
+  <div class="ans-num">8</div>
+  <div>
+    <span class="ans-correct">Doğru Cevap: C</span>
+    <div class="ans-explain">Glasser'ın Temel Öğretme Modeli'nde ilk adım <b>hedeflerin saptanmasıdır</b>; ardından giriş davranışları belirlenir, ortam düzenlenir ve değerlendirme yapılır.</div>
+  </div>
+</div>
+
+<div class="ans-item">
+  <div class="ans-num">9</div>
+  <div>
+    <span class="ans-correct">Doğru Cevap: A</span>
+    <div class="ans-explain">Beyin Temelli Öğrenme'nin en altın kuralı: <b>'Öğrenme teşvikle (destekle) artar, korku (kaygı) ile azalır.'</b></div>
+  </div>
+</div>
+
+<div class="ans-item">
+  <div class="ans-num">10</div>
+  <div>
+    <span class="ans-correct">Doğru Cevap: C</span>
+    <div class="ans-explain"><b>Varoluşçu Zeka</b>, Gardner'ın kuramına sonradan eklenen 9. boyuttur ve varlığın başı-sonuyla ilgili evrensel sorularla ilgilenir.</div>
+  </div>
+</div>
+
+<div class="ans-item">
+  <div class="ans-num">11</div>
+  <div>
+    <span class="ans-correct">Doğru Cevap: D</span>
+    <div class="ans-explain">Carroll'un modeline göre öğrenmede belirleyici olan en temel değişken <b>zamandır.</b></div>
+  </div>
+</div>
+
+<div class="ans-item">
+  <div class="ans-num">12</div>
+  <div>
+    <span class="ans-correct">Doğru Cevap: B</span>
+    <div class="ans-explain">Gözlem yollu öğrenmeyi sistematik bir bütünlüğe ulaştıran kişi <b>Albert Bandura</b>'dır (Thorndike konuyu ilk kez deneysel olarak açıklamıştır, ancak sistemleştiren o değildir).</div>
+  </div>
+</div>
+
+<div class="ans-item">
+  <div class="ans-num">13</div>
+  <div>
+    <span class="ans-correct">Doğru Cevap: B</span>
+    <div class="ans-explain">Kazanılan bilgiyi farklı bir örnekte (slayt hazırlama) uygulamak <b>B Basamağı (Uygulama)</b> düzeyine örnektir.</div>
+  </div>
+</div>
+
+<div class="ans-item">
+  <div class="ans-num">14</div>
+  <div>
+    <span class="ans-correct">Doğru Cevap: B</span>
+    <div class="ans-explain">Anlatım yönteminde sadece dinlemenin öğrenmedeki etkisi yaklaşık <b>%20</b>'dir.</div>
+  </div>
+</div>
+
+<div class="ans-item">
+  <div class="ans-num">15</div>
+  <div>
+    <span class="ans-correct">Doğru Cevap: C</span>
+    <div class="ans-explain">Sorular numara veya oturma sırasına göre değil, tüm sınıfın dikkatinin canlı kalması için <b>rastgele</b> sorulmalıdır.</div>
+  </div>
+</div>
+
+<div class="ans-item">
+  <div class="ans-num">16</div>
+  <div>
+    <span class="ans-correct">Doğru Cevap: B</span>
+    <div class="ans-explain">Örnek olayın amacı öğrencilerin farklı/alternatif çözümler üretmesi olduğundan, olayın <b>tek bir çözümü olmamalıdır.</b></div>
+  </div>
+</div>
+
+<div class="ans-item">
+  <div class="ans-num">17</div>
+  <div>
+    <span class="ans-correct">Doğru Cevap: B</span>
+    <div class="ans-explain"><b>Kırmızı Şapka</b>, tutkuları, hisleri ve sezgileri (duygusal/sübjektif boyutu) temsil eder.</div>
+  </div>
+</div>
+
+<div class="ans-item">
+  <div class="ans-num">18</div>
+  <div>
+    <span class="ans-correct">Doğru Cevap: A</span>
+    <div class="ans-explain">Rol oynamada başkasının kimliğine/penceresine bürünme (kurgu) vardır; <b>Drama'da ise öğrenci kendi çözümünü/doğallığını katar.</b></div>
+  </div>
+</div>
+
+<div class="ans-item">
+  <div class="ans-num">19</div>
+  <div>
+    <span class="ans-correct">Doğru Cevap: B</span>
+    <div class="ans-explain">Keller Planı, sınıftaki tüm öğrencilerin <b>aynı hızda ve aynı etkinliklerle öğrenemeyeceği</b> varsayımına dayanır; bu yüzden homojen küçük gruplar oluşturulur.</div>
+  </div>
+</div>
+
+<div class="ans-item">
+  <div class="ans-num">20</div>
+  <div>
+    <span class="ans-correct">Doğru Cevap: B</span>
+    <div class="ans-explain">Eleştirel Düşünmede <b>sol beyin etkindir</b> ve yaklaşım analitik, nesnel ve odaklama (derinleşme) esaslıdır; yaratıcı düşünme ise sağ beyin ve yayma (genişleme) odaklıdır.</div>
+  </div>
+</div>
+
+  </div>
+  
+<div class="footer">
+  <div>Öğretim <span class="accent-word">İlke</span> ve Yöntemleri</div>
+  <div class="fnum">30</div>
+</div>
+
+</section>
+
+
+
+
+
+
+
+</body>
+</html>
