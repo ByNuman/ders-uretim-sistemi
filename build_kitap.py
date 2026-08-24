@@ -236,7 +236,9 @@ def verify_page_numbers(courses: list[dict], pdf_path: Path, fm: dict):
 
 def build_book(module_name: str = "content.kitap"):
     book = importlib.import_module(module_name).get_book()
-    css = B.load_css()
+    # Kitap KENDİ geometri config'ini kullanır (B.BOOK_GEOMETRY); tekil ders
+    # build'inin config'inden (B.SINGLE_GEOMETRY) bağımsızdır.
+    css = B.load_css(B.BOOK_GEOMETRY)
 
     fm_pages = front_matter_page_count(len(book.course_modules))
     courses = collect_courses(book, offset=fm_pages, css=css)
@@ -266,12 +268,13 @@ def build_book(module_name: str = "content.kitap"):
     html_path.write_text(html, encoding="utf-8")
     print(f"[kitap] HTML yazıldı: {html_path} ({len(html) // 1024} KB)")
 
-    overflow = B.render_pdf(html_path, pdf_path, expected_pages=fm["stats"]["pages"])
+    overflow = B.render_pdf(html_path, pdf_path, expected_pages=fm["stats"]["pages"],
+                            geo=B.BOOK_GEOMETRY)
     report_overflow(overflow, courses)
     B.optimize_pdf(pdf_path)
     verify_page_numbers(courses, pdf_path, fm)
     n = add_book_bookmarks(pdf_path, courses, fm)
-    B.finalize_for_print(pdf_path, B.strip_tags(book.title))
+    B.finalize_for_print(pdf_path, B.strip_tags(book.title), geo=B.BOOK_GEOMETRY)
     size_mb = pdf_path.stat().st_size / 1024 / 1024
     print(f"[kitap] Yer imi ağacı: {n} girdi ({len(courses)} ders düğümü + alt başlıklar)")
     print(f"[kitap] PDF üretildi: {pdf_path} ({size_mb:.1f} MB)")

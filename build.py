@@ -14,6 +14,7 @@ yazar -> Ghostscript ile PDF/X-4 CMYK'ya çevirir.
 import sys
 import subprocess
 import importlib
+from dataclasses import dataclass
 from pathlib import Path
 from jinja2 import Environment, FileSystemLoader
 
@@ -31,68 +32,107 @@ OUTPUT.mkdir(exist_ok=True)
 
 
 # =============================================================================
-# BASKI GEOMETRİSİ — TEK KAYNAK
+# BASKI GEOMETRİSİ — İKİ AYRI ÇIKTI, İKİ AYRI CONFIG
 # =============================================================================
-# Sayfa ölçüsü, taşma payı ve kenar boşluklarının TANIMLANDIĞI tek yer burasıdır.
+# Sayfa ölçüsü, taşma payı ve kenar boşlukları burada TANIMLANIR. Birbirinden
+# BAĞIMSIZ iki config vardır (bkz. CLAUDE.md'nin en üstündeki KRİTİK KURAL):
+#
+#     SINGLE_GEOMETRY -> `python build.py content.<slug>` ile üretilen TEKİL
+#                        ders PDF'i.
+#     BOOK_GEOMETRY   -> `python build_kitap.py` ile üretilen BİRLEŞİK kitap.
+#
+# Şu anda ikisinin değerleri aynıdır (175x250mm trim); ama TEK BİR GLOBAL
+# SABİT DEĞİLLERDİR: birini değiştirmek diğerini etkilemez. Bir çıktının
+# ölçüsünü değiştirdikten sonra sayfalama sabitleri (GLOSSARY_PER_PAGE vb.) ve
+# ChapterPage dağılımları o ölçüye göre yeniden ölçülmelidir:
+#     python tools/kalibre.py && python tools/dengele.py --hepsi
+#
 # style.css içindeki aynı adlı :root değişkenleri yalnızca varsayılandır;
-# page_geometry_css() bu sabitlerden üretilen bloğu CSS'in SONUNA ekleyerek
-# onları ezer. Böylece "CSS'te 175mm ama Chromium'a 210mm verilmiş" türü
-# sessiz uyumsuzluk yapısal olarak imkânsızdır.
+# page_geometry_css(geo) seçilen config'ten üretilen bloğu CSS'in SONUNA
+# ekleyerek onları ezer. Böylece "CSS'te 175mm ama Chromium'a 210mm verilmiş"
+# türü sessiz uyumsuzluk yapısal olarak imkânsızdır.
 
-TRIM_W_MM = 175.0          # bitmiş (kesilmiş) sayfa genişliği
-TRIM_H_MM = 250.0          # bitmiş (kesilmiş) sayfa yüksekliği
-BLEED_MM = 3.0             # taşma payı (her kenar) — full-bleed zeminler için
 
-MARGIN_TOP_MM = 11.0
-MARGIN_BOTTOM_MM = 19.0    # sayfa numarası payı dahil
-MARGIN_INNER_MM = 14.0     # sırt/gutter tarafı — PUR Amerikan cilt payı
-MARGIN_OUTER_MM = 9.0
+@dataclass(frozen=True)
+class PageGeometry:
+    """Tek bir çıktının (tekil ders / birleşik kitap) baskı geometrisi."""
 
-# Ayna simetri yönü. Standart kitap ciltlemesinde TEK (1, 3, 5...) sayfa sağ
-# yapraktır, dolayısıyla sırtı SOLDA kalır -> "left".  Ciltçiniz tersini
-# istiyorsa tek kelimeyi "right" yapmak yeterlidir, başka hiçbir yeri
-# değiştirmeye gerek yoktur.
-ODD_PAGE_GUTTER = "left"
+    name: str
+    trim_w: float               # bitmiş (kesilmiş) sayfa genişliği (mm)
+    trim_h: float               # bitmiş (kesilmiş) sayfa yüksekliği (mm)
+    bleed: float = 3.0          # taşma payı (her kenar) — full-bleed zeminler için
+    mg_top: float = 11.0
+    mg_bottom: float = 19.0     # sayfa numarası payı dahil
+    mg_inner: float = 14.0      # sırt/gutter tarafı — PUR Amerikan cilt payı
+    mg_outer: float = 9.0
+    # Ayna simetri yönü. Standart kitap ciltlemesinde TEK (1, 3, 5...) sayfa
+    # sağ yapraktır, dolayısıyla sırtı SOLDA kalır -> "left".  Ciltçiniz
+    # tersini istiyorsa tek kelimeyi "right" yapmak yeterlidir.
+    odd_page_gutter: str = "left"
 
-# Fiziksel render ölçüsü (bleed box) — Chromium'a verilen ve PDF MediaBox'ı
-# olan boyut. Trim kutusu bunun 3mm içindedir (bkz. set_print_boxes()).
-PAGE_W_MM = TRIM_W_MM + 2 * BLEED_MM
-PAGE_H_MM = TRIM_H_MM + 2 * BLEED_MM
+    # Fiziksel render ölçüsü (bleed box) — Chromium'a verilen ve PDF MediaBox'ı
+    # olan boyut. Trim kutusu bunun `bleed` kadar içindedir (set_print_boxes()).
+    @property
+    def page_w(self) -> float:
+        return self.trim_w + 2 * self.bleed
+
+    @property
+    def page_h(self) -> float:
+        return self.trim_h + 2 * self.bleed
+
+
+SINGLE_GEOMETRY = PageGeometry(name="tekil ders", trim_w=175.0, trim_h=250.0)
+BOOK_GEOMETRY = PageGeometry(name="birleşik kitap", trim_w=175.0, trim_h=250.0)
+
+# Geriye dönük uyumluluk: tools/olcum.py ve tools/kalibre.py tekil ders
+# sayfalarını ölçtükleri için TEKİL config'in değerlerini okur. Yeni kod bu
+# modül sabitleri yerine doğrudan bir PageGeometry geçirmelidir.
+TRIM_W_MM = SINGLE_GEOMETRY.trim_w
+TRIM_H_MM = SINGLE_GEOMETRY.trim_h
+BLEED_MM = SINGLE_GEOMETRY.bleed
+MARGIN_TOP_MM = SINGLE_GEOMETRY.mg_top
+MARGIN_BOTTOM_MM = SINGLE_GEOMETRY.mg_bottom
+MARGIN_INNER_MM = SINGLE_GEOMETRY.mg_inner
+MARGIN_OUTER_MM = SINGLE_GEOMETRY.mg_outer
+ODD_PAGE_GUTTER = SINGLE_GEOMETRY.odd_page_gutter
+PAGE_W_MM = SINGLE_GEOMETRY.page_w
+PAGE_H_MM = SINGLE_GEOMETRY.page_h
 
 
 def _mm(v: float) -> str:
     return f"{v:g}mm"
 
 
-def page_geometry_css() -> str:
-    """style.css'in sonuna eklenen, yukarıdaki sabitlerden türetilmiş geometri
+def page_geometry_css(geo: PageGeometry = SINGLE_GEOMETRY) -> str:
+    """style.css'in sonuna eklenen, verilen config'ten türetilmiş geometri
     bloğu. Tek/çift sayfa ayna simetrisi burada kurulur: tüm .page'ler <body>'nin
     doğrudan <section> çocukları olduğu için :nth-of-type() sırası PDF'teki
     fiziksel sayfa sırasıyla birebir aynıdır."""
-    inner_side = "left" if ODD_PAGE_GUTTER == "left" else "right"
+    inner_side = "left" if geo.odd_page_gutter == "left" else "right"
     outer_side = "right" if inner_side == "left" else "left"
     return f"""
 /* ===== build.py tarafından üretildi — elle düzenlemeyin ===================
-   Trim {_mm(TRIM_W_MM)} x {_mm(TRIM_H_MM)} · bleed {_mm(BLEED_MM)} ·
-   kenarlar: üst {_mm(MARGIN_TOP_MM)} / alt {_mm(MARGIN_BOTTOM_MM)} /
-   iç {_mm(MARGIN_INNER_MM)} / dış {_mm(MARGIN_OUTER_MM)} ·
-   tek sayfa sırtı: {ODD_PAGE_GUTTER}
+   Config: {geo.name} ·
+   Trim {_mm(geo.trim_w)} x {_mm(geo.trim_h)} · bleed {_mm(geo.bleed)} ·
+   kenarlar: üst {_mm(geo.mg_top)} / alt {_mm(geo.mg_bottom)} /
+   iç {_mm(geo.mg_inner)} / dış {_mm(geo.mg_outer)} ·
+   tek sayfa sırtı: {geo.odd_page_gutter}
    ========================================================================= */
-@page {{ size: {_mm(PAGE_W_MM)} {_mm(PAGE_H_MM)}; margin: 0; }}
+@page {{ size: {_mm(geo.page_w)} {_mm(geo.page_h)}; margin: 0; }}
 :root {{
-  --trim-w: {_mm(TRIM_W_MM)};
-  --trim-h: {_mm(TRIM_H_MM)};
-  --bleed: {_mm(BLEED_MM)};
-  --page-w: {_mm(PAGE_W_MM)};
-  --page-h: {_mm(PAGE_H_MM)};
-  --mg-top: {_mm(MARGIN_TOP_MM)};
-  --mg-bottom: {_mm(MARGIN_BOTTOM_MM)};
-  --mg-inner: {_mm(MARGIN_INNER_MM)};
-  --mg-outer: {_mm(MARGIN_OUTER_MM)};
-  --pad-top: {_mm(BLEED_MM + MARGIN_TOP_MM)};
-  --pad-bottom: {_mm(BLEED_MM + MARGIN_BOTTOM_MM)};
-  --pad-inner: {_mm(BLEED_MM + MARGIN_INNER_MM)};
-  --pad-outer: {_mm(BLEED_MM + MARGIN_OUTER_MM)};
+  --trim-w: {_mm(geo.trim_w)};
+  --trim-h: {_mm(geo.trim_h)};
+  --bleed: {_mm(geo.bleed)};
+  --page-w: {_mm(geo.page_w)};
+  --page-h: {_mm(geo.page_h)};
+  --mg-top: {_mm(geo.mg_top)};
+  --mg-bottom: {_mm(geo.mg_bottom)};
+  --mg-inner: {_mm(geo.mg_inner)};
+  --mg-outer: {_mm(geo.mg_outer)};
+  --pad-top: {_mm(geo.bleed + geo.mg_top)};
+  --pad-bottom: {_mm(geo.bleed + geo.mg_bottom)};
+  --pad-inner: {_mm(geo.bleed + geo.mg_inner)};
+  --pad-outer: {_mm(geo.bleed + geo.mg_outer)};
 }}
 /* Ayna simetri — tek sayfada sırt {inner_side}, çift sayfada {outer_side} */
 body > section.page:nth-of-type(odd) {{
@@ -106,10 +146,10 @@ body > section.page:nth-of-type(even) {{
 """
 
 
-def load_css() -> str:
-    """style.css + build.py'den türetilen geometri bloğu. Tek ders ve kitap
-    build'i AYNI fonksiyonu kullanır."""
-    return (TEMPLATES / "style.css").read_text(encoding="utf-8") + page_geometry_css()
+def load_css(geo: PageGeometry = SINGLE_GEOMETRY) -> str:
+    """style.css + verilen config'ten türetilen geometri bloğu. Tek ders ve
+    kitap build'i AYNI fonksiyonu kullanır, ama KENDİ geometry config'iyle."""
+    return (TEMPLATES / "style.css").read_text(encoding="utf-8") + page_geometry_css(geo)
 
 
 def strip_tags(s: str) -> str:
@@ -354,12 +394,13 @@ def build(module_name: str):
     return pdf_path
 
 
-def finalize_for_print(pdf_path: Path, title: str):
+def finalize_for_print(pdf_path: Path, title: str,
+                       geo: PageGeometry = SINGLE_GEOMETRY):
     """Baskı öncesi son iki adım: sayfa kutularını (TrimBox/BleedBox) yaz ve
     Ghostscript ile PDF/X-4 CMYK'ya çevir. Ghostscript yoksa build durmaz --
     net bir kurulum uyarısı basılır ve dosya RGB kalır."""
-    pdfx.set_print_boxes(pdf_path, TRIM_W_MM, TRIM_H_MM, BLEED_MM)
-    pdfx.convert_or_warn(pdf_path, title, TRIM_W_MM, TRIM_H_MM, BLEED_MM)
+    pdfx.set_print_boxes(pdf_path, geo.trim_w, geo.trim_h, geo.bleed)
+    pdfx.convert_or_warn(pdf_path, title, geo.trim_w, geo.trim_h, geo.bleed)
 
 
 def report_page_count(pdf_path: Path):
@@ -462,7 +503,7 @@ def validate(pack) -> list[str]:
 
 
 def render_pdf(html_path: Path, pdf_path: Path, expected_pages: int | None = None,
-               attempts: int = 3):
+               attempts: int = 3, geo: PageGeometry = SINGLE_GEOMETRY):
     """PDF'i render eder ve (expected_pages verilmişse) çıktının GERÇEKTEN
     beklenen sayıda sayfa içerdiğini doğrular.
 
@@ -472,7 +513,7 @@ def render_pdf(html_path: Path, pdf_path: Path, expected_pages: int | None = Non
     yakın; bu yüzden sayfa sayısı burada doğrulanır ve tutmuyorsa yeniden
     denenir. Hiçbir koşulda eksik PDF teslim edilmez."""
     for attempt in range(1, attempts + 1):
-        overflow = _render_pdf_once(html_path, pdf_path)
+        overflow = _render_pdf_once(html_path, pdf_path, geo)
         if expected_pages is None:
             return overflow
         from pypdf import PdfReader
@@ -485,7 +526,8 @@ def render_pdf(html_path: Path, pdf_path: Path, expected_pages: int | None = Non
         f"PDF {attempts} denemede de eksik render edildi ({real}/{expected_pages} sayfa).")
 
 
-def _render_pdf_once(html_path: Path, pdf_path: Path):
+def _render_pdf_once(html_path: Path, pdf_path: Path,
+                     geo: PageGeometry = SINGLE_GEOMETRY):
     script = f"""
 const {{ chromium }} = require('playwright');
 (async () => {{
@@ -497,7 +539,7 @@ const {{ chromium }} = require('playwright');
   // fiziksel olarak aşıyor mu? Aşıyorsa içerik sessizce kesilir (önceki
   // sistemin kör noktası) -- burada bunu build zamanında YAKALARIZ.
   const overflow = await page.evaluate(() => {{
-    const PAGE_H_MM = {PAGE_H_MM};
+    const PAGE_H_MM = {geo.page_h};
     const mmToPx = document.querySelector('.page').getBoundingClientRect().height
                    / PAGE_H_MM; // 1mm kaç px render edildi
     const pages = Array.from(document.querySelectorAll('.page'));
@@ -544,11 +586,11 @@ const {{ chromium }} = require('playwright');
             bad = _json.loads(line[len("__OVERFLOW__"):])
             overflow = bad
             if bad:
-                print(f"[TAŞMA UYARISI] {len(bad)} sayfa {PAGE_W_MM:g}x{PAGE_H_MM:g}mm sınırını aşıyor -- içerik kesiliyor olabilir:")
+                print(f"[TAŞMA UYARISI] {len(bad)} sayfa {geo.page_w:g}x{geo.page_h:g}mm sınırını aşıyor -- içerik kesiliyor olabilir:")
                 for b in bad:
                     print(f"    - Sayfa (fiziksel sıra) {b['index']}: ~{b['overflowMm']}mm taşma")
             else:
-                print(f"[build] Taşma denetimi: tüm sayfalar {PAGE_W_MM:g}x{PAGE_H_MM:g}mm sınırları içinde. ✓")
+                print(f"[build] Taşma denetimi: tüm sayfalar {geo.page_w:g}x{geo.page_h:g}mm sınırları içinde. ✓")
     return overflow   # kitap build'i taşan sayfayı hangi dersin olduğuna çevirmek için kullanır
 
 

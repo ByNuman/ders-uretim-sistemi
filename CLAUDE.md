@@ -1,5 +1,29 @@
 # CLAUDE.md — Görsel Ders Notu Üretim Sistemi
 
+## KRİTİK KURAL: Birleşik Kitaba Otomatik Ekleme Yasağı
+
+Yeni bir ders (görsel ders notu PDF'i) üretildiğinde veya güncellendiğinde,
+bu dersi birleşik "10 ders" kitabına (veya ileride oluşacak başka bir
+birleşik kitaba) OTOMATİK OLARAK EKLEME. Birleştirme scriptini çalıştırma.
+
+Kural:
+- Tekil ders kitabı üretimi ve birleşik kitap üretimi birbirinden
+  TAMAMEN AYRI, birbirini tetiklemeyen iki iştir.
+- Bir ders için "işle", "anlat", "görsel not hazırla" gibi bir istek
+  geldiğinde, sonucu sadece o dersin kendi PDF'i olarak üret ve
+  outputs klasörüne koy. Birleştirme scriptine (merge/combine script)
+  DOKUNMA.
+- Birleşik kitaba bir dersin eklenmesi/çıkarılması/yeniden sıralanması
+  SADECE kullanıcı açıkça "birleşik kitaba ekle", "kitabı güncelle",
+  "birleştirmeyi çalıştır" gibi bir talimat verdiğinde yapılır.
+- Emin değilsen (istek belirsizse), birleştirmeyi ÇALIŞTIRMADAN ÖNCE
+  kullanıcıya sor: "Bu dersi birleşik kitaba da eklememi ister misiniz?"
+- Yeni bir ders üretirken sayfa boyutu (trim) ayarı olarak varsayılan
+  tekil-kitap trim boyutunu kullan, birleşik kitabın trim boyutunu
+  (17,5×25cm) DEĞİL — bu iki değer birbirinden bağımsız olmalı ve
+  build.py'de ayrı ayrı config/parametre olarak tutulmalı, tek bir
+  global sabitle yönetilmemeli.
+
 Bu dosya, bu repodaki "Görsel Ders Notu Kitabı" üretim sistemini kullanarak
 yeni bir ders işlerken Claude Code'un izlemesi gereken talimatları içerir.
 Kullanıcı sana bir ders özeti (PDF/metin) verip "bunu görsel ders notuna
@@ -51,11 +75,27 @@ Ağustos'unda tek seferde **0,8229 ile ölçeklendi** (gövde 9,6 → 7,9 pt);
 kapak sayfası ve sayfa geometrisi bu ölçeklemenin dışında bırakıldı. Yeni
 bir bileşen eklerken ölçüleri bu skalaya uydurun.
 
-**Tek kaynak `build.py`'nin başındaki sabitlerdir** (`TRIM_W_MM`, `TRIM_H_MM`,
-`BLEED_MM`, `MARGIN_*_MM`, `ODD_PAGE_GUTTER`). `page_geometry_css()` bunlardan
+**İKİ AYRI CONFIG vardır ve birbirinden bağımsızdır** (bkz. en üstteki
+KRİTİK KURAL). `build.py`'nin başındaki `PageGeometry` dataclass'ından iki
+örnek üretilir:
+
+| Config | Kullanan | Şu anki trim |
+|---|---|---|
+| `SINGLE_GEOMETRY` | `python build.py content.<slug>` (tekil ders) | 175 × 250 mm |
+| `BOOK_GEOMETRY` | `python build_kitap.py` (birleşik kitap) | 175 × 250 mm |
+
+Değerleri şu an aynıdır ama TEK BİR GLOBAL SABİT DEĞİLDİR: birini
+değiştirmek diğerini etkilemez. `page_geometry_css(geo)` verilen config'ten
 CSS değişkenlerini üretip `style.css`'in sonuna ekler; `style.css`'teki aynı
-adlı `:root` değerleri yalnızca varsayılandır. Ölçüyü değiştirecekseniz
-SADECE build.py'yi düzenleyin — sonra mutlaka:
+adlı `:root` değerleri yalnızca varsayılandır. `load_css(geo)`,
+`render_pdf(..., geo=)` ve `finalize_for_print(..., geo=)` hep bu config'i
+taşır — tekil ders çağrılarında varsayılan `SINGLE_GEOMETRY`, kitap
+build'inde açıkça `BOOK_GEOMETRY`. Modül düzeyindeki eski `TRIM_W_MM` /
+`PAGE_H_MM` gibi isimler `SINGLE_GEOMETRY`'nin takma adlarıdır ve sadece
+`tools/olcum.py` + `tools/kalibre.py` geriye dönük uyumluluğu içindir.
+
+Bir çıktının ölçüsünü değiştirecekseniz SADECE ilgili config'i düzenleyin —
+sonra mutlaka:
 
 ```bash
 python tools/kalibre.py        # sözlük/test/cevap sabitlerini yeniden ölçer
@@ -661,6 +701,10 @@ python build_kitap.py            # content/kitap.py'deki ders sırasına göre
 ```
 
 ### Kitaba yeni ders eklemek
+> Bu bölüm YALNIZCA kullanıcı açıkça "birleşik kitaba ekle / kitabı güncelle /
+> birleştirmeyi çalıştır" dediğinde uygulanır (bkz. en üstteki KRİTİK KURAL).
+> Bir ders üretmek, bu adımı kendiliğinden TETİKLEMEZ.
+
 `content/kitap.py` içindeki `COURSE_MODULES` listesine **tek satır** ekle:
 ```python
 COURSE_MODULES = [
@@ -939,7 +983,9 @@ python3 theme_engine.py
       içeriği taşıdım/birleştirdim — asla yeni içerik uydurmadım, taşan
       denemeleri geri aldım
 - [ ] Bookmark/link sayısını doğruladım
-- [ ] Yeni dersi `content/kitap.py` içindeki `COURSE_MODULES` listesine ekledim
-      ve `python build_kitap.py` ile birleşik kitabı yeniden derledim; taşma,
+- [ ] (SADECE kullanıcı açıkça istediyse — bkz. en üstteki KRİTİK KURAL;
+      istemediyse bu adımı ATLA ve kitaba dokunma) Yeni dersi
+      `content/kitap.py` içindeki `COURSE_MODULES` listesine ekledim ve
+      `python build_kitap.py` ile birleşik kitabı yeniden derledim; taşma,
       sayfa zinciri ve render doğrulamalarının hepsi "✓" verdi
 - [ ] PDF'i kullanıcıya sundum
