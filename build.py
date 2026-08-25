@@ -32,7 +32,7 @@ if hasattr(sys.stdout, "reconfigure"):
     sys.stderr.reconfigure(encoding="utf-8")
 
 from theme_engine import resolve_theme_css
-from renk_uretici import pack_rengi
+from renk_uretici import pack_rengi, belirlenmis_renk
 import pdfx
 import donem as donem_mod
 
@@ -426,6 +426,34 @@ def exam_page_count(pack) -> int:
     return n
 
 
+def uygula_kayitli_renk(pack) -> None:
+    """Dersin rengini `renk_uretici.DERS_RENKLERI` tablosuyla hizalar.
+
+    NEDEN: bir dersin rengi tabloda ÖNCEDEN belirlenmiştir (bkz. CLAUDE.md
+    "Rengi SEN seçme"). Yeni bir ders modülü yazarken `theme_color=` alanını
+    doldurmayı unutmak, o dersi sessizce sabit temanın rengine düşürürdü --
+    yani önceden verilmiş karar boşa giderdi. Burada:
+
+      * `theme_color` YOKSA  -> tablodaki renk uygulanır (sessiz kayma biter),
+      * `theme_color` VARSA ama tablodan FARKLIYSA -> uyarı basılır ama
+        DEĞİŞTİRİLMEZ; bilinçli bir istisna olabilir, karar yazarındır.
+
+    Tabloda olmayan ders (yeni bir aile) hiç etkilenmez."""
+    ad = getattr(pack, "ders_klasoru", "") or strip_tags(pack.title)
+    kayit = belirlenmis_renk(ad)
+    if not kayit:
+        return
+    mevcut = getattr(pack, "theme_color", None)
+    if not mevcut:
+        pack.theme_color = kayit
+        print(f"[build] Renk tablodan alındı: {ad} -> {kayit} "
+              f"(renk_uretici.DERS_RENKLERI)")
+    elif mevcut.upper() != kayit.upper():
+        print(f"[RENK UYARISI] {ad}: modülde {mevcut.upper()} yazıyor, "
+              f"DERS_RENKLERI tablosunda {kayit}. Modüldeki değer kullanıldı -- "
+              f"kasıtlı değilse ikisini eşitleyin.")
+
+
 def build(module_name: str, d: "donem_mod.Donem | None" = None):
     if d is not None:
         set_donem(d)
@@ -433,6 +461,7 @@ def build(module_name: str, d: "donem_mod.Donem | None" = None):
         out_dir()      # dönem seçilmediyse burada net hatayla durur
     mod = DONEM.import_ders(module_name)
     pack = mod.get_pack()
+    uygula_kayitli_renk(pack)
 
     ctx = course_context(pack)
     page_starts = ctx["page_starts"]

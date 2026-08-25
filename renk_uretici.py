@@ -20,7 +20,11 @@ Renk nereden gelir? (öncelik sırası)
    `templates/style.css`'teki `--accent` değeri kullanılır.)
    Yani görsel kitap sistemi HER ZAMAN otoritedir: bir dersin görsel kitapta
    hangi rengi varsa, anlatım PDF'i de o rengi alır.
-2. **Deterministik türetme** — o ders için henüz bir `src/<ders>.py` yoksa,
+2. **Önceden belirlenmiş ders rengi** — `DERS_RENKLERI` tablosu. Henüz
+   `src/<ders>.py` yazılmamış dersler için renk baştan sabitlenmiştir; ilke
+   "RENK = DERS AİLESİ"dir (Tefsir hep yeşil, Hadis hep kiremit...). Yeni bir
+   ders modülü yazarken `theme_color=` alanına buradaki hex'i kopyalayın.
+3. **Deterministik türetme** — ders ne kayıtlı ne de tabloda ise,
    renk ders adının karakterlerinden sabit bir hash ile türetilir (aynı ders
    adı her zaman aynı rengi verir; rastgelelik yok). Türetme, görsel kitabın
    dinamik tema motorunun (`theme_engine.generate_theme_vars`) ta kendisiyle
@@ -68,6 +72,75 @@ def normalize_ders_adi(ad: str) -> str:
     karakter, boşluk/noktalama farkını yok sayar)."""
     ad = (ad or "").translate(_TR_FOLD).upper()
     return re.sub(r"[^A-Z0-9]+", "", ad)
+
+
+# ---------------------------------------------------------------------------
+# 1.5. yol: ÖNCEDEN BELİRLENMİŞ DERS RENKLERİ  (ilke: RENK = DERS AİLESİ)
+# ---------------------------------------------------------------------------
+# Her rengin gerekçesi DERSİN KENDİ RUHUDUR, bir üst sınıftan miras DEĞİL:
+# Tefsir mushaf yeşili (vahyin metni), Tecvid turkuaz (tilavetin akışı), Hadis
+# koyu deri cilt kahvesi (rivayet, isnad, el yazması), Kelam mor (soyut akıl),
+# İslam Felsefesi gece mavisi (serin akıl, hikmet), İslam Hukuku vişne (mühür,
+# hüküm), Tasavvuf gül (aşk, sema), Tarih bronz (altın çağ), Arap Dili
+# terracotta (çöl toprağı, hat), Sınıf Yönetimi/Ölçme çini laciverti (düzen,
+# güven), Din Eğitimi/Rehberlik zeytin (fide, yetiştirme).
+#
+# Aynı ders ailesi farklı dönemlerde tekrar ettiğinde renk de tekrar eder
+# (Tefsir III = Tefsir IV), çünkü ruh aynıdır. Hue dağılımı:
+# 8/28/48/82/150/180/212/242/274/322/350 derece — aralar en az 20°, yani bir
+# dönem kitabındaki 11 ders birbirinden ayrışır.
+#
+# Anahtarlar ders adının NORMALİZE edilmiş hâlidir; sondaki Roma rakamı
+# ("TEFSİR III" -> "TEFSIR") atılır, yani bir aile için TEK satır yeter.
+#
+# ÖNCELİK: bir dersin `src/<ders>.py` dosyası varsa oradaki `theme_color` her
+# zaman kazanır (bkz. kayitli_ders_rengi). Bu tablo, HENÜZ YAZILMAMIŞ dersler
+# için rengi baştan sabitler — yeni bir `src/<ders>.py` yazarken `theme_color=`
+# alanına buradaki hex'i kopyalayın ki iki sistem sapmasın.
+DERS_RENKLERI = {
+    # --- Vahiy metni ------------------------------------------------------
+    "TEFSIR":                   "#206040",  # mushaf yesili        H150
+    "KURANOKUMAVETECVID":       "#1D6363",  # turkuaz / tilavet    H180
+    # --- Rivayet ----------------------------------------------------------
+    "HADIS":                    "#664324",  # koyu deri cilt       H28
+    # --- Akil / itikad ----------------------------------------------------
+    "SISTEMATIKKELAM":          "#592F79",  # mor / soyut akil     H274
+    "ISLAMFELSEFESITARIHI":     "#2F2D76",  # gece mavisi          H242
+    # --- Hukum ------------------------------------------------------------
+    "ISLAMHUKUKU":              "#7A2433",  # visne / muhur        H350
+    # --- Kalp -------------------------------------------------------------
+    "TASAVVUF":                 "#7B3260",  # gul / erik           H322
+    # --- Tarih ------------------------------------------------------------
+    "ISLAMMEDENIYETITARIHI":    "#776931",  # bronz / altin cag    H48
+    "ISLAMMEZHEPLERITARIHI":    "#776931",  # (ayni ruh, farkli donem)
+    # --- Dil / edebiyat ---------------------------------------------------
+    "ARAPDILIVEEDEBIYATI":      "#8C2F21",  # terracotta / col     H8
+    # --- Egitim / din hizmetleri -----------------------------------------
+    "SINIFYONETIMI":                       "#1F4775",  # cini laciverti  H212
+    "EGITIMDEOLCMEVEDEGERLENDIRME":        "#1F4775",  # (ayni ruh, farkli donem)
+    "DINEGITIMI":                          "#51662E",  # zeytin / fide   H82
+    "DINHIZMETLERINDEREHBERLIKVEILETISIM": "#51662E",  # (ayni ruh, farkli donem)
+}
+
+_ROMEN = {"I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X"}
+
+
+def _aile_anahtari(ders_adi: str) -> str:
+    """Ders adını aile anahtarına çevirir: sondaki Roma rakamı AYRI BİR KELİME
+    ise atılır, kalan kısım normalize edilir.
+
+    Roma rakamı ayıklaması kelime bazında yapılır; normalize edilmiş metnin
+    sonundan harf kırpmak "DİN EĞİTİMİ" -> "DINEGITIM" gibi yanlış anahtar
+    üretirdi (sondaki 'I' rakam değil, kelimenin parçası)."""
+    kelimeler = (ders_adi or "").split()
+    while kelimeler and kelimeler[-1].translate(_TR_FOLD).upper() in _ROMEN:
+        kelimeler.pop()
+    return normalize_ders_adi(" ".join(kelimeler))
+
+
+def belirlenmis_renk(ders_adi: str):
+    """Tabloda önceden belirlenmiş renk (hex) ya da None."""
+    return DERS_RENKLERI.get(_aile_anahtari(ders_adi))
 
 
 # ---------------------------------------------------------------------------
@@ -194,6 +267,9 @@ def ders_rengi(ders_adi: str, sinif=None, donem=None, sinav=None,
     kayit = kayitli_ders_rengi(ders_adi, sinif, donem, sinav)
     if kayit:
         renk, kaynak = kayit
+    elif belirlenmis_renk(ders_adi):
+        renk = belirlenmis_renk(ders_adi)
+        kaynak = f"DERS_RENKLERI['{_aile_anahtari(ders_adi)}']"
     else:
         renk, kaynak = deterministik_renk(ders_adi), "ders adından türetildi"
     return (renk, kaynak) if kaynakla else renk
@@ -229,9 +305,16 @@ if __name__ == "__main__":
     ap.add_argument("--sinav")
     ap.add_argument("--liste", action="store_true",
                     help="Dönemdeki tüm kayıtlı derslerin rengini listeler")
+    ap.add_argument("--tablo", action="store_true",
+                    help="Önceden belirlenmiş ders renklerini (DERS_RENKLERI) listeler")
     a = ap.parse_args()
 
-    if a.liste:
+    if a.tablo:
+        print()
+        print("=== DERS_RENKLERI (onceden belirlenmis -- renk = dersin ruhu) ===")
+        for k, v in DERS_RENKLERI.items():
+            print(f"  {k:38s} {v}   RGB{hex_to_rgb(v)}")
+    elif a.liste:
         for kok in _donem_kokleri(a.sinif, a.donem, a.sinav):
             kayitlar = _src_kayitlari(kok)
             if not kayitlar:

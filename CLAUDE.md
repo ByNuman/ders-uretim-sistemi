@@ -742,6 +742,48 @@ return CoursePack(
 )
 ```
 
+### Rengi SEN seçme — `DERS_RENKLERI` tablosuna bak
+
+`renk_uretici.py` içindeki `DERS_RENKLERI` tablosu, hangi dersin hangi rengi
+alacağını **önceden sabitler**. İlke: **RENK = DERSİN RUHU** — her ton o dersin
+kendi anlamından seçilmiştir, bir üst sınıftan miras alınmamıştır:
+
+| Ders | Renk | Gerekçe |
+|---|---|---|
+| Tefsir | `#206040` | mushaf yeşili — vahyin metni |
+| Kur'an Okuma ve Tecvid | `#1D6363` | turkuaz — tilavetin akışı |
+| Hadis | `#664324` | koyu deri cilt — rivayet, isnad, el yazması |
+| Sistematik Kelam | `#592F79` | mor — soyut akıl, akide |
+| İslam Felsefesi Tarihi | `#2F2D76` | gece mavisi — serin akıl, hikmet |
+| İslam Hukuku | `#7A2433` | vişne — mühür, hüküm, otorite |
+| Tasavvuf | `#7B3260` | gül — aşk, sema, kalp |
+| İslam Medeniyeti / Mezhepleri Tarihi | `#776931` | bronz — altın çağ, kadim |
+| Arap Dili ve Edebiyatı | `#8C2F21` | terracotta — çöl toprağı, hat |
+| Sınıf Yönetimi · Ölçme ve Değerlendirme | `#1F4775` | çini laciverti — düzen, güven |
+| Din Eğitimi · Rehberlik ve İletişim | `#51662E` | zeytin — fide, yetiştirme |
+
+Aynı ders ailesi farklı dönemde tekrar ederse renk de tekrar eder (Tefsir III =
+Tefsir IV), çünkü ruh aynıdır. Hue dağılımı 8/28/48/82/150/180/212/242/274/322/350
+derecedir — aralar en az 20°, yani bir dönem kitabındaki 11 ders ayrışır.
+
+Yeni bir `src/<ders>.py` yazarken:
+
+```bash
+python renk_uretici.py "TEFSİR III" --sinif 3 --donem 1 --sinav final
+python renk_uretici.py --tablo        # tüm önceden belirlenmiş renkler
+```
+
+Çıkan hex'i `theme_color=` alanına **birebir** kopyala. Kendi kafandan renk
+seçme — seçersen görsel kitap ile `ders-anlatim` skill'inin ürettiği anlatım
+PDF'i farklı renkte çıkar (skill de aynı tablodan okur).
+
+Bir ders tabloda yoksa (yeni bir aile) önce tabloya bir satır ekle, sonra o
+hex'i kullan. Tabloya renk eklerken AYNI DÖNEMDEKİ diğer derslerin hue'larından
+en az ~25° uzak bir ton seç.
+
+Öncelik sırası: `src/<ders>.py`'deki `theme_color` → `DERS_RENKLERI` →
+ders adından deterministik türetme (son çare).
+
 Hazır palet için (opsiyonel kolaylık):
 ```python
 from theme_engine import PALETTE_HUES, generate_theme_vars, _hsl_to_hex
