@@ -11,7 +11,7 @@ Aşağıdakiler **GNU Genel Kamu Lisansı 3. sürüm** ile lisanslanmıştır:
 
 ```
 build.py · build_kitap.py · content_model.py · theme_engine.py
-renk_uretici.py · pdfx.py · donem.py · arabic_reshape.py
+renk_uretici.py · pdfx.py · donem.py
 templates/ (style.css ve tüm .j2 şablonları) · tools/
 dersler/src/ornek_ders.py
 ```
@@ -79,7 +79,8 @@ Gerekçe için `README.md` → "Depoda ders PDF'leri neden yok?" bölümüne bak
 **Fontlar depoda gelmez.** Tasarım DejaVu Sans / DejaVu Serif kullanır ve
 bunlar işletim sisteminden okunur; depoda font dosyası dağıtılmaz.
 
-> Not: `fonts/ArabicExtracted-*.ttf` dosyaları 2026 Ağustos'unda silindi.
+> Not: `fonts/ArabicExtracted-*.ttf` dosyaları (ve onlarla birlikte hiç
+> kullanılmayan `arabic_reshape.py`) 2026 Ağustos'unda silindi.
 > Kodun hiçbir yerinden kullanılmıyorlardı ve içlerinde telif/lisans kaydı
 > bulunmuyordu (bir PDF'ten çıkarılmış alt küme olduklarına işaret eder).
 > Kaynağı belirsiz içeriği dağıtmamak için kaldırıldılar.

@@ -1,0 +1,102 @@
+name: build
+
+# Temiz bir makinede kurulumun ve üretim hattının gerçekten çalıştığını
+# doğrular. Geliştirici makinesinde Ghostscript ve Chromium çoktan kurulu
+# olduğu için "bende çalışıyor" hiçbir şey kanıtlamaz; bu iş akışı her
+# şeyi sıfırdan kurar.
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+  workflow_dispatch:
+
+jobs:
+  ornek-ders:
+    name: Örnek dersi sıfırdan derle
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      # KURULUM.md 4. adım — Ghostscript olmadan da build durmaz, ama CI'da
+      # PDF/X-4 dönüşümünün de sınanmasını istiyoruz.
+      - name: Ghostscript kur
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends ghostscript fonts-dejavu
+
+      # KURULUM.md 2. adım
+      - name: Python bağımlılıkları
+        run: pip install -r requirements.txt
+
+      # KURULUM.md 3. adım
+      - name: Node bağımlılıkları ve Chromium
+        run: |
+          npm install
+          npx playwright install --with-deps chromium
+
+      - name: Kurulum teşhisi
+        run: python pdfx.py
+
+      # KURULUM.md 5. adım — sınıf ağacı depoda olmadığı için düz kipe
+      # kendiliğinden geçilmeli; bayrak vermiyoruz ki o yol da sınansın.
+      # `shell: bash` ŞART: GitHub'ın Linux varsayılanı `bash -e` ve pipefail
+      # KAPALI. O hâlde boru hattının çıkış kodu tee'den gelir; build.py
+      # çökse bile adım yeşil görünür. `shell: bash` -eo pipefail verir.
+      - name: Örnek dersi derle
+        shell: bash
+        run: python build.py ornek_ders | tee build.log
+
+      # Taşma uyarısı build'i DURDURMAZ (bilinçli: kullanıcı görüp karar
+      # verir). CI'da ise kırmızı olmalı, yoksa sessizce içerik kaybeden bir
+      # PDF yeşil görünür.
+      - name: Taşma denetimi
+        run: |
+          if grep -q "TAŞMA UYARISI" build.log; then
+            echo "::error::Taşma tespit edildi -- içerik kesiliyor olabilir"
+            grep -A5 "TAŞMA UYARISI" build.log
+            exit 1
+          fi
+          echo "Taşma yok."
+
+      - name: Çıktıyı doğrula
+        run: |
+          python - <<'PY'
+          import sys
+          from pathlib import Path
+          from pypdf import PdfReader
+
+          pdf = Path("dersler/gorsel_ders_notlari/ÖRNEK DERS/gorsel-ders-notu-sistemi.pdf")
+          if not pdf.exists():
+              sys.exit(f"PDF üretilmedi: {pdf}")
+
+          r = PdfReader(str(pdf))
+          sayfa = len(r.pages)
+          if sayfa < 10:
+              sys.exit(f"PDF beklenenden kısa: {sayfa} sayfa")
+
+          kutu = r.pages[0].trimbox
+          mm = lambda v: round(float(v) / 72 * 25.4, 1)
+          en, boy = mm(kutu.width), mm(kutu.height)
+          if (en, boy) != (175.0, 250.0):
+              sys.exit(f"TrimBox yanlış: {en} x {boy} mm (175 x 250 olmalı)")
+
+          print(f"{sayfa} sayfa · TrimBox {en} x {boy} mm · yer imi "
+                f"{len(list(r.outline))} girdi")
+          PY
+
+      - name: Üretilen PDF'i sakla
+        uses: actions/upload-artifact@v4
+        with:
+          name: ornek-ders-pdf
+          path: dersler/gorsel_ders_notlari/ÖRNEK DERS/*.pdf
+          if-no-files-found: error

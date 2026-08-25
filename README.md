@@ -1,5 +1,7 @@
 # Görsel Ders Notu Üretim Sistemi
 
+[![build](https://github.com/ByNuman/ders-uretim-sistemi/actions/workflows/build.yml/badge.svg)](https://github.com/ByNuman/ders-uretim-sistemi/actions/workflows/build.yml) [![license: GPL v3](https://img.shields.io/badge/license-GPLv3-blue.svg)](LICENSE)
+
 Üniversite derslerinin ham metin özetlerini, baskıya hazır **görsel ders notu
 kitabı** PDF'ine çeviren bir üretim hattı. Çıktı; kapak, içindekiler, genel
 bakış, numaralı bölümler (terim kutuları, kişi kartları, karşılaştırma
@@ -10,6 +12,18 @@ Ders içeriği HTML/CSS'te değil, **Python veri modelinde** yazılır
 (`content_model.py`). Tasarım tek bir yerde durur (`templates/`), içerik ise
 her ders için ayrı bir modülde. Bu yüzden tasarımda yapılan bir düzeltme tüm
 derslere birden uygulanır.
+
+<p align="center">
+  <img src="docs/ornek-kapak.png" alt="Kapak sayfası" width="24%">
+  <img src="docs/ornek-genel-bakis.png" alt="Genel bakış sayfası" width="24%">
+  <img src="docs/ornek-bolum.png" alt="Bölüm sayfası" width="24%">
+  <img src="docs/ornek-test.png" alt="Test sayfası" width="24%">
+</p>
+
+<p align="center">
+  <sub>Depoyla birlikte gelen <code>ornek_ders</code> çıktısından: kapak ·
+  genel bakış · bölüm · değerlendirme testi</sub>
+</p>
 
 ## Hızlı başlangıç
 
