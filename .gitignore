@@ -8,3 +8,29 @@ __pycache__/
 **/gorsel_ders_notlari/_olcum.js
 **/gorsel_ders_notlari/_kal.js
 .calisma/
+
+# ============================================================
+# ÜRETİLEN ÇIKTILAR — depoda tutulmaz
+# Bu depo SİSTEMİ içerir, ders çıktılarını değil. Her PDF/HTML çıktısı
+# `<dönem>/src/<ders>.py` içerik modülünden yeniden üretilebilir:
+#     python build.py <slug> --sinif X --donem Y --sinav Z
+# Kurallar UZANTI bazlıdır, klasör bazlı DEĞİL — böylece 339 .gitkeep
+# dosyası ve dizin iskeleti depoda kalır.
+# ============================================================
+**/gorsel_ders_notlari/**/*.pdf
+**/gorsel_ders_notlari/**/*.html
+**/calisma_rehberleri/**/*.pdf
+**/calisma_rehberleri/**/*.docx
+**/ders_anlatimlari/**/*.pdf
+**/ders_anlatimlari/**/*.docx
+3-sinif/kapak-renk-onizleme.pdf
+3-sinif/kapak-renk-onizleme.html
+
+# ============================================================
+# HAM DERS KAYNAKLARI — kişisel/telifli materyal, depoda tutulmaz.
+# Koddan ÜRETİLEMEZ: bu dosyaların tek kopyası sizin diskinizdedir,
+# kendi yedeğinizi ayrıca alın.
+# ============================================================
+**/kaynaklar/**
+!**/kaynaklar/**/
+!**/.gitkeep

@@ -1,0 +1,13 @@
+# Görsel Ders Notu Üretim Sistemi — Python bağımlılıkları
+#     pip install -r requirements.txt
+#
+# Not: PDF render'ı Python değil, Node üzerinden Playwright/Chromium yapar.
+# Onun kurulumu için README.md'deki "Kurulum" bölümüne bakın.
+
+jinja2>=3.1        # HTML şablonları (templates/*.j2)
+pypdf>=4.0         # yer imleri, sayfa sayısı doğrulaması, XMP (PDF/X-4 kimliği)
+pymupdf>=1.24      # sayfa kutuları (TrimBox/BleedBox), boyut optimizasyonu, önizleme PNG
+
+# Ham kaynak PDF'lerinden metin çıkarmak için (yeni bir ders işlerken kullanılır;
+# üretim hattının kendisi buna bağlı değildir)
+pdfplumber>=0.11

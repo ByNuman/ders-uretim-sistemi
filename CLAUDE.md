@@ -132,6 +132,27 @@ ders klasörüyle eşleşmemesine yol açar. **Yeni derste her zaman doldurun.**
 > Eski `ders_ozetleri/` klasörü KALKTI — adı `özetlenmiş_dersler` ile
 > karışıyordu. Tüm çıktılar artık `gorsel_ders_notlari/` altındadır.
 
+### Çıktılar ve kaynaklar git'e GİRMEZ
+
+`gorsel_ders_notlari/`, `calisma_rehberleri/`, `ders_anlatimlari/` ve
+`kaynaklar/` altındaki dosyalar `.gitignore`'dadır — depoda yalnızca klasör
+iskeleti (`.gitkeep`) durur. Bir ders ürettikten sonra PDF'i commit etmeye
+ÇALIŞMA; git onu zaten yok sayar.
+
+Sebep: bir dersin gerçek içeriği `src/<ders>.py` modülüdür, PDF ondan her
+zaman yeniden üretilebilir. PDF ikili dosya olduğu için git sıkıştıramaz;
+her yeniden derleme depoya tam bir kopya daha eklerdi (bu depo bir kez 345
+MB'a çıkmıştı, %98.5'i çıktı dosyalarıydı).
+
+Pratik sonuçları:
+- Bir ders "kayboldu" diye endişelenme — `src/<ders>.py` duruyorsa
+  `python build.py <slug> --sinif X --donem Y --sinav Z` onu geri getirir.
+- `kaynaklar/` altındaki ham materyal koddan ÜRETİLEMEZ ve git'te yedeği
+  YOKTUR. Kullanıcıya bu dosyaları silmesini/taşımasını önerme.
+- Yeni bir çıktı türü eklersen (`.docx` gibi) `.gitignore`'a kuralını da
+  ekle; kurallar UZANTI bazlıdır, klasör bazlı değil (yoksa `.gitkeep`
+  iskeleti de yok sayılır ve dizin yapısı depodan silinir).
+
 ### Kökte kalan paylaşılan altyapı (döneme ait DEĞİL, asla kopyalanmaz)
 
 ```
