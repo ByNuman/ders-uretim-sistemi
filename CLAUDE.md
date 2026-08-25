@@ -1090,8 +1090,18 @@ Bunlar `templates/style.css` içinde zaten düzeltilmiş durumda — sadece
   ile `theme_engine.py` üzerinden SINIRSIZ sayıda özel renk üretilebilir
   (bkz. "Renk Teması" bölümü) — sabit sınıflar artık bir seçenek, zorunluluk
   değil.
-- Kapak: çok katmanlı gradient + nokta dokusu + döner amblem (halka + saat
-  çentikleri + sunburst) + 4 köşede ince "cilt" süsü + dev soluk motif harfi.
+- Kapak: çok katmanlı gradient + döner amblem (halka + saat çentikleri +
+  sunburst) + 4 köşede ince "cilt" süsü + dev soluk motif harfi.
+- **SAYFA ARKA PLANI DÜZDÜR — nokta deseni/doku YOKTUR.** Hem kapakta hem iç
+  sayfalarda (içindekiler, genel bakış, bölümler, sözlük, test, cevap
+  anahtarı) eskiden düşük opaklıklı bir nokta matrisi (`.body-page::before`
+  ve `.cover::before` üzerinde tekrarlayan `radial-gradient`) vardı; 2026
+  Ağustos'unda kullanıcı isteğiyle KALDIRILDI. İç sayfaların zemini artık
+  yalnızca `--paper` tonu, kapağınki yalnızca gradyan katmanlarıdır. Yeni bir
+  bileşen eklerken sayfa arka planına nokta/doku/desen **ekleme**; bu iki
+  kuralı geri getirme. (Bölüm banner'ının kendi içindeki çok hafif doku
+  `.chbanner::before` bir KUTU dokusudur, sayfa zemini değildir ve bilerek
+  bırakılmıştır.)
 - Her sayfa A4 (210×297mm), `.page` sınıfı `overflow:hidden` — taşma her
   zaman görünür/yakalanabilir olmalı (bkz. yukarıdaki flex-shrink notu).
 - İçindekiler hem sayfa-içi tıklanabilir linkler (`<a href="#ch-N">`) hem

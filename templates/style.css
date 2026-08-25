@@ -135,16 +135,10 @@ em { font-style: italic; }
 }
 .page:last-child { page-break-after: auto; }
 
-/* zemin dokusu: çok hafif nokta matrisi -- kağıt/kumaş hissi verir, metni etkilemez */
-.body-page::before {
-  content: "";
-  position: absolute; inset: 0;
-  background-image: radial-gradient(circle, rgba(20,22,30,0.05) 0.6px, transparent 0.6px);
-  background-size: 3.6mm 3.6mm;
-  opacity: 0.55;
-  pointer-events: none;
-  z-index: 0;
-}
+/* Zemin dokusu KALDIRILDI: iç sayfalarda arka plan artık düz `--paper` tonudur.
+   (Eski hâli `.body-page::before` üzerinde tekrarlayan bir radial-gradient nokta
+   matrisiydi; sayfa arka planına nokta/doku EKLEMEYİN — bkz. CLAUDE.md
+   "Tasarım sistemi özeti".) */
 .body-page > * { position: relative; z-index: 1; flex-shrink: 0; }
 
 /* ================= KAPAK — çok katmanlı, dokulu, amblemli ================= */
@@ -158,15 +152,8 @@ em { font-style: italic; }
   padding: var(--pad-top) var(--pad-right) var(--pad-bottom) var(--pad-left);
   justify-content: space-between;
 }
-/* ince nokta dokusu -- kumaş/kağıt hissi */
-.cover::before {
-  content: "";
-  position: absolute; inset: 0;
-  background-image: radial-gradient(circle, rgba(255,255,255,0.10) 0.7px, transparent 0.7px);
-  background-size: 4.2mm 4.2mm;
-  mix-blend-mode: overlay;
-  pointer-events: none;
-}
+/* Kapaktaki ince nokta dokusu KALDIRILDI: kapak arka planı artık yalnızca
+   gradyan katmanlarından oluşur (bkz. yukarıdaki .body-page notu). */
 /* iç çerçeve -- "cilt" hissi */
 .cover::after {
   content: "";
