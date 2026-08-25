@@ -132,6 +132,27 @@ ders klasörüyle eşleşmemesine yol açar. **Yeni derste her zaman doldurun.**
 > Eski `ders_ozetleri/` klasörü KALKTI — adı `özetlenmiş_dersler` ile
 > karışıyordu. Tüm çıktılar artık `gorsel_ders_notlari/` altındadır.
 
+### DÜZ KİP (`dersler/`) — sınıf ağacı olmayan kurulumlar
+
+Bu depo GitHub'da yalnızca boş bir `dersler/` iskeletiyle yayımlanır; sınıf
+ağaçları (`2-sinif/`, `3-sinif/`) `.gitignore`'dadır ve klonlayan kişide hiç
+bulunmaz. `donem.py` bunu algılar:
+
+- Sınıf ağacı diskte YOKSA ve kullanıcı sınıf/dönem/sınav vermediyse →
+  kendiliğinden `dersler/` köküne geçer ve bunu konsola yazar.
+- `--duz` bayrağı verilirse → her koşulda `dersler/` kullanılır.
+- Sınıf ağacı VARSA (bu makinede var) → hiçbir şey değişmez, dönem yine
+  sorulur. KRİTİK KURAL 2 aynen geçerlidir.
+
+**Bayrağın adı `--duz`, `--dersler` DEĞİL.** `tools/olcum.py`,
+`tools/dengele.py` ve `tools/kalibre.py` dosyalarında `dersler` adında
+KONUMSAL bir argüman (ölçülecek ders listesi) zaten var; aynı adı kullanmak
+argparse `dest`'ini ezip o üç aracı bozuyor.
+
+`dersler/src/ornek_ders.py` yayımlanan tek ders modülüdür: içeriği sistemin
+kendi belgelerinden yazılmış özgün bir metindir (bir ders kitabından
+türetilmediği için GPL kapsamındadır) ve kurulum doğrulaması olarak kullanılır.
+
 ### Çıktılar ve kaynaklar git'e GİRMEZ
 
 `gorsel_ders_notlari/`, `calisma_rehberleri/`, `ders_anlatimlari/` ve

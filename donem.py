@@ -63,6 +63,12 @@ SINIFLAR = ("2", "3")
 DONEMLER = ("1", "2")
 SINAVLAR = ("vize", "final")
 
+# DÜZ ("dersler/") KİPİ — sınıf/dönem/sınav ağacı OLMAYAN kurulumlar için.
+# Bu depo GitHub'da yalnızca boş bir `dersler/` iskeletiyle yayımlanır; sınıf
+# ağaçları (`2-sinif/`, `3-sinif/`) .gitignore'dadır ve klonlayan kişide hiç
+# bulunmaz. O kişi tek bir çalışma klasörü kullanır: `dersler/`.
+DUZ_KLASOR = "dersler"
+
 # Bir dönem klasörünün alt yapısı — iskeleti kurarken de bu liste kullanılır.
 ALT_KLASORLER = (
     "kaynaklar/ders_kaynaklari",      # GİRDİ  — ham ders metni      (ders adı alt klasörü)
@@ -82,10 +88,13 @@ class Donem:
     sinif: str
     donem: str
     sinav: str
+    duz: bool = False          # True ise sınıf/dönem/sınav yok, kök `dersler/`
 
     # --- yollar -------------------------------------------------------------
     @property
     def root(self) -> Path:
+        if self.duz:
+            return ROOT / DUZ_KLASOR
         return ROOT / f"{self.sinif}-sinif" / f"{self.donem}-donem" / self.sinav
 
     @property
@@ -145,10 +154,14 @@ class Donem:
         return self.root / "ders_anlatimlari"
 
     def __str__(self) -> str:
+        if self.duz:
+            return "dersler (düz kip — sınıf/dönem ayrımı yok)"
         return f"{self.sinif}. sınıf / {self.donem}. dönem / {self.sinav}"
 
     @property
     def etiket(self) -> str:
+        if self.duz:
+            return DUZ_KLASOR
         return f"{self.sinif}-sinif/{self.donem}-donem/{self.sinav}"
 
     # --- kurulum / import ---------------------------------------------------
@@ -205,6 +218,19 @@ def add_args(parser) -> None:
                         help="Dönem (1 veya 2). Verilmezse sorulur.")
     parser.add_argument("--sinav", choices=SINAVLAR,
                         help="Sınav dönemi (vize veya final). Verilmezse sorulur.")
+    # DİKKAT: bayrağın adı --duz'dur, --dersler DEĞİL. tools/olcum.py,
+    # tools/dengele.py ve tools/kalibre.py'de `dersler` adında KONUMSAL bir
+    # argüman (ölçülecek ders listesi) zaten var; aynı adı kullanmak argparse
+    # dest'ini ezip o araçları bozuyordu.
+    parser.add_argument("--duz", action="store_true",
+                        help=f"Düz kip: sınıf/dönem/sınav ağacı yerine tek bir "
+                             f"{DUZ_KLASOR}/ klasörü kullanılır. Sınıf ağacı hiç "
+                             f"yoksa (temiz klon) zaten kendiliğinden bu kipe geçilir.")
+
+
+def _sinif_agaci_var() -> bool:
+    """Diskte en az bir `<n>-sinif/` klasörü var mı? Yoksa düz kipe geçilir."""
+    return any((ROOT / f"{s}-sinif").is_dir() for s in SINIFLAR)
 
 
 def _sorulamadi(alan: str) -> SystemExit:
@@ -254,6 +280,30 @@ def resolve(args=None, *, ensure: bool = True) -> Donem:
                 )
             return deger
         return _sor(alan, secenekler)
+
+    # --- DÜZ KİP -----------------------------------------------------------
+    # İki yoldan girilir:
+    #   1) --dersler açıkça verilmişse,
+    #   2) sınıf ağacı DİSKTE HİÇ YOKSA (temiz klon) ve kullanıcı da sınıf/
+    #      dönem/sınav vermemişse.
+    # (2) KRİTİK KURAL 2'yi ("varsayım yapma") çiğnemez: ortada seçilebilecek
+    # bir dönem yoktur, dolayısıyla yanlış döneme yazma riski de yoktur.
+    # Sınıf ağacı varsa bu kip KENDİLİĞİNDEN devreye girmez; dönem yine sorulur.
+    if getattr(args, "duz", False):
+        d = Donem("", "", "", duz=True)
+        if ensure:
+            d.ensure()
+        return d
+
+    verilen = [getattr(args, a, None) if args is not None else None
+               for a in ("sinif", "donem", "sinav")]
+    if not any(verilen) and not _sinif_agaci_var():
+        print(f"[donem] Sınıf/dönem ağacı bulunamadı; düz kipe geçildi "
+              f"-> {DUZ_KLASOR}/  (açıkça seçmek için: --duz)")
+        d = Donem("", "", "", duz=True)
+        if ensure:
+            d.ensure()
+        return d
 
     d = Donem(al("sinif", SINIFLAR), al("donem", DONEMLER), al("sinav", SINAVLAR))
     if ensure:

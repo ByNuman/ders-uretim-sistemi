@@ -34,3 +34,16 @@ __pycache__/
 **/kaynaklar/**
 !**/kaynaklar/**/
 !**/.gitkeep
+
+# ============================================================
+# KİŞİSEL ÇALIŞMA AĞACI — depoda yayımlanmaz
+# Sınıf/dönem/sınav ağaçları kişinin kendi ders içeriğini barındırır ve
+# GitHub'a çıkmaz. Depo yalnızca boş `dersler/` iskeletiyle yayımlanır;
+# klonlayan kişide sınıf ağacı hiç bulunmaz ve donem.py kendiliğinden düz
+# kipe geçer (bkz. donem.py -> DUZ_KLASOR).
+#
+# Kendi makinenizde sınıf/dönem ayrımını kullanmaya devam edebilirsiniz:
+# klasörler diskte durur, sadece git izlemez.
+# ============================================================
+2-sinif/
+3-sinif/

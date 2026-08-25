@@ -122,11 +122,11 @@ export DERS_GS=/usr/local/bin/gs
 
 ## 5. Adım — İlk dersinizi üretin
 
-Depoda 2. sınıf 2. dönem finalinin 11 dersi hazır geliyor. Birini derleyerek
-kurulumu uçtan uca test edin:
+Depoda `ornek_ders` adında, sistemin kendisini anlatan bir örnek ders gelir.
+Onu derleyerek kurulumu uçtan uca test edin:
 
 ```bash
-python build.py sosyoloji --sinif 2 --donem 2 --sinav final
+python build.py ornek_ders
 ```
 
 Beklenen çıktının son satırları:
@@ -134,20 +134,16 @@ Beklenen çıktının son satırları:
 ```
 [build] Taşma denetimi: tüm sayfalar 181x256mm sınırları içinde. ✓
 [prepress] PDF/X-4 CMYK dönüşümü tamam
-[SONUÇ] Toplam sayfa: 22
+[SONUÇ] Toplam sayfa: 13
 [SONUÇ] Bitmiş (trim) ölçü : 175 x 250 mm
 ```
 
 PDF şuraya düşer:
-`2-sinif/2-donem/final/gorsel_ders_notlari/SOSYOLOJİ/sosyolojiye-giris.pdf`
+`dersler/gorsel_ders_notlari/ÖRNEK DERS/gorsel-ders-notu-sistemi.pdf`
 
-Bunu görüyorsanız **kurulum tamamdır.**
-
-Bir de renk önizlemesini deneyin (hızlıdır, tüm kapakları tek PDF'te gösterir):
-
-```bash
-python tools/kapak_onizleme.py --sinif 3
-```
+Bunu görüyorsanız **kurulum tamamdır.** Üretilen PDF aynı zamanda sistemin
+kullanım kılavuzudur: kendi dersinizi yazarken `dersler/src/ornek_ders.py`
+dosyasını kopyalayıp içeriğini değiştirin.
 
 ---
 
@@ -163,17 +159,17 @@ yapın.
 adımdır. `npx playwright install chromium` çalıştırın (3. adım).
 
 ### `[hata] --sinif verilmedi ve interaktif olarak sorulamıyor.`
-Bu bir hata değil, kasıtlı bir güvenlik önlemidir: sistemin **varsayılan bir
-dönemi yoktur**, çünkü yanlış döneme sessizce yazmak geri alması zor bir
-hatadır. Üç parametreyi birlikte verin:
+Bu mesajı yalnızca **sınıf/dönem/sınav ağacını** kurduysanız görürsünüz. O
+ağaç varken sistem varsayılan bir dönem seçmez — yanlış döneme sessizce
+yazmak geri alması zor bir hatadır. Üç parametreyi birlikte verin:
 
 ```bash
 python build.py <ders> --sinif 2 --donem 2 --sinav final
 ```
 
-Terminalde çalışıyorsanız zaten size sorar. Script/CI içinde çalıştırıyorsanız
+Terminalde çalışıyorsanız zaten size sorar. Script/CI içinde
 `DERS_SINIF`, `DERS_DONEM`, `DERS_SINAV` ortam değişkenlerini de
-kullanabilirsiniz.
+kullanabilirsiniz. Düz `dersler/` klasörüne dönmek için: `--duz`.
 
 ### `[UYARI] FOGRA39 profili bulunamadı`
 Normaldir, hata değil. Matbaa FOGRA39 istemiyorsa görmezden gelin. İstiyorsa
@@ -202,6 +198,7 @@ Konsol kod sayfası sorunudur, üretilen PDF'i etkilemez. İsterseniz
 
 ## Sırada ne var
 
-- **Kendi dersinizi eklemek:** `README.md` → "İlk dersinizi üretmek"
+- **Kendi dersinizi eklemek:** `dersler/src/ornek_ders.py` dosyasını
+  kopyalayın; ayrıca `README.md` → "İlk dersinizi üretmek"
 - **Veri modelinin tam API referansı ve üretim kuralları:** `CLAUDE.md`
 - **Ders renkleri:** `python renk_uretici.py --tablo`

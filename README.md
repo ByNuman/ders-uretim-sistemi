@@ -23,10 +23,10 @@ pip install -r requirements.txt      # Python paketleri
 npm install                          # PDF'i Chromium render eder
 npx playwright install chromium      # ~150 MB, sadece ilk kurulumda
 
-python build.py sosyoloji --sinif 2 --donem 2 --sinav final
+python build.py ornek_ders            # örnek dersi derle
 ```
 
-Son komut 22 sayfalık örnek bir ders PDF'i üretir. Ürettiyse kurulum
+Son komut 13 sayfalık örnek bir ders PDF'i üretir. Ürettiyse kurulum
 tamamdır. Ayrıca **Ghostscript** kurmanız önerilir (matbaa için CMYK
 dönüşümü) — yoksa sistem yine çalışır, PDF sadece RGB kalır.
 
@@ -90,39 +90,55 @@ genel CMYK profiline düşülür ve uyarı basılır. Bkz. `assets/icc/README.md
 
 ## Klasör yapısı
 
-Dosyalar **sınıf / dönem / sınav dönemi** ağacında tutulur. Hiçbir script'in
-varsayılan dönemi yoktur; her komut `--sinif` `--donem` `--sinav` üçlüsünü
-birlikte alır.
+Bütün çalışma tek bir `dersler/` klasöründe olur:
 
 ```
-<sinif>-sinif/<donem>-donem/<sinav>/
+dersler/
 ├── kaynaklar/
 │   ├── ders_kaynaklari/<DERS ADI>/     # GİRDİ: ham ders metni / kaynak PDF
-│   ├── ogretmen_notlari/<DERS ADI>/    # GİRDİ: öğretmenin dağınık dikte notu
+│   ├── ogretmen_notlari/<DERS ADI>/    # GİRDİ: dağınık dikte notu
 │   └── özetlenmiş_dersler/<DERS ADI>/  # ARA:   yukarıdakilerden çıkarılan yazılı özet
-├── src/                                # <ders_slug>.py içerik modülleri + kitap.py
+├── src/                                # <ders>.py içerik modülleri
 ├── gorsel_ders_notlari/<DERS ADI>/     # ÇIKTI: PDF + HTML
 ├── calisma_rehberleri/<DERS ADI>/      # ÇIKTI: çalışma rehberi
 └── ders_anlatimlari/<DERS ADI>/        # ÇIKTI: ders anlatımı
 ```
 
-Paylaşılan altyapı kökte durur ve tüm dönemler tarafından ortak kullanılır:
-`build.py` · `build_kitap.py` · `content_model.py` · `theme_engine.py` ·
-`renk_uretici.py` · `pdfx.py` · `templates/` · `tools/`
+Paylaşılan altyapı kökte durur: `build.py` · `build_kitap.py` ·
+`content_model.py` · `theme_engine.py` · `renk_uretici.py` · `pdfx.py` ·
+`templates/` · `tools/`
+
+### İsteğe bağlı: sınıf / dönem / sınav ağacı
+
+Birden fazla sınıf ve sınav dönemini ayrı ayrı yönetmek isterseniz sistem
+`<sinif>-sinif/<donem>-donem/<sinav>/` ağacını da destekler. Bu ağaç
+kurulduğunda her komut üç parametreyi birlikte ister:
+
+```bash
+python build.py <ders> --sinif 2 --donem 2 --sinav final
+```
+
+Böylece aynı ders farklı dönemlerde bağımsız sürümler halinde tutulabilir
+(ör. bir dersin vize ve final kitabı ayrı renkte ve ayrı içerikte olur) ve
+`build_kitap.py` bir dönemin tüm derslerini tek ciltte birleştirir.
+
+Sınıf ağacı diskte yoksa sistem kendiliğinden `dersler/` kipine geçer;
+açıkça seçmek için `--duz` bayrağını kullanın.
 
 ## İlk dersinizi üretmek
 
-1. `<dönem>/src/yeni_ders.py` dosyasını yazın. Şablon olarak
-   `2-sinif/2-donem/final/src/sosyoloji.py` iyi bir orta-karmaşıklıkta
-   örnektir. Tek dışa verilen şey `get_pack() -> CoursePack` fonksiyonudur.
+1. `dersler/src/ornek_ders.py` dosyasını kopyalayın ve içeriğini değiştirin.
+   Bu örnek, sistemin kendisini anlatır ve kullanılabilecek bütün blokları
+   (terim kutusu, madde listesi, tablo, vurgu kutusu, akış şeması, sözlük,
+   test) örnekler. Tek dışa verilen şey `get_pack() -> CoursePack`'tir.
 2. Derleyin:
    ```bash
-   python build.py yeni_ders --sinif 2 --donem 2 --sinav final
+   python build.py yeni_ders
    ```
 3. Konsoldaki **taşma denetimi** çıktısını okuyun. Taşma varsa sayfaları
    otomatik yeniden dağıtın:
    ```bash
-   python tools/dengele.py yeni_ders --sinif 2 --donem 2 --sinav final
+   python tools/dengele.py yeni_ders
    ```
 
 Veri modelinin tam API referansı ve üretim sürecinin adım adım kuralları
@@ -138,15 +154,15 @@ belirlenmiştir** ve ilke "renk = dersin ruhu"dur.
 ```bash
 python renk_uretici.py --tablo               # belirlenmiş ders renkleri
 python theme_engine.py                       # hazır palet önizlemesi
-python tools/kapak_onizleme.py --sinif 3     # kapakları tek PDF'te gör
+python tools/kapak_onizleme.py --sinif 3     # kapakları tek PDF'te gör (sınıf ağacı kipi)
 ```
 
 ## Araçlar
 
 ```bash
-python tools/olcum.py <slug>  --sinif X --donem Y --sinav Z   # sayfa doluluğunu ölçer
-python tools/dengele.py <slug> --sinif X --donem Y --sinav Z  # sayfaları yeniden dağıtır
-python tools/kalibre.py        --sinif X --donem Y --sinav Z  # sayfa boyutu değiştiyse
+python tools/olcum.py <ders>     # sayfa doluluğunu ölçer
+python tools/dengele.py <ders>   # sayfaları taşmayacak biçimde yeniden dağıtır
+python tools/kalibre.py          # sayfa boyutu değiştiyse sabitleri yeniden ölçer
 ```
 
 ## Lisans

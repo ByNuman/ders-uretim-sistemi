@@ -13,7 +13,12 @@ Aşağıdakiler **GNU Genel Kamu Lisansı 3. sürüm** ile lisanslanmıştır:
 build.py · build_kitap.py · content_model.py · theme_engine.py
 renk_uretici.py · pdfx.py · donem.py · arabic_reshape.py
 templates/ (style.css ve tüm .j2 şablonları) · tools/
+dersler/src/ornek_ders.py
 ```
+
+`ornek_ders.py` bilerek GPL kapsamındadır: içeriği sistemin kendi
+belgelerinden yazılmış özgün bir metindir, hiçbir ders kitabından
+türetilmemiştir. Kendi dersinizi yazarken onu kopyalayabilirsiniz.
 
 Copyright (C) 2026 Numan Gözdaş
 
@@ -36,8 +41,7 @@ dağıtırsanız** doğar.
 
 ## 2. Ders içerikleri — Tüm hakları saklıdır
 
-`<sinif>-sinif/<donem>-donem/<sinav>/src/` altındaki ders modüllerinin
-**metinsel içeriği** (ders özetleri, bölüm metinleri, kavram tanımları, test
+Ders modüllerinin (`ornek_ders.py` hariç) **metinsel içeriği** (ders özetleri, bölüm metinleri, kavram tanımları, test
 soruları ve çözümleri) **GPL kapsamı DIŞINDADIR** ve tüm hakları saklıdır.
 
 Bu ayrımın sebebi: bu metinler üniversite ders kitaplarından ve öğretim
@@ -45,14 +49,14 @@ Bu ayrımın sebebi: bu metinler üniversite ders kitaplarından ve öğretim
 materyalden türeyen içeriği özgür lisansla dağıtmak, sahip olmadığım hakları
 devretmek olurdu.
 
-Bu modüller depoda **yalnızca örnek** olarak bulunur: sisteme yeni bir ders
-eklerken `CoursePack` yapısının nasıl doldurulduğunu göstermek içindir.
+Bu modüller **depoya dahil değildir** — sınıf ağaçlarıyla birlikte
+`.gitignore` kapsamındadır ve yalnızca yazarın kendi bilgisayarında bulunur.
+Bu madde, depoyu klonlayıp kendi derslerini yazacak kişiler için değil, o
+içeriğin başka bir yolla eline geçtiği durumlar için geçerlidir.
 
-**İzin verilen:** Yapıyı, biçimi ve kod desenini örnek alarak **kendi**
-derslerinizi yazmak.
-
-**İzin verilmeyen:** Ders metinlerini olduğu gibi veya küçük değişikliklerle
-kopyalayıp yayımlamak, dağıtmak veya ticari olarak kullanmak.
+Sisteme yeni bir ders eklerken örnek almanız gereken dosya
+`dersler/src/ornek_ders.py`'dir; o dosya GPL kapsamındadır ve serbestçe
+kopyalanabilir.
 
 ---
 
@@ -63,6 +67,8 @@ Aşağıdakiler `.gitignore` kapsamındadır ve depoya dahil değildir:
 - `kaynaklar/` — ham ders materyalleri (üçüncü taraf telifli olabilir)
 - `gorsel_ders_notlari/`, `calisma_rehberleri/`, `ders_anlatimlari/` —
   üretilmiş PDF çıktıları
+- `<n>-sinif/` — kişisel sınıf/dönem çalışma ağaçları ve içlerindeki
+  ders modülleri
 
 Gerekçe için `README.md` → "Depoda ders PDF'leri neden yok?" bölümüne bakın.
 
