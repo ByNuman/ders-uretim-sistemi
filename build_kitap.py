@@ -55,8 +55,8 @@ ROOT = Path(__file__).parent
 sys.path.insert(0, str(ROOT))
 
 import build as B                       # noqa: E402  (sayfalama/render/validate tek kaynak)
-import donem as donem_mod               # noqa: E402
-from theme_engine import resolve_theme_css, generate_theme_vars_from_hex   # noqa: E402
+from cekirdek import donem as donem_mod               # noqa: E402
+from cekirdek.theme_engine import resolve_theme_css, generate_theme_vars_from_hex   # noqa: E402
 
 
 # --- Ön kısım sayfa düzeni ---------------------------------------------------

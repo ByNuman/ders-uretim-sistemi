@@ -38,7 +38,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
-from content_model import (                                      # noqa: E402
+from cekirdek.content_model import (                                      # noqa: E402
     KeyTerm, Callout, FlowStep, FlowDiagram, ComparisonTable,
     BulletBlock, Chapter, ChapterPage, Concept, CoursePack,
     TestQuestion, AnswerItem,

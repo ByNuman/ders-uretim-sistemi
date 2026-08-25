@@ -57,7 +57,7 @@ import importlib
 from dataclasses import dataclass
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent
+ROOT = Path(__file__).resolve().parents[1]   # cekirdek/ -> proje kökü
 
 SINIFLAR = ("2", "3")
 DONEMLER = ("1", "2")

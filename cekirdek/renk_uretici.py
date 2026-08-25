@@ -59,13 +59,25 @@ Komut satırı:
     python renk_uretici.py --liste --sinif 2 --donem 2 --sinav final
 """
 
+# --- doğrudan çalıştırma desteği ------------------------------------------
+# Bu modül hem paket olarak (`from cekirdek.X import ...`) hem de doğrudan
+# (`python cekirdek/X.py`) çalıştırılabilir. Doğrudan çalıştırıldığında
+# sys.path[0] `cekirdek/` olur ve kardeş modüller `cekirdek.` önekiyle
+# bulunamaz; bu blok proje kökünü path'e ekleyerek ikisini de çalıştırır.
+import sys as _sys
+from pathlib import Path as _Path
+if __package__ in (None, ""):
+    _sys.path.insert(0, str(_Path(__file__).resolve().parents[1]))
+# ---------------------------------------------------------------------------
+
 import hashlib
 import re
 from pathlib import Path
 
-from theme_engine import generate_theme_vars, generate_theme_vars_from_hex
+from cekirdek.theme_engine import (generate_theme_vars,
+                                   generate_theme_vars_from_hex)
 
-ROOT = Path(__file__).resolve().parent
+ROOT = Path(__file__).resolve().parents[1]   # cekirdek/ -> proje kökü
 STYLE_CSS = ROOT / "templates" / "style.css"
 
 # theme_color vermeyen LEGACY dersler için son çare (style.css okunamazsa)

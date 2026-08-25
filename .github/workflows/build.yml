@@ -45,7 +45,7 @@ jobs:
           npx playwright install --with-deps chromium
 
       - name: Kurulum teşhisi
-        run: python pdfx.py
+        run: python cekirdek/pdfx.py
 
       # KURULUM.md 5. adım — sınıf ağacı depoda olmadığı için düz kipe
       # kendiliğinden geçilmeli; bayrak vermiyoruz ki o yol da sınansın.

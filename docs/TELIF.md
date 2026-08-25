@@ -10,8 +10,8 @@ lisanslanmıştır. Depoyu kullanmadan önce ikisini de okuyun.
 Aşağıdakiler **GNU Genel Kamu Lisansı 3. sürüm** ile lisanslanmıştır:
 
 ```
-build.py · build_kitap.py · content_model.py · theme_engine.py
-renk_uretici.py · pdfx.py · donem.py
+build.py · build_kitap.py · cekirdek/content_model.py · cekirdek/theme_engine.py
+cekirdek/renk_uretici.py · cekirdek/pdfx.py · cekirdek/donem.py
 templates/ (style.css ve tüm .j2 şablonları) · tools/
 dersler/src/ornek_ders.py
 ```
@@ -22,7 +22,7 @@ türetilmemiştir. Kendi dersinizi yazarken onu kopyalayabilirsiniz.
 
 Copyright (C) 2026 Numan Gözdaş
 
-Lisansın tam metni: [`LICENSE`](LICENSE)
+Lisansın tam metni: [`LICENSE`](../LICENSE)
 
 **Ne yapabilirsiniz:** Kullanabilir, inceleyebilir, değiştirebilir,
 dağıtabilir ve ticari olarak kullanabilirsiniz.
@@ -70,7 +70,7 @@ Aşağıdakiler `.gitignore` kapsamındadır ve depoya dahil değildir:
 - `<n>-sinif/` — kişisel sınıf/dönem çalışma ağaçları ve içlerindeki
   ders modülleri
 
-Gerekçe için `README.md` → "Depoda ders PDF'leri neden yok?" bölümüne bakın.
+Gerekçe için `../README.md` → "Depoda ders PDF'leri neden yok?" bölümüne bakın.
 
 ---
 
@@ -91,7 +91,7 @@ onayı gerektirdiği için eci.org'dan ayrıca indirilir; bkz.
 
 **Çalışma zamanı bağımlılıkları** (jinja2, pypdf, pymupdf, pdfplumber,
 Playwright, Ghostscript) depoda değildir, kurulum sırasında kendi
-lisanslarıyla indirilir; bkz. `KURULUM.md`.
+lisanslarıyla indirilir; bkz. `docs/KURULUM.md`.
 
 ---
 

@@ -9,7 +9,7 @@ tabloları, akış şemaları, vurgu kutuları), kavramlar sözlüğü ve 20 sor
 çoktan seçmeli test + çözümlü cevap anahtarından oluşur.
 
 Ders içeriği HTML/CSS'te değil, **Python veri modelinde** yazılır
-(`content_model.py`). Tasarım tek bir yerde durur (`templates/`), içerik ise
+(`cekirdek/content_model.py`). Tasarım tek bir yerde durur (`templates/`), içerik ise
 her ders için ayrı bir modülde. Bu yüzden tasarımda yapılan bir düzeltme tüm
 derslere birden uygulanır.
 
@@ -45,7 +45,7 @@ tamamdır. Ayrıca **Ghostscript** kurmanız önerilir (matbaa için CMYK
 dönüşümü) — yoksa sistem yine çalışır, PDF sadece RGB kalır.
 
 **Adım adım anlatım, işletim sistemine göre kurulum ve sorun giderme için:
-[`KURULUM.md`](KURULUM.md)**
+[`docs/KURULUM.md`](docs/KURULUM.md)**
 
 ## Ne üretir
 
@@ -79,7 +79,7 @@ ayrıca alın — bu depo onların yedeği değildir.**
 ## Kurulum
 
 Ayrıntılı, adım adım kurulum rehberi ayrı bir dosyadadır:
-**[`KURULUM.md`](KURULUM.md)** — işletim sistemine göre komutlar, her adım
+**[`docs/KURULUM.md`](docs/KURULUM.md)** — işletim sistemine göre komutlar, her adım
 için doğrulama ve sık karşılaşılan hatalar.
 
 Özet gereksinimler:
@@ -93,7 +93,7 @@ için doğrulama ve sık karşılaşılan hatalar.
 Kurulumu doğrulamak için:
 
 ```bash
-python pdfx.py        # Ghostscript + ICC profili teşhisi
+python cekirdek/pdfx.py        # Ghostscript + ICC profili teşhisi
 ```
 
 ### ICC profili (matbaa için, opsiyonel)
@@ -119,7 +119,7 @@ dersler/
 ```
 
 Paylaşılan altyapı kökte durur: `build.py` · `build_kitap.py` ·
-`content_model.py` · `theme_engine.py` · `renk_uretici.py` · `pdfx.py` ·
+`cekirdek/content_model.py` · `cekirdek/theme_engine.py` · `cekirdek/renk_uretici.py` · `cekirdek/pdfx.py` ·
 `templates/` · `tools/`
 
 ### İsteğe bağlı: sınıf / dönem / sınav ağacı
@@ -160,14 +160,14 @@ Veri modelinin tam API referansı ve üretim sürecinin adım adım kuralları
 
 ## Renkler
 
-Her dersin vurgu rengi tek bir hex'ten türetilir; `theme_engine.py` kapak
+Her dersin vurgu rengi tek bir hex'ten türetilir; `cekirdek/theme_engine.py` kapak
 gradyanından tablo başlığına kadar tüm tonları otomatik üretir. Ders renkleri
-`renk_uretici.py` içindeki `DERS_RENKLERI` tablosunda **önceden
+`cekirdek/renk_uretici.py` içindeki `DERS_RENKLERI` tablosunda **önceden
 belirlenmiştir** ve ilke "renk = dersin ruhu"dur.
 
 ```bash
-python renk_uretici.py --tablo               # belirlenmiş ders renkleri
-python theme_engine.py                       # hazır palet önizlemesi
+python cekirdek/renk_uretici.py --tablo               # belirlenmiş ders renkleri
+python cekirdek/theme_engine.py                       # hazır palet önizlemesi
 python tools/kapak_onizleme.py --sinif 3     # kapakları tek PDF'te gör (sınıf ağacı kipi)
 ```
 
@@ -185,7 +185,7 @@ Bu depoda iki tür içerik vardır ve **ayrı ayrı** lisanslanmıştır:
 
 | Ne | Lisans |
 |---|---|
-| **Sistem** — `build.py`, `templates/`, `theme_engine.py`, `tools/` … | **GNU GPL v3** ([`LICENSE`](LICENSE)) |
+| **Sistem** — `build.py`, `templates/`, `cekirdek/theme_engine.py`, `tools/` … | **GNU GPL v3** ([`LICENSE`](LICENSE)) |
 | **Ders içerikleri** — `<dönem>/src/*.py` içindeki metinler | Tüm hakları saklıdır |
 
 Copyright (C) 2026 Numan Gözdaş
@@ -200,4 +200,4 @@ kitaplarından türetilmiş özetler oldukları için serbest lisansla dağıtı
 Yapılarını örnek alıp kendi derslerinizi yazabilirsiniz, metinleri
 kopyalayamazsınız.
 
-Ayrıntılı açıklama ve üçüncü taraf bileşenler: **[`TELIF.md`](TELIF.md)**
+Ayrıntılı açıklama ve üçüncü taraf bileşenler: **[`docs/TELIF.md`](docs/TELIF.md)**

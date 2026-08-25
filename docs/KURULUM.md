@@ -103,7 +103,7 @@ sudo apt install ghostscript
 
 **Doğrulama:**
 ```bash
-python pdfx.py
+python cekirdek/pdfx.py
 ```
 
 Bu komut Ghostscript'i ve ICC profilini bulup sürümlerini yazdırır.
@@ -188,7 +188,7 @@ python tools/dengele.py <ders> --sinif X --donem Y --sinav Z
 ### Ürettiğim PDF'i commit edemiyorum
 Kasıtlı: `gorsel_ders_notlari/`, `calisma_rehberleri/`, `ders_anlatimlari/`
 ve `kaynaklar/` altındaki dosyalar `.gitignore`'dadır. Sebebi ve gerekçesi
-için `README.md` → "Depoda ders PDF'leri neden yok?" bölümüne bakın.
+için `../README.md` → "Depoda ders PDF'leri neden yok?" bölümüne bakın.
 
 ### Windows'ta Türkçe karakterler bozuk görünüyor
 Konsol kod sayfası sorunudur, üretilen PDF'i etkilemez. İsterseniz
@@ -199,6 +199,6 @@ Konsol kod sayfası sorunudur, üretilen PDF'i etkilemez. İsterseniz
 ## Sırada ne var
 
 - **Kendi dersinizi eklemek:** `dersler/src/ornek_ders.py` dosyasını
-  kopyalayın; ayrıca `README.md` → "İlk dersinizi üretmek"
+  kopyalayın; ayrıca `../README.md` → "İlk dersinizi üretmek"
 - **Veri modelinin tam API referansı ve üretim kuralları:** `CLAUDE.md`
-- **Ders renkleri:** `python renk_uretici.py --tablo`
+- **Ders renkleri:** `python cekirdek/renk_uretici.py --tablo`

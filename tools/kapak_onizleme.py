@@ -47,8 +47,8 @@ sys.path.insert(0, str(ROOT))
 
 from jinja2 import Environment, FileSystemLoader                    # noqa: E402
 from build import load_css, SINGLE_GEOMETRY, page_geometry_css      # noqa: E402
-from theme_engine import resolve_theme_css                          # noqa: E402
-from renk_uretici import ders_rengi                                 # noqa: E402
+from cekirdek.theme_engine import resolve_theme_css                          # noqa: E402
+from cekirdek.renk_uretici import ders_rengi                                 # noqa: E402
 
 TEMPLATES = ROOT / "templates"
 

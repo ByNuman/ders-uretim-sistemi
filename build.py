@@ -46,10 +46,10 @@ if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8")
     sys.stderr.reconfigure(encoding="utf-8")
 
-from theme_engine import resolve_theme_css
-from renk_uretici import pack_rengi, belirlenmis_renk
-import pdfx
-import donem as donem_mod
+from cekirdek.theme_engine import resolve_theme_css
+from cekirdek.renk_uretici import pack_rengi, belirlenmis_renk
+from cekirdek import pdfx
+from cekirdek import donem as donem_mod
 
 ROOT = Path(__file__).parent
 TEMPLATES = ROOT / "templates"

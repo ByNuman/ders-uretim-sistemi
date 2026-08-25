@@ -43,9 +43,20 @@ import sys
 import tempfile
 from pathlib import Path
 
+# --- doğrudan çalıştırma desteği ------------------------------------------
+# Bu modül hem paket olarak (`from cekirdek.X import ...`) hem de doğrudan
+# (`python cekirdek/X.py`) çalıştırılabilir. Doğrudan çalıştırıldığında
+# sys.path[0] `cekirdek/` olur ve kardeş modüller `cekirdek.` önekiyle
+# bulunamaz; bu blok proje kökünü path'e ekleyerek ikisini de çalıştırır.
+import sys as _sys
+from pathlib import Path as _Path
+if __package__ in (None, ""):
+    _sys.path.insert(0, str(_Path(__file__).resolve().parents[1]))
+# ---------------------------------------------------------------------------
+
 MM = 72.0 / 25.4          # 1mm kaç PostScript puntosu
 
-ROOT = Path(__file__).parent
+ROOT = Path(__file__).resolve().parents[1]   # cekirdek/ -> proje kökü
 
 # ICC profili aranırken kullanılacak dosya adı kalıpları (öncelik sırasıyla).
 # FOGRA39 / "ISO Coated v2 (ECI)" Avrupa kuşe baskının fiili standardıdır ve

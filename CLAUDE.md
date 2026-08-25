@@ -136,7 +136,7 @@ ders klasörüyle eşleşmemesine yol açar. **Yeni derste her zaman doldurun.**
 
 Bu depo GitHub'da yalnızca boş bir `dersler/` iskeletiyle yayımlanır; sınıf
 ağaçları (`2-sinif/`, `3-sinif/`) `.gitignore`'dadır ve klonlayan kişide hiç
-bulunmaz. `donem.py` bunu algılar:
+bulunmaz. `cekirdek/donem.py` bunu algılar:
 
 - Sınıf ağacı diskte YOKSA ve kullanıcı sınıf/dönem/sınav vermediyse →
   kendiliğinden `dersler/` köküne geçer ve bunu konsola yazar.
@@ -174,11 +174,10 @@ Pratik sonuçları:
   ekle; kurallar UZANTI bazlıdır, klasör bazlı değil (yoksa `.gitkeep`
   iskeleti de yok sayılır ve dizin yapısı depodan silinir).
 
-### Kökte kalan paylaşılan altyapı (döneme ait DEĞİL, asla kopyalanmaz)
+### Paylaşılan altyapı (döneme ait DEĞİL, asla kopyalanmaz)
 
 ```
-build.py · build_kitap.py · donem.py · content_model.py · theme_engine.py
-pdfx.py · renk_uretici.py · templates/ · tools/ · assets/
+build.py · build_kitap.py · cekirdek/ · templates/ · tools/ · assets/
 ```
 
 Bu dosyalar TÜM dönemler tarafından paylaşılır. `templates/style.css` veya
@@ -189,7 +188,7 @@ ama dönem-özel bir "düzeltme" yapmaya çalışma.
 ### Ders modülleri neden noktalı yolla import edilmiyor?
 
 `2-sinif` geçerli bir Python paket adı değildir, bu yüzden eski
-`content.kelam_tarihi` biçimi artık kullanılamaz. `donem.py`, seçilen dönemin
+`content.kelam_tarihi` biçimi artık kullanılamaz. `cekirdek/donem.py`, seçilen dönemin
 `src/` klasörünü `sys.path`'in başına koyar ve modül **çıplak adıyla**
 (`kelam_tarihi`) import edilir. Eski noktalı yazım yine de kabul edilir
 (önek atılır), ama yeni kodda çıplak ad kullan.
@@ -200,10 +199,16 @@ Bir `src/*.py` dosyasının başındaki
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 ```
 
-satırı proje köküne (`content_model.py`'nin bulunduğu yere) çıkar —
-`src/ -> <sinav> -> <donem> -> <sinif> -> KÖK` = 4 seviye. Yeni bir ders
-dosyası yazarken bu satırı olduğu gibi kopyala; `parents[1]` yazarsan
-`content_model` bulunamaz.
+satırı **proje köküne** çıkar (`cekirdek/` paketinin bulunduğu yere) —
+`src/ -> <sinav> -> <donem> -> <sinif> -> KÖK` = 4 seviye. Düz kipte
+(`dersler/src/`) bu sayı **2**'dir. Yeni bir ders dosyası yazarken doğru
+seviyeyi say; yanlış sayarsan `cekirdek` paketi bulunamaz.
+
+Veri şeması `cekirdek` paketinden import edilir:
+
+```python
+from cekirdek.content_model import KeyTerm, Chapter, ChapterPage, CoursePack
+```
 
 ## Sistemin amacı
 
@@ -316,13 +321,14 @@ silinir — kullanıcının elindeki
 ders-uretim-sistemi/
 │
 │  ── PAYLAŞILAN ALTYAPI (döneme ait değil) ────────────────────────────────
-├── donem.py                # SINIF/DÖNEM/SINAV çözümleyici — tüm scriptlerin ortak girişi
-├── content_model.py        # Veri şeması (dataclass'lar) — API referansı aşağıda
 ├── build.py                # TEK DERS: HTML üret → PDF render → küçült → bookmark → kutular → CMYK
 ├── build_kitap.py          # BİRLEŞİK KİTAP: bir dönemin tüm derslerini tek ciltte birleştirir
-├── pdfx.py                 # BASKI ÖNCESİ: TrimBox/BleedBox + Ghostscript ile PDF/X-4 CMYK
-├── theme_engine.py         # Sınırsız renk teması motoru (tek hex'ten tam tema üretir)
-├── renk_uretici.py         # DERSE ÖZEL VURGU RENGİ — build.py + ders-anlatim skill'inin ORTAK kaynağı
+├── cekirdek/               # KÜTÜPHANE — doğrudan çalıştırılmaz, yukarıdakiler kullanır
+│   ├── donem.py            # SINIF/DÖNEM/SINAV (ve düz `dersler/`) çözümleyici
+│   ├── content_model.py    # Veri şeması (dataclass'lar) — API referansı aşağıda
+│   ├── theme_engine.py     # Sınırsız renk teması motoru (tek hex'ten tam tema üretir)
+│   ├── renk_uretici.py     # DERSE ÖZEL VURGU RENGİ — build + ders-anlatim ORTAK kaynağı
+│   └── pdfx.py             # BASKI ÖNCESİ: TrimBox/BleedBox + Ghostscript ile PDF/X-4 CMYK
 ├── tools/
 │   ├── olcum.py            # Her bloğun GERÇEK yüksekliğini (mm) Chromium'da ölçer
 │   ├── dengele.py          # Ölçüme göre ChapterPage bölünmelerini yeniden dağıtır
@@ -334,6 +340,7 @@ ders-uretim-sistemi/
 │   ├── _kitap_on_kisim.html.j2   # Kitabın kapak/künye/önsöz/rehber/içindekiler/harita sayfaları
 │   └── style.css                  # Tasarım sistemi (sabit — dokunma, sadece bug varsa düzelt)
 ├── assets/icc/             # FOGRA39 ("ISO Coated v2") ICC profili buraya konur (bkz. README)
+├── docs/                   # KURULUM.md · TELIF.md · README ekran görüntüleri
 │
 │  ── DÖNEM AĞAÇLARI (8 sınav dönemi) ──────────────────────────────────────
 ├── 2-sinif/{1,2}-donem/{vize,final}/
@@ -463,13 +470,13 @@ arası kabul edilebilir) — çok yoğun bölümleri en baştan 2-3 `ChapterPage
 böl, tek dev sayfaya sıkıştırmaya çalışma.
 
 ### 3. `<D>/src/<ders_slug>.py` dosyasını yaz
-Aşağıdaki "content_model.py API Referansı" bölümüne birebir uyarak yaz.
+Aşağıdaki "cekirdek/content_model.py API Referansı" bölümüne birebir uyarak yaz.
 Mevcut derslerden birini (`2-sinif/2-donem/final/src/sosyoloji.py` iyi bir orta-karmaşıklıkta
 örnektir) şablon olarak kopyalayıp değiştirmek en hızlı yoldur.
 
 Her ders için ayrıca:
 - **Renk teması sınırsızdır**: `theme_color="#7A2438"` gibi TEK bir hex renk
-  verin — `theme_engine.py` tüm tonları (kapak gradyanı, banner, tablo
+  verin — `cekirdek/theme_engine.py` tüm tonları (kapak gradyanı, banner, tablo
   başlığı, kart kenarlığı vb.) otomatik türetir. Kolaylık için
   `theme_engine.PALETTE_HUES` içinde 16 hazır isimlendirilmiş ton var
   (`from theme_engine import PALETTE_HUES, generate_theme_vars` ile
@@ -644,10 +651,10 @@ olduğu için linkler birden fazla sayfaya dağılmaz (bkz. "KRİTİK KURAL 4").
 ### 8. Teslim et
 PDF'i kullanıcının erişebileceği çıktı konumuna kopyala ve sun.
 
-## content_model.py API Referansı
+## cekirdek/content_model.py API Referansı
 
 ```python
-from content_model import (
+from cekirdek.content_model import (
     Person, KeyTerm, Callout, FlowStep, FlowDiagram, ComparisonTable,
     InfoCard, Ayah, BulletBlock, Chapter, ChapterPage, Concept, CoursePack,
     TestQuestion, AnswerItem,               # GÜNCEL sınav formatı — yeni derslerde bunları kullan
@@ -732,7 +739,7 @@ from content_model import (
   **`MatchRow(key, detail, reference)`** — **LEGACY.** Eski "Sınav Hazırlık"
   bölümünün üç bileşeniydi. Yeni derslerde KULLANMAYIN — yerine
   `TestQuestion`/`AnswerItem` kullanın (aşağıda). Sadece geriye dönük
-  uyumluluk için `content_model.py`'da duruyorlar; `pack.test_questions`
+  uyumluluk için `cekirdek/content_model.py`'da duruyorlar; `pack.test_questions`
   boş bırakılırsa şablon otomatik olarak bu LEGACY formatı render eder.
 
 - **`TestQuestion(number, stem, options)`** — **GÜNCEL sınav formatı.**
@@ -768,10 +775,10 @@ from content_model import (
   "Final" yazar. Varsayılan "Final" olduğu için mevcut final dersleri
   etkilenmez; `subtitle`'a ayrıca "— Vize Özeti" eklemeyin, tekrar olur.
 
-## Renk Teması (sınırsız — `theme_engine.py`)
+## Renk Teması (sınırsız — `cekirdek/theme_engine.py`)
 
 5 sabit tema (`indigo/burgundy/forest/slate/plum`) hâlâ çalışıyor, ama
-YENİ derslerde bunlarla sınırlı kalmanıza gerek yok. `theme_engine.py`,
+YENİ derslerde bunlarla sınırlı kalmanıza gerek yok. `cekirdek/theme_engine.py`,
 TEK bir hex renkten (`--accent`, `--accent-dark`, kapak gradyanı, `--paper`
 zemin tonu dahil) tüm CSS değişkenlerini otomatik türetir — mevcut 5
 temanın HSL değerleri geriye doğru analiz edilerek kalibre edilmiştir,
@@ -788,7 +795,7 @@ return CoursePack(
 
 ### Rengi SEN seçme — `DERS_RENKLERI` tablosuna bak
 
-`renk_uretici.py` içindeki `DERS_RENKLERI` tablosu, hangi dersin hangi rengi
+`cekirdek/renk_uretici.py` içindeki `DERS_RENKLERI` tablosu, hangi dersin hangi rengi
 alacağını **önceden sabitler**. İlke: **RENK = DERSİN RUHU** — her ton o dersin
 kendi anlamından seçilmiştir, bir üst sınıftan miras alınmamıştır:
 
@@ -813,8 +820,8 @@ derecedir — aralar en az 20°, yani bir dönem kitabındaki 11 ders ayrışır
 Yeni bir `src/<ders>.py` yazarken:
 
 ```bash
-python renk_uretici.py "TEFSİR III" --sinif 3 --donem 1 --sinav final
-python renk_uretici.py --tablo        # tüm önceden belirlenmiş renkler
+python cekirdek/renk_uretici.py "TEFSİR III" --sinif 3 --donem 1 --sinav final
+python cekirdek/renk_uretici.py --tablo        # tüm önceden belirlenmiş renkler
 ```
 
 Çıkan hex'i `theme_color=` alanına **birebir** kopyala. Kendi kafandan renk
@@ -867,8 +874,8 @@ devam etmesi içindir. **Yeni bir ders yazarken her zaman `test_questions`/
 ```python
 import sys
 from pathlib import Path
-sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from content_model import (...)
+sys.path.insert(0, str(Path(__file__).resolve().parents[4]))   # düz kipte parents[2]
+from cekirdek.content_model import (...)
 
 def get_pack() -> CoursePack:
     ch1 = Chapter(number=1, title="...", subtitle="...", key_terms=[
@@ -1157,12 +1164,12 @@ Bunlar `templates/style.css` içinde zaten düzeltilmiş durumda — sadece
     `CompatibilityLevel`'ı zorla 1.3'e çeker ve saydamlığı düzleştirir.
     Ölçüldü: aynı ders `-dPDFX` ile 23.7 MB / PDF 1.3 / ~5 dk, bayraksız
     (`-dCompatibilityLevel=1.6` + PDFX_def.ps'teki `GTS_PDFXVersion` +
-    OutputIntent) 3.9 MB / PDF 1.6 / 22 sn. `pdfx.py` bilerek `-dPDFX`
+    OutputIntent) 3.9 MB / PDF 1.6 / 22 sn. `cekirdek/pdfx.py` bilerek `-dPDFX`
     KULLANMAZ; geri eklerseniz dosya şişer ve kapak gradyanları rasterleşir.
 
 14. **Ghostscript'in varsayılan görsel ayarları kapak gradyanını 22 dpi'a
     düşürüyordu**: `pdfwrite`'ın downsample varsayılanları Chromium'un gömdüğü
-    tam sayfa rasterleri eziyor. `pdfx.py` bu yüzden `-dDownsample*Images=false`
+    tam sayfa rasterleri eziyor. `cekirdek/pdfx.py` bu yüzden `-dDownsample*Images=false`
     ve `-d*ImageFilter=/FlateEncode` veriyor (kayıpsız). Bu satırları silmeyin.
 
 15. **PyMuPDF'in `set_xml_metadata()`'sı Ghostscript çıktısında sessizce
@@ -1199,7 +1206,7 @@ Bunlar `templates/style.css` içinde zaten düzeltilmiş durumda — sadece
   tonlu, beyaz değil) setini tanımlar; callout renkleri
   (`focus/caution/insight/route`) tema-bağımsız sabittir. 5 sabit isimli
   tema (`indigo/burgundy/forest/slate/plum`) hâlâ var, ama `theme_color`
-  ile `theme_engine.py` üzerinden SINIRSIZ sayıda özel renk üretilebilir
+  ile `cekirdek/theme_engine.py` üzerinden SINIRSIZ sayıda özel renk üretilebilir
   (bkz. "Renk Teması" bölümü) — sabit sınıflar artık bir seçenek, zorunluluk
   değil.
 - Kapak: çok katmanlı gradient + döner amblem (halka + saat çentikleri +
@@ -1236,7 +1243,7 @@ python tools/dengele.py <slug> --sinif X --donem Y --sinav Z   # --kuru = sadece
 python tools/kalibre.py --sinif X --donem Y --sinav Z          # sayfa boyutu değiştiyse
 
 # Ghostscript + ICC profili teşhisi
-python pdfx.py
+python cekirdek/pdfx.py
 
 # BİR DÖNEMİN tüm derslerini tek kitap halinde derle (src/kitap.py sırasına göre)
 python build_kitap.py --sinif X --donem Y --sinav Z
@@ -1255,7 +1262,7 @@ for it in r.outline: print(it.title, '->', r.get_destination_page_number(it)+1)
 "
 
 # Tema paleti önizlemesi (hangi renklerin kullanıldığını görmek için)
-python3 theme_engine.py
+python cekirdek/theme_engine.py
 ```
 
 ## Özet — bir ders eklerken zihinsel kontrol listesi
@@ -1269,8 +1276,9 @@ python3 theme_engine.py
 - [ ] Kullanılmamış bir renk seçtim (`theme_color=` hex, aynı dönemin
       `src/` dizinindeki diğer derslerden görsel olarak ayrışan), tek harfli
       Latin `icon_text` verdim
-- [ ] `<D>/src/<slug>.py` yazdım, `content_model.py` API'sine birebir uydum
-      (başındaki `sys.path` satırı `parents[4]` olmalı)
+- [ ] `<D>/src/<slug>.py` yazdım, `cekirdek/content_model.py` API'sine birebir uydum
+      (başındaki `sys.path` satırı `parents[4]` olmalı — düz kipte `parents[2]`;
+      import `from cekirdek.content_model import ...` biçimindedir)
 - [ ] `ders_klasoru=` alanını doldurdum ve `kaynaklar/` altındaki ders
       klasörü adıyla BİREBİR aynı yazdım
 - [ ] 20 soruluk `test_questions` + eşleşen `answer_key_items` yazdım
