@@ -47,3 +47,17 @@ __pycache__/
 # ============================================================
 2-sinif/
 3-sinif/
+
+# ============================================================
+# YEREL ORTAM VE GEÇİCİ DOSYALAR
+# KURULUM.md sanal ortam kurmayı önerir; adı ne olursa olsun yoksayılır.
+# _kapak_onizleme.js'i tools/kapak_onizleme.py köke yazar (node_modules
+# proje kökünde olduğu için başka yerde çalışmıyor) ve iş bitince silinir --
+# ama build yarıda kesilirse geride kalır.
+# ============================================================
+.venv/
+venv/
+.env
+_kapak_onizleme.js
+.DS_Store
+Thumbs.db

@@ -1,0 +1,12 @@
+# Satır sonlarını depoda LF olarak normalleştir. Bu dosya olmadan Windows'ta
+# çalışan biri CRLF ile commit eder, macOS/Linux'ta çalışan LF ile; aynı dosya
+# hiçbir şey değişmeden "tamamen değişmiş" görünür.
+* text=auto eol=lf
+
+# İkili dosyalar — asla satır sonu dönüşümüne uğramamalı
+*.pdf   binary
+*.png   binary
+*.jpg   binary
+*.ttf   binary
+*.otf   binary
+*.icc   binary
