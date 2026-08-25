@@ -11,6 +11,28 @@ Ders içeriği HTML/CSS'te değil, **Python veri modelinde** yazılır
 her ders için ayrı bir modülde. Bu yüzden tasarımda yapılan bir düzeltme tüm
 derslere birden uygulanır.
 
+## Hızlı başlangıç
+
+Sistemi yeni indirdiyseniz sırasıyla şunları yapın (~10-15 dk):
+
+```bash
+git clone https://github.com/ByNuman/ders-uretim-sistemi.git
+cd ders-uretim-sistemi
+
+pip install -r requirements.txt      # Python paketleri
+npm install                          # PDF'i Chromium render eder
+npx playwright install chromium      # ~150 MB, sadece ilk kurulumda
+
+python build.py sosyoloji --sinif 2 --donem 2 --sinav final
+```
+
+Son komut 22 sayfalık örnek bir ders PDF'i üretir. Ürettiyse kurulum
+tamamdır. Ayrıca **Ghostscript** kurmanız önerilir (matbaa için CMYK
+dönüşümü) — yoksa sistem yine çalışır, PDF sadece RGB kalır.
+
+**Adım adım anlatım, işletim sistemine göre kurulum ve sorun giderme için:
+[`KURULUM.md`](KURULUM.md)**
+
 ## Ne üretir
 
 | Çıktı | Komut |
@@ -42,25 +64,17 @@ ayrıca alın — bu depo onların yedeği değildir.**
 
 ## Kurulum
 
-Gereken: **Python 3.10+**, **Node.js 18+**, **Ghostscript**.
+Ayrıntılı, adım adım kurulum rehberi ayrı bir dosyadadır:
+**[`KURULUM.md`](KURULUM.md)** — işletim sistemine göre komutlar, her adım
+için doğrulama ve sık karşılaşılan hatalar.
 
-```bash
-# 1) Python bağımlılıkları
-pip install -r requirements.txt
+Özet gereksinimler:
 
-# 2) PDF render'ı Chromium yapar (Playwright üzerinden)
-npm install
-npx playwright install chromium
-
-# 3) Ghostscript — RGB'den PDF/X-4 CMYK'ya dönüşüm için
-#    macOS:   brew install ghostscript
-#    Ubuntu:  sudo apt install ghostscript
-#    Windows: ghostscript.com üzerinden installer
-```
-
-Ghostscript kurulu değilse **build durmaz**: net bir uyarı basılır ve PDF
-RGB bırakılır. Kurulu ama PATH'te değilse tam yolu `DERS_GS` ortam
-değişkenine yazın.
+| Yazılım | Sürüm | Zorunlu mu? |
+|---|---|---|
+| Python | 3.10+ | Evet |
+| Node.js | 18+ | Evet (PDF render'ı Chromium yapar) |
+| Ghostscript | 9+ | Hayır — yoksa PDF RGB kalır, build durmaz |
 
 Kurulumu doğrulamak için:
 
