@@ -108,7 +108,7 @@ birlikte alır.
 
 Paylaşılan altyapı kökte durur ve tüm dönemler tarafından ortak kullanılır:
 `build.py` · `build_kitap.py` · `content_model.py` · `theme_engine.py` ·
-`renk_uretici.py` · `pdfx.py` · `templates/` · `tools/` · `fonts/`
+`renk_uretici.py` · `pdfx.py` · `templates/` · `tools/`
 
 ## İlk dersinizi üretmek
 
@@ -151,5 +151,23 @@ python tools/kalibre.py        --sinif X --donem Y --sinav Z  # sayfa boyutu de�
 
 ## Lisans
 
-Belirlenmedi. Depodaki kod ve tasarım sistemi yazarına aittir; ders
-içerikleri ve ham kaynaklar depoya dahil değildir.
+Bu depoda iki tür içerik vardır ve **ayrı ayrı** lisanslanmıştır:
+
+| Ne | Lisans |
+|---|---|
+| **Sistem** — `build.py`, `templates/`, `theme_engine.py`, `tools/` … | **GNU GPL v3** ([`LICENSE`](LICENSE)) |
+| **Ders içerikleri** — `<dönem>/src/*.py` içindeki metinler | Tüm hakları saklıdır |
+
+Copyright (C) 2026 Numan Gözdaş
+
+Sistemi kullanabilir, değiştirebilir ve dağıtabilirsiniz; karşılığında ondan
+türettiğiniz çalışma da GPL v3 altında açık kalmak zorundadır. **Kendi ders
+notlarınızı üretmek bu şartın kapsamına girmez** — yükümlülük ancak sistemi
+(ya da ondan türeteni) başkasına dağıtırsanız doğar.
+
+Ders modülleri depoda yalnızca **örnek** olarak bulunur; üniversite ders
+kitaplarından türetilmiş özetler oldukları için serbest lisansla dağıtılamaz.
+Yapılarını örnek alıp kendi derslerinizi yazabilirsiniz, metinleri
+kopyalayamazsınız.
+
+Ayrıntılı açıklama ve üçüncü taraf bileşenler: **[`TELIF.md`](TELIF.md)**

@@ -157,7 +157,7 @@ Pratik sonuçları:
 
 ```
 build.py · build_kitap.py · donem.py · content_model.py · theme_engine.py
-pdfx.py · renk_uretici.py · arabic_reshape.py · templates/ · tools/ · fonts/ · assets/
+pdfx.py · renk_uretici.py · arabic_reshape.py · templates/ · tools/ · assets/
 ```
 
 Bu dosyalar TÜM dönemler tarafından paylaşılır. `templates/style.css` veya
@@ -313,7 +313,6 @@ ders-uretim-sistemi/
 │   ├── _kitap_on_kisim.html.j2   # Kitabın kapak/künye/önsöz/rehber/içindekiler/harita sayfaları
 │   └── style.css                  # Tasarım sistemi (sabit — dokunma, sadece bug varsa düzelt)
 ├── assets/icc/             # FOGRA39 ("ISO Coated v2") ICC profili buraya konur (bkz. README)
-├── fonts/
 │
 │  ── DÖNEM AĞAÇLARI (8 sınav dönemi) ──────────────────────────────────────
 ├── 2-sinif/{1,2}-donem/{vize,final}/
@@ -668,12 +667,14 @@ from content_model import (
   için o dönemin `src/tefsir2.py` dosyasına bak. Ham Arapça Unicode metni doğrudan
   `arabic=` alanına yaz — ekstra bir işlem gerekmez.
 
-  > **Not:** Repoda `arabic_reshape.py` ve `fonts/ArabicExtracted-*.ttf`
-  > dosyaları bulunur ama hiçbir yerden import edilmez — DejaVu Sans'ın
-  > Chromium'daki native shaping'i (HarfBuzz) tek başına yeterli çıktığı için
-  > kullanılmadan kalmış bir yedek/deneme. Bu dosyaları kullanmana gerek yok;
-  > CSS zaten `font-family: "DejaVu Sans"` + `direction: rtl` ile doğru
-  > sonucu veriyor.
+  > **Not:** Repoda `arabic_reshape.py` bulunur ama hiçbir yerden import
+  > edilmez — DejaVu Sans'ın Chromium'daki native shaping'i (HarfBuzz) tek
+  > başına yeterli çıktığı için kullanılmadan kalmış bir deneme. Yanındaki
+  > `fonts/ArabicExtracted-*.ttf` dosyaları 2026 Ağustos'unda SİLİNDİ:
+  > kullanılmıyorlardı ve içlerinde hiç telif/lisans kaydı yoktu (bir PDF'ten
+  > çıkarılmış alt küme olduklarına işaret eder), yani kaynağı belirsiz
+  > içerik dağıtılıyordu. Geri getirme; CSS zaten `font-family: "DejaVu Sans"`
+  > + `direction: rtl` ile doğru sonucu veriyor.
 
 - **`BulletBlock(number, title, bullets, subtitle=None)`** — numaralı
   alt-başlık + madde listesi. `bullets` içindeki her madde `<b>vurgu</b>`

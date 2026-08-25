@@ -1,4 +1,19 @@
 # -*- coding: utf-8 -*-
+#
+# Görsel Ders Notu Üretim Sistemi
+# Copyright (C) 2026 Numan Gözdaş
+#
+# Bu program özgür yazılımdır: Özgür Yazılım Vakfı'nın yayımladığı GNU Genel
+# Kamu Lisansı'nın 3. sürümü koşulları altında yeniden dağıtabilir ve/veya
+# değiştirebilirsiniz.
+#
+# Bu program yararlı olacağı umuduyla dağıtılmaktadır, ancak HİÇBİR GARANTİ
+# VERİLMEZ; SATILABİLİRLİK veya BELİRLİ BİR AMACA UYGUNLUK zımni garantileri
+# dahi verilmez. Ayrıntılar için GNU Genel Kamu Lisansı'na bakın.
+#
+# Lisansın bir kopyasını bu depodaki LICENSE dosyasında bulabilirsiniz;
+# ayrıca <https://www.gnu.org/licenses/> adresinden edinebilirsiniz.
+#
 """
 DERS ÜRETİM SİSTEMİ — build_kitap.py  (BİRLEŞİK KİTAP)
 ======================================================
