@@ -712,6 +712,15 @@ from content_model import (
   (3-5 `(başlık, alt_metin)` tuple), `overview_note`. `distinctions`/
   `match_table`/`qa_items` LEGACY'dir, yeni derslerde boş bırakın.
 
+- **`sinav_etiketi`** (opsiyonel, varsayılan `"Final"`) — kapaktaki sınav
+  adı. Kapak kickerinde ("Görsel Ders Notu Kitabı · **Final** Özeti"), kapak
+  istatistik kutusunda ve kapak alt bilgisinde ("N Bölüm · **Final** Sınavı
+  Hazırlığı") görünür; LEGACY "Sınav Hazırlık" bölümünün pageband etiketi
+  ("**Final** Tekrarı") de buradan türer. **`--sinav vize` ile derlenen bir
+  ders için `sinav_etiketi="Vize"` yazın** — yoksa vize kitabının kapağında
+  "Final" yazar. Varsayılan "Final" olduğu için mevcut final dersleri
+  etkilenmez; `subtitle`'a ayrıca "— Vize Özeti" eklemeyin, tekrar olur.
+
 ## Renk Teması (sınırsız — `theme_engine.py`)
 
 5 sabit tema (`indigo/burgundy/forest/slate/plum`) hâlâ çalışıyor, ama

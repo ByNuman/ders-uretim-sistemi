@@ -281,6 +281,13 @@ class CoursePack:
     # Boş bırakılırsa build.py başlıktan türetilen slug'a düşer (geriye dönük uyumluluk).
     ders_klasoru: str = ""
 
+    # --- Kapaktaki sınav etiketi ---
+    # Kapak kickerinde ("Görsel Ders Notu Kitabı · <X> Özeti"), kapak istatistik
+    # kutusunda ve alt bilgide görünen sınav adı. Varsayılan "Final"dir; vize
+    # kitapları için "Vize" yazılır. LEGACY "Sınav Hazırlık" bölümünün pageband
+    # etiketi de ("<X> Tekrarı") bu değerden türetilir.
+    sinav_etiketi: str = "Final"
+
     # --- Otomatik hesaplanan istatistikler (elle yazılmaz) ---
     def chapter_count(self) -> int:
         return len(self.chapters)

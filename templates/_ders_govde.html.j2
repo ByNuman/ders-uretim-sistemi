@@ -197,7 +197,7 @@
   <div class="cover-corner bl"></div>
   <div class="cover-corner br"></div>
   <div class="cover-top">
-    <div class="cover-kicker">Görsel Ders Notu Kitabı · Final Özeti</div>
+    <div class="cover-kicker">Görsel Ders Notu Kitabı · {{ pack.sinav_etiketi }} Özeti</div>
     <div class="cover-emblem">
       <div class="ring-outer"></div>
       <div class="ring-mid"></div>
@@ -219,11 +219,11 @@
     <div class="cover-stats">
       <div class="cover-stat"><b>{{ pack.chapter_count() }}</b>Bölüm</div>
       <div class="cover-stat"><b>{{ pack.concept_count() }}</b>Anahtar Kavram</div>
-      <div class="cover-stat"><b>Final</b>Sınav Hazırlık</div>
+      <div class="cover-stat"><b>{{ pack.sinav_etiketi }}</b>Sınav Hazırlık</div>
     </div>
     <div class="cover-foot">
       <div>Ders Notu Serisi</div>
-      <div>{{ pack.chapter_count() }} Bölüm · Final Sınavı Hazırlığı</div>
+      <div>{{ pack.chapter_count() }} Bölüm · {{ pack.sinav_etiketi }} Sınavı Hazırlığı</div>
     </div>
   </div>
 </section>
@@ -422,8 +422,8 @@
    ============================================================ #}
 {% set exam_pageno = namespace(n=ctx.page_starts["exam"]) %}
 <section class="page body-page{{ ctx.pagecls }}" id="{{ ctx.prefix }}exam">
-  <div class="pageband"><div>{{ pack.title }}</div><div class="pageband-course">Final Tekrarı</div></div>
-  <div class="section-kicker">Final Tekrarı</div>
+  <div class="pageband"><div>{{ pack.title }}</div><div class="pageband-course">{{ pack.sinav_etiketi }} Tekrarı</div></div>
+  <div class="section-kicker">{{ pack.sinav_etiketi }} Tekrarı</div>
   <div class="section-title">Sınav Hazırlık</div>
   <div class="section-lede">En sık karıştırılan ayrımlar, düşünür/kavram eşleştirmesi ve hızlı soru-cevapla son tekrar.</div>
 
@@ -458,7 +458,7 @@
 {# Fazladan distinctions sayfaları (nadiren gerekir; veri kaybını önler) #}
 {% for dpage in ctx.distinctions_pages[1:] %}
 <section class="page body-page{{ ctx.pagecls }}">
-  <div class="pageband"><div>{{ pack.title }}</div><div class="pageband-course">Final Tekrarı</div></div>
+  <div class="pageband"><div>{{ pack.title }}</div><div class="pageband-course">{{ pack.sinav_etiketi }} Tekrarı</div></div>
   <div class="chcontinue"><div class="tag">Sınav Hazırlık · Devam</div><div class="cctitle">Karıştırılan Ayrımlar (devamı)</div></div>
   <div class="dist-grid">
     {% for d in dpage %}
@@ -476,7 +476,7 @@
 {# Fazladan eşleştirme tablosu sayfaları (nadiren gerekir; veri kaybını önler) #}
 {% for mpage in ctx.matchtable_pages[1:] %}
 <section class="page body-page{{ ctx.pagecls }}">
-  <div class="pageband"><div>{{ pack.title }}</div><div class="pageband-course">Final Tekrarı</div></div>
+  <div class="pageband"><div>{{ pack.title }}</div><div class="pageband-course">{{ pack.sinav_etiketi }} Tekrarı</div></div>
   <div class="chcontinue"><div class="tag">Sınav Hazırlık · Devam</div><div class="cctitle">Eşleştirme Tablosu (devamı)</div></div>
   <div class="match-table-wrap">
     <table class="matchtable">
@@ -497,7 +497,7 @@
 {% for qpage in ctx.qa_pages %}
 {% if qpage %}
 <section class="page body-page{{ ctx.pagecls }}">
-  <div class="pageband"><div>{{ pack.title }}</div><div class="pageband-course">Final Tekrarı</div></div>
+  <div class="pageband"><div>{{ pack.title }}</div><div class="pageband-course">{{ pack.sinav_etiketi }} Tekrarı</div></div>
   <div class="chcontinue"><div class="tag">Sınav Hazırlık · Devam</div><div class="cctitle">Hızlı Soru-Cevap</div></div>
   <div class="qa-grid">
     {% for qa in qpage %}
