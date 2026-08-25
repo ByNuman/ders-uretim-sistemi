@@ -235,13 +235,14 @@
 {% set toc_pageno = namespace(n=ctx.page_starts["toc"]) %}
 {% for trows in ctx.toc_pages %}
 <section class="page body-page{{ ctx.pagecls }}">
-  <div class="pageband"><div>{{ pack.title }}</div><div class="pageband-course">{{ pack.course_code if loop.first else "İçindekiler · Devam" }}</div></div>
-  {% if loop.first %}
+  <div class="pageband"><div>{{ pack.title }}</div><div class="pageband-course">{{ pack.course_code }}</div></div>
   <div class="toc-kicker">Kitap Planı</div>
   <div class="toc-title">İçindekiler</div>
+  {# İçindekiler tek sayfadır; satır çoksa lede düşer, yerini satırlara bırakır. #}
+  {% if not ctx.toc_compact %}
   <div class="toc-lede">{{ pack.subtitle }} — bölüm bölüm takip edilecek çalışma haritası.</div>
   {% endif %}
-  <div class="toc-list">
+  <div class="toc-list{{ " toc-compact" if ctx.toc_compact }}">
     {% for row in trows %}
     <a class="toc-row" href="#{{ ctx.prefix }}{{ row.anchor }}">
       <div class="toc-num{{ " alt" if row.alt }}">{{ row.num }}</div>

@@ -596,6 +596,9 @@ print(len(annots), 'link on TOC page')
 Bölüm sayısı + 2 (sözlük + test — GÜNCEL formatta cevap anahtarı ayrı bir
 outline girdisi daha eklerse de İçindekiler sayfasında hâlâ tek satır
 olarak görünür, bkz. "Test + Cevap Anahtarı" bölümü) kadar TOC linki olmalı.
+Bu linklerin **tamamı 2. fiziksel sayfadadır** — İçindekiler tek sayfa
+olduğu için linkler birden fazla sayfaya dağılmaz (bkz. "KRİTİK KURAL 4").
+`r.pages[1]` dışında bir sayfada TOC linki görürsen kural bozulmuş demektir.
 
 ### 8. Teslim et
 PDF'i kullanıcının erişebileceği çıktı konumuna kopyala ve sun.
@@ -835,8 +838,7 @@ MATCHTABLE_PER_PAGE = 11   # LEGACY
 TEST_PER_PAGE_FIRST = 7    # ilk test sayfası (bilgi çubuğu + talimat kutusu var)
 TEST_PER_PAGE = 8          # test devam sayfaları
 ANSWER_PER_PAGE = 23       # cevap anahtarı sayfası başına çözüm (20 soru -> tek sayfa)
-TOC_ROWS_FIRST = 7         # İçindekiler ilk sayfası
-TOC_ROWS_REST = 8          # İçindekiler devam sayfaları
+TOC_COMPACT_THRESHOLD = 7  # bu kadar satırı aşınca İçindekiler sıkışık kipe geçer
 OVERVIEW_PAGES = 1         # Genel Bakış TEK sayfa
 ```
 
@@ -847,25 +849,49 @@ büyük değer alındı. Tahminle değiştirmeyin — sayfa boyutu değişirse
 
 Bölme işini `paginate_capped()` yapar, düz `paginate()` değil: önce gereken
 en az sayfa sayısını bulur, sonra öğeleri **dengeli** dağıtır. Böylece 30
-kavram `12+12+6` yerine `10+10+10` olur — son sayfa yarı boş kalmaz. Tek
-istisna İçindekiler'dir (`balanced=False`): bir kitabın içindekiler sayfası
-dolu başlayıp kısa bir taşmayla biter, ortadan ikiye bölünmüş iki yarım
-sayfa yanlış görünür.
+kavram `12+12+6` yerine `10+10+10` olur — son sayfa yarı boş kalmaz.
+İçindekiler bu mekanizmayı hiç kullanmaz, çünkü asla bölünmez (bkz. aşağıdaki
+"İçindekiler TEK SAYFADIR" kuralı).
 
 Test ve Cevap Anahtarı bölümleri **2 sütunlu** düzende render edilir
 (`templates/style.css` içinde `.tq-list`/`.ans-list` → `column-count: 2`,
 `column-fill: balance`; her madde `break-inside: avoid` ile bir sütunda
 bölünmeden kalır).
 
-**İçindekiler çok sayfalı olabilir; Genel Bakış tek sayfadır.** Küçültülmüş
-punto + genişletilmiş metin alanında Genel Bakış'ın dört bloğu (hero + 6 kart
-+ çalışma akışı + sınav notu) tek sayfaya sığar (`OVERVIEW_PAGES = 1`); en
-yüklü ders olan Öğretim İlke ve Yöntemleri'nde ~%97 doluluk verir, yani
-marj dardır — Genel Bakış'a blok eklerseniz taşma denetimini mutlaka okuyun.
-İçindekiler `ctx.toc_pages` üzerinden sayfalanır. Sayfa numaraları
-`compute_page_numbers()` içinde buna göre hesaplanır — bir dersin ön
-sayfaları artık sabit 3 değil, `1 + toc_page_count(pack) + OVERVIEW_PAGES`
-tanedir.
+### KRİTİK KURAL 4: İçindekiler TEK SAYFADIR
+
+**İçindekiler ASLA ikinci bir sayfaya taşmaz** — ders kaç bölümlü olursa
+olsun, kapaktan sonra tek bir İçindekiler sayfası gelir. `toc_page_count()`
+sabit `1` döndürür ve `ctx.toc_pages` tek parçadır; "İçindekiler · Devam"
+diye bir sayfa artık ÜRETİLMEZ.
+
+Sığdırma işini sayfa bölme değil, **CSS sıkışık kipi** yapar. Satır sayısı
+(`bölüm sayısı + 2`) `TOC_COMPACT_THRESHOLD`'u aşarsa şablon `toc-list`'e
+`toc-compact` sınıfını ekler ve şunlar olur:
+
+- `toc-lede` (alt başlık cümlesi) gizlenir — tek başına ~10mm kazandırır
+- satır dolgusu 3.79mm → 1.85mm, numara dairesi 7.74mm → 6.25mm küçülür
+- **alt başlık tek satıra kırpılır** (`white-space:nowrap` + ellipsis)
+
+Son madde kritiktir: eskiden uzun alt başlık iki-üç satıra sarıp satırı
+30.8mm'ye çıkarabiliyordu; kırpma sayesinde satır yüksekliği artık sabittir
+(~11mm) ve taşma yapısal olarak imkânsızdır. Ölçüm: satırlara ~190mm yer
+kalıyor, yani **13 satıra** kadar güvenli. En yüklü ders 9 bölüm = 11
+satırdır (Kelâm Tarihi), pay vardır. Eşiğin altındaki dersler eski ferah
+görünümü (lede + geniş satır) aynen korur.
+
+Bir ders 12 bölümü aşarsa bu kuralın sınırına gelinir — o noktada satırı
+daha da sıkıştırmak yerine dersi bölmeyi değerlendirin.
+
+**Genel Bakış da tek sayfadır.** Küçültülmüş punto + genişletilmiş metin
+alanında Genel Bakış'ın dört bloğu (hero + 6 kart + çalışma akışı + sınav
+notu) tek sayfaya sığar (`OVERVIEW_PAGES = 1`); en yüklü ders olan Öğretim
+İlke ve Yöntemleri'nde ~%97 doluluk verir, yani marj dardır — Genel Bakış'a
+blok eklerseniz taşma denetimini mutlaka okuyun.
+
+Sayfa numaraları `compute_page_numbers()` içinde buna göre hesaplanır; bir
+dersin ön sayfaları `1 + toc_page_count(pack) + OVERVIEW_PAGES` = **her zaman
+3** tanedir (kapak + içindekiler + genel bakış).
 
 ## Birleşik Kitap (`build_kitap.py`)
 

@@ -315,6 +315,21 @@ em { font-style: italic; }
 .toc-sub { font-size: 6.99pt; color: var(--ink-faint); margin-top: 0.66mm; }
 .toc-page { flex: 0 0 auto; font-size: 7.57pt; font-weight:700; color: var(--accent); background: var(--accent-tint); padding: 1.32mm 2.47mm; border-radius: 4.94px; }
 
+/* İçindekiler TEK SAYFADIR (bkz. CLAUDE.md). Satır sayısı build.py'deki
+   TOC_COMPACT_THRESHOLD'u aşınca şablon .toc-compact ekler ve satırlar
+   sıkışır. Kritik olan alt başlığın TEK satıra kırpılmasıdır: satır
+   yüksekliği böylece sabitlenir, uzun alt başlıklı dersler taşıramaz. */
+.toc-list.toc-compact { margin-top: 4.11mm; }
+.toc-compact .toc-row { padding: 1.85mm 2.47mm; gap: 3.29mm; }
+.toc-compact .toc-num { width: 6.25mm; height: 6.25mm; font-size: 6.99pt; }
+.toc-compact .toc-heading { font-size: 8.23pt; }
+.toc-compact .toc-sub {
+  font-size: 6.58pt; margin-top: 0.33mm;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.toc-compact .toc-body { min-width: 0; }   /* flex öğesi kırpılabilsin */
+.toc-compact .toc-page { font-size: 7.07pt; padding: 0.99mm 2.06mm; }
+
 /* ---------- Genel Bakış ---------- */
 .ov-hero {
   background: linear-gradient(125deg, var(--accent-dark), var(--accent) 88%);

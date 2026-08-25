@@ -354,11 +354,10 @@ def toc_rows(pack, page_starts: dict) -> list[dict]:
 
 
 def toc_page_count(pack) -> int:
-    """İçindekiler kaç fiziksel sayfa tutar? page_starts'tan ÖNCE bilinmeli,
-    o yüzden sadece satır SAYISINA bakar (satır içeriğine değil)."""
-    n = len(pack.chapters) + 2
-    return len(paginate_capped(list(range(n)), TOC_ROWS_FIRST, TOC_ROWS_REST,
-                               balanced=False))
+    """İçindekiler HER ZAMAN TEK SAYFADIR (proje kuralı, bkz. CLAUDE.md).
+    Satır sayısı ne olursa olsun bölünmez; sığdırma işini CSS'teki
+    `.toc-compact` kipi yapar (bkz. TOC_COMPACT_THRESHOLD)."""
+    return 1
 
 
 def course_context(pack, offset: int = 0, prefix: str = "", pagecls: str = "") -> dict:
@@ -368,8 +367,9 @@ def course_context(pack, offset: int = 0, prefix: str = "", pagecls: str = "") -
     page_starts = compute_page_numbers(pack, offset)
     return {
         "page_starts": page_starts,
-        "toc_pages": paginate_capped(toc_rows(pack, page_starts),
-                                     TOC_ROWS_FIRST, TOC_ROWS_REST, balanced=False),
+        # İçindekiler bölünmez -- tek sayfa, tek parça (bkz. toc_page_count).
+        "toc_pages": [toc_rows(pack, page_starts)],
+        "toc_compact": len(pack.chapters) + 2 > TOC_COMPACT_THRESHOLD,
         "glossary_pages": paginate_capped(pack.glossary, GLOSSARY_PER_PAGE),
         "qa_pages": paginate_capped(pack.qa_items, QA_PER_PAGE),
         "distinctions_pages": paginate_capped(pack.distinctions, DISTINCTIONS_PER_PAGE),
@@ -394,13 +394,16 @@ TEST_PER_PAGE_FIRST = 7    # ilk test sayfasında bilgi çubuğu + talimat kutus
 TEST_PER_PAGE = 8          # devam sayfalarında (2 sütunlu düzen, 5 seçenekli MCQ)
 ANSWER_PER_PAGE = 23       # sayfa başına çözümlü cevap (2 sütunlu düzen)
 
-# İçindekiler satırı, 137mm'lik metin genişliğinde alt başlığı iki satıra
-# sardığı için A4'tekinden (~18mm) yüksek (~25mm). İlk sayfada ayrıca
-# kicker+başlık+lede var, bu yüzden kapasitesi ayrı.
-# En yüksek satır 30.8mm ölçüldü (uzun alt başlıklı ders); ilk sayfada
-# 160mm, devam sayfasında 202mm boş yer var -> 5 ve 6 satır her derste güvenli.
-TOC_ROWS_FIRST = 7
-TOC_ROWS_REST = 8
+# İÇİNDEKİLER HER ZAMAN TEK SAYFADIR (proje kuralı, bkz. CLAUDE.md).
+# Eskiden TOC_ROWS_FIRST/REST ile sayfalara bölünüyordu; bu sabitler kalktı.
+# Satır sayısı bu eşiği aşınca şablon `.toc-compact` sınıfını ekler: lede
+# gizlenir, satır dolgusu ve numara dairesi küçülür, alt başlık TEK satıra
+# kırpılır (böylece satır yüksekliği sabitlenir). Eşiğin altındaki dersler
+# eski ferah görünümü aynen korur.
+# Ölçüm: normal satır ~16mm (uzun alt başlıkta 30.8mm'ye çıkabiliyordu),
+# compact satır ~11mm; sayfada satırlara ~190mm kalıyor -> 13 satır güvenli.
+# En yüklü ders 9 bölüm = 11 satır (kelam_tarihi), yani pay var.
+TOC_COMPACT_THRESHOLD = 7
 
 # Genel Bakış 175x250mm'de tek sayfaya sığmıyor (ölçüldü: 214-264mm / 215mm).
 # SABİT olarak ikiye bölünür: 1. sayfa hero + 6 kart, 2. sayfa akış + not.
