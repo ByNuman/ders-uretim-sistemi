@@ -114,6 +114,11 @@ def collect_courses(book, offset: int = 0, css: str = "") -> list[dict]:
     for i, module_name in enumerate(book.course_modules, start=1):
         pack = B.DONEM.import_ders(module_name).get_pack()
 
+        # Harita kutuları: kitap da tek ders PDF'iyle AYNI önbelleği kullanır
+        # (görsel üretilmez, yalnızca bağlanır). Eksikse o dersin sayfası yer
+        # tutucuyla basılır ve uyarı verilir -- kitap derlemesi durmaz.
+        B.harita_raporu(pack, B.haritalari_coz(pack))
+
         # Tema kapsamı: theme_color veren dersler kendi .ders-N sınıfını alır;
         # LEGACY dersler (theme_color'ı olmayan) style.css'teki sabit
         # .theme-XXXX sınıfını doğrudan .page üzerinde kullanır.

@@ -61,3 +61,8 @@ venv/
 _kapak_onizleme.js
 .DS_Store
 Thumbs.db
+
+# Natural Earth harita verisi: kamu mali (CC0), 3 MB, koddan uretilemez ama
+# her an yeniden indirilebilir -- depoda tutulmaz.
+#     python tools/harita.py --veri-indir
+assets/harita/*.geojson

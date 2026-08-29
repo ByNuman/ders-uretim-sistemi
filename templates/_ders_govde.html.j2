@@ -143,6 +143,45 @@
 {% endfor %}
 {% endmacro %}
 
+{# Harita kutusu + yanındaki metin sütunu (ChapterPage.add_map).
+   Görsel build.py tarafından çözülür: m.gorsel_src boşsa görsel henüz
+   üretilmemiştir ve sayfa BOZULMAZ -- yerine ölçüsü aynı bir yer tutucu
+   basılır (böylece taşma denetimi yine gerçeği ölçer). #}
+{% macro render_geomap(m) %}
+<figure class="geomap">
+  <figcaption class="geomap-cap">{{ m.label }}</figcaption>
+  <div class="geomap-frame" style="aspect-ratio: {{ m.gorsel_oran }};">
+    {% if m.svg %}
+    {{ m.svg | safe }}
+    {% else %}
+    <div class="geomap-missing">
+      <b>Harita çizilemedi</b>
+      <span>{{ m.region }}</span>
+      <span class="geomap-file">python tools/harita.py --veri-indir</span>
+    </div>
+    {% endif %}
+  </div>
+  {% if m.caption %}<div class="geomap-note">{{ m.caption | safe }}</div>{% endif %}
+  {% if m.source %}<div class="geomap-source">{{ m.source }}</div>{% endif %}
+</figure>
+{% endmacro %}
+
+{% macro render_mapsplit(m, yan_items, taraf) %}
+{% if taraf == 'tam' %}
+<div class="mapfull">
+  {{ render_geomap(m) }}
+  {% for kind, data in yan_items %}{{ render_item(kind, data) }}{% endfor %}
+</div>
+{% else %}
+<div class="mapsplit {{ 'map-left' if taraf == 'sol' else 'map-right' }}">
+  <div class="mapsplit-text">
+    {% for kind, data in yan_items %}{{ render_item(kind, data) }}{% endfor %}
+  </div>
+  <div class="mapsplit-figure">{{ render_geomap(m) }}</div>
+</div>
+{% endif %}
+{% endmacro %}
+
 {% macro render_summary(text) %}
 <div class="chsummary"><b>Bölüm Özeti</b>{{ text | safe }}</div>
 {% endmacro %}
@@ -181,6 +220,7 @@
   {% elif kind == "table" %}{{ render_table(data) }}
   {% elif kind == "ayat" %}{{ render_ayat(data[0], data[1]) }}
   {% elif kind == "info_cards" %}{{ render_info_cards(data[0], data[1]) }}
+  {% elif kind == "mapsplit" %}{{ render_mapsplit(data[0], data[1], data[2]) }}
   {% elif kind == "summary" %}{{ render_summary(data) }}
   {% endif %}
 {% endmacro %}

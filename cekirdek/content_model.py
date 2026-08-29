@@ -119,12 +119,100 @@ class Ayah:
 
 
 @dataclass
+class Place:
+    """Haritadaki tek bir işaret: şehir noktası ya da komşu bölge etiketi.
+
+    Koordinat GERÇEKTİR ve doğrulanabilir olmalıdır (WGS84, ondalık derece).
+    GeoJSON düzeniyle uyum için sıra `lon, lat`'tır — enlem/boylamı ters
+    yazmak haritayı sessizce bozar, yazarken dikkat edin.
+    """
+    name: str
+    lon: float                 # doğu +, batı -
+    lat: float                 # kuzey +, güney -
+    sag: bool = True           # etiket noktanın sağında mı yazılsın (kalabalıkta False yapın)
+
+
+@dataclass
+class MapBox:
+    """Bölümün yanında duran coğrafi harita kutusu.
+
+    Harita BUILD SIRASINDA, gerçek kartografik veriden çizilir
+    (`cekirdek/harita_cizim.py`): kıyı/göl/nehir katmanları Natural Earth
+    1:50m (kamu malı), şehirler aşağıdaki gerçek koordinatlar. Üretim
+    ücretsiz ve deterministiktir; bir görüntü modeline sorulmaz.
+
+    Alanlar:
+        region      Kutunun tanımladığı devlet/bölge adı (Türkçe)
+        bbox        (batı, güney, doğu, kuzey) ondalık derece — haritanın çerçevesi
+        cities      list[Place] — kırmızı nokta + etiket
+        neighbors   list[Place] — gri metin etiketi (nokta yok); "\\n" ile satır böl
+        territory   list[list[(lon, lat)]] — YAKLAŞIK alan poligon(lar)ı
+
+    `territory` DÜRÜSTLÜK MESELESİDİR: ortaçağ siyasi sınırları için serbest
+    ve yetkeli bir veri kümesi yoktur (Natural Earth bugünün sınırlarıdır,
+    CShapes 1886'da başlar, Euratlas lisanslıdır). Poligon elle, kaba hatlarla
+    yazılır ve kutuda HER ZAMAN "yaklaşık" ibaresiyle görünür (`source`).
+    Sahte bir atlas künyesi (sayfa numaralı uydurma atıf) YAZMAYIN.
+
+    ÖNEMLİ: cities/neighbors listelerine yalnızca ham kaynakta GEÇEN yer
+    adlarını yazın. Harita, metinde olmayan bir şehri göstermemelidir.
+    Bütün etiketler TÜRKÇE yazılır ("Gürgenç", "Semerkant", "Kara-Hıtaylar").
+    """
+    region: str
+    bbox: tuple = ()                                          # (batı, güney, doğu, kuzey)
+    cities: list = field(default_factory=list)                # list[Place]
+    neighbors: list = field(default_factory=list)             # list[Place]
+    territory: list = field(default_factory=list)             # list[list[(lon, lat)]]
+    label: str = "Coğrafi konum"                              # kutu üstündeki başlık etiketi
+    caption: str = ""                                         # kutunun altındaki açıklama
+    source: str = ("Sınırlar yaklaşıktır (temsilî). Coğrafya: Natural Earth "
+                   "1:50m, kamu malı.")
+
+    # --- Hazır Commons haritası (opsiyonel) ---
+    # Doluysa harita SIFIRDAN ÇİZİLMEZ: Wikimedia Commons'tan alınmış
+    # profesyonel bir tarihî harita derse uyarlanır (lejant Türkçeye, renkler
+    # temaya). O zaman bbox/cities/territory KULLANILMAZ ve `source` alanı
+    # `CommonsKaynak.atif` ile EZİLİR -- CC BY-SA atfı zorunludur, bkz.
+    # cekirdek/harita_commons.py ve assets/harita/commons/LISANS.md.
+    commons: object = None                                    # CommonsKaynak | None
+
+    # --- build.py tarafından doldurulur (elle yazılmaz) ---
+    svg: str = ""             # çizilmiş harita; boşsa veri eksiktir (yer tutucu basılır)
+    gorsel_oran: str = "4 / 3"
+
+
+@dataclass
 class BulletBlock:
     """Numaralı alt-başlık altındaki düz anlatım: başlık + madde listesi."""
     number: int
     title: str
     bullets: list[str]           # her biri düz metin; "**vurgu**" markdown-benzeri kalın için kullanılabilir
     subtitle: Optional[str] = None
+
+
+def _item_kind(obj) -> str:
+    """Bir içerik nesnesini şablonun tanıdığı item tipine çevirir.
+
+    `ChapterPage.add_map(..., yan=[...])` için gerekir: orada bloklar
+    `.add_block()` gibi tip adıyla değil, doğrudan nesne olarak verilir.
+    """
+    if isinstance(obj, BulletBlock):
+        return "block"
+    if isinstance(obj, Callout):
+        return "callout"
+    if isinstance(obj, ComparisonTable):
+        return "table"
+    if isinstance(obj, FlowDiagram):
+        return "flow"
+    if isinstance(obj, Person):
+        return "person"
+    if isinstance(obj, list) and obj and all(isinstance(x, KeyTerm) for x in obj):
+        return "terms"
+    raise TypeError(
+        f"add_map(yan=[...]) bu tipi tanımıyor: {type(obj).__name__}. "
+        "Desteklenenler: BulletBlock, Callout, ComparisonTable, FlowDiagram, "
+        "Person, list[KeyTerm]."
+    )
 
 
 @dataclass
@@ -160,6 +248,25 @@ class ChapterPage:
         self.items.append(("info_cards", (title, cards))); return self
     def add_summary(self, text: str):
         self.items.append(("summary", text)); return self
+
+    def add_map(self, harita: "MapBox", yan: list | None = None, taraf: str = "sag"):
+        """Harita kutusunu, YANINDAKİ metin bloklarıyla birlikte iki sütuna koyar.
+
+            .add_map(MapBox(...), yan=[BulletBlock(1, "Coğrafi Bağlam", [...])])
+
+        `yan` listesindeki nesneler metin sütununda, normal sayfa akışındaki
+        gibi render edilir (BulletBlock, Callout, ComparisonTable, KeyTerm
+        listesi, Person, FlowDiagram desteklenir). `taraf` "sag" ya da "sol":
+        haritanın hangi sütuna düşeceğini belirler.
+
+        Bu çağrı TEK bir item üretir; ölçüm/dengeleme araçları (tools/olcum.py,
+        tools/dengele.py) onu bölünemez tek blok olarak görür.
+        """
+        if taraf not in ("sag", "sol", "tam"):
+            raise ValueError(f"taraf 'sag', 'sol' veya 'tam' olmalı, verilen: {taraf!r}")
+        yan_items = [(_item_kind(o), o) for o in (yan or [])]
+        self.items.append(("mapsplit", (harita, yan_items, taraf)))
+        return self
 
 
 @dataclass
