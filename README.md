@@ -2,11 +2,15 @@
 
 [![build](https://github.com/ByNuman/ders-uretim-sistemi/actions/workflows/build.yml/badge.svg)](https://github.com/ByNuman/ders-uretim-sistemi/actions/workflows/build.yml) [![license: GPL v3](https://img.shields.io/badge/license-GPLv3-blue.svg)](LICENSE)
 
-Üniversite derslerinin ham metin özetlerini, baskıya hazır **görsel ders notu
-kitabı** PDF'ine çeviren bir üretim hattı. Çıktı; kapak, içindekiler, genel
-bakış, numaralı bölümler (terim kutuları, kişi kartları, karşılaştırma
-tabloları, akış şemaları, vurgu kutuları), kavramlar sözlüğü ve 20 soruluk
-çoktan seçmeli test + çözümlü cevap anahtarından oluşur.
+Üniversite derslerinin ham metin özetlerini **A4 görsel ders notu kitabı**
+PDF'ine çeviren bir üretim hattı. Çıktı; kapak, içindekiler, genel bakış,
+numaralı bölümler (terim kutuları, kişi kartları, karşılaştırma tabloları,
+akış şemaları, vurgu kutuları), kavramlar sözlüğü ve 20 soruluk çoktan
+seçmeli test + çözümlü cevap anahtarından oluşur.
+
+PDF doğrudan **fotokopiyle çoğaltılmak** üzere hazırlanır: dar kenarlı A4,
+RGB, taşma payı yok. Matbaaya iş göndereceğiniz gün `--cmyk` bayrağı aynı
+dosyayı PDF/X-4 (DeviceCMYK) standardına çevirir.
 
 Ders içeriği HTML/CSS'te değil, **Python veri modelinde** yazılır
 (`cekirdek/content_model.py`). Tasarım tek bir yerde durur (`templates/`), içerik ise
@@ -90,9 +94,9 @@ için doğrulama ve sık karşılaşılan hatalar.
 |---|---|---|
 | Python | 3.10+ | Evet |
 | Node.js | 18+ | Evet (PDF render'ı Chromium yapar) |
-| Ghostscript | 9+ | Hayır — yoksa PDF RGB kalır, build durmaz |
+| Ghostscript | 9+ | Hayır — yalnızca `--cmyk` (matbaa) için gerekir |
 
-Kurulumu doğrulamak için:
+Matbaa kipini kullanacaksanız kurulumu doğrulamak için:
 
 ```bash
 python cekirdek/pdfx.py        # Ghostscript + ICC profili teşhisi
