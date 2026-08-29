@@ -78,11 +78,8 @@ def get_pack() -> CoursePack:
             FlowStep("src/*.py", "CoursePack"),
             FlowStep("HTML", "Jinja şablonu"),
             FlowStep("PDF", "Chromium"),
-            FlowStep("CMYK", "Ghostscript"),
+            FlowStep("CMYK", "Ghostscript (--cmyk)"),
         ], caption="Üretim hattının beş adımı. Her adım bir öncekinin çıktısını girdi alır."))
-    )
-    ch1.pages.append(
-        ChapterPage()
         .add_table(ComparisonTable(
             "Üç klasörün rolü — birbirinin yerine geçmez",
             ["Klasör", "Rolü", "Kim yazar?"],
@@ -97,6 +94,9 @@ def get_pack() -> CoursePack:
             "<b>özetlenmiş_dersler/</b> klasörü build.py'nin ÇIKTISI değil, "
             "<b>GİRDİSİDİR</b>. Üretilen PDF'ler her zaman "
             "<b>gorsel_ders_notlari/</b> altına düşer."))
+    )
+    ch1.pages.append(
+        ChapterPage()
         .add_summary(
             "Sistem, içerik ile tasarımı birbirinden ayırır. Siz yalnızca içeriği "
             "yazarsınız; sayfa düzeni, tipografi, renk ve baskı geometrisi sizin "
@@ -135,9 +135,6 @@ def get_pack() -> CoursePack:
             "Her <b>AnswerItem.correct</b> değeri, o sorunun seçenek anahtarlarından biri olmalıdır.",
             "Numaralandırma 1'den başlar ve boşluksuz artar; <b>validate()</b> bunu denetler.",
         ]))
-    )
-    ch2.pages.append(
-        ChapterPage()
         .add_table(ComparisonTable(
             "Sayfaya eklenebilecek bloklar",
             ["Metot", "Ne üretir"],
@@ -149,6 +146,9 @@ def get_pack() -> CoursePack:
                 ["<b>.add_flow()</b>", "Yatay oklu süreç şeması"],
                 ["<b>.add_summary()</b>", "Bölüm sonu özet kutusu"],
             ]))
+    )
+    ch2.pages.append(
+        ChapterPage()
         .add_callout(Callout(
             "caution", "Aşırı yüklü sayfa",
             "Tek bir sayfaya terim kutusu + iki büyük tablo + callout + özet "
@@ -172,10 +172,10 @@ def get_pack() -> CoursePack:
                                       "fiziksel sayfa sınırıyla karşılaştıran otomatik kontrol."),
             KeyTerm("dengele.py", "Blok yüksekliklerini ölçüp sayfa bölünmelerini "
                                   "taşmayacak biçimde yeniden dağıtan araç."),
-            KeyTerm("Bleed", "Kesim payı. Zemin renginin sayfa kenarında beyaz "
-                             "çizgi bırakmaması için her kenardan 3 mm taşırılır."),
-            KeyTerm("PDF/X-4", "Matbaanın beklediği baskı standardı. Çıktı otomatik "
-                               "olarak RGB'den CMYK'ya çevrilir."),
+            KeyTerm("Bleed", "Kesim payı. Yalnızca matbaada kesilecek işlerde "
+                             "gerekir; fotokopi kipinde 0'dır."),
+            KeyTerm("PDF/X-4", "Matbaanın beklediği baskı standardı. Çıktı "
+                               "varsayılan olarak RGB'dir; --cmyk ile çevrilir."),
         ],
     )
     ch3.pages.append(
@@ -191,20 +191,21 @@ def get_pack() -> CoursePack:
             "Baskı geometrisi",
             ["Ölçü", "Değer"],
             [
-                ["Bitmiş (trim) ölçü", "175 × 250 mm"],
-                ["Taşma payı (bleed)", "3 mm — render 181 × 256 mm"],
-                ["İç / dış kenar", "14 mm / 9 mm (ayna simetrik)"],
-                ["Gövde punto", "7,9 pt"],
+                ["Sayfa ölçüsü", "A4 — 210 × 297 mm"],
+                ["Taşma payı (bleed)", "0 mm — fotokopide kesim yok"],
+                ["Üst / alt kenar", "12 mm / 15 mm"],
+                ["Sol / sağ kenar", "12 mm / 12 mm (dar)"],
+                ["Gövde punto", "9,6 pt"],
             ]))
-    )
-    ch3.pages.append(
-        ChapterPage()
         .add_callout(Callout(
             "insight", "Taşma neden bu kadar önemli?",
             "Tarayıcı, sayfa sınıra yaklaştığında elemanları sessizce küçültüp "
             "taşmayı gizleyebiliyordu. Tasarımda <b>flex-shrink: 0</b> zorunlu "
             "kılınarak bu engellendi: artık taşma her zaman <b>gerçek</b> ve "
             "build çıktısında <b>görünür</b>."))
+    )
+    ch3.pages.append(
+        ChapterPage()
         .add_flow(FlowDiagram([
             FlowStep("Derle", "build.py"),
             FlowStep("Uyarıyı oku", "taşma var mı?"),
@@ -248,9 +249,9 @@ def get_pack() -> CoursePack:
         Concept("Taşma denetimi", "Sayfa sınırının aşılıp aşılmadığı.",
                 "Render yüksekliği ölçülür.", 3),
         Concept("Bleed", "Kesim payı.",
-                "Her kenardan 3 mm.", 3),
+                "Fotokopi kipinde 0 mm.", 3),
         Concept("PDF/X-4", "Baskı öncesi PDF standardı.",
-                "Ghostscript ile CMYK'ya çevrilir.", 3),
+                "--cmyk verilirse üretilir.", 3),
     ]
 
     # =====================================================================
@@ -269,7 +270,7 @@ def get_pack() -> CoursePack:
             "A": "Uyarıyı görmezden gelmek", "B": "Punto ve boşlukları küçültmek",
             "C": "tools/dengele.py çalıştırmak", "D": "Sayfa boyutunu büyütmek",
             "E": "İçeriği silmek"}),
-        TestQuestion(5, "Bitmiş (trim) sayfa ölçüsü nedir?", {
+        TestQuestion(5, "Üretilen sayfanın ölçüsü nedir?", {
             "A": "A4 (210 × 297 mm)", "B": "175 × 250 mm", "C": "181 × 256 mm",
             "D": "148 × 210 mm", "E": "160 × 240 mm"}),
         TestQuestion(6, "Bir dersin tema rengi nasıl belirlenir?", {
@@ -295,8 +296,8 @@ def get_pack() -> CoursePack:
         AnswerItem(4, "C", "<b>tools/dengele.py</b> blokları ölçüp sayfa bölünmelerini "
                            "yeniden dağıtır. Punto veya boşluk küçültmek yasaktır: "
                            "tasarım sistemi sabit kalmalıdır."),
-        AnswerItem(5, "B", "<b>175 × 250 mm</b> bitmiş ölçüdür. 181 × 256 mm ise "
-                           "3 mm bleed dahil render ölçüsüdür."),
+        AnswerItem(5, "A", "<b>A4 (210 × 297 mm).</b> Çıktı fotokopiyle çoğaltıldığı "
+                           "için kesim payı (bleed) yoktur; render ölçüsü de A4'tür."),
         AnswerItem(6, "B", "<b>theme_color</b> alanına yazılan tek bir hex renkten "
                            "theme_engine.py bütün tonları türetir."),
         AnswerItem(7, "B", "<b>Girdisidir.</b> Ham kaynaktan çıkarılan yazılı özet burada "
@@ -337,8 +338,8 @@ def get_pack() -> CoursePack:
                                                 "tüm tonlar üretilir."},
             {"title": "Taşma yakalanır", "text": "Sayfaya sığmayan içerik sessizce "
                                                  "kesilmez, build sırasında bildirilir."},
-            {"title": "Baskıya hazırdır", "text": "Çıktı otomatik olarak PDF/X-4 CMYK'ya "
-                                                  "çevrilir, kesim kutuları yazılır."},
+            {"title": "Baskıya hazırdır", "text": "A4 RGB çıktı doğrudan fotokopiye "
+                                                  "gider; matbaa için --cmyk yeter."},
             {"title": "Yeniden üretilebilir", "text": "PDF kaybolsa da modül dursun; "
                                                       "tek komutla geri gelir."},
         ],

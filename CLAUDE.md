@@ -24,7 +24,7 @@ Kural:
   kullanıcıya sor: "Bu dersi birleşik kitaba da eklememi ister misiniz?"
 - Yeni bir ders üretirken sayfa boyutu (trim) ayarı olarak varsayılan
   tekil-kitap trim boyutunu kullan, birleşik kitabın trim boyutunu
-  (17,5×25cm) DEĞİL — bu iki değer birbirinden bağımsız olmalı ve
+  DEĞİL — bu iki değer birbirinden bağımsız olmalı ve
   build.py'de ayrı ayrı config/parametre olarak tutulmalı, tek bir
   global sabitle yönetilmemeli.
 
@@ -234,29 +234,38 @@ vardır: `python build_kitap.py --sinif X --donem Y --sinav Z`
 (bkz. aşağıdaki "Birleşik Kitap" bölümü). Birleştirme HER ZAMAN tek bir
 sınav dönemi içindedir; dönemler asla tek ciltte karışmaz.
 
-## Sayfa boyutu, taşma payı ve kenar boşlukları (BASKI GEOMETRİSİ)
+## Sayfa boyutu ve kenar boşlukları (SAYFA GEOMETRİSİ)
 
-Çıktı **A4 DEĞİLDİR**. Kitap kapağıyla eşleşen ölçü:
+Çıktı **A4'tür ve FOTOKOPİ içindir** — matbaa/kesim/ciltleme yoktur
+(2026 Ağustos'unda kullanıcı matbaa fikrinden vazgeçti; önceki 175 × 250 mm
++ 3 mm bleed kitap ölçüsü terk edildi):
 
 | | |
 |---|---|
-| Bitmiş (trim) ölçü | **175 × 250 mm** |
-| Taşma payı (bleed) | **3 mm** (her kenar) — render/MediaBox 181 × 256 mm |
-| Üst / alt kenar | 11 mm / 19 mm (alt, sayfa numarası payı dahil) |
-| İç (sırt/gutter) / dış kenar | 14 mm / 9 mm — **ayna simetrik** |
-| Metin alanı | 152 × 220 mm |
-| Gövde punto | **7,9 pt** (eski 9,6 pt'nin 0,8229 katı) |
+| Sayfa ölçüsü | **210 × 297 mm (A4 dikey)** |
+| Taşma payı (bleed) | **0 mm — YOK.** Kesim olmadığı için render/MediaBox = A4 |
+| Üst / alt kenar | 12 mm / 15 mm (alt, sayfa numarası payı dahil) |
+| İç / dış kenar | 12 mm / 12 mm — **simetrik** (tek yüz fotokopi) |
+| Metin alanı | **186 × 270 mm** |
+| Gövde punto | **9,6 pt** (tasarımın orijinal A4 ölçeği) |
 
-Ayna simetri: TEK sayfalar (1, 3, 5…) sağ yapraktır, sırtı SOLDADIR; çift
-sayfalarda tersi. PUR Amerikan cilt için iç kenar dıştan 5 mm geniştir.
-(DİKKAT: 14 mm sırt payı PUR cilt için sıkıdır — matbaa 15-18 mm isterse
-`MARGIN_INNER_MM`'i artırıp `tools/kalibre.py` + `tools/dengele.py --hepsi`
-zincirini tekrar çalıştırın.)
+Kenarlar bilinçli olarak DAR. Daha da daraltmayın: fotokopi makineleri ve
+ofis yazıcıları kağıdın kenarından **~5 mm** basamaz, 10 mm'nin altına
+inmek kenardaki içeriği kırpma riskine sokar.
 
-`templates/style.css` içindeki tüm tipografi/boşluk/çizgi ölçüleri 2026
-Ağustos'unda tek seferde **0,8229 ile ölçeklendi** (gövde 9,6 → 7,9 pt);
-kapak sayfası ve sayfa geometrisi bu ölçeklemenin dışında bırakıldı. Yeni
-bir bileşen eklerken ölçüleri bu skalaya uydurun.
+**Fotokopi kipinin iki sonucu:**
+- **Bleed 0'dır.** Kapak gradyanı ve `--paper` zemin tonu hâlâ tam sayfayı
+  kaplar, ama fotokopide dış ~5 mm'de ince beyaz bir çerçeve kalır. Bu
+  makinenin fiziksel sınırıdır, bir hata değildir.
+- **Ayna simetri etkisizdir** (iç = dış = 12 mm). Arkalı-önlü çekip
+  spiral/zımba yapacaksanız `PageGeometry.mg_inner`'ı 18 mm'ye çıkarmanız
+  yeterli; `odd_page_gutter` hangi tarafın sırt olduğunu zaten söyler.
+
+`templates/style.css` içindeki tipografi/boşluk/çizgi ölçüleri bir dönem
+0,8229 ile küçültülmüştü (175 × 250 mm sayfa için, gövde 9,6 → 7,9 pt);
+A4'e dönülürken bu küçültme **birebir geri alındı** (209 satır, ×1,2152) —
+yani tasarım yeniden çizildiği orijinal A4 ölçeğindedir. Yeni bir bileşen
+eklerken ölçüleri bu skalaya uydurun, küçültülmüş değerlere değil.
 
 **İKİ AYRI CONFIG vardır ve birbirinden bağımsızdır** (bkz. en üstteki
 KRİTİK KURAL). `build.py`'nin başındaki `PageGeometry` dataclass'ından iki
@@ -264,8 +273,8 @@ KRİTİK KURAL). `build.py`'nin başındaki `PageGeometry` dataclass'ından iki
 
 | Config | Kullanan | Şu anki trim |
 |---|---|---|
-| `SINGLE_GEOMETRY` | `python build.py <slug> --sinif X --donem Y --sinav Z` (tekil ders) | 175 × 250 mm |
-| `BOOK_GEOMETRY` | `python build_kitap.py --sinif X --donem Y --sinav Z` (birleşik kitap) | 175 × 250 mm |
+| `SINGLE_GEOMETRY` | `python build.py <slug> --sinif X --donem Y --sinav Z` (tekil ders) | 210 × 297 mm |
+| `BOOK_GEOMETRY` | `python build_kitap.py --sinif X --donem Y --sinav Z` (birleşik kitap) | 210 × 297 mm |
 
 Değerleri şu an aynıdır ama TEK BİR GLOBAL SABİT DEĞİLDİR: birini
 değiştirmek diğerini etkilemez. `page_geometry_css(geo)` verilen config'ten
@@ -288,19 +297,32 @@ python tools/dengele.py --hepsi --sinif X --donem Y --sinav Z   # sayfaları yen
 Sırtın hangi tarafta olduğunu değiştirmek için tek satır yeter:
 `ODD_PAGE_GUTTER = "right"` (sağdan sola açılan cilt için).
 
-Bleed GEREKLİDİR: hem kapak gradyanı hem gövde sayfalarının `--paper` zemin
-tonu tam sayfayı kaplar (full-bleed). `pdfx.set_print_boxes()` PDF'e
-CropBox/BleedBox = 181×256 mm, **TrimBox = 175×250 mm** yazar; matbaa kesim
-yerini TrimBox'tan okur. (ArtBox bilerek yazılmaz — PDF/X bir sayfada
-TrimBox VEYA ArtBox ister, ikisini birden değil.)
+Bleed 0 olduğu için `pdfx.set_print_boxes()` artık CropBox/BleedBox/TrimBox'ın
+üçünü de aynı yere, **210×297 mm**'ye yazar. (ArtBox bilerek yazılmaz — PDF/X
+bir sayfada TrimBox VEYA ArtBox ister, ikisini birden değil.) Chromium levhayı
+kendi piksel yuvarlamasıyla bir kenarda ~0,1 mm eksik üretebilir; `pdfx.py`
+yarım milimetreye kadar sapmayı sessizce levhaya sığdırır, uyarı yalnızca
+gerçek bir eksiklikte çıkar.
 
-## Otomatik PDF/X-4 CMYK dönüşümü
+## PDF/X-4 CMYK dönüşümü — VARSAYILAN OLARAK KAPALI
 
-`build.py` ve `build_kitap.py`, PDF'i üretip yer imlerini ekledikten hemen
-sonra `pdfx.convert_or_warn()` çağırır: çıktı Ghostscript ile **RGB'den
-PDF/X-4 (DeviceCMYK)**'ya çevrilir. Ara RGB dosya geçici klasörde kalır ve
-silinir — kullanıcının elindeki
-`<D>/gorsel_ders_notlari/<DERS ADI>/<slug>.pdf` doğrudan CMYK'dır.
+**Çıktı artık RGB'dir.** Fotokopi makineleri ve ofis yazıcıları renk
+dönüşümünü kendi sürücülerinde yapar; dosyayı önceden CMYK'ya çevirmek
+renkleri donuklaştırır, boyutu büyütür ve her derlemeye Ghostscript'in
+dakikalarını ekler. `finalize_for_print()` bu yüzden sayfa kutularını HER
+ZAMAN yazar ama `pdfx.convert_or_warn()`'u yalnızca CMYK istendiğinde çağırır.
+
+Matbaaya iş göndereceğiniz gün tek bayrak yeter — her iki build de aynı
+bayrağı `build.add_cikti_args()` üzerinden paylaşır:
+
+```bash
+python build.py <slug> --sinif X --donem Y --sinav Z --cmyk
+python build_kitap.py --sinif X --donem Y --sinav Z --cmyk
+```
+
+`--rgb` varsayılanı açıkça yazmak içindir. Kalıcı olarak değiştirmek
+isterseniz `build.py`'deki `CMYK_DEFAULT` sabitini çevirin. Aşağıdaki
+maddeler yalnızca `--cmyk` verildiğinde geçerlidir:
 
 * **Ghostscript kurulu değilse build DURMAZ**: işletim sistemine göre kurulum
   komutunu içeren net bir uyarı basılır ve dosya RGB bırakılır
@@ -507,7 +529,7 @@ python build.py <ders_slug> --sinif X --donem Y --sinav Z
 Bu tek komut şunları otomatik yapar: HTML üretir → tutarlılık denetimi
 (`validate()`: bölüm numaraları ardışık mı, sözlük referansları geçerli mi,
 tekrar eden terim var mı) → Playwright ile PDF'e render eder → **her sayfanın
-gerçek render yüksekliğini 181×256mm sınırıyla karşılaştırır** → PDF'e gerçek
+gerçek render yüksekliğini 210×297mm sınırıyla karşılaştırır** → PDF'e gerçek
 bookmark/outline ekler → TrimBox/BleedBox yazar → Ghostscript ile PDF/X-4
 CMYK'ya çevirir → **toplam sayfa sayısını ve bitmiş ölçüyü konsola basar.**
 
@@ -962,25 +984,39 @@ Sığdırma işini sayfa bölme değil, **CSS sıkışık kipi** yapar. Satır s
 (`bölüm sayısı + 2`) `TOC_COMPACT_THRESHOLD`'u aşarsa şablon `toc-list`'e
 `toc-compact` sınıfını ekler ve şunlar olur:
 
-- `toc-lede` (alt başlık cümlesi) gizlenir — tek başına ~10mm kazandırır
-- satır dolgusu 3.79mm → 1.85mm, numara dairesi 7.74mm → 6.25mm küçülür
+- `toc-lede` (alt başlık cümlesi) gizlenir
+- satır dolgusu 4.6mm → 3mm, numara dairesi 9.4mm → 7.6mm küçülür
 - **alt başlık tek satıra kırpılır** (`white-space:nowrap` + ellipsis)
 
-Son madde kritiktir: eskiden uzun alt başlık iki-üç satıra sarıp satırı
-30.8mm'ye çıkarabiliyordu; kırpma sayesinde satır yüksekliği artık sabittir
-(~11mm) ve taşma yapısal olarak imkânsızdır. Ölçüm: satırlara ~190mm yer
-kalıyor, yani **13 satıra** kadar güvenli. En yüklü ders 9 bölüm = 11
-satırdır (Kelâm Tarihi), pay vardır. Eşiğin altındaki dersler eski ferah
-görünümü (lede + geniş satır) aynen korur.
+Son madde kritiktir: uzun bir alt başlık ferah kipte iki-üç satıra sarıp
+satırı ~29.6mm'ye çıkarabilir; kırpma sayesinde sıkışık kipte satır
+yüksekliği **sabittir** ve taşma yapısal olarak imkânsızdır.
 
-Bir ders 12 bölümü aşarsa bu kuralın sınırına gelinir — o noktada satırı
-daha da sıkıştırmak yerine dersi bölmeyi değerlendirin.
+**A4 ölçümü** (Chromium, Kelâm Tarihi / 11 satır üzerinde):
 
-**Genel Bakış da tek sayfadır.** Küçültülmüş punto + genişletilmiş metin
-alanında Genel Bakış'ın dört bloğu (hero + 6 kart + çalışma akışı + sınav
-notu) tek sayfaya sığar (`OVERVIEW_PAGES = 1`); en yüklü ders olan Öğretim
-İlke ve Yöntemleri'nde ~%97 doluluk verir, yani marj dardır — Genel Bakış'a
-blok eklerseniz taşma denetimini mutlaka okuyun.
+| | |
+|---|---|
+| Sayfada satırlara kalan yer | **232,4 mm** |
+| Ferah satır | 20,7 mm (sarma ile ~29,6 mm — belirsiz) |
+| Sıkışık satır | **16,4 mm — sabit** (alt başlık kırpık) |
+| Ferah kapasite (en kötü satıra göre) | 232,4 / 29,6 = **7 satır** → `TOC_COMPACT_THRESHOLD = 7` |
+| Sıkışık kapasite (kesin) | 232,4 / 16,4 = **14 satır** → `TOC_MAX_ROWS = 14` |
+
+Eşik neden 7'de kalıyor: ferah kipte alt başlık sarabildiği için satır
+yüksekliği ÖNCEDEN bilinemez, bu yüzden eşik en kötü satıra göre hesaplanır.
+Sıkışık kipte kırpma yüzünden yükseklik sabit olduğundan kapasite kesindir —
+ferahlık, eşiği yükselterek değil sıkışık kipin kendisini rahatlatarak
+kazanılır (2026 Ağustos: `.toc-compact` blok değerleri A4 ölçeğine çekildi;
+Kelâm Tarihi'nin listesi 133,6 → 178,2 mm oldu, punto 8,23 → 10 pt).
+
+**14 satır (= 12 bölüm) aşılırsa** `validate()` derlemeden önce net bir uyarı
+basar (`TOC_MAX_ROWS`); o noktada satırı daha da sıkıştırmak yerine dersi
+bölmeyi değerlendirin. `.toc-compact` değerlerini elle küçültmeyin — bu
+sabitler ölçümle bağlıdır, birini değiştirirseniz diğerini de yeniden ölçün.
+
+**Genel Bakış da tek sayfadır.** Dört bloğu (hero + 6 kart + çalışma akışı +
+sınav notu) A4'te rahat sığar (`OVERVIEW_PAGES = 1`) — Genel Bakış'a blok
+eklerseniz taşma denetimini yine de okuyun.
 
 Sayfa numaraları `compute_page_numbers()` içinde buna göre hesaplanır; bir
 dersin ön sayfaları `1 + toc_page_count(pack) + OVERVIEW_PAGES` = **her zaman
@@ -1183,11 +1219,12 @@ Bunlar `templates/style.css` içinde zaten düzeltilmiş durumda — sadece
     elle ölçü verildiğinde Chromium sayfayı ~0.35mm büyütüp içeriği 0.26mm
     sağa kaydırıyordu. `@page` kuralından okunduğunda içerik tam sol-üst
     köşeye oturuyor; `pdfx.set_print_boxes()` kutuları levhanın SOL-ÜST
-    köşesinden ölçtüğü için TrimBox tam 175×250mm çıkıyor. (Chromium levhayı
+    köşesinden ölçtüğü için TrimBox tam 210×297mm çıkıyor. (Chromium levhayı
     yine ~0.02-0.12mm büyük üretir; MediaBox bu yüzden BleedBox'tan birkaç
     yüzde mm büyüktür — bu normaldir, MediaBox'a dokunulmaz.)
 
-17. **Dar sayfada flex sütunlarında uzun kelimeler taşıyor**: 175mm'de 5
+17. **Dar sayfada flex sütunlarında uzun kelimeler taşıyor**: (175mm'lik eski
+    sayfada tespit edildi, A4'te riski azaldı ama koruma duruyor) 5
     adımlı akış şemasında sütun ~22mm'ye düşüyor ve "Varoluşçuluğa" gibi
     kelimeler kutunun dışına sarkıyordu (flex öğesi min-content'in altına
     inemez). `.ov-flow-step` ve `.flowdiag .fstep` bu yüzden
@@ -1221,7 +1258,7 @@ Bunlar `templates/style.css` içinde zaten düzeltilmiş durumda — sadece
   kuralı geri getirme. (Bölüm banner'ının kendi içindeki çok hafif doku
   `.chbanner::before` bir KUTU dokusudur, sayfa zemini değildir ve bilerek
   bırakılmıştır.)
-- Her sayfa A4 (210×297mm), `.page` sınıfı `overflow:hidden` — taşma her
+- Her sayfa A4 (210×297mm, bleed yok), `.page` sınıfı `overflow:hidden` — taşma her
   zaman görünür/yakalanabilir olmalı (bkz. yukarıdaki flex-shrink notu).
 - İçindekiler hem sayfa-içi tıklanabilir linkler (`<a href="#ch-N">`) hem
   gerçek PDF outline paneli (`build.py`'deki `add_bookmarks()`) üretir —
@@ -1234,8 +1271,11 @@ Bunlar `templates/style.css` içinde zaten düzeltilmiş durumda — sadece
 ## Hızlı komut özeti
 
 ```bash
-# Tek dersi derle (PDF/X-4 CMYK çıktı dahil)
+# Tek dersi derle (A4, RGB — fotokopi için)
 python build.py <slug> --sinif X --donem Y --sinav Z
+
+# Aynı ders, matbaa için PDF/X-4 CMYK olarak
+python build.py <slug> --sinif X --donem Y --sinav Z --cmyk
 
 # Sayfa doluluğunu ölç / bölüm sayfalarını yeniden dağıt / sabitleri kalibre et
 python tools/olcum.py <slug> --sinif X --donem Y --sinav Z
@@ -1286,8 +1326,9 @@ python cekirdek/theme_engine.py
 - [ ] `python build.py <slug> --sinif X --donem Y --sinav Z` çalıştırdım
 - [ ] "[TAŞMA UYARISI]" çıkmayana kadar `tools/dengele.py` çalıştırıp
       yeniden derledim (gerekirse elle sayfa böldüm)
-- [ ] Konsoldaki "[SONUÇ] Bitmiş (trim) ölçü : 175 x 250 mm" satırını ve
-      PDF/X-4 CMYK dönüşümünün "✓" verdiğini gördüm
+- [ ] Konsoldaki "[SONUÇ] Bitmiş (trim) ölçü : 210 x 297 mm" satırını gördüm
+      (renk kipi: "[prepress] Çıktı RGB bırakıldı (fotokopi kipi)" — matbaa
+      için --cmyk verildiyse onun yerine PDF/X-4 dönüşümünün "✓"sü)
 - [ ] Kapak (yeni renk doğru mu?) + içindekiler + genel bakış + her bölüm
       ilk sayfası + en az bir tablo sayfası + sözlük son sayfası + test
       son sayfası + cevap anahtarı son sayfası görsel kontrol ettim

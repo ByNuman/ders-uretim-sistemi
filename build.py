@@ -25,8 +25,9 @@ Ders modülü, seçilen dönemin src/ klasöründen okunur; çıktı aynı döne
 gorsel_ders_notlari/<DERS ADI>/ klasörüne yazılır.
 
 CoursePack nesnesini alır -> Jinja2 ile HTML üretir -> Playwright/Chromium
-ile 175x250mm (+3mm bleed) PDF'e render eder -> sayfa kutularını (TrimBox)
-yazar -> Ghostscript ile PDF/X-4 CMYK'ya çevirir.
+ile A4 (210x297mm, bleed yok — fotokopi) PDF'e render eder -> sayfa kutularını
+(TrimBox) yazar. Çıktı VARSAYILAN OLARAK RGB'dir; matbaa için PDF/X-4 CMYK
+dönüşümü --cmyk bayrağıyla açılır.
 Çıktı: <sinif>-sinif/<donem>-donem/<sinav>/gorsel_ders_notlari/<DERS ADI>/<slug>.pdf
 (CMYK, baskıya hazır) ve (denetim için) aynı klasörde .html
 
@@ -120,7 +121,7 @@ def out_dir() -> Path:
 #                        ders PDF'i.
 #     BOOK_GEOMETRY   -> `python build_kitap.py` ile üretilen BİRLEŞİK kitap.
 #
-# Şu anda ikisinin değerleri aynıdır (175x250mm trim); ama TEK BİR GLOBAL
+# Şu anda ikisinin değerleri aynıdır (A4 210x297mm, bleed 0); ama TEK BİR GLOBAL
 # SABİT DEĞİLLERDİR: birini değiştirmek diğerini etkilemez. Bir çıktının
 # ölçüsünü değiştirdikten sonra sayfalama sabitleri (GLOSSARY_PER_PAGE vb.) ve
 # ChapterPage dağılımları o ölçüye göre yeniden ölçülmelidir:
@@ -137,16 +138,18 @@ class PageGeometry:
     """Tek bir çıktının (tekil ders / birleşik kitap) baskı geometrisi."""
 
     name: str
-    trim_w: float               # bitmiş (kesilmiş) sayfa genişliği (mm)
-    trim_h: float               # bitmiş (kesilmiş) sayfa yüksekliği (mm)
-    bleed: float = 3.0          # taşma payı (her kenar) — full-bleed zeminler için
-    mg_top: float = 11.0
-    mg_bottom: float = 19.0     # sayfa numarası payı dahil
-    mg_inner: float = 14.0      # sırt/gutter tarafı — PUR Amerikan cilt payı
-    mg_outer: float = 9.0
-    # Ayna simetri yönü. Standart kitap ciltlemesinde TEK (1, 3, 5...) sayfa
-    # sağ yapraktır, dolayısıyla sırtı SOLDA kalır -> "left".  Ciltçiniz
-    # tersini istiyorsa tek kelimeyi "right" yapmak yeterlidir.
+    trim_w: float               # bitmiş sayfa genişliği (mm) — fotokopide kağıdın kendisi
+    trim_h: float               # bitmiş sayfa yüksekliği (mm)
+    # FOTOKOPİ KİPİ: taşma payı YOK. Bleed yalnızca matbaada kesilecek işler
+    # içindir; fotokopide kesim olmadığı için 0'dır ve render ölçüsü = A4.
+    bleed: float = 0.0
+    mg_top: float = 12.0
+    mg_bottom: float = 15.0     # sayfa numarası payı dahil
+    mg_inner: float = 12.0      # zımba/spiral tarafı
+    mg_outer: float = 12.0
+    # Ayna simetri yönü. Tek yüz fotokopide iç/dış eşit olduğu için görünür bir
+    # etkisi yoktur; arkalı-önlü çekip ciltleyecekseniz mg_inner'ı büyütmek
+    # (ör. 18) yeterlidir, bu alan hangi tarafın sırt olduğunu söyler.
     odd_page_gutter: str = "left"
 
     # Fiziksel render ölçüsü (bleed box) — Chromium'a verilen ve PDF MediaBox'ı
@@ -160,8 +163,9 @@ class PageGeometry:
         return self.trim_h + 2 * self.bleed
 
 
-SINGLE_GEOMETRY = PageGeometry(name="tekil ders", trim_w=175.0, trim_h=250.0)
-BOOK_GEOMETRY = PageGeometry(name="birleşik kitap", trim_w=175.0, trim_h=250.0)
+# A4 (210x297mm), bleed yok — çıktı matbaaya değil FOTOKOPİYE gidiyor.
+SINGLE_GEOMETRY = PageGeometry(name="tekil ders", trim_w=210.0, trim_h=297.0)
+BOOK_GEOMETRY = PageGeometry(name="birleşik kitap", trim_w=210.0, trim_h=297.0)
 
 # Geriye dönük uyumluluk: tools/olcum.py ve tools/kalibre.py tekil ders
 # sayfalarını ölçtükleri için TEKİL config'in değerlerini okur. Yeni kod bu
@@ -397,10 +401,14 @@ def course_context(pack, offset: int = 0, prefix: str = "", pagecls: str = "") -
 
 
 # --- Sayfalama kapasiteleri ---------------------------------------------------
-# 175x250mm sayfa için tools/kalibre.py ile ÖLÇÜLDÜ: her aday değer 10 dersin
-# hepsinde render edilip taşma denetimine sokuldu, taşmayan en büyük değer
-# alındı. Sayfa boyutunu değiştirirseniz `python tools/kalibre.py` çalıştırıp
-# bu bloğu yenileyin -- tahminle değiştirmeyin.
+# A4 (210x297mm) sayfa için tools/kalibre.py ile ÖLÇÜLDÜ: her aday değer 11
+# dersin hepsinde render edilip taşma denetimine sokuldu, taşmayan en büyük
+# değer alındı. Sayfa boyutunu değiştirirseniz `python tools/kalibre.py`
+# çalıştırıp bu bloğu yenileyin -- tahminle değiştirmeyin.
+#
+# NOT: Bu altı sayı 175x250mm sürümüyle AYNI çıktı. Tesadüf değil: A4'e
+# geçerken hem sayfa (220 -> 270mm metin yüksekliği, x1.227) hem tipografi
+# (x1.2152) aynı oranda büyüdü, yani sayfa başına kapasite korundu.
 GLOSSARY_PER_PAGE = 22     # 2 sütun x 6 satır
 QA_PER_PAGE = 12            # LEGACY
 DISTINCTIONS_PER_PAGE = 8  # LEGACY
@@ -412,18 +420,28 @@ ANSWER_PER_PAGE = 23       # sayfa başına çözümlü cevap (2 sütunlu düzen
 # İÇİNDEKİLER HER ZAMAN TEK SAYFADIR (proje kuralı, bkz. CLAUDE.md).
 # Eskiden TOC_ROWS_FIRST/REST ile sayfalara bölünüyordu; bu sabitler kalktı.
 # Satır sayısı bu eşiği aşınca şablon `.toc-compact` sınıfını ekler: lede
-# gizlenir, satır dolgusu ve numara dairesi küçülür, alt başlık TEK satıra
-# kırpılır (böylece satır yüksekliği sabitlenir). Eşiğin altındaki dersler
-# eski ferah görünümü aynen korur.
-# Ölçüm: normal satır ~16mm (uzun alt başlıkta 30.8mm'ye çıkabiliyordu),
-# compact satır ~11mm; sayfada satırlara ~190mm kalıyor -> 13 satır güvenli.
-# En yüklü ders 9 bölüm = 11 satır (kelam_tarihi), yani pay var.
+# gizlenir, satır dolgusu küçülür, alt başlık TEK satıra kırpılır. Eşiğin
+# altındaki dersler ferah görünümü aynen korur.
+#
+# A4 ÖLÇÜMÜ (Chromium, kelam_tarihi / 11 satır üzerinde):
+#   sayfada satırlara kalan yer ................ 232.4 mm
+#   ferah satır (alt başlık sarabilir) ......... 20.7 mm, sarma ile ~29.6 mm
+#   sıkışık satır (alt başlık tek satıra kırpık)  16.4 mm  -- SABİT
+# Ferah kip sarma yüzünden belirsiz olduğu için eşik en kötü satıra göre
+# hesaplanır: 232.4 / 29.6 = 7 satır. Sıkışık kipte satır yüksekliği kırpma
+# sayesinde SABİT olduğundan kapasite kesin: 232.4 / 16.4 = 14 satır.
 TOC_COMPACT_THRESHOLD = 7
 
-# Genel Bakış 175x250mm'de tek sayfaya sığmıyor (ölçüldü: 214-264mm / 215mm).
-# SABİT olarak ikiye bölünür: 1. sayfa hero + 6 kart, 2. sayfa akış + not.
-# Ölçüye göre değil yapıya göre bölmek bilinçli: sayfa numaraları render'dan
-# ÖNCE hesaplanabilir olmalı (bkz. compute_page_numbers).
+# Sıkışık kipin ölçülmüş satır kapasitesi = 12 bölüm + sözlük + test.
+# Bunu aşan bir ders İçindekiler'i taşırır; taşma denetimi zaten yakalar ama
+# validate() sebebini önceden ve anlaşılır biçimde söyler (bkz. CLAUDE.md:
+# "Bir ders 12 bölümü aşarsa ... dersi bölmeyi değerlendirin").
+TOC_MAX_ROWS = 14
+
+# Genel Bakış TEK sayfadır. Yapıya göre (ölçüye göre değil) sabitlenmiştir:
+# sayfa numaraları render'dan ÖNCE hesaplanabilir olmalı (bkz.
+# compute_page_numbers). A4'te dört blok (hero + 6 kart + akış + sınav notu)
+# rahat sığıyor; buraya blok eklerseniz taşma denetimini mutlaka okuyun.
 OVERVIEW_PAGES = 1
 
 
@@ -519,13 +537,49 @@ def build(module_name: str, d: "donem_mod.Donem | None" = None):
     return pdf_path
 
 
+# --- ÇIKTI RENK UZAYI --------------------------------------------------------
+# VARSAYILAN: RGB (fotokopi kipi). PDF/X-4 CMYK dönüşümü yalnızca MATBAAYA
+# gönderilecek işler içindir; fotokopi makinesi ve ofis yazıcısı zaten kendi
+# renk dönüşümünü yapar, önceden CMYK'ya çevirmek renkleri donuklaştırır,
+# dosyayı büyütür ve her derlemeye Ghostscript'in dakikalarını ekler.
+# Matbaaya iş gönderecekseniz: python build.py <slug> ... --cmyk
+CMYK_DEFAULT = False
+
+
 def finalize_for_print(pdf_path: Path, title: str,
-                       geo: PageGeometry = SINGLE_GEOMETRY):
-    """Baskı öncesi son iki adım: sayfa kutularını (TrimBox/BleedBox) yaz ve
-    Ghostscript ile PDF/X-4 CMYK'ya çevir. Ghostscript yoksa build durmaz --
-    net bir kurulum uyarısı basılır ve dosya RGB kalır."""
+                       geo: PageGeometry = SINGLE_GEOMETRY,
+                       cmyk: "bool | None" = None):
+    """Baskı öncesi son adım(lar): sayfa kutularını (TrimBox/BleedBox) her zaman
+    yaz; SADECE cmyk=True ise Ghostscript ile PDF/X-4 CMYK'ya çevir.
+
+    cmyk=None verilirse CMYK_DEFAULT geçerlidir (fotokopi kipinde False).
+    Ghostscript yoksa build durmaz -- net bir uyarı basılır, dosya RGB kalır."""
     pdfx.set_print_boxes(pdf_path, geo.trim_w, geo.trim_h, geo.bleed)
-    pdfx.convert_or_warn(pdf_path, title, geo.trim_w, geo.trim_h, geo.bleed)
+    if CMYK_DEFAULT if cmyk is None else cmyk:
+        pdfx.convert_or_warn(pdf_path, title, geo.trim_w, geo.trim_h, geo.bleed)
+    else:
+        print("[prepress] Çıktı RGB bırakıldı (fotokopi kipi). "
+              "Matbaa için PDF/X-4 CMYK isterseniz --cmyk ekleyin.")
+
+
+def add_cikti_args(ap) -> None:
+    """--cmyk / --rgb bayraklarını ekler. build.py ve build_kitap.py ORTAK
+    kullanır ki iki çıktının renk kipi tek yerden yönetilsin."""
+    g = ap.add_mutually_exclusive_group()
+    g.add_argument("--cmyk", action="store_true",
+                   help="Çıktıyı Ghostscript ile PDF/X-4 CMYK'ya çevir "
+                        "(MATBAA için; fotokopide gereksiz, varsayılan kapalı)")
+    g.add_argument("--rgb", action="store_true",
+                   help="Çıktıyı RGB bırak (varsayılan davranış)")
+
+
+def apply_cikti_args(args) -> None:
+    """add_cikti_args() ile alınan bayrakları modül durumuna işler."""
+    global CMYK_DEFAULT
+    if getattr(args, "cmyk", False):
+        CMYK_DEFAULT = True
+    elif getattr(args, "rgb", False):
+        CMYK_DEFAULT = False
 
 
 def report_page_count(pdf_path: Path):
@@ -603,6 +657,13 @@ def validate(pack) -> list[str]:
     chapter_numbers = [c.number for c in pack.chapters]
     if chapter_numbers != list(range(1, len(chapter_numbers) + 1)):
         warnings.append(f"Bölüm numaraları sıralı/ardışık değil: {chapter_numbers}")
+    toc_rows = len(pack.chapters) + 2          # bölümler + sözlük + test
+    if toc_rows > TOC_MAX_ROWS:
+        warnings.append(
+            f"İçindekiler {toc_rows} satır; sıkışık kipin ölçülmüş kapasitesi "
+            f"{TOC_MAX_ROWS} satır. İçindekiler TEK SAYFA olmak zorunda olduğu "
+            f"için bu ders taşar -- dersi bölmeyi değerlendirin "
+            f"(en fazla {TOC_MAX_ROWS - 2} bölüm).")
     for c in pack.glossary:
         if c.chapter_ref not in chapter_numbers:
             warnings.append(f"Sözlük terimi '{c.term}' var olmayan {c.chapter_ref}. Bölüme referans veriyor.")
@@ -729,8 +790,10 @@ if __name__ == "__main__":
     ap.add_argument("ders", help="Ders modülünün adı, ör. kelam_tarihi "
                                  "(eski 'content.kelam_tarihi' yazımı da kabul edilir)")
     donem_mod.add_args(ap)
+    add_cikti_args(ap)
     args = ap.parse_args()
 
+    apply_cikti_args(args)
     d = donem_mod.resolve(args)
     print(f"[build] Dönem: {d}  ({d.etiket})")
     build(args.ders, d)

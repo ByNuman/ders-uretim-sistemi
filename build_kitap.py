@@ -28,7 +28,8 @@ ait olmadığı için kökte durur). Yani her sınav dönemi KENDİ birleşik
 kitabına sahiptir, dönemler birbirine karışmaz.
 
 src/kitap.py'de listelenen derslerin hepsini TEK bir HTML'e dizip tek
-seferde 175x250mm (+3mm bleed) PDF/X-4 CMYK dosyaya render eder. build.py ile aynı şablon gövdesini
+seferde A4 (210x297mm, bleed yok) tek bir PDF'e render eder (RGB; --cmyk ile
+PDF/X-4 CMYK). build.py ile aynı şablon gövdesini
 (_ders_govde.html.j2) ve aynı sayfalama fonksiyonlarını kullanır; tek fark,
 her derse bir SAYFA OFFSET'i verilmesidir:
 
@@ -317,8 +318,10 @@ if __name__ == "__main__":
     ap.add_argument("kitap", nargs="?", default="kitap",
                     help="Kitap tanım modülü (varsayılan: kitap -> src/kitap.py)")
     donem_mod.add_args(ap)
+    B.add_cikti_args(ap)
     args = ap.parse_args()
 
+    B.apply_cikti_args(args)
     d = donem_mod.resolve(args)
     print(f"[kitap] Dönem: {d}  ({d.etiket})")
     build_book(args.kitap, d)

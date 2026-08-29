@@ -27,8 +27,9 @@ jobs:
         with:
           node-version: "20"
 
-      # KURULUM.md 4. adım — Ghostscript olmadan da build durmaz, ama CI'da
-      # PDF/X-4 dönüşümünün de sınanmasını istiyoruz.
+      # KURULUM.md 4. adım — varsayılan çıktı RGB olduğu için Ghostscript
+      # ARTIK ZORUNLU DEĞİL; yine de kuruyoruz, çünkü aşağıda `--cmyk` yolunu
+      # da sınıyoruz (matbaa kipi bozulursa CI kırmızı olsun).
       - name: Ghostscript kur
         run: |
           sudo apt-get update -qq
@@ -85,13 +86,41 @@ jobs:
               sys.exit(f"PDF beklenenden kısa: {sayfa} sayfa")
 
           kutu = r.pages[0].trimbox
-          mm = lambda v: round(float(v) / 72 * 25.4, 1)
+          mm = lambda v: round(float(v) / 72 * 25.4, 2)
           en, boy = mm(kutu.width), mm(kutu.height)
-          if (en, boy) != (175.0, 250.0):
-              sys.exit(f"TrimBox yanlış: {en} x {boy} mm (175 x 250 olmalı)")
+          # Tolerans neden 0.5mm: Chromium levhayı kendi cihaz-pikseli
+          # yuvarlamasıyla üretiyor ve bir kenarda ~0.1mm eksik kalabiliyor
+          # (bkz. cekirdek/pdfx.py). Bleed 0 olduğu için bu doğrudan trim'e
+          # yansır; yarım mm altındaki sapma baskıda da fotokopide de anlamsız.
+          if abs(en - 210.0) > 0.5 or abs(boy - 297.0) > 0.5:
+              sys.exit(f"TrimBox yanlış: {en} x {boy} mm (210 x 297 olmalı)")
 
-          print(f"{sayfa} sayfa · TrimBox {en} x {boy} mm · yer imi "
+          # Varsayılan çıktı RGB olmalı: CMYK dönüşümü yalnızca --cmyk ile.
+          ham = pdf.read_bytes()
+          if ham.count(b"DeviceCMYK"):
+              sys.exit("Varsayılan çıktıda DeviceCMYK var -- RGB olmalıydı")
+
+          print(f"{sayfa} sayfa · TrimBox {en} x {boy} mm · RGB · yer imi "
                 f"{len(list(r.outline))} girdi")
+          PY
+
+      # Matbaa yolu da sınansın: --cmyk verildiğinde Ghostscript devreye girip
+      # PDF/X-4 (DeviceCMYK) üretmeli. Varsayılan yol yukarıda sınandı.
+      - name: Matbaa kipini derle (--cmyk)
+        shell: bash
+        run: python build.py ornek_ders --cmyk | tee cmyk.log
+
+      - name: Matbaa çıktısını doğrula
+        run: |
+          grep -q "PDF/X-4 CMYK dönüşümü tamam" cmyk.log             || { echo "::error::--cmyk verildi ama PDF/X-4 dönüşümü olmadı"; exit 1; }
+          python - <<'PY'
+          import sys
+          from pathlib import Path
+          pdf = Path("dersler/gorsel_ders_notlari/ÖRNEK DERS/gorsel-ders-notu-sistemi.pdf")
+          ham = pdf.read_bytes()
+          if not ham.count(b"DeviceCMYK"):
+              sys.exit("--cmyk çıktısında DeviceCMYK yok")
+          print("PDF/X-4 CMYK çıktısı doğrulandı.")
           PY
 
       - name: Üretilen PDF'i sakla

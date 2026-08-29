@@ -14,7 +14,7 @@ depo 4 MB + Node paketleri ~20 MB + Chromium ~150 MB + Ghostscript ~60 MB.
 |---|---|---|---|
 | **Python** | 3.10+ | Üretim hattının kendisi | **Evet** |
 | **Node.js** | 18+ | PDF render'ı Chromium yapar (Playwright üzerinden) | **Evet** |
-| **Ghostscript** | 9+ | RGB → PDF/X-4 CMYK dönüşümü (matbaa çıktısı) | Hayır — yoksa PDF RGB kalır |
+| **Ghostscript** | 9+ | RGB → PDF/X-4 CMYK dönüşümü, yalnızca `--cmyk` verilirse | Hayır — matbaaya iş göndermeyecekseniz gereksiz |
 
 Python 3.10 alt sınırı keyfi değil: kod `int | None` biçimli tip
 gösterimlerini çalışma zamanında kullanıyor, bu söz dizimi 3.10 ile geldi.
@@ -85,10 +85,11 @@ node -e "require('playwright'); console.log('Playwright tamam')"
 
 ---
 
-## 4. Adım — Ghostscript (opsiyonel ama önerilir)
+## 4. Adım — Ghostscript (çoğu kullanıcı için gereksiz)
 
-Matbaaya gidecek CMYK çıktısı için gerekir. Kurmazsanız sistem yine çalışır,
-sadece PDF **RGB** kalır ve build sırasında sizi uyarır.
+Yalnızca **matbaaya** gidecek CMYK çıktısı (`--cmyk`) için gerekir. Varsayılan
+çıktı zaten **A4 RGB**'dir ve doğrudan fotokopiye/ofis yazıcısına gider —
+fotokopi için bu adımı atlayabilirsiniz.
 
 ```bash
 # macOS
@@ -132,10 +133,10 @@ python build.py ornek_ders
 Beklenen çıktının son satırları:
 
 ```
-[build] Taşma denetimi: tüm sayfalar 181x256mm sınırları içinde. ✓
-[prepress] PDF/X-4 CMYK dönüşümü tamam
+[build] Taşma denetimi: tüm sayfalar 210x297mm sınırları içinde. ✓
+[prepress] Çıktı RGB bırakıldı (fotokopi kipi).
 [SONUÇ] Toplam sayfa: 13
-[SONUÇ] Bitmiş (trim) ölçü : 175 x 250 mm
+[SONUÇ] Bitmiş (trim) ölçü : 210 x 297 mm
 ```
 
 PDF şuraya düşer:

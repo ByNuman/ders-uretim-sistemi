@@ -111,13 +111,22 @@ def set_print_boxes(pdf_path: Path, trim_w_mm: float, trim_h_mm: float,
     w_pt = (trim_w_mm + 2 * bleed_mm) * MM
     h_pt = (trim_h_mm + 2 * bleed_mm) * MM
     b = bleed_mm * MM
+    TOL = 0.5 * MM          # kabul edilen levha eksikliği (bkz. döngüdeki not)
     too_small = 0
     for page in doc:
         mb = page.mediabox
         # Levha beklenenden küçükse kutuyu levhaya sığdır (aksi halde PyMuPDF
         # "not in MediaBox" hatası verir) ve sayacı artır.
+        #
+        # Tolerans neden 0.01pt değil de yarım mm: Chromium levhayı kendi
+        # cihaz-pikseli yuvarlamasıyla üretiyor ve bir kenarda ~0.1mm EKSİK
+        # kalabiliyor (ölçüldü: 210mm istendi, 209.89mm geldi). Bleed varken
+        # bu fark bleed'in içinde kayboluyordu; bleed=0 (fotokopi) kipinde
+        # doğrudan trim'e yansıyor. 0.1mm ne matbaada ne fotokopide anlamlı
+        # bir sapmadır -- bu yüzden yalnızca YARIM MİLİMETREDEN büyük eksikler
+        # uyarı sayılır, altındakiler sessizce levhaya sığdırılır.
         pw, ph = min(w_pt, mb.width), min(h_pt, mb.height)
-        if pw < w_pt - 0.01 or ph < h_pt - 0.01:
+        if pw < w_pt - TOL or ph < h_pt - TOL:
             too_small += 1
         bleed_rect = pymupdf.Rect(0, 0, pw, ph)
         trim_rect = pymupdf.Rect(b, b, pw - b, ph - b)

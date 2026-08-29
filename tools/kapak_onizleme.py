@@ -194,7 +194,7 @@ body {{ margin: 0; font-family: "DejaVu Sans", sans-serif; }}
   box-shadow: 0 0.6mm 1.6mm rgba(0,0,0,.28);
 }}
 /* `transform: scale()` DEĞİL, `zoom`: transform yalnızca görüntüyü küçültür,
-   düzen kutusu 181x256mm kalır ve .shot'tan taşar; Chromium baskıda taşan
+   düzen kutusu tam sayfa ölçüsünde (A4) kalır ve .shot'tan taşar; Chromium baskıda taşan
    belgeyi sayfaya sığdırmak için TÜM sayfayı ~0.71 oranında küçültüyordu
    (ekranda doğru, PDF'te küçük). `zoom` düzen kutusunu da küçültür. */
 .scaler {{
@@ -253,7 +253,7 @@ def html_uret(kartlar, sutun, satir, baslik) -> str:
             f'<span>Kapak renk önizlemesi · sayfa {n + 1}/{toplam}</span></div>'
             f'<div class="grid">{parca}</div></div>')
 
-    # style.css + geometri bloğu İKİ tane `@page { size: 181mm 256mm }` içerir
+    # style.css + geometri bloğu İKİ tane `@page { size: 210mm 297mm }` içerir
     # (ders sayfasının ölçüsü). Önizleme sayfası A4'tür; iki kural yan yana
     # kalırsa Chromium levhayı doğru üretse bile içeriği küçültüp sol-üste
     # yaslıyor. Bu yüzden ders @page'leri SÖKÜLÜR, tek @page bizimki olur.

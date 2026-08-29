@@ -41,8 +41,8 @@ python build.py ornek_ders            # örnek dersi derle
 ```
 
 Son komut 13 sayfalık örnek bir ders PDF'i üretir. Ürettiyse kurulum
-tamamdır. Ayrıca **Ghostscript** kurmanız önerilir (matbaa için CMYK
-dönüşümü) — yoksa sistem yine çalışır, PDF sadece RGB kalır.
+tamamdır. **Ghostscript** yalnızca matbaa çıktısı (`--cmyk`) alacaksanız
+gerekir; varsayılan A4 RGB çıktı için kurmanıza gerek yok.
 
 **Adım adım anlatım, işletim sistemine göre kurulum ve sorun giderme için:
 [`docs/KURULUM.md`](docs/KURULUM.md)**
@@ -55,9 +55,11 @@ dönüşümü) — yoksa sistem yine çalışır, PDF sadece RGB kalır.
 | Bir dönemin tüm derslerini içeren birleşik kitap | `python build_kitap.py --sinif X --donem Y --sinav Z` |
 | Bir sınıfın tüm ders kapaklarının renk önizlemesi | `python tools/kapak_onizleme.py --sinif 3` |
 
-Baskı özellikleri: **175 × 250 mm** bitmiş (trim) ölçü, 3 mm taşma payı,
-ayna simetrik kenar boşlukları, gerçek PDF yer imleri ve otomatik
-**PDF/X-4 (DeviceCMYK)** dönüşümü.
+Sayfa özellikleri: **A4 (210 × 297 mm)**, dar kenar boşlukları
+(üst 12 · alt 15 · yan 12 mm), taşma payı yok ve gerçek PDF yer imleri.
+Çıktı **RGB**'dir — doğrudan fotokopi/ofis yazıcısı içindir. Matbaaya iş
+göndereceğiniz gün `--cmyk` bayrağı **PDF/X-4 (DeviceCMYK)** dönüşümünü
+açar ve kesim kutularını yazar.
 
 ## Depoda ders PDF'leri neden yok?
 
@@ -96,9 +98,10 @@ Kurulumu doğrulamak için:
 python cekirdek/pdfx.py        # Ghostscript + ICC profili teşhisi
 ```
 
-### ICC profili (matbaa için, opsiyonel)
+### ICC profili (yalnızca `--cmyk` için, opsiyonel)
 
-CMYK dönüşümü `assets/icc/ISOcoated_v2_eci.icc` (FOGRA39) profilini kullanır.
+`--cmyk` ile yapılan CMYK dönüşümü `assets/icc/ISOcoated_v2_eci.icc`
+(FOGRA39) profilini kullanır.
 Profil lisans onayı gerektirdiği için depoda gelmez; yoksa Ghostscript'in
 genel CMYK profiline düşülür ve uyarı basılır. Bkz. `assets/icc/README.md`.
 

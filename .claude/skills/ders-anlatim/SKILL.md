@@ -68,7 +68,21 @@ Anlatım/toparlama tamamlandıktan sonra, biriken taslak doğrudan işlenmiş bi
 **Taslak akışı:** Bölüm bölüm üretilen içerik, nihai çıktı klasörlerine değil gizli bir çalışma dosyasına yazılır: **proje kökündeki** `.calisma/<ders adı>.md` (dönem ağacının içine değil — geçici dosya, `.gitignore`'da). Bu hem kesintiye dayanıklılığı sağlar (yarıda kalırsa buradan devam edilir) hem de PDF'e çevrilmeden önceki ham içeriktir. Tüm bölümler bitince bu taslaktan PDF üretilir; ardından taslak ve varsa ara `.docx` dosyası silinir.
 
 **Görsel stil (kullanıcının paylaştığı referans PDF'e göre belirlendi):**
-- Sayfa: A4, tek sütun, renk/tema yok (siyah-beyaz, sade akademik görünüm)
+- Sayfa: **A4 dikey — 210 x 297 mm**, tek sütun, renk/tema yok (siyah-beyaz, sade akademik görünüm)
+- **Kenar boşlukları DAR ve ZORUNLU** (çıktı fotokopiyle çoğaltılıyor):
+  üst **12 mm** · alt **15 mm** · sol **12 mm** · sağ **12 mm** -> metin alanı **186 x 270 mm**.
+  Word'ün "Dar" hazır ayarına denktir. python-docx'te her `section` için ayrı ayrı yazılmalı:
+  ```python
+  from docx.shared import Mm
+  for sec in doc.sections:
+      sec.page_width, sec.page_height = Mm(210), Mm(297)   # A4 dikey
+      sec.top_margin, sec.bottom_margin = Mm(12), Mm(15)
+      sec.left_margin, sec.right_margin = Mm(12), Mm(12)
+  ```
+  Bunu yazmazsan python-docx varsayılanı (Letter boyut + 1 inç = 25.4 mm kenar)
+  devreye girer; sayfa hem A4 olmaz hem boşluklar iki katına çıkar. Görsel ders
+  notu sistemi de aynı ölçüleri kullanır (bkz. `build.py` içindeki
+  `SINGLE_GEOMETRY`), böylece iki çıktı yan yana aynı kağıtta durur.
 - Gövde metni: Times New Roman, ~11-12pt
 - Bölüm başlıkları ("Bölüm N: ..."): kalın, büyük punto; her bölüm **yeni bir sayfada** başlar
 - Alt başlıklar (1. ..., 2. ... gibi numaralı bölümler): kalın, orta punto
