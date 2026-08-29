@@ -528,7 +528,8 @@ python build.py <ders_slug> --sinif X --donem Y --sinav Z
 ```
 Bu tek komut şunları otomatik yapar: HTML üretir → tutarlılık denetimi
 (`validate()`: bölüm numaraları ardışık mı, sözlük referansları geçerli mi,
-tekrar eden terim var mı) → Playwright ile PDF'e render eder → **her sayfanın
+tekrar eden terim var mı, İçindekiler satır sayısı kapasiteyi aşıyor mu,
+**içerik metinlerinde kapatılmamış HTML etiketi var mı**) → Playwright ile PDF'e render eder → **her sayfanın
 gerçek render yüksekliğini 210×297mm sınırıyla karşılaştırır** → PDF'e gerçek
 bookmark/outline ekler → TrimBox/BleedBox yazar → Ghostscript ile PDF/X-4
 CMYK'ya çevirir → **toplam sayfa sayısını ve bitmiş ölçüyü konsola basar.**
@@ -1230,7 +1231,21 @@ Bunlar `templates/style.css` içinde zaten düzeltilmiş durumda — sadece
     inemez). `.ov-flow-step` ve `.flowdiag .fstep` bu yüzden
     `min-width: 0; overflow-wrap: break-word;` taşır — kaldırmayın.
 
-18. **`add_ayat()` başlığı artık opsiyoneldir**: uzun bir ayet grubu (Tefsir
+18. **Kapatılmamış tek bir `<b>` sayfa düzenini sessizce çökertir**: şablon
+    içerik metinlerini KAÇIRMADAN basar (`<b>vurgu</b>` yazabilmeniz için).
+    Bedeli, dengesiz bir etiketin geçerli HTML üretmesi ama tarayıcının hata
+    kurtarma algoritmasını tetiklemesidir: etiket, kendinden sonraki KARDEŞ
+    düğümleri kendi içine alır. Ölçüldü (`ornek_ders`, 2026 Ağustos): sözlükteki
+    tek bir açık `<b>`, 2 sütunlu ızgarayı 4/10'a bölmüş, bir hücreyi 17,6mm
+    yerine 123,5mm yapmış ve alt bilgiyi metnin ortasında bırakmıştı. Aynı tuzak
+    `<ders>` gibi **köşeli parantezli yer tutucularda** da geçerlidir — tarayıcı
+    bunu bilinmeyen bir etiket sayar ve yutar (`src/<ders>.py` ekranda
+    `src/.py` görünüyordu). Metinde etiketi DÜZ METİN olarak göstermek
+    istiyorsanız `&lt;b&gt;` yazın. **Ne taşma denetimi ne CI bunu yakalar**
+    (çıktı taşmıyor, sadece yanlış); bu yüzden `validate()` artık `CoursePack`
+    ağacındaki bütün metinleri gezip etiket dengesini denetler.
+
+19. **`add_ayat()` başlığı artık opsiyoneldir**: uzun bir ayet grubu (Tefsir
     II'de 279mm'ye kadar) tek sayfaya sığmadığında `tools/dengele.py` grubu
     Ayah kartları arasından bölüyor; devam parçası `add_ayat(None, [...])`
     olarak basılıyor ve şablondaki `{% if title %}` koruması sayesinde başlık

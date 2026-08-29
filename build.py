@@ -36,6 +36,7 @@ otomatik oluşturulur. Bu kural TÜM sınıf/dönem/sınav kombinasyonlarında
 geçerlidir.
 """
 
+import re
 import sys
 import argparse
 import subprocess
@@ -414,6 +415,9 @@ QA_PER_PAGE = 12            # LEGACY
 DISTINCTIONS_PER_PAGE = 8  # LEGACY
 MATCHTABLE_PER_PAGE = 11    # LEGACY
 TEST_PER_PAGE_FIRST = 7    # ilk test sayfasında bilgi çubuğu + talimat kutusu da var
+                           # (2026-08: kalibre.py'ye eklendi ve ilk kez ÖLÇÜLDÜ --
+                           #  elle konmuş 7 değeri A4'te de doğru çıktı; 8'de bazı
+                           #  derslerin uzun soru metinleri ilk sayfayı taşırıyor)
 TEST_PER_PAGE = 8          # devam sayfalarında (2 sütunlu düzen, 5 seçenekli MCQ)
 ANSWER_PER_PAGE = 23       # sayfa başına çözümlü cevap (2 sütunlu düzen)
 
@@ -651,6 +655,52 @@ def optimize_pdf(pdf_path: Path) -> tuple[int, int]:
     return before, after
 
 
+# Şablon, içerik metinlerini KAÇIRMADAN (autoescape kapalı) basar: böylece
+# <b>vurgu</b> yazabiliyorsunuz. Bedeli, kapatılmamış tek bir etiketin geçerli
+# HTML üretmesi ama tarayıcının hata kurtarma algoritmasını tetiklemesidir --
+# etiket kendinden sonraki kardeş düğümleri kendi içine alır ve sayfa düzeni
+# sessizce çöker (ölçüldü: ornek_ders sözlüğünde tek bir açık <b>, ızgarayı
+# 2 sütundan çıkarıp alt bilgiyi metnin ortasında bıraktı). Ne taşma denetimi
+# ne CI bunu yakalar; çünkü çıktı "taşmıyor", sadece yanlış.
+_ETIKET_RE = re.compile(r"<\s*(/?)\s*([a-zA-Z][a-zA-Z0-9]*)[^>]*?(/?)\s*>")
+_BOS_ETIKETLER = {"br", "hr", "img", "wbr", "input", "meta", "link"}
+
+
+def _etiket_dengesizligi(metin: str) -> str | None:
+    """Bir içerik metnindeki kapatılmamış/fazladan kapatılmış ilk etiketi
+    döndürür; metin dengeliyse None."""
+    yigin = []
+    for kapanis, ad, kendini_kapatan in _ETIKET_RE.findall(metin):
+        ad = ad.lower()
+        if ad in _BOS_ETIKETLER or kendini_kapatan:
+            continue
+        if kapanis:
+            if not yigin or yigin[-1] != ad:
+                return f"</{ad}> fazladan (açılmamış)"
+            yigin.pop()
+        else:
+            yigin.append(ad)
+    return f"<{yigin[-1]}> kapatılmamış" if yigin else None
+
+
+def _metinleri_gez(nesne, yol="pack", derinlik=0):
+    """CoursePack ağacındaki bütün string alanları (yol, metin) olarak üretir."""
+    import dataclasses
+    if derinlik > 12:
+        return
+    if isinstance(nesne, str):
+        yield yol, nesne
+    elif isinstance(nesne, (list, tuple)):
+        for i, o in enumerate(nesne):
+            yield from _metinleri_gez(o, f"{yol}[{i}]", derinlik + 1)
+    elif isinstance(nesne, dict):
+        for k, v in nesne.items():
+            yield from _metinleri_gez(v, f"{yol}[{k!r}]", derinlik + 1)
+    elif dataclasses.is_dataclass(nesne):
+        for f in dataclasses.fields(nesne):
+            yield from _metinleri_gez(getattr(nesne, f.name), f"{yol}.{f.name}", derinlik + 1)
+
+
 def validate(pack) -> list[str]:
     """Üretim öncesi otomatik tutarlılık denetimi."""
     warnings = []
@@ -685,6 +735,15 @@ def validate(pack) -> list[str]:
             q = next((q for q in pack.test_questions if q.number == a.number), None)
             if q and a.correct not in q.options:
                 warnings.append(f"Cevap anahtarı {a.number}: '{a.correct}' seçeneği soruda yok.")
+    for yol, metin in _metinleri_gez(pack):
+        if "<" not in metin:
+            continue
+        hata = _etiket_dengesizligi(metin)
+        if hata:
+            warnings.append(
+                f"Bozuk HTML ({yol}): {hata} -- sayfa düzeni sessizce çöker. "
+                f"Etiketi düz metin olarak göstermek istiyorsanız &lt;b&gt; yazın. "
+                f"Metin: {metin[:70]!r}")
     return warnings
 
 

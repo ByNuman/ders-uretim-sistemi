@@ -54,6 +54,10 @@ from cekirdek.theme_engine import resolve_theme_css           # noqa: E402
 # sabit adı -> (aday değerler, o bölümün ilk sayfasının anchor'ı)
 CANDIDATES = {
     "GLOSSARY_PER_PAGE": list(range(26, 5, -1)),
+    # İlk test sayfasında banner + 3'lü bilgi çubuğu + talimat kutusu da var,
+    # bu yüzden devam sayfalarından AYRI kalibre edilir. Uzun süre bu listede
+    # yoktu; sabit elle 7'de kalmıştı ve A4'e geçince ölçülmemiş oldu.
+    "TEST_PER_PAGE_FIRST": list(range(12, 1, -1)),
     "TEST_PER_PAGE": list(range(12, 1, -1)),
     "ANSWER_PER_PAGE": list(range(24, 3, -1)),
     "QA_PER_PAGE": list(range(12, 2, -1)),
@@ -64,6 +68,7 @@ CANDIDATES = {
 # hangi sabit hangi sayfa aralığını etkiler (page_starts anahtarı, bitiş anahtarı)
 SPANS = {
     "GLOSSARY_PER_PAGE": ("glossary", ("test", "exam")),
+    "TEST_PER_PAGE_FIRST": ("test", ("answer_key",)),
     "TEST_PER_PAGE": ("test", ("answer_key",)),
     "ANSWER_PER_PAGE": ("answer_key", ("end+1",)),
     "QA_PER_PAGE": ("exam", ("end+1",)),

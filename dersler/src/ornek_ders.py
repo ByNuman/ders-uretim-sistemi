@@ -80,6 +80,9 @@ def get_pack() -> CoursePack:
             FlowStep("PDF", "Chromium"),
             FlowStep("CMYK", "Ghostscript (--cmyk)"),
         ], caption="Üretim hattının beş adımı. Her adım bir öncekinin çıktısını girdi alır."))
+    )
+    ch1.pages.append(
+        ChapterPage()
         .add_table(ComparisonTable(
             "Üç klasörün rolü — birbirinin yerine geçmez",
             ["Klasör", "Rolü", "Kim yazar?"],
@@ -94,9 +97,6 @@ def get_pack() -> CoursePack:
             "<b>özetlenmiş_dersler/</b> klasörü build.py'nin ÇIKTISI değil, "
             "<b>GİRDİSİDİR</b>. Üretilen PDF'ler her zaman "
             "<b>gorsel_ders_notlari/</b> altına düşer."))
-    )
-    ch1.pages.append(
-        ChapterPage()
         .add_summary(
             "Sistem, içerik ile tasarımı birbirinden ayırır. Siz yalnızca içeriği "
             "yazarsınız; sayfa düzeni, tipografi, renk ve baskı geometrisi sizin "
@@ -135,6 +135,9 @@ def get_pack() -> CoursePack:
             "Her <b>AnswerItem.correct</b> değeri, o sorunun seçenek anahtarlarından biri olmalıdır.",
             "Numaralandırma 1'den başlar ve boşluksuz artar; <b>validate()</b> bunu denetler.",
         ]))
+    )
+    ch2.pages.append(
+        ChapterPage()
         .add_table(ComparisonTable(
             "Sayfaya eklenebilecek bloklar",
             ["Metot", "Ne üretir"],
@@ -146,9 +149,6 @@ def get_pack() -> CoursePack:
                 ["<b>.add_flow()</b>", "Yatay oklu süreç şeması"],
                 ["<b>.add_summary()</b>", "Bölüm sonu özet kutusu"],
             ]))
-    )
-    ch2.pages.append(
-        ChapterPage()
         .add_callout(Callout(
             "caution", "Aşırı yüklü sayfa",
             "Tek bir sayfaya terim kutusu + iki büyük tablo + callout + özet "
@@ -187,6 +187,9 @@ def get_pack() -> CoursePack:
             "Uyarı varsa önce <b>tools/dengele.py</b> çalıştırın; o çözemezse sayfayı elle bölün.",
             "<b>✓</b> görene kadar derleyin — uyarıyla teslim edilen PDF içerik kaybetmiş demektir.",
         ]))
+    )
+    ch3.pages.append(
+        ChapterPage()
         .add_table(ComparisonTable(
             "Baskı geometrisi",
             ["Ölçü", "Değer"],
@@ -203,9 +206,6 @@ def get_pack() -> CoursePack:
             "taşmayı gizleyebiliyordu. Tasarımda <b>flex-shrink: 0</b> zorunlu "
             "kılınarak bu engellendi: artık taşma her zaman <b>gerçek</b> ve "
             "build çıktısında <b>görünür</b>."))
-    )
-    ch3.pages.append(
-        ChapterPage()
         .add_flow(FlowDiagram([
             FlowStep("Derle", "build.py"),
             FlowStep("Uyarıyı oku", "taşma var mı?"),
@@ -237,7 +237,7 @@ def get_pack() -> CoursePack:
         Concept("KeyTerm", "Terim kutusu öğesi.",
                 "Her bölümde tam 4 tane.", 2),
         Concept("BulletBlock", "Numaralı alt başlık + madde listesi.",
-                "Maddeler <b> ile vurgu içerebilir.", 2),
+                "Maddeler &lt;b&gt; ile vurgu içerebilir.", 2),
         Concept("ComparisonTable", "Başlıklı karşılaştırma tablosu.",
                 "2-3 sütun en iyi sonucu verir.", 2),
         Concept("Callout", "Renkli vurgu kutusu.",
@@ -345,7 +345,7 @@ def get_pack() -> CoursePack:
         ],
         overview_flow=[
             ("Kaynak", "Ham ders metni"),
-            ("Modül", "src/<ders>.py"),
+            ("Modül", "src/&lt;ders&gt;.py"),
             ("Derle", "build.py"),
             ("Denetle", "Taşma + görsel"),
         ],
