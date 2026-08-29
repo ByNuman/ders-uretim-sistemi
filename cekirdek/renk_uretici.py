@@ -135,6 +135,7 @@ DERS_RENKLERI = {
     "ISLAMFELSEFESITARIHI":     "#2F2D76",  # gece mavisi          H242
     # --- Hukum ------------------------------------------------------------
     "ISLAMHUKUKU":              "#7A2433",  # visne / muhur        H350
+    "ISLAMHUKUKUSULU":          "#7A2433",  # (ayni aile: fikih usulu)
     # --- Kalp -------------------------------------------------------------
     "TASAVVUF":                 "#7B3260",  # gul / erik           H322
     # --- Tarih ------------------------------------------------------------
