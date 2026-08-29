@@ -404,7 +404,9 @@ em { font-style: italic; }
   border-radius: 7px; padding: 3.4mm 4.2mm; background: var(--paper);
   box-shadow: var(--shadow-sm);
 }
-.term-box .term-name { font-size: 9.3pt; font-weight:700; color: var(--accent-dark); margin-bottom: 1.1mm; font-family:"DejaVu Serif",serif; }
+/* "DejaVu Sans" yedegi SADECE DejaVu Serif'te bulunmayan glifler icin devreye girer
+   (Arapca terim karsiliklari); Latin harfleri yine DejaVu Serif'ten gelir. */
+.term-box .term-name { font-size: 9.3pt; font-weight:700; color: var(--accent-dark); margin-bottom: 1.1mm; font-family:"DejaVu Serif","DejaVu Sans",serif; }
 .term-box .term-def { font-size: 8.3pt; color: var(--ink-soft); line-height:1.45; }
 
 /* ---------- Kişi kartı ---------- */
