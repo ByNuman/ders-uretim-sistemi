@@ -73,3 +73,13 @@ assets/harita/*.geojson
 assets/harita/uretilmis/*.png
 assets/harita/uretilmis/*.jpg
 assets/harita/uretilmis/*.jpeg
+
+# Commons RASTER kaynaklari (PNG/JPG): git bunlari sikistiramaz -- ucu birden
+# 24,7 MB tutuyor ve depo 4,1 MB. Geojson ile ayni gerekce: koddan uretilemez
+# ama her an yeniden indirilebilir; her dosyanin Commons URL'si, yazari ve
+# lisansi assets/harita/commons/LISANS.md'de kayitlidir. Bunlari kullanan ders
+# modulleri (ornegin islam_tarihi_3.py) zaten sinif agacinda, yani gitignore'da.
+# SVG kaynaklar METIN oldugu icin git'te KALIR -- asagidaki kural onlara dokunmaz.
+assets/harita/commons/*.png
+assets/harita/commons/*.jpg
+assets/harita/commons/*.jpeg
