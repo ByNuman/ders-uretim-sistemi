@@ -66,3 +66,10 @@ Thumbs.db
 # her an yeniden indirilebilir -- depoda tutulmaz.
 #     python tools/harita.py --veri-indir
 assets/harita/*.geojson
+
+# fal.ai ile renklendirilmis haritalar: koddan (tools/harita_uret.py + yanindaki
+# .json uretim kunyesi) yeniden uretilebilir ikili dosyalar. Kunye JSON'lari
+# git'e GIRER -- hangi model, hangi prompt, hangi kaynak, hangi tarih.
+assets/harita/uretilmis/*.png
+assets/harita/uretilmis/*.jpg
+assets/harita/uretilmis/*.jpeg

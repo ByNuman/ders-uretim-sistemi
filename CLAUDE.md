@@ -895,18 +895,254 @@ oluyorsa o dersin hue'sunu birkaç derece kaydırmayı deneyin.
 rotaları) metnin YANINDA duran bir harita kutusu konur: iki sütunlu düzen,
 metin sütunu 1.2 / harita sütunu 1 oranında.
 
-### İKİ YOL VAR: kendi çizimimiz ya da Commons'tan hazır harita
+### ÜÇ YOL VAR: kendi çizimimiz · Commons SVG'si · Commons raster'ı
 
-| | `harita_cizim` (kendi çizimimiz) | `harita_commons` (hazır harita) |
+| | `harita_cizim` | `CommonsKaynak` (SVG) | `CommonsGorsel` (PNG/JPG) |
+|---|---|---|---|
+| Ne zaman | Konum/çerçeve yeterliyse | Vektör kaynak varsa | **Vikipedi maddesindeki harita** |
+| Sınırlar | **Yaklaşık** — kaba poligonumuz | Kartografın çizimi | Kartografın çizimi |
+| Etiket | Türkçe yazarız | **Çevrilebilir** | Kaynağınki kalır + `Isaret` katmanı |
+| Renk | Tema | İstenirse uyarlanır | **fal.ai** (1.) veya Pillow (2. yol) |
+| Uyarlama | — | Çeviri, kırpma, punto, lejant | Kırpma · küçültme · renk · imleç |
+| Lisans | Yükümlülük yok (CC0) | Genelde CC BY-SA — atıf + ShareAlike | Aynı |
+
+**Vikipedi'de gördüğünüz harita neden aramada çıkmıyor?** Commons aramasını
+`filemime:image/svg+xml` ile daraltırsanız yalnızca vektör dosyalar gelir;
+oysa Vikipedi maddelerindeki tarihî haritaların ÇOĞU PNG/JPG'dir. Bir maddenin
+gerçekte hangi haritayı kullandığını görmek için:
+
+```bash
+curl -s "https://tr.wikipedia.org/w/api.php?action=query&prop=images&titles=Memlûk%20Devleti&format=json"
+```
+
+Ölçülen örnek: TR "Memlûk Devleti" maddesi `Mamluk Sultanate of Cairo 1317 AD.jpg`
+kullanıyor; SVG filtresiyle yapılan arama bunu hiç göremiyordu ve yerine
+sınır DEĞİL sefer gösteren bir harita seçilmişti.
+
+**Renk uyarlaması artık varsayılan DEĞİL.** Bir haritanın dersin tema rengiyle
+aynı olması gerekmiyor (2026 Ağustos, kullanıcı kararı); `renkler=`/`aciklik=`
+verilmezse harita kaynağın kendi tonlarıyla basılır. Mekanizma duruyor, ama
+yeni bir derste kullanmadan önce gerçekten gerekli mi diye sorun.
+
+`MapBox.commons` doluysa harita ÇİZİLMEZ; `bbox`/`cities`/`territory`
+kullanılmaz ve `source` alanı `atif` ile **ezilir** (atıf zorunludur, bir ders
+onu gizleyemez).
+
+```python
+.add_map(MapBox(
+    region="Memlük Sultanlığı: Mısır ve Bilâdü'ş-Şâm (1317)",
+    label="Tarihî harita",
+    commons=CommonsGorsel(
+        dosya="memluk-sultanligi-1317.jpg",
+        atif="Harita: Ro4444, Wikimedia Commons, CC BY-SA 4.0 — ...",
+        kirp=(700, 80, 1780, 1500),          # PİKSEL: (sol, üst, sağ, alt)
+        lejant_elle={"#c3ded2": "Sultanlığın toprakları"},
+    ),
+    caption="...",
+), yan=[BulletBlock(1, "...", [...])], taraf="sag")
+```
+
+#### Raster haritada renk ve yer imleçleri
+
+İki şey daha yapılabilir — **ikisi de determinist, görüntü modeli kullanmaz**:
+
+```python
+commons=CommonsGorsel(
+    dosya="memluk-sultanligi-1317.jpg",
+    kirp=(700, 80, 1780, 1500),
+    renk_hedef="#1D4E79", renk_ton=(140, 175),   # toprağı dersin rengine çek
+    isaretler=[
+        Isaret("Kahire", 0.195, 0.392),
+        Isaret("Akkâ",   0.386, 0.270, yan="sol"),
+    ],
+)
+```
+
+**Renk (`renk_hedef` + `renk_ton`)**: tonu verilen derece aralığına düşen
+pikseller hedef renge çekilir, **parlaklık korunur**. Sonuç: arazi gölgesi,
+kesikli sınır çizgisi ve kaynağın kendi etiketleri OLDUĞU GİBİ kalır.
+`renk_ton`'u ÖLÇEREK bulun: Memlük haritasında toprak 140-175°, deniz 186°,
+komşu kara 50-70°; aralığı dar tutmak toprağı denizden ayırır.
+
+Bu determinist yol **yedek/ikinci yoldur** ve kaldırılmayacaktır (2026-08-30
+kullanıcı kararı): ücretsizdir, internetsiz çalışır ve her derlemede aynı
+sonucu verir. Renklendirmenin BİRİNCİ yolu artık fal.ai'dir — bkz. aşağıdaki
+"fal.ai ile renklendirme" bölümü.
+
+**İmleçler (`Isaret`)**: koordinat KIRPILMIŞ görselin oranıdır (0-1), yani
+kırpmayı sonradan değiştirseniz de imleç kaymaz. Görüntüye ÇİZİLMEZ, üstüne
+HTML katmanı olarak konur — baskıda vektör keskinliğinde kalır, etiket Türkçe
+ve sayfanın yazı tipiyle olur, yanlış yere düşen bir imleç görüntü yeniden
+üretilmeden tek satırla taşınır.
+
+**Koordinatı gözle DOĞRULAYIN.** Yöntem: kırpılmış görseli yüzde ızgarasıyla
+basın, imleçleri kırmızı artı olarak üstüne çizin, yakınlaştırıp bakın. Ölçüldü:
+ilk denemede "Halep" imleci Hama'ya düşmüştü — enlem/boylamdan doğrusal
+tahmin, harita izdüşümü bilinmediği için tek başına yetmiyor.
+
+KURAL: yalnızca bölümün METNİNDE geçen yerler işaretlenir (harita, metinde
+olmayan bir yeri öne çıkarmamalı).
+
+Raster'da diğer tek uyarlama kırpmadır; onu da genelde kaynağın lejant kutusunu
+dışarıda bırakmak için kullanırsınız (82mm'lik sütunda o kutu okunmaz) —
+yerine `lejant_elle` ile tek satırlık Türkçe lejant yazılır. Görsel baskı
+çözünürlüğüne küçültülür (`en_fazla_px`, varsayılan 1400 ≈ 430 dpi); bu
+olmadan 16 MB'lık bir PNG kitabı şişirir. Küçültme **Pillow** ile yapılır;
+kurulu değilse build durmaz, dosyayı olduğu gibi gömer ve uyarır.
+
+### fal.ai ile renklendirme (raster haritanın BİRİNCİ yolu)
+
+**2026-08-30 kullanıcı kararı: fal.ai geri geldi — ama yalnızca RENKLENDİRME
+için.** Ağustos'ta terk edilen şey görüntü modeline harita *çizdirmekti*; bu
+yasak aynen duruyor (bkz. bir sonraki bölüm). Yeni izin verilen iş bundan
+kategorik olarak farklıdır: **gerçek bir kartografın çizdiği Commons haritasının
+RENGİNİ dersin tonuna çekmek.** Coğrafyayı model üretmez, kaynaktan gelir.
+
+> **AYRIM — bunu karıştırma:** modele "Hârezmşâhlar haritası çiz" demek
+> YASAKTIR (kıyıyı ezberden benzetir, şehri uydurur). Modele "şu gerçek
+> haritanın toprak rengini #1D4E79 yap, başka hiçbir şeye dokunma" demek
+> SERBESTTİR. Birincisinde harita modelin uydurmasıdır, ikincisinde kaynağın
+> çizimidir.
+
+**Etiketleri model YAZMAZ.** Türkçe yer adları bugünkü gibi `Isaret` HTML
+katmanı olarak haritanın üstüne biner (2026-08-30 kullanıcı kararı: karma yol).
+Sebep: görüntü modelleri Türkçe diyakritikleri sık bozuyor (Gürgenç -> Gurgenc)
+ve etiketi yanlış şehre koyabiliyor; HTML katmanında ise harf her zaman doğru,
+baskıda vektör keskinliğinde ve yanlış yere düşen bir imleç görüntü yeniden
+ÜRETİLMEDEN tek satırla taşınabiliyor.
+
+#### Zincir
+
+```
+Vikipedi maddesinin GERÇEKTEN kullandığı haritayı bul
+        (action=query&prop=images — SVG filtresiyle arama onu göremez)
+   -> Commons'tan indir: assets/harita/commons/<ad>.<uzanti>
+   -> assets/harita/commons/LISANS.md'ye künye satırı ekle
+   -> python tools/harita_uret.py ...        (ELLE, tek seferlik)
+   -> assets/harita/uretilmis/<ad>.png + <ad>.json (üretim künyesi)
+   -> denetim kapısı: geçerse kabul, geçmezse dosya YAZILMAZ
+   -> src/<ders>.py: CommonsGorsel(dosya="uretilmis/<ad>.png", ...)
+   -> build.py bunu bugünkü gibi gömer  (DETERMİNİST — fal.ai çağrılmaz)
+```
+
+#### KURAL: fal.ai `build.py`'nin İÇİNDEN ASLA çağrılmaz
+
+Üretim, build'den **ayrı ve elle çalıştırılan** bir adımdır. Aksi hâlde her
+`python build.py` çağrısı para harcar, internet ister ve her seferinde
+FARKLI bir harita üretir — 28 sayfalık bir kitabın yeniden derlenmesi artık
+aynı sonucu vermez, yani sistemin determinist olma özelliği kaybolur.
+`build.py` yalnızca `assets/harita/uretilmis/` altındaki HAZIR dosyayı gömer.
+
+#### `tools/harita_uret.py` — sözleşme
+
+```bash
+python tools/harita_uret.py <slug> --bolum N --sinif X --donem Y --sinav Z \
+       [--cozunurluk 1K|2K] [--model nano-banana-pro] [--kuru] [--zorla]
+```
+
+Yaptığı iş sırayla:
+
+1. Ders modülünü okur, N. bölümdeki `MapBox`/`CommonsGorsel`'i ve kaynak
+   dosyayı bulur; dersin tema rengini `cekirdek/renk_uretici.py`'den alır
+   (kendi kafasından renk seçmez — bkz. `DERS_RENKLERI`).
+2. Prompt'u kurar: *"toprak örtüsünün rengini <hex> yap; kıyı, sınır çizgisi,
+   arazi gölgesi, kaynağın kendi etiketleri ve KESİKLİ sınırların kesikliği
+   AYNEN kalsın; hiçbir yazı ekleme veya silme."*
+3. Kaynağı fal CDN'e yükler, modeli **`--cozunurluk`** ayarında çalıştırır
+   (varsayılan **1K** — sebebi aşağıdaki bölümde).
+4. Sonucu `assets/harita/uretilmis/` altına yazar ve yanına `<ad>.json`
+   künyesini koyar: model, tam prompt, seed, tarih, kaynak dosya + lisansı,
+   çıktı ölçüsü, denetim sonuçları.
+5. Denetim kapısını çalıştırır; **geçmezse dosyayı YAZMAZ** (`--zorla` hariç).
+
+`--kuru` yalnızca prompt'u ve tahmini maliyeti basar, çağrı yapmaz.
+
+#### Denetim kapısı — atlanamaz
+
+Ağustos'taki kayıpların hiçbiri build çıktısında GÖRÜNMEMİŞTİ; ancak piksel
+piksel karşılaştırınca fark edildi. Bu yüzden dört ölçüt mekanik olarak
+denetlenir:
+
+| Ölçüt | Eşik | Neyi yakalar |
 |---|---|---|
-| Ne zaman | Konum/çerçeve göstermek yeterliyse | Bölüm gerçek bir tarihî sınırı/genişlemeyi anlatıyorsa |
-| Sınırlar | **Yaklaşık** — bizim kaba poligonumuz | Kaynağın kartografının çizimi |
-| Lisans | Yükümlülük yok (CC0 Natural Earth) | Çoğunlukla **CC BY-SA 4.0** — atıf + ShareAlike |
-| Kurulum | `--veri-indir` (3 MB) | Dosya `assets/harita/commons/` altında |
+| Çıktı çözünürlüğü | ≥ yerleşimin gerektirdiği px (aşağıya bak) | baskıda bulanık harita |
+| En-boy oranı | ±%1 | %6'lık sıkışma |
+| Toprak maskesi IoU | ≥ %95 | sınırın kayması / uydurulması |
+| Yan yana karşılaştırma PNG'si | **gözle okunur** | silinen yer adları, kesikli sınırın düzleşmesi |
 
-`MapBox.commons` doluysa harita ÇİZİLMEZ, Commons dosyası derse uyarlanır;
-o zaman `bbox`/`cities`/`territory` kullanılmaz ve `source` alanı
-`CommonsKaynak.atif` ile **ezilir** (atıf zorunludur, bir ders onu gizleyemez).
+İlk üçü sayısaldır; dördüncüsü zorunlu insan adımıdır ve `harita_uret.py`
+karşılaştırma görselini diske yazıp yolunu basar. **Ağustos'ta kaybedilen
+üç şeyin ikisini (etiket, kesikli sınır) hiçbir sayısal ölçüt yakalayamaz** —
+o yüzden gözle bakmadan bir haritayı kabul etme.
+
+#### Atıf: AI düzenlemesi GİZLENEMEZ
+
+CC BY-SA bir haritayı yapay zekâyla düzenlemek de **türev eserdir**; atıf ve
+ShareAlike yükümlülüğü aynen devam eder. `assets/harita/uretilmis/` altındaki
+bir dosya kullanıldığında `build.py` atıf satırına *"yapay zekâ ile
+renklendirildi (<model>, <tarih>)"* ibaresini **otomatik ekler** — tıpkı
+`atif`'in bugün `source`'u ezmesi gibi, bir ders bunu gizleyemez. Üretim
+künyesi (`<ad>.json`) git'e girer; üretilmiş PNG `.gitignore`'dadır (koddan
+yeniden üretilebilir, ikili dosya depoyu şişirir).
+
+#### Çözünürlük: **1024 px, kalite `low`** (2026-08-30 kullanıcı kararı)
+
+`build.py` gömmeden önce her raster haritayı `CommonsGorsel.en_fazla_px`
+(varsayılan **1400 px**) değerine küçültür. Yani 2K'nın üstüne çıkmak parayı
+ve süreyi çöpe atmaktır — o pikseller derlemede zaten siliniyor.
+
+**Denetim eşiği 300 değil 240 dpi'dır** (`HEDEF_DPI`). Gerekçesi tasarımsal:
+bu raster yalnızca **coğrafyayı ve rengi** taşır; okunması gereken Türkçe yer
+adları `Isaret` HTML katmanındadır ve baskıda **vektördür**, yani görselin
+çözünürlüğünden bağımsız olarak keskindir. Metin taşımayan bir zemin görseli
+için 240 dpi fotokopide yeterlidir.
+
+> **İSTİSNA:** bir haritada KAYNAĞIN KENDİ etiketlerine güveniyorsanız
+> (Delhi'de olduğu gibi — Lahore/Daulatabad okunsun diye imleç koymamıştık)
+> 240 dpi YETMEZ; o harita için `--dpi 300` verin.
+
+**"Ölçü" uzun kenardır — dikey haritada genişlik düşer.** 82 mm'lik kutuda
+240 dpi için gereken **775 px**'tir:
+
+| Harita | En/boy | 1024'te genişlik | Durum |
+|---|---|---|---|
+| Hârezm (2191×1522) | 1,44 yatay | 1024 | geçer |
+| Delhi (1441×1548) | 0,93 dikey | 953 | geçer |
+| Memlük (1080×1420) | 0,76 dikey | 779 | **kıl payı** geçer |
+
+Memlük payı 4 px'tir — o haritanın kırpması değişirse eşiği yeniden kontrol
+edin. `harita_uret.py` beklenen genişliği **üretimden ÖNCE** hesaplayıp
+"kapıdan GEÇER / kapıda KALIR" diye basar; boşa çağrı yapmayın.
+`taraf="tam"` haritalarda 1024 = 140 dpi'dır — orada ölçüyü büyütün.
+
+#### Model seçimi (2026-08-30 ölçümü)
+
+| Model | Üst sınır | Fiyat | Not |
+|---|---|---|---|
+| `openai/gpt-image-2/edit` | `image_size` serbest | **$1,00** | **Varsayılan** (kullanıcı kararı); `quality="low"`, ölçü 1024 |
+| `bytedance/seedream/v5/pro/edit` | 2048 px | **$0,0675** | En ucuzu — bütçe sıkışıksa bu. Pilotu bu çalıştırdı |
+| `fal-ai/nano-banana-pro/edit` | 4K | $0,15 | Sınır haritasını **reddediyor**, kullanılamıyor |
+
+**Fiyat farkı 15 kattır** ve tek `quality` alanı olan model gpt-image-2'dir
+(`auto`/`low`/`medium`/`high`). Bütçe darsa `--model seedream` deyin; araç
+gpt-image-2 seçildiğinde maliyet uyarısını zaten basar.
+
+**İki sağlayıcı tuzağı ölçüldü (2026-08-30), zaman kaybetmeyin:**
+
+* **`nano-banana-pro` sınır gösteren haritayı DÜZENLEMEYİ REDDEDİYOR.**
+  Görüntüyü indiriyor, sonra 422 `invalid_request` / "Could not generate
+  images with the given prompts and images" veriyor. Google'ın jeopolitik
+  koruması tarihî devlet sınırlarında da tetikleniyor. Prompt'u yumuşatmak
+  denendi, sonuç değişmedi — bu modeli tarihî harita için kullanmayın.
+* **`seedream` Wikimedia'dan İNDİREMİYOR** (`file_download_error`);
+  upload.wikimedia.org tarayıcı dışı isteklere hotlink engeli koyuyor.
+  Çözüm: dosyayı önce fal CDN'ine aynalayın, sonra CDN URL'sini verin.
+  Aynı sebeple Commons API'sine yapılan `urllib` çağrısı da 403 döner —
+  gerçek bir `User-Agent` başlığı şart.
+
+Fiyat çözünürlükten bağımsızdır (görüntü başına sabit), yani 1K'ya inmek
+parayı değil **süreyi** ve gereksiz pikseli kazandırır. Beş haritayı
+yeniden üretmek ~$0,75-2,25 tutar (deneme sayısına göre).
 
 ### Harita GERÇEK VERİDEN çizilir — yapay zekâ ile ÜRETİLMEZ
 
@@ -920,8 +1156,11 @@ o zaman `bbox`/`cities`/`territory` kullanılmaz ve `source` alanı
 ile okunur, izdüşüm ve SVG saf Python'dur), çıktı SVG'dir, üretim ücretsiz
 ve **deterministiktir** — aynı girdi her derlemede aynı haritayı verir.
 
-**Bir görüntü modeline (fal.ai / gpt-image-2) çizdirme yolu 2026 Ağustos'ta
-TERK EDİLDİ; geri getirmeyin.** Görüntü modeli bir harita motoru değildir:
+**Bir görüntü modeline (fal.ai / gpt-image-2) harita ÇİZDİRME yolu 2026
+Ağustos'ta TERK EDİLDİ; geri getirmeyin.** Bu yasak, yukarıdaki "fal.ai ile
+renklendirme" iznini KAPSAMAZ ve onunla karıştırılmamalıdır: orada model
+gerçek bir haritanın rengini değiştirir, burada ise haritanın kendisini
+sıfırdan uydurur. Görüntü modeli bir harita motoru değildir:
 kıyıyı ezberden benzetir, sınırı uydurur. Ölçülen hatalar: Hazar Denizi üç
 haritada imparatorluk sınırının İÇİNDE kaldı; Ammuriye önce Suriye kıyısına,
 sonra güneydoğu Anadolu'ya kondu (doğru yere gelmesi için elle koordinat
@@ -974,6 +1213,14 @@ uyarlama yeniden uygulanabilir). Künye `assets/harita/commons/LISANS.md`'de.
   | `yazi_olcek=1.6` | etiketi FİZİKSEL olarak tam sayfadakiyle aynı boya çıkarır |
   | `yazi_araligi=(23, 28)` | punto YELPAZESİNİ sıkıştırır (çarpanın alternatifi) |
   | `lejant=True` | lejant kutusunu SVG'den söküp haritanın ALTINA HTML basar |
+  | `lejant_elle={hex: "açıklama"}` | kaynakta çizili lejant yoksa elle yazılır |
+  | `dolgu_opaklik=0.78` | yarı saydam alanların opaklığını yükseltir |
+
+  **`dolgu_opaklik` ne zaman?** Kartograf alanı yarı saydam bırakmış olabilir
+  (altındaki nehirler görünsün diye). Kaynağın yeşili o opaklıkta yeşil kalır
+  ama tema rengine çevrilen lacivert krem zeminle karışıp GRİYE düşer
+  (ölçüldü: Delhi haritası, kaynak `fill-opacity:0.392`). 0,78 rengi geri
+  getirir, coğrafya hâlâ görünür; 1.0 yapmayın.
 
   **`yazi_olcek` mi `yazi_araligi` mı?** Kaynağın punto yelpazesi darsa
   (Rum Selçuklu: şehir 19,5 / antik ad 12,2) düz çarpan yeter. Genişse

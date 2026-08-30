@@ -518,7 +518,15 @@ def haritalari_coz(pack, d: "donem_mod.Donem | None" = None) -> dict:
                 mb = data[0]
                 mb.gorsel_oran = f"{g} / {y}"
                 try:
-                    if mb.commons is not None:
+                    if isinstance(mb.commons, harita_commons.CommonsGorsel):
+                        # Hazır RASTER harita (PNG/JPG): uyarlanmaz, kırpılıp
+                        # küçültülerek gömülür. Atıf yine ZORUNLU.
+                        mb.svg, mb.gorsel_oran, mb.lejant = \
+                            harita_commons.gorsel_hazirla(mb.commons)
+                        mb.source = mb.commons.atif
+                        cizilen.append({"bolum": ch.number, "bolge": mb.region,
+                                        "kaynak": "commons"})
+                    elif mb.commons is not None:
                         # Hazır Commons haritası: çizilmez, uyarlanır.
                         # Atıf ZORUNLU -- CC BY-SA gereği source'u eziyoruz ki
                         # bir dersin kendi source metni atfı gizleyemesin.

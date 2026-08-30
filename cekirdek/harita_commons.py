@@ -51,6 +51,7 @@ yeniden uygulanabilir ve neyi değiştirdiğimiz kayıt altındadır.
 
 from __future__ import annotations
 
+import base64
 import re
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -112,11 +113,24 @@ class CommonsKaynak:
     # ~16). Karşılaştırma boşluktan bağımsızdır: kaynakta iki satıra bölünmüş
     # "Mamluk"/"Sultanate" tspan'leri "Mamluk Sultanate" yazımıyla eşleşir.
     koru: list = field(default_factory=list)
+    # Kaynak alanları yarı saydam bıraktıysa (altındaki nehirler görünsün diye)
+    # tema rengine çevrilen ton griye düşebilir; bu değer >0 verilirse
+    # `renkler` ile eşlenen alanların fill-opacity'si buna çekilir. 1.0 yapmayın.
+    # ÖLÇÜLDÜ (Delhi haritası, kaynak fill-opacity 0.392): yeşil bu opaklıkta
+    # yeşil kalıyordu ama lacivert krem zeminle karışıp griye düşüyordu; 0.78
+    # rengi geri getiriyor, altındaki nehirler hâlâ görünüyor.
+    dolgu_opaklik: float = 0.0
     # Lejantı SVG'den söküp HTML'e taşır. Yan sütunda ŞART: kaynaktaki lejant
     # kutusu haritanın %43'ü kadar geniştir; küçülünce hem kendisi okunmaz olur
     # hem de haritanın güneydoğusunu kapatır. HTML'e taşınınca sayfanın kendi
     # tipografisiyle (7pt) basılır, yani her ölçekte okunur kalır.
     lejant: bool = False
+    # Kaynakta ÇİZİLİ bir lejant kutusu yoksa (bazı haritalarda renklerin
+    # anlamı yalnızca Commons dosya sayfasında yazar) lejant elle verilir:
+    # {kaynak_hex: "Türkçe açıklama"}. Anahtarlar KAYNAK renkleridir; tema
+    # eşlemesinden geçirilir, yani HTML lejant haritadaki son renkleri gösterir.
+    # `lejant=True` ile birlikte kullanılırsa sökülen lejantın yerine geçer.
+    lejant_elle: dict = field(default_factory=dict)
 
 
 class KaynakYok(FileNotFoundError):
@@ -359,6 +373,32 @@ def _yazi_olcekle(svg: str, k: float) -> str:
     return svg
 
 
+def _dolgu_opakligi(svg: str, renkler: list, deger: float) -> str:
+    """Verilen dolgu renklerini taşıyan elemanların fill-opacity'sini değiştirir.
+
+    Neden gerekli: kartograf alanı yarı saydam bırakmış olabilir (Delhi
+    haritasında `fill-opacity:0.392`) ki altındaki nehirler görünsün. Kaynağın
+    yeşili bu opaklıkta hâlâ yeşil kalıyordu, ama tema rengine çevrilen
+    lacivert %39'da griye düşüyor -- çünkü krem zeminle karışınca mavi-sarı
+    karşıtlığı doygunluğu yiyor. Opaklığı ölçülü biçimde yükseltmek rengi geri
+    getirir; 1.0 yapmayın, altındaki coğrafya tamamen kaybolur.
+    """
+    hedef = {r.lower() for r in renkler}
+
+    def stil(m):
+        govde = m.group(1)
+        renk = re.search(r"fill\s*:\s*(#[0-9a-fA-F]{6})", govde)
+        if not renk or renk.group(1).lower() not in hedef:
+            return m.group(0)
+        if re.search(r"fill-opacity\s*:", govde):
+            govde = re.sub(r"fill-opacity\s*:\s*[\d.]+", f"fill-opacity:{deger:.3f}", govde)
+        else:
+            govde += f";fill-opacity:{deger:.3f}"
+        return f'style="{govde}"'
+
+    return re.sub(r'style="([^"]*)"', stil, svg)
+
+
 def _lejanti_cikar(svg: str) -> tuple[str, list]:
     """Lejant kutusunu SVG'den söker ve (renk, metin) çiftlerini döndürür.
 
@@ -460,6 +500,24 @@ def _kirp(svg: str, kutu: tuple) -> str:
                   'viewBox="%.2f %.2f %.2f %.2f"' % (x, y, g, yuk), svg, count=1)
 
 
+def _viewbox_tamamla(svg: str) -> str:
+    """viewBox'ı olmayan dosyaya width/height'tan bir viewBox türetir.
+
+    Her Commons dosyasında viewBox yok (Inkscape yalnızca width/height
+    yazabiliyor). Kutuya sığdırmak için width/height'ı %100 yapıyoruz; viewBox
+    yoksa o anda koordinat sistemi de kaybolur ve harita ya devasa ya da
+    kırpılmış çıkar. Ölçüldü: Orta Doğu 1328 haritası ekrana sığmayan gri bir
+    dikdörtgen olarak basılıyordu.
+    """
+    if re.search(r'viewBox\s*=\s*"', svg):
+        return svg
+    kok = svg[svg.find("<svg"): svg.find(">", svg.find("<svg")) + 1]
+    g, y = _sayi(kok, "width"), _sayi(kok, "height")
+    if not g or not y:
+        return svg
+    return svg.replace("<svg", f'<svg viewBox="0 0 {g:.4f} {y:.4f}"', 1)
+
+
 def _olcu(svg: str) -> tuple[str, str]:
     """viewBox'tan (oran_metni, viewBox) döndürür; kutunun en-boy oranı budur."""
     m = re.search(r'viewBox\s*=\s*"([\d.\s+-]+)"', svg)
@@ -490,8 +548,12 @@ def uyarla(kaynak: CommonsKaynak, tema_hex: str) -> tuple[str, str, list, list]:
     svg = yol.read_text(encoding="utf-8")
 
     svg = _sadelestir(svg)
-    if kaynak.renkler:
-        svg = _renkleri_degistir(svg, _renk_esle(kaynak.renkler, tema_hex, kaynak.aciklik))
+    svg = _viewbox_tamamla(svg)
+    renk_esleme = _renk_esle(kaynak.renkler, tema_hex, kaynak.aciklik) if kaynak.renkler else {}
+    if renk_esleme:
+        svg = _renkleri_degistir(svg, renk_esleme)
+        if kaynak.dolgu_opaklik:
+            svg = _dolgu_opakligi(svg, list(renk_esleme.values()), kaynak.dolgu_opaklik)
     svg, bulunmayan = _metinleri_degistir(svg, kaynak.metin)
     if kaynak.metin_renk:
         svg = _renkleri_degistir(svg, {k.lower(): v for k, v in kaynak.metin_renk.items()})
@@ -502,6 +564,11 @@ def uyarla(kaynak: CommonsKaynak, tema_hex: str) -> tuple[str, str, list, list]:
     lejant_ogeleri = []
     if kaynak.lejant:
         svg, lejant_ogeleri = _lejanti_cikar(svg)
+    if kaynak.lejant_elle:
+        # Elle yazılan lejant: anahtarlar KAYNAK renkleridir, haritadakiyle
+        # aynı tema eşlemesinden geçirilir ki kutucuk ile alan aynı tonda olsun.
+        lejant_ogeleri = [(renk_esleme.get(k.lower(), k.lower()), v)
+                          for k, v in kaynak.lejant_elle.items()]
     svg, _silinen = _yaziyi_sil(svg, kaynak.sil_desen, kaynak.koru)
     svg = re.sub(r"(font-family\s*:\s*)([^;\"']+)", r"\1" + kaynak.yazitipi, svg)
     svg = re.sub(r'font-family\s*=\s*"[^"]*"', f'font-family="{kaynak.yazitipi}"', svg)
@@ -534,3 +601,175 @@ def uyarla(kaynak: CommonsKaynak, tema_hex: str) -> tuple[str, str, list, list]:
     svg = re.sub(r'(<svg\b[^>]*?)\sheight\s*=\s*"[^"]*"', r"\1", svg, count=1)
     svg = svg.replace("<svg", '<svg width="100%" height="100%"', 1)
     return svg, oran, bulunmayan, lejant_ogeleri
+
+
+# ===========================================================================
+# HAZIR RASTER HARİTA (PNG / JPG)
+# ---------------------------------------------------------------------------
+# Vikipedi maddelerindeki tarihî haritaların ÇOĞU vektör değil, raster'dır.
+# SVG yolu (yukarısı) onları hiç göremiyordu; bu bölüm o boşluğu kapatır.
+#
+# NE KAYBEDERİZ: raster'da etiket çevrilemez, ayıklanamaz, renk değiştirilemez.
+# Harita olduğu gibi, kendi dilinde ve kendi renkleriyle girer. Elimizde kalan
+# tek uyarlama piksel KIRPMAsıdır (lejant kutusunu ya da boş kenarı atmak).
+#
+# NE KAZANIRIZ: kartografın asıl çizimi. Bir devletin gerçek sınırlarını
+# gösteren en iyi harita çoğu zaman raster'dır.
+# ===========================================================================
+
+MIME = {".png": "image/png", ".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".gif": "image/gif"}
+
+
+@dataclass
+class Isaret:
+    """Haritanın ÜSTÜNE bindirilen tek bir yer imleci (nokta + Türkçe etiket).
+
+    `x`/`y` KIRPILMIŞ görselin oranıdır (0-1, sol üstten). Oran kullanılmasının
+    sebebi: kırpmayı ya da küçültmeyi sonradan değiştirsek de imleç kaymaz.
+
+    İmleç görüntünün İÇİNE ÇİZİLMEZ, üstüne HTML katmanı olarak konur. Üç
+    sebeple: (1) baskıda vektör keskinliği -- 430 dpi'lık bir raster'a gömülen
+    yazı bulanıklaşır; (2) etiket Türkçe ve sayfanın kendi yazı tipiyle olur;
+    (3) yanlış yere düşen bir imleç tek satır düzenlemeyle taşınır, görüntü
+    yeniden üretilmez.
+
+    KURAL: yalnızca bölümün METNİNDE geçen yerler işaretlenir.
+    """
+    ad: str
+    x: float
+    y: float
+    yan: str = "sag"          # etiketin noktaya göre yönü: "sag" | "sol"
+
+
+@dataclass
+class CommonsGorsel:
+    """Commons'taki hazır RASTER haritanın derse bağlanma tarifi.
+
+    `CommonsKaynak` (SVG) ile aynı yerde kullanılır: `MapBox.commons`.
+    Fark, uyarlama imkânının yalnızca kırpma olmasıdır.
+    """
+    dosya: str                                   # assets/harita/commons/ altındaki ad
+    atif: str                                    # ZORUNLU: yazar + lisans + bağlantı
+    kirp: tuple = ()                             # (sol, üst, sağ, alt) PİKSEL
+    # Baskı çözünürlüğü: 82mm'lik sütunda 1400 px ≈ 430 dpi, fotokopi için
+    # fazlasıyla yeterli. Kaynak dosyalar 3370 px / 16 MB'a kadar çıkabiliyor;
+    # küçültülmezse tek harita kitabı PDF'ini şişirir.
+    en_fazla_px: int = 1400
+    kalite: int = 88                             # JPEG kalitesi
+    # Kırpılan lejantın yerine Türkçe açıklama: {hex: "açıklama"}.
+    lejant_elle: dict = field(default_factory=dict)
+
+    # --- Determinist renk uyarlaması (görüntü modeli DEĞİL) ---
+    # `renk_hedef` verilirse, tonu `renk_ton` aralığına düşen pikseller o renge
+    # çekilir. PARLAKLIK KORUNUR: arazi gölgesi, kesikli sınır çizgisi ve
+    # kaynağın kendi etiketleri olduğu gibi kalır -- bir görüntü modeliyle
+    # yapıldığında bunların üçü de sessizce kayboluyordu (ölçüldü: Memlük
+    # haritası, 2026 Ağustos).
+    #
+    # `renk_ton` KAYNAK tonlarının derece aralığıdır; ölçerek bulun, tahmin
+    # etmeyin. Memlük haritasında toprak 140-175°, deniz 186°, komşu kara
+    # 50-70° -- yani aralığı dar tutmak toprağı denizden ayırıyor.
+    renk_hedef: str = ""              # hedef hex (genelde dersin tema rengi)
+    renk_ton: tuple = ()              # (en_kucuk_derece, en_buyuk_derece)
+    renk_parlaklik: float = 0.86      # <1 koyulaştırır; 1.0 = kaynağınki
+    renk_doygunluk: float = 0.55      # hedef doygunluk tavanı
+
+    # Haritanın üstüne bindirilen yer imleçleri (bkz. Isaret)
+    isaretler: list = field(default_factory=list)
+
+
+def _gorsel_olcekle(veri: bytes, kaynak: CommonsGorsel) -> tuple[bytes, str, float]:
+    """Kırpar, küçültür ve (veri, mime, en/boy oranı) döndürür.
+
+    Pillow yoksa build DURMAZ: dosya olduğu gibi gömülür ve uyarı basılır.
+    Çerçeve `object-fit: contain` kullandığı için yanlış orandan gelen tek
+    sonuç kenarda boşluk olur; harita EZİLMEZ.
+    """
+    uzanti = Path(kaynak.dosya).suffix.lower()
+    try:
+        import io
+        from PIL import Image
+    except ImportError:
+        print("[UYARI] Pillow kurulu değil: raster harita küçültülmeden gömülüyor "
+              "(PDF şişebilir). Kurulum: pip install Pillow")
+        return veri, MIME.get(uzanti, "image/png"), 0.0
+
+    im = Image.open(io.BytesIO(veri))
+    if kaynak.renk_hedef and kaynak.renk_ton:
+        im = _tonu_kaydir(im, kaynak)
+    if kaynak.kirp:
+        if len(kaynak.kirp) != 4:
+            raise ValueError(f"CommonsGorsel.kirp (sol, üst, sağ, alt) olmalı; "
+                             f"verilen: {kaynak.kirp!r}")
+        im = im.crop(tuple(int(v) for v in kaynak.kirp))
+    if im.width > kaynak.en_fazla_px:
+        yeni_yuk = max(1, round(im.height * kaynak.en_fazla_px / im.width))
+        im = im.resize((kaynak.en_fazla_px, yeni_yuk), Image.LANCZOS)
+
+    tampon = io.BytesIO()
+    saydam = im.mode in ("RGBA", "LA", "P")
+    if saydam:
+        im.convert("RGBA").save(tampon, format="PNG", optimize=True)
+        mime = "image/png"
+    else:
+        im.convert("RGB").save(tampon, format="JPEG", quality=kaynak.kalite, optimize=True)
+        mime = "image/jpeg"
+    return tampon.getvalue(), mime, im.width / im.height
+
+
+def _tonu_kaydir(im, kaynak: CommonsGorsel):
+    """Tonu `renk_ton` aralığında olan pikselleri `renk_hedef` ailesine çeker.
+
+    PARLAKLIK KORUNUR (yalnızca `renk_parlaklik` ile ölçeklenir): arazi gölgesi,
+    kesikli sınır çizgisi ve kaynağın kendi etiketleri olduğu gibi kalır. Bir
+    görüntü modeliyle yapılan aynı işte bu üçü de sessizce kaybolmuştu.
+
+    Doygunluğu düşük pikseller (gri/krem komşu kara) hiç dokunulmadan geçer;
+    yoksa haritanın yarısı maviye boyanırdı.
+    """
+    import colorsys
+    hedef_h = colorsys.rgb_to_hls(*[int(kaynak.renk_hedef[i:i + 2], 16) / 255
+                                    for i in (1, 3, 5)])[0]
+    alt, ust = kaynak.renk_ton
+    im = im.convert("RGB")
+    px = im.load()
+    g, y = im.size
+    for j in range(y):
+        for i in range(g):
+            r, gg, b = px[i, j]
+            h, l, sat = colorsys.rgb_to_hls(r / 255, gg / 255, b / 255)
+            if sat < 0.12 or not (alt <= h * 360 <= ust):
+                continue
+            nr, ng, nb = colorsys.hls_to_rgb(hedef_h, l * kaynak.renk_parlaklik,
+                                             min(kaynak.renk_doygunluk, sat + 0.35))
+            px[i, j] = (int(nr * 255), int(ng * 255), int(nb * 255))
+    return im
+
+
+def _isaret_html(isaretler: list) -> str:
+    """İmleçleri görüntünün üstüne bindirilecek HTML olarak üretir."""
+    parcalar = []
+    for m in isaretler:
+        if not (0.0 <= m.x <= 1.0 and 0.0 <= m.y <= 1.0):
+            raise ValueError(f"Isaret('{m.ad}') koordinatı 0-1 aralığında olmalı "
+                             f"(kırpılmış görselin oranı); verilen: {m.x}, {m.y}")
+        sinif = "geomap-pin" + (" sol" if m.yan == "sol" else "")
+        parcalar.append(f'<span class="{sinif}" style="left:{m.x * 100:.2f}%;'
+                        f'top:{m.y * 100:.2f}%">{m.ad}</span>')
+    return "".join(parcalar)
+
+
+def gorsel_hazirla(kaynak: CommonsGorsel) -> tuple[str, str, list]:
+    """Raster haritayı sayfaya gömülmeye hazır <img> olarak döndürür.
+
+    Dönen: (html, css_en_boy_orani, lejant_ogeleri)
+    """
+    yol = COMMONS / kaynak.dosya
+    if not yol.exists():
+        raise KaynakYok(f"Commons haritası yok: {yol}")
+    veri, mime, oran = _gorsel_olcekle(yol.read_bytes(), kaynak)
+    b64 = base64.b64encode(veri).decode("ascii")
+    html = f'<img alt="" src="data:{mime};base64,{b64}">' + _isaret_html(kaynak.isaretler)
+    oran_metni = f"{oran:.4f} / 1" if oran else "4 / 3"
+    lejant = [(k.lower(), v) for k, v in kaynak.lejant_elle.items()]
+    return html, oran_metni, lejant

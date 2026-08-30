@@ -11,3 +11,8 @@ pymupdf>=1.24      # sayfa kutuları (TrimBox/BleedBox), boyut optimizasyonu, ö
 # Ham kaynak PDF'lerinden metin çıkarmak için (yeni bir ders işlerken kullanılır;
 # üretim hattının kendisi buna bağlı değildir)
 pdfplumber>=0.11
+
+# Raster (PNG/JPG) Commons haritalarını kırpıp baskı çözünürlüğüne küçültmek için
+# (cekirdek/harita_commons.py -> CommonsGorsel). Yoksa build durmaz, dosya
+# küçültülmeden gömülür ve uyarı basılır.
+Pillow>=10.0
