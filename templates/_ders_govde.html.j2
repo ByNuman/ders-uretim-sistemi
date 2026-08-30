@@ -161,6 +161,16 @@
     </div>
     {% endif %}
   </div>
+  {# Lejant SVG'nin İÇİNDE değil ALTINDA: harita yan sütuna küçültülünce
+     lejant onunla birlikte küçülüp okunmaz olmasın diye sökülüp buraya
+     taşınıyor (bkz. cekirdek/harita_commons.py -> _lejanti_cikar). #}
+  {% if m.lejant %}
+  <ul class="geomap-legend">
+    {% for renk, metin in m.lejant %}
+    <li><span class="geomap-swatch" style="background: {{ renk }};"></span>{{ metin }}</li>
+    {% endfor %}
+  </ul>
+  {% endif %}
   {% if m.caption %}<div class="geomap-note">{{ m.caption | safe }}</div>{% endif %}
   {% if m.source %}<div class="geomap-source">{{ m.source }}</div>{% endif %}
 </figure>

@@ -179,6 +179,11 @@ class MapBox:
     # --- build.py tarafından doldurulur (elle yazılmaz) ---
     svg: str = ""             # çizilmiş harita; boşsa veri eksiktir (yer tutucu basılır)
     gorsel_oran: str = "4 / 3"
+    # Haritanın ALTINA HTML olarak basılan lejant: [(renk_hex, "etiket"), ...].
+    # Yalnızca `CommonsKaynak.lejant=True` iken dolar; lejant o zaman kaynak
+    # SVG'den sökülüp buraya taşınır, böylece harita küçültülünce lejant
+    # onunla birlikte küçülmez (bkz. cekirdek/harita_commons.py).
+    lejant: list = field(default_factory=list)
 
 
 @dataclass

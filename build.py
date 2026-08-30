@@ -522,13 +522,19 @@ def haritalari_coz(pack, d: "donem_mod.Donem | None" = None) -> dict:
                         # Hazır Commons haritası: çizilmez, uyarlanır.
                         # Atıf ZORUNLU -- CC BY-SA gereği source'u eziyoruz ki
                         # bir dersin kendi source metni atfı gizleyemesin.
-                        mb.svg, mb.gorsel_oran, eksik_metin = harita_commons.uyarla(
-                            mb.commons, tema)
+                        mb.svg, mb.gorsel_oran, eksik_metin, mb.lejant = \
+                            harita_commons.uyarla(mb.commons, tema)
                         mb.source = mb.commons.atif
                         for anahtar in eksik_metin:
                             print(f"[UYARI] Bölüm {ch.number} haritası: '{anahtar}' "
                                   f"metni kaynak SVG'de bulunamadı -- çeviri uygulanmadı "
                                   f"(kaynak dosya güncellenmiş olabilir).")
+                        # Lejant istendi ama sökülemedi: harita lejantsız
+                        # basılırsa renkler anlamsızlaşır, sessiz kalmayalım.
+                        if getattr(mb.commons, "lejant", False) and not mb.lejant:
+                            print(f"[UYARI] Bölüm {ch.number} haritası: lejant kutusu "
+                                  f"SVG içinde bulunamadı -- HTML lejant basılamıyor "
+                                  f"(kaynak dosyanın düzeni değişmiş olabilir).")
                         cizilen.append({"bolum": ch.number, "bolge": mb.region,
                                         "kaynak": "commons"})
                     else:

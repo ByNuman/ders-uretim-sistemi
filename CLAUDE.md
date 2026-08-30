@@ -940,9 +940,14 @@ sessiz bir yanlış bilgi kaynağıdır.
         metin={"Territori del Sultanato di Rum nel 1100 circa": "1100 civarında Rum Selçuklu toprakları"},
         renkler=["#412424", "#754142", "#a3595b", "#bf8b8c"],   # KOYUDAN AÇIĞA
         metin_renk={"#f8ff00": "#12233A"},                       # kontrast düzeltmesi
+        # Yan sütuna sığdırma (bkz. aşağıdaki tuzaklar) — dördü BİRLİKTE:
+        kirp=(240, 0, 1215, 672),    # boş denizi at, yakınlaştır
+        sil_desen=r"^\(.+\)$",       # şehrin antik karşılığını at
+        yazi_olcek=1.6,              # etiket fiziksel olarak aynı boyda kalsın
+        lejant=True,                 # lejant SVG'den sökül, HTML'e taşın
     ),
     caption="...",
-), yan=[], taraf="tam")
+), yan=[BulletBlock(1, "İsim Kökeni ve Coğrafi Bağlam", [...])], taraf="sag")
 ```
 
 Kaynak SVG'yi **elle düzenlemeyin**: Commons'tan geldiği gibi durur, dönüşüm
@@ -956,11 +961,46 @@ uyarlama yeniden uygulanabilir). Künye `assets/harita/commons/LISANS.md`'de.
 * **Renk uyarlaması kontrastı bozabilir.** Kaynakta sarı şehir etiketleri koyu
   bordo zemine göre seçilmişti; zemini açık maviye çekince okunmaz oldular.
   `metin_renk` + beyaz hale (`hale=True`, varsayılan) ikisini birden çözer.
-* **Geniş harita dar sütuna sığmaz.** 2.19:1 bir harita 78mm sütunda 36mm'ye
-  düşüyor, şehir etiketleri ~4pt kalıyor. `taraf="tam"` ile sayfa genişliğine
-  (186mm) alın; ayrıca haritayı `yan=[]` ile KENDİ bloğu yapın, metni ayrı
-  `.add_block()` ile ekleyin — yoksa harita+metin tek dev blok olur ve
-  dengeleyici bölüm açılışını %41 boş bırakır.
+* **Geniş harita dar sütuna OLDUĞU GİBİ sığmaz — küçültme ayarlarıyla sığar.**
+  2.19:1 bir harita 82mm sütunda 37mm'ye düşer ve şehir etiketleri ~2.9pt
+  kalır. Çözüm `taraf="tam"`a kaçmak DEĞİL, `CommonsKaynak`'ın dört küçültme
+  ayarını birlikte kullanmaktır (Rum Selçuklu haritasında ölçülüp uygulandı):
+
+  | Ayar | Ne yapar |
+  |---|---|
+  | `kirp=(x, y, gen, yuk)` | viewBox'ı daraltır — boş denizi atıp yakınlaştırır |
+  | `sil_desen=r"^\(.+\)$"` | ikincil etiketleri atar (şehrin antik karşılığı) |
+  | `koru=["Otrar", …]` | TERSİ: yalnızca listedekiler kalır (çok etiketli kaynak) |
+  | `yazi_olcek=1.6` | etiketi FİZİKSEL olarak tam sayfadakiyle aynı boya çıkarır |
+  | `yazi_araligi=(23, 28)` | punto YELPAZESİNİ sıkıştırır (çarpanın alternatifi) |
+  | `lejant=True` | lejant kutusunu SVG'den söküp haritanın ALTINA HTML basar |
+
+  **`yazi_olcek` mi `yazi_araligi` mı?** Kaynağın punto yelpazesi darsa
+  (Rum Selçuklu: şehir 19,5 / antik ad 12,2) düz çarpan yeter. Genişse
+  (Moğol: şehir 8px, ülke 21px) çarpan işe yaramaz — şehri okunur yapan
+  katsayı ülke adını haritanın üstüne taşırır. `yazi_araligi` sıralamayı
+  (şehir < deniz < ülke) korur ama hepsini verilen aralığa çeker.
+
+  **`koru` ne zaman?** Kaynakta 30'dan fazla etiket varsa. Moğol haritasında
+  139 etiket vardı (Lhasa'dan Novgorod'a); 82mm'lik sütunda okunabilir üst
+  sınır ~16'dır. Listeye YALNIZCA o bölümün metninde geçen yerler yazılır —
+  harita, ders metninde olmayan bir yeri öne çıkarmamalıdır.
+
+  Ölçüt: **`yazi_olcek` ≈ kırpmanın yakınlaştırma katsayısı** (eski genişlik /
+  yeni genişlik). O zaman etiketler haritaya ORANLA aynı kalır, yani
+  kalabalıklaşmaz. `lejant=True` yan sütunda ŞARTTIR: kaynak lejant kutusu
+  haritanın %43'ü kadar geniştir, küçülünce hem kendisi okunmaz olur hem de
+  haritanın bir köşesini kapatır; HTML'e taşınınca sayfanın kendi puntosuyla
+  (7pt) basılır. Lejant sökülemezse build **uyarır** — harita sessizce
+  lejantsız (yani renkleri anlamsız) basılmaz.
+
+  Ölçülen sonuç (İslam Tarihi III, Bölüm 2): 186 × 85 mm tam genişlik kutusu
+  → 82 × 45 mm yan sütun kutusu (**%76 daha az alan**), şehir etiketi ~6pt
+  ile okunur, sayfa doluluğu %72 → %94.
+
+  `taraf="tam"` yine de bir seçenektir; o kipte haritayı `yan=[]` ile KENDİ
+  bloğu yapın ve metni ayrı `.add_block()` ile ekleyin — yoksa harita+metin
+  tek dev blok olur ve dengeleyici bölüm açılışını %41 boş bırakır.
 
 ### Kendi çizdiğimiz haritanın kullanımı
 

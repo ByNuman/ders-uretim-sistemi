@@ -542,6 +542,19 @@ table.ctable td:first-child { font-weight:700; color: var(--ink); }
   background: var(--paper); box-shadow: var(--shadow-sm);
 }
 .geomap-frame > svg { display: block; width: 100%; height: 100%; }
+/* Harita lejantı: SVG'nin içinden sökülüp HTML'e taşınmış renk açıklamaları.
+   Sayfanın kendi puntosuyla basıldığı için harita küçülünce lejant küçülmez --
+   yan sütun kipinin (taraf="sag"/"sol") çalışabilmesinin ön koşuludur. */
+.geomap-legend {
+  list-style: none; margin: 1.8mm 0 0; padding: 0;
+  font-size: 7pt; line-height: 1.45; color: var(--ink-soft);
+}
+.geomap-legend li { display: flex; gap: 1.6mm; align-items: baseline; }
+.geomap-legend li + li { margin-top: .6mm; }
+.geomap-swatch {
+  width: 3.4mm; height: 2.2mm; flex: 0 0 auto; border-radius: 1px;
+  border: .3pt solid var(--line); transform: translateY(.2mm);
+}
 .geomap-note {
   font-size: 7.6pt; color: var(--ink-faint); line-height: 1.4; margin-top: 1.8mm;
 }
