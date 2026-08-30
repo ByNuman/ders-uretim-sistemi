@@ -1593,16 +1593,20 @@ Bunlar `templates/style.css` içinde zaten düzeltilmiş durumda — sadece
    görünür) — bu yüzden yeni bir renk denerken HER ZAMAN kapak sayfasını
    görsel kontrol et.
 
-7. **`TEST_PER_PAGE` çok yüksek olursa ilk test sayfası taşar**: İlk sayfada
-   banner + 3'lü bilgi çubuğu + talimat kutusu da olduğu için, devam
-   sayfalarına göre daha az yer kalır. 2 sütunlu düzene geçildiğinde `8`
-   denendi, bazı derslerde ilk sayfa taştı; `7`'de bile başka bir derste
-   taştı; `6`'da üç ders de (Felsefe/Sosyoloji/Psikoloji) taşmadan geçti —
-   bu yüzden sabit `6`'da tutuluyor (bkz. yukarıdaki "Sayfalama sabitleri").
-   Yeni bir ders TEST_PER_PAGE'i global olarak değiştirmemeli — sabit zaten
+7. **`TEST_PER_PAGE_FIRST` çok yüksek olursa ilk test sayfası taşar**: İlk
+   sayfada banner + 3'lü bilgi çubuğu + talimat kutusu da olduğu için, devam
+   sayfalarına göre daha az yer kalır. Bu yüzden ilk sayfanın kapasitesi
+   devam sayfalarınınkinden (`TEST_PER_PAGE = 8`) AYRI bir sabitte tutulur.
+   175x250mm sürümünde bu sabit elle `6`'ya çekilmişti; A4'e geçilirken
+   `tools/kalibre.py`'ye eklenip İLK KEZ ÖLÇÜLDÜ ve dönemin bütün dersleri
+   üzerinde **`7`** çıktı (`8`'de bazı derslerin uzun soru metinleri ilk
+   sayfayı taşırıyor). Sabit bu yüzden `7`'dir — bkz. yukarıdaki "Sayfalama
+   sabitleri" ve `build.py`'deki `TEST_PER_PAGE_FIRST`.
+   Yeni bir ders bu sabiti global olarak değiştirmemeli — sabit zaten
    birden fazla dersin en sıkı senaryosuna göre kalibredir; sadece o dersin
    soru metinleri alışılmadık uzunsa yine de taşma çıkabilir, o zaman
-   metni kısaltmayı düşün, sabiti değil.
+   metni kısaltmayı düşün, sabiti değil. Sayfa boyutu değişirse tahminle
+   düzeltme yapma: `python tools/kalibre.py` çalıştırıp yeniden ölç.
 
 8. **Test/Cevap Anahtarı 2 sütunlu düzen**: `column-count:2` ile CSS çoklu
    sütun düzeni kullanılıyor (CSS Grid değil) çünkü tarayıcı önce birinci
