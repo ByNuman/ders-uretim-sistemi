@@ -178,21 +178,13 @@ class MapBox:
     source: str = ("Sınırlar yaklaşıktır (temsilî). Coğrafya: Natural Earth "
                    "1:50m, kamu malı.")
 
-    # --- Hazır Commons haritası (opsiyonel) ---
-    # Doluysa harita SIFIRDAN ÇİZİLMEZ: Wikimedia Commons'tan alınmış
-    # profesyonel bir tarihî harita derse uyarlanır (lejant Türkçeye, renkler
-    # temaya). O zaman bbox/cities/territory KULLANILMAZ ve `source` alanı
-    # `CommonsKaynak.atif` ile EZİLİR -- CC BY-SA atfı zorunludur, bkz.
-    # cekirdek/harita_commons.py ve assets/harita/commons/LISANS.md.
-    commons: object = None                                    # CommonsKaynak | None
-
     # --- build.py tarafından doldurulur (elle yazılmaz) ---
     svg: str = ""             # çizilmiş harita; boşsa veri eksiktir (yer tutucu basılır)
     gorsel_oran: str = "4 / 3"
     # Haritanın ALTINA HTML olarak basılan lejant: [(renk_hex, "etiket"), ...].
-    # Yalnızca `CommonsKaynak.lejant=True` iken dolar; lejant o zaman kaynak
-    # SVG'den sökülüp buraya taşınır, böylece harita küçültülünce lejant
-    # onunla birlikte küçülmez (bkz. cekirdek/harita_commons.py).
+    # `katmanlar` doluyken harita_cizim tarafından doldurulur: lejant SVG'nin
+    # İÇİNDE değil ALTINDA durur, böylece harita yan sütuna küçültülünce
+    # lejant onunla birlikte küçülüp okunmaz olmaz.
     lejant: list = field(default_factory=list)
 
 

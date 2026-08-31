@@ -1,0 +1,253 @@
+{
+ "_not": "Illustrator SVG'si. Capa oranlari GOZLE OKUNMADI: kaynagin kendi <use xlink:href='#New_Symbol_2'> sehir noktalarinin transform matrisinden tam deger olarak alinip viewBox'a (992.13x595.28) bolundu. Onceki denemede 17 capa kucultulmus izgaradan gozle okunmus, ortalama artik %2,77 / en buyuk %8,3 cikmis ve harita cikarilamaz sayilmisti; hata izdusumde degil OKUMADAYDI. ton = yedi genisleme bandinin ORTAK ton araligi (olculdu: 22,5°..46,9°); kara 63,8°, kesikli sinir 15,6°, deniz 178,1° disarida kalir -- yani yedi bant TEK sinira birlesiyor. kirp = rasterlestirilmis 1800px goruntudeki viewBox alani (alttaki 120px viewport dolgusu atilir).",
+ "kirp": [
+  0,
+  0,
+  1800,
+  1080
+ ],
+ "ton": [
+  19,
+  52
+ ],
+ "capalar": [
+  {
+   "ad": "Novgorod",
+   "lon": 31.28,
+   "lat": 58.52,
+   "x": 0.20675,
+   "y": 0.07116
+  },
+  {
+   "ad": "Esztergom",
+   "lon": 18.74,
+   "lat": 47.79,
+   "x": 0.04575,
+   "y": 0.14334
+  },
+  {
+   "ad": "Smolensk",
+   "lon": 32.05,
+   "lat": 54.78,
+   "x": 0.18003,
+   "y": 0.14225
+  },
+  {
+   "ad": "Murom",
+   "lon": 42.05,
+   "lat": 55.57,
+   "x": 0.24535,
+   "y": 0.19194
+  },
+  {
+   "ad": "Bolgar",
+   "lon": 49.06,
+   "lat": 54.98,
+   "x": 0.2861,
+   "y": 0.23881
+  },
+  {
+   "ad": "Kostantiniyye",
+   "lon": 28.98,
+   "lat": 41.01,
+   "x": 0.05623,
+   "y": 0.3618
+  },
+  {
+   "ad": "Sudak",
+   "lon": 34.97,
+   "lat": 44.85,
+   "x": 0.12606,
+   "y": 0.34547
+  },
+  {
+   "ad": "Dimaşk",
+   "lon": 36.29,
+   "lat": 33.51,
+   "x": 0.0672,
+   "y": 0.57203
+  },
+  {
+   "ad": "Bağdat",
+   "lon": 44.36,
+   "lat": 33.31,
+   "x": 0.14126,
+   "y": 0.64099
+  },
+  {
+   "ad": "Erzurum",
+   "lon": 41.28,
+   "lat": 39.9,
+   "x": 0.14594,
+   "y": 0.48849
+  },
+  {
+   "ad": "İsfahan",
+   "lon": 51.67,
+   "lat": 32.65,
+   "x": 0.2104,
+   "y": 0.70271
+  },
+  {
+   "ad": "Şiraz",
+   "lon": 52.53,
+   "lat": 29.6,
+   "x": 0.2095,
+   "y": 0.7694
+  },
+  {
+   "ad": "Rey",
+   "lon": 51.43,
+   "lat": 35.59,
+   "x": 0.21921,
+   "y": 0.64099
+  },
+  {
+   "ad": "Buhara",
+   "lon": 64.42,
+   "lat": 39.77,
+   "x": 0.35725,
+   "y": 0.612
+  },
+  {
+   "ad": "Semerkant",
+   "lon": 66.97,
+   "lat": 39.65,
+   "x": 0.38264,
+   "y": 0.6192
+  },
+  {
+   "ad": "Otrar",
+   "lon": 68.3,
+   "lat": 42.85,
+   "x": 0.39963,
+   "y": 0.5654
+  },
+  {
+   "ad": "Balasagun",
+   "lon": 75.65,
+   "lat": 42.82,
+   "x": 0.46534,
+   "y": 0.56768
+  },
+  {
+   "ad": "Herat",
+   "lon": 62.2,
+   "lat": 34.35,
+   "x": 0.3238,
+   "y": 0.71652
+  },
+  {
+   "ad": "Gazne",
+   "lon": 68.42,
+   "lat": 33.55,
+   "x": 0.38743,
+   "y": 0.7521
+  },
+  {
+   "ad": "Sığnak",
+   "lon": 66.72,
+   "lat": 44.15,
+   "x": 0.38972,
+   "y": 0.528
+  },
+  {
+   "ad": "Belh",
+   "lon": 66.9,
+   "lat": 36.76,
+   "x": 0.37637,
+   "y": 0.68092
+  },
+  {
+   "ad": "Lahor",
+   "lon": 74.33,
+   "lat": 31.55,
+   "x": 0.44964,
+   "y": 0.8033
+  },
+  {
+   "ad": "Budaun",
+   "lon": 79.12,
+   "lat": 28.04,
+   "x": 0.50188,
+   "y": 0.87908
+  },
+  {
+   "ad": "Yarkant",
+   "lon": 77.27,
+   "lat": 38.42,
+   "x": 0.48171,
+   "y": 0.66055
+  },
+  {
+   "ad": "Lhasa",
+   "lon": 91.12,
+   "lat": 29.65,
+   "x": 0.63562,
+   "y": 0.82852
+  },
+  {
+   "ad": "Dunhuang",
+   "lon": 94.66,
+   "lat": 40.14,
+   "x": 0.65169,
+   "y": 0.60051
+  },
+  {
+   "ad": "Kaifeng",
+   "lon": 114.31,
+   "lat": 34.8,
+   "x": 0.85808,
+   "y": 0.60667
+  },
+  {
+   "ad": "Chengdu",
+   "lon": 104.07,
+   "lat": 30.57,
+   "x": 0.77293,
+   "y": 0.75669
+  },
+  {
+   "ad": "Dali",
+   "lon": 100.23,
+   "lat": 25.61,
+   "x": 0.74539,
+   "y": 0.87913
+  },
+  {
+   "ad": "Liaoyang",
+   "lon": 123.17,
+   "lat": 41.27,
+   "x": 0.89896,
+   "y": 0.41229
+  },
+  {
+   "ad": "Pekin",
+   "lon": 116.41,
+   "lat": 39.9,
+   "x": 0.84991,
+   "y": 0.4938
+  },
+  {
+   "ad": "Seul",
+   "lon": 126.98,
+   "lat": 37.57,
+   "x": 0.95437,
+   "y": 0.44802
+  },
+  {
+   "ad": "Avarga",
+   "lon": 110.72,
+   "lat": 47.2,
+   "x": 0.75425,
+   "y": 0.39277
+  },
+  {
+   "ad": "Lanzhou",
+   "lon": 103.83,
+   "lat": 36.06,
+   "x": 0.75279,
+   "y": 0.64644
+  }
+ ]
+}

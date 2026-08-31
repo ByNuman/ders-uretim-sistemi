@@ -540,33 +540,8 @@ table.ctable td:first-child { font-weight:700; color: var(--ink); }
 .geomap-frame {
   border: 1px solid var(--line); border-radius: 8px; overflow: hidden;
   background: var(--paper); box-shadow: var(--shadow-sm);
-  position: relative;   /* yer imleçleri buna göre konumlanır */
 }
-/* YER İMLECİ: haritanın üstüne bindirilen nokta + Türkçe etiket.
-   Görüntünün İÇİNE ÇİZİLMEZ -- baskıda vektör keskinliğinde kalsın, etiket
-   sayfanın kendi yazı tipiyle olsun ve yanlış yere düşen bir imleç görüntü
-   yeniden üretilmeden tek satırla taşınabilsin diye (bkz. Isaret). */
-.geomap-pin {
-  position: absolute; transform: translateY(-50%);
-  padding-left: 2.0mm; white-space: nowrap; line-height: 1;
-  font-size: 6.2pt; font-weight: 700; color: var(--accent-dark);
-  /* Beyaz hale: hem açık hem koyu zeminde okunur (haritada ikisi de var). */
-  text-shadow: 0 0 .5mm #fff, 0 0 .5mm #fff, 0 0 .35mm #fff;
-}
-.geomap-pin::before {
-  content: ""; position: absolute; left: 0; top: 50%;
-  width: 1.3mm; height: 1.3mm; margin: -.65mm 0 0 -.65mm; border-radius: 50%;
-  background: var(--accent-dark); border: .3mm solid #fff; box-sizing: content-box;
-}
-.geomap-pin.sol {
-  padding-left: 0; padding-right: 2.0mm; transform: translate(-100%, -50%);
-}
-.geomap-pin.sol::before { left: auto; right: 0; margin: -.65mm -.65mm 0 0; }
 .geomap-frame > svg { display: block; width: 100%; height: 100%; }
-/* Raster harita (PNG/JPG, base64 gömülü). `contain`: çerçeve oranı görselin
-   oranıyla zaten eşleşiyor, ama Pillow yoksa oran hesaplanamaz -- o durumda
-   kenarda boşluk kalır, harita EZİLMEZ. */
-.geomap-frame > img { display: block; width: 100%; height: 100%; object-fit: contain; }
 /* Harita lejantı: SVG'nin içinden sökülüp HTML'e taşınmış renk açıklamaları.
    Sayfanın kendi puntosuyla basıldığı için harita küçülünce lejant küçülmez --
    yan sütun kipinin (taraf="sag"/"sol") çalışabilmesinin ön koşuludur. */

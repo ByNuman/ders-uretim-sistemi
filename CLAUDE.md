@@ -352,13 +352,13 @@ ders-uretim-sistemi/
 │   ├── renk_uretici.py     # DERSE ÖZEL VURGU RENGİ — build + ders-anlatim ORTAK kaynağı
 │   ├── harita.py           # HARİTA KUTUSU: hangi bölüm harita adayı (tespit)
 │   ├── harita_cizim.py     # HARİTA ÇİZİMİ: Natural Earth + gerçek koordinat -> SVG
-│   ├── harita_commons.py   # HAZIR HARİTA: Commons SVG/raster'ını derse uyarlar
+│   ├── sinir_cikar.py      # SINIR ÇIKARMA: Commons haritasının alanı -> lon/lat poligonu
 │   ├── commons_ara.py      # KAYNAK BULMA: bir Vikipedi maddesinin kullandığı haritalar
 │   └── pdfx.py             # BASKI ÖNCESİ: TrimBox/BleedBox + Ghostscript ile PDF/X-4 CMYK
 ├── tools/
 │   ├── olcum.py            # Her bloğun GERÇEK yüksekliğini (mm) Chromium'da ölçer
 │   ├── dengele.py          # Ölçüme göre ChapterPage bölünmelerini yeniden dağıtır
-│   ├── harita.py           # HARİTA: kaynak bul/indir · aday tara · önizle · imleç denetle
+│   ├── harita.py           # HARİTA: kaynak bul/indir · sınır çıkar · aday tara · önizle
 │   └── kalibre.py          # Sözlük/Test/Cevap sayfa başına öğe sabitlerini kalibre eder
 ├── templates/
 │   ├── _ders_govde.html.j2      # BİR DERSİN GÖVDESİ — asıl şablon, tek kaynak (sabit)
@@ -908,27 +908,37 @@ metin sütunu 1.2 / harita sütunu 1 oranında.
 Bu kural sistemi deterministik tutar: `build.py` hiçbir zaman internete
 çıkmaz, para harcamaz ve aynı girdi her derlemede aynı haritayı verir.
 
-### ÜÇ YOL VAR: kendi çizimimiz · hazır Commons haritası · sınırı çıkarıp çizmek
+### TEK YOL VAR: sınırı kaynaktan çıkar, geri kalanını biz çizelim
 
-| | `harita_cizim` (kendi çizimimiz) | `harita_commons` (hazır harita) |
-|---|---|---|
-| Ne zaman | Konum/çerçeve göstermek yeterliyse | Bölüm gerçek bir tarihî sınır/genişleme anlatıyorsa |
-| Sınırlar | **Yaklaşık** — elle yazılan kaba poligon, kesikli kenarla öyle etiketlenir | Kartografın çizimi |
-| Etiket | Türkçe, biz yazarız (`Place`) | SVG'de çevrilebilir · raster'da kaynağınki kalır + `Isaret` katmanı |
-| Lisans | Yükümlülük yok (Natural Earth, CC0) | Genelde CC BY-SA — **atıf zorunlu**, ShareAlike |
-| Bağımlılık | Yok (saf Python + GeoJSON) | Raster küçültme için Pillow |
+```
+tools/harita.py --commons     Vikipedi maddesinin kullandığı haritayı bul/indir
+        ↓
+tools/harita.py --sinir-cikar Renkli alanı gerçek lon/lat poligonuna çevir
+        ↓
+cekirdek/harita_cizim.py      Natural Earth üzerine BİZİM motorumuzla çiz
+```
 
-Commons tarafında dosya biçimine göre iki sınıf var — ikisi de `MapBox.commons`
-alanına konur:
+Üç dosya tek bir hattır, birbirinin alternatifi değildir: `sinir_cikar`
+çizimini `harita_cizim`e yaptırır, çıkaracağı kaynağı `commons_ara`dan alır.
 
-* **`CommonsKaynak`** — vektör SVG. Etiketi çevrilebilir, ayıklanabilir,
-  puntosu ölçeklenebilir, lejantı sökülebilir.
-* **`CommonsGorsel`** — raster PNG/JPG. Uyarlama imkânı kırpma, determinist
-  renk kaydırma ve üstüne binen `Isaret` imleçleriyle sınırlıdır.
+Sonuç: sınır kartografın, geri kalan her şey bizim. Bütün etiketler Türkçe,
+baskıda vektör, PDF'e megabaytlık raster gömülmüyor, harita kitabın kendi
+tipografisiyle basılıyor ve her derleme aynı çıktıyı veriyor.
 
-`MapBox.commons` doluysa harita ÇİZİLMEZ; `bbox`/`cities`/`territory`
-kullanılmaz ve `source` alanı `atif` ile **ezilir** (atıf zorunludur, bir ders
-onu gizleyemez).
+> **2026-08-31 — hazır harita GÖMME yolu söküldü.** Eskiden ikinci bir yol
+> vardı: Commons haritasını (SVG veya raster) olduğu gibi sayfaya gömüp
+> etiketlerini çevirmek/kırpmak (`cekirdek/harita_commons.py`,
+> `CommonsKaynak`, `CommonsGorsel`, `Isaret`, `--imlec`). Silindi. Raster
+> yarısı zaten ölü koddu — dört raster harita sınır çıkarmaya geçince hiçbir
+> ders kullanmıyordu. SVG yarısını yalnızca Moğol haritası tutuyordu ve o da
+> artık çiziliyor (aşağıdaki nota bakın). Geri getirmeyin: gömülü harita
+> yabancı dilde etiket, raster şişkinlik ve ikinci bir tipografi demekti.
+
+`MapBox.territory` (tek sınır) ya da `MapBox.katmanlar` (genişleme evreleri)
+alanına konan poligon **kartografın çizgisidir**, elle tahmin değildir — ama
+kesikli kenar yine kalır, çünkü kaynağın kendisi de sınırı yaklaşık ilan eder.
+Atıf ZORUNLUDUR (bkz. "`territory` dürüstlük meselesidir").
+
 
 ### Harita eklemenin yolu: `tools/harita.py --commons`
 
@@ -992,11 +1002,10 @@ kaydırıp parlaklığı koruduğu için bir harfe dokunması fiziksel olarak
 mümkün değildir.
 
 
-### ÜÇÜNCÜ YOL: sınırı Commons haritasından ÇIKAR, geri kalanı biz çizelim
+### Sınır çıkarma: `--sinir-cikar`
 
-En iyi sonucu bu verir: **sınır kartografın, geri kalan her şey bizim.** Bütün
-etiketler Türkçe ve baskıda vektör olur, PDF'e 16 MB'lık raster gömülmez,
-harita kitabın kendi tipografisiyle basılır.
+Kaynağın renkli alanını gerçek koordinata çevirir; sonuç `territory`
+olur ve harita `harita_cizim.py` ile ÇİZİLİR.
 
 ```bash
 python tools/harita.py --sinir-cikar memluk-sultanligi-1317.jpg
@@ -1020,7 +1029,8 @@ kaynak değişmedikçe yeniden kullanılır.
 ]}
 ```
 
-`x`/`y` KIRPILMIŞ görselin oranıdır — `--imlec` ızgarasından okunur. `ton`,
+`x`/`y` KIRPILMIŞ görselin oranıdır (vektör kaynakta dosyadan okunur,
+bkz. aşağısı). `ton`,
 kaynağın toprak renginin derece aralığıdır; ÖLÇÜN, tahmin etmeyin.
 
 **Gürültü halkalarına dikkat:** kaynağın dağ gölgeleri toprak rengiyle aynı
@@ -1086,20 +1096,35 @@ Moğol haritasında komşu bantlar kanal başına yalnızca ~9 birim farklıdır
 tolerans 8'de iki bandın maskesi 1526 pikselde çakışırken **tolerans 4'te
 çakışma sıfırdır**.
 
-#### Her harita çıkarılamaz — Moğol haritası ÖLÇÜLDÜ ve VAZGEÇİLDİ
+#### Çapaları GÖZLE okumayın — vektör kaynakta dosyadan okuyun
 
-Moğol İmparatorluğu haritası (Bölüm 5) bilerek Commons uyarlaması olarak
-BIRAKILDI. 17 çapa okundu, fit tutmadı: ortalama artık %2,77, en büyük %8,3.
-Teşhis boylam eğimini ölçmekle yapıldı — Kostantiniyye→Bağdat 0,247 %/derece,
-Kaifeng→Hangzhou 1,947 %/derece. Sekiz kat fark; gerçek bir izdüşüm böyle
-davranmaz, yani sorun izdüşümde değil OKUMADA. Harita Avrupa'dan Japonya'ya
-yarım küre kaplıyor, ~50 minik şehir dairesi var ve küçültülmüş ızgaradan
-güvenilir okunmuyorlar.
+Moğol İmparatorluğu haritası bir kez "çıkarılamaz" ilan edilmişti: 17 çapa
+küçültülmüş ızgaradan gözle okunmuş, ortalama artık %2,77 / en büyük %8,3
+çıkmıştı. Boylam eğimi ölçülüp (Kostantiniyye→Bağdat 0,247 %/derece,
+Kaifeng→Hangzhou 1,947 %/derece — sekiz kat fark) "sorun izdüşümde değil
+OKUMADA" teşhisi konmuştu. **Teşhis doğruydu, sonuç yanlıştı:** çözüm haritadan
+vazgeçmek değil, okumayı bırakmaktı.
 
-Ayrıca çevirmenin kazancı da şüpheliydi: o haritanın mevcut hâli zaten vektör,
-etiketleri Türkçe, 139 etiketten dersin metninde geçen 10'u seçilmiş ve lejantı
-HTML'e taşınmış durumda. **Ders: bir haritayı çevirmek her zaman iyileştirme
-değildir; artık raporu "çevirme" de diyebilir.**
+Kaynak VEKTÖRSE çapa koordinatı dosyanın içinde tam değer olarak yazılıdır.
+Bu haritada şehirler `<use xlink:href="#New_Symbol_2" transform="matrix(...)">`
+ile basılmış; 65 noktanın konumu matristen alınıp en yakın `<text>` etiketiyle
+eşleştirildi (çoğu 4 px içinde eşleşti, ikinci en yakın etiket 20+ px uzakta —
+yani eşleşmeler tekildi). Aynı harita, aynı izdüşüm modeli:
+
+| | gözle okuma (17 çapa) | dosyadan okuma (34 çapa) |
+|---|---|---|
+| ortalama artık | %2,77 | **%0,66** |
+| en büyük artık | %8,3 | **%1,79** |
+
+`Capa.x/y` hâlâ kırpılmış görselin oranıdır; değişen tek şey o oranın nereden
+geldiği. Raster kaynakta gözle okumak zorundasınız — orada çapaları dört bir
+yana dağıtmak (bkz. yukarıdaki Memlük ölçümü) tek savunmanızdır.
+
+Kalan %1,79'u kovalamayın: 34 çapa haritanın dört bir yanına dağılmış
+durumda, yani artık modelin yarım küre ölçeğindeki sınırıdır, okuma hatası
+değil. Üç çapayı (Esztergom, Bolgar, Seul) tek tek çıkarmak denendi — en
+büyük artık %1,83 ve %1,89'a ÇIKTI. Kuadratik hâlâ tavandır (bkz. yukarısı).
+
 
 #### Sahte halkalar: `--tek-parca`
 
@@ -1123,145 +1148,6 @@ Sınır CC BY-SA bir haritadan türetilmiştir. Kendi motorumuzla çizmek onu
 Bu, `territory`nin normalde "yaklaşık" olan durumundan da farklıdır: burada
 sınır ELLE TAHMİN EDİLMEMİŞTİR, kartografın çizgisidir — ama kesikli kenar
 yine de kalır, çünkü kaynağın kendisi de sınırı yaklaşık ilan ediyor.
-
-### Raster harita: kırpma, renk ve yer imleçleri
-
-```python
-.add_map(MapBox(
-    region="Memlük Sultanlığı: Mısır ve Bilâdü'ş-Şâm (1317)",
-    label="Tarihî harita",
-    commons=CommonsGorsel(
-        dosya="memluk-sultanligi-1317.jpg",
-        atif="Harita: Ro4444, Wikimedia Commons, CC BY-SA 4.0 — ...",
-        kirp=(700, 80, 1780, 1500),                  # PİKSEL: (sol, üst, sağ, alt)
-        renk_hedef="#1D4E79", renk_ton=(140, 175),   # toprağı dersin rengine çek
-        lejant_elle={"#80b0da": "Memlük Sultanlığı'nın toprakları"},
-        isaretler=[
-            Isaret("Kahire", 0.195, 0.392),
-            Isaret("Akkâ",   0.404, 0.269, yan="sol"),
-        ],
-    ),
-    caption="...",
-), yan=[BulletBlock(1, "...", [...])], taraf="sag")
-```
-
-**Kırpma** genelde kaynağın lejant kutusunu dışarıda bırakmak içindir (82mm'lik
-sütunda o kutu okunmaz); yerine `lejant_elle` ile tek satırlık Türkçe lejant
-yazılır. Görsel baskı çözünürlüğüne küçültülür (1400 px ≈ 430 dpi); bu olmadan
-16 MB'lık bir PNG kitabı şişirir. Küçültme **Pillow** ile yapılır; kurulu
-değilse build durmaz, dosyayı olduğu gibi gömer ve uyarır.
-
-**Renk (`renk_hedef` + `renk_ton`)** — tonu verilen derece aralığına düşen
-pikseller hedef renge çekilir, **parlaklık korunur**. Sonuç: arazi gölgesi,
-kesikli sınır çizgisi ve kaynağın kendi etiketleri OLDUĞU GİBİ kalır.
-`renk_ton`'u ÖLÇEREK bulun: Memlük haritasında toprak 140-175°, deniz 186°,
-komşu kara 50-70°; aralığı dar tutmak toprağı denizden ayırır.
-
-Renk uyarlaması **varsayılan değildir** (2026 Ağustos, kullanıcı kararı): bir
-haritanın dersin tonuyla aynı olması gerekmiyor. `renk_hedef` verilmezse harita
-kaynağın kendi renkleriyle basılır.
-
-### `Isaret` imleçleri ve `--imlec` denetimi — ATLAMAYIN
-
-`Isaret` görüntüye ÇİZİLMEZ, üstüne HTML katmanı olarak konur: baskıda vektör
-keskinliğinde kalır, etiket Türkçe ve sayfanın yazı tipiyle olur, yanlış yere
-düşen bir imleç görüntü yeniden üretilmeden tek satırla taşınır.
-
-Koordinat **kırpılmış görselin oranıdır** (0-1, sol üstten) — kırpmayı
-sonradan değiştirseniz de imleç kaymaz.
-
-**Yanlış imleç SESSİZDİR.** Ne taşma denetimi ne `validate()` onu görür;
-harita gayet düzgün basılır, sadece şehir yanlış yerdedir. Enlem/boylamdan
-doğrusal tahmin de yetmez, çünkü kaynağın izdüşümü bilinmiyor. Bu yüzden
-her raster haritada şunu çalıştırın ve çıkan PNG'ye **gözle bakın**:
-
-```bash
-python tools/harita.py --imlec islam_tarihi_3 --bolum 3 --sinif 2 --donem 2 --sinav final
-```
-
-Yüzde ızgarasıyla birlikte her imleci kırmızı artı olarak basar. Ölçülen
-faydası (2026-08-31): Memlük haritasındaki 6 imleçten **3'ü yanlıştı** —
-"Kudüs" kıyıda (55 km batıda), "Akkâ" denizde, "Aynicâlût" kıyı şeridinin
-batısında duruyordu; üçü de aynı yönde kaymıştı.
-
-**Yanlış imleci nasıl düzeltirsiniz:** doğru duran 3 imleçten afin izdüşüm
-çözüp (`x,y = a·lon + b·lat + c`) diğerlerinin yerini hesaplayın, sonra
-`--imlec` ile tekrar bakın. Tek bir imleci gözle "biraz sağa" itmek yanıltıcıdır.
-
-KURAL: yalnızca bölümün METNİNDE geçen yerler işaretlenir (harita, metinde
-olmayan bir yeri öne çıkarmamalı).
-
-### Commons SVG haritası kullanımı
-
-```python
-.add_map(MapBox(
-    region="Rum Selçuklu Sultanlığı'nın genişlemesi (1100-1240)",
-    label="Tarihî harita",
-    commons=CommonsKaynak(
-        dosya="rum-selcuklu-genisleme-1100-1240.svg",
-        atif="Harita: <yazar>, Wikimedia Commons, CC BY-SA 4.0 — ... uyarlama da CC BY-SA 4.0'dır.",
-        metin={"Territori del Sultanato di Rum nel 1100 circa": "1100 civarında Rum Selçuklu toprakları"},
-        metin_renk={"#f8ff00": "#12233A"},   # kontrast düzeltmesi
-        # Yan sütuna sığdırma (bkz. aşağıdaki tuzaklar) — dördü BİRLİKTE:
-        kirp=(240, 0, 1215, 672),    # boş denizi at, yakınlaştır
-        sil_desen=r"^\(.+\)$",       # şehrin antik karşılığını at
-        yazi_olcek=1.6,              # etiket fiziksel olarak aynı boyda kalsın
-        lejant=True,                 # lejant SVG'den sökül, HTML'e taşın
-    ),
-    caption="...",
-), yan=[BulletBlock(1, "İsim Kökeni ve Coğrafi Bağlam", [...])], taraf="sag")
-```
-
-Kaynak SVG'yi **elle düzenlemeyin**: Commons'tan geldiği gibi durur, dönüşüm
-kod içinde yapılır (böylece neyi değiştirdiğimiz kayıtlı, dosya güncellenirse
-uyarlama yeniden uygulanabilir). Künye `assets/harita/commons/LISANS.md`'de.
-
-Üç tuzak ölçüldü, kaldırmayın:
-* **Yazı tipi tek tırnakla yazılır** (`'DejaVu Sans', sans-serif`). Çift tırnak
-  `style="..."` özniteliğini erken kapatıp SVG'yi geçersiz XML yapıyor —
-  Chromium dosyayı hiç açmıyor, sayfa boş çıkıyor. (Artık `harita_commons.YAZITIPI`
-  sabitinde, ders başına ayar değil.)
-* **Etiket rengi kontrastı bozabilir.** Kaynakta sarı şehir etiketleri koyu
-  bordo zemine göre seçilmişti; açık bir zeminde okunmaz oluyorlar.
-  `metin_renk` + beyaz hale (her zaman açık) ikisini birden çözer.
-* **Geniş harita dar sütuna OLDUĞU GİBİ sığmaz — küçültme ayarlarıyla sığar.**
-  2.19:1 bir harita 82mm sütunda 37mm'ye düşer ve şehir etiketleri ~2.9pt
-  kalır. Çözüm `taraf="tam"`a kaçmak DEĞİL, aşağıdaki ayarları birlikte
-  kullanmaktır:
-
-  | Ayar | Ne yapar |
-  |---|---|
-  | `kirp=(x, y, gen, yuk)` | viewBox'ı daraltır — boş denizi atıp yakınlaştırır |
-  | `sil_desen=r"^\(.+\)$"` | ikincil etiketleri atar (şehrin antik karşılığı) |
-  | `koru=["Otrar", …]` | TERSİ: yalnızca listedekiler kalır (çok etiketli kaynak) |
-  | `yazi_olcek=1.6` | etiketi FİZİKSEL olarak tam sayfadakiyle aynı boya çıkarır |
-  | `yazi_araligi=(23, 28)` | punto YELPAZESİNİ sıkıştırır (çarpanın alternatifi) |
-  | `lejant=True` | lejant kutusunu SVG'den söküp haritanın ALTINA HTML basar |
-  | `lejant_elle={hex: "açıklama"}` | kaynakta çizili lejant yoksa elle yazılır |
-
-  **`yazi_olcek` mi `yazi_araligi` mı?** Kaynağın punto yelpazesi darsa
-  (Rum Selçuklu: şehir 19,5 / antik ad 12,2) düz çarpan yeter. Genişse
-  (Moğol: şehir 8px, ülke 21px) çarpan işe yaramaz — şehri okunur yapan
-  katsayı ülke adını haritanın üstüne taşırır. `yazi_araligi` sıralamayı
-  (şehir < deniz < ülke) korur ama hepsini verilen aralığa çeker.
-
-  **`koru` ne zaman?** Kaynakta 30'dan fazla etiket varsa. Moğol haritasında
-  139 etiket vardı (Lhasa'dan Novgorod'a); 82mm'lik sütunda okunabilir üst
-  sınır ~16'dır. Listeye YALNIZCA o bölümün metninde geçen yerler yazılır.
-
-  Ölçüt: **`yazi_olcek` ≈ kırpmanın yakınlaştırma katsayısı** (eski genişlik /
-  yeni genişlik). `lejant=True` yan sütunda ŞARTTIR: kaynak lejant kutusu
-  haritanın %43'ü kadar geniştir; HTML'e taşınınca sayfanın kendi puntosuyla
-  (7pt) basılır. Lejant sökülemezse build **uyarır** — harita sessizce
-  lejantsız (yani renkleri anlamsız) basılmaz.
-
-  Ölçülen sonuç (İslam Tarihi III, Bölüm 2): 186 × 85 mm tam genişlik kutusu
-  → 82 × 45 mm yan sütun kutusu (**%76 daha az alan**), şehir etiketi ~6pt
-  ile okunur, sayfa doluluğu %72 → %94.
-
-  `taraf="tam"` yine de bir seçenektir; o kipte haritayı `yan=[]` ile KENDİ
-  bloğu yapın ve metni ayrı `.add_block()` ile ekleyin — yoksa harita+metin
-  tek dev blok olur ve dengeleyici bölüm açılışını %41 boş bırakır.
 
 ### Kendi çizdiğimiz haritanın kullanımı
 
@@ -1334,12 +1220,11 @@ bir göl boyanamaz.
 
 ```bash
 python tools/harita.py --veri-indir                                     # bir kez (Natural Earth)
-python tools/harita.py --commons "<Vikipedi maddesi>"                   # hazır harita ara
+python tools/harita.py --commons "<Vikipedi maddesi>"                   # kaynak harita ara
 python tools/harita.py --commons "<madde>" --sec N --ders <slug>        # indir + künye + kod parçası
 python tools/harita.py --sinir-cikar <dosya.jpg>                        # sınırı lon/lat poligonuna çevir
 python tools/harita.py --tara   <slug> --sinif X --donem Y --sinav Z    # aday bölümler
 python tools/harita.py --onizle <slug> --sinif X --donem Y --sinav Z    # haritaları dosyaya yaz
-python tools/harita.py --imlec  <slug> --bolum N --sinif X --donem Y --sinav Z   # imleç denetimi
 ```
 
 `assets/harita/*.geojson` (3 MB) ve Commons raster kaynakları `.gitignore`'dadır;
@@ -1800,7 +1685,6 @@ python tools/harita.py --sinir-cikar <dosya.jpg>
 python tools/harita.py --veri-indir
 python tools/harita.py --tara <slug> --sinif X --donem Y --sinav Z
 python tools/harita.py --onizle <slug> --sinif X --donem Y --sinav Z
-python tools/harita.py --imlec <slug> --bolum N --sinif X --donem Y --sinav Z
 
 # Ghostscript + ICC profili teşhisi
 python cekirdek/pdfx.py
@@ -1861,10 +1745,10 @@ python cekirdek/theme_engine.py
       harita gerekiyorsa `--commons "<madde>"` ile buldum (LISANS.md künyesi
       otomatik yazıldı) ve build çıktısındaki "[harita] N harita kutusu ...
       0 eksik" satırını gördüm
-- [ ] Haritada `Isaret` imleci varsa `tools/harita.py --imlec` ile ızgaralı
-      PNG'yi üretip HER imleci gözle denetledim (yanlış imleç SESSİZDİR —
-      ne taşma denetimi ne validate() onu yakalar; ölçüldü: Memlük
-      haritasındaki 6 imleçten 3'ü yanlış yerdeydi)
+- [ ] Yeni bir sınır çıkardıysam `assets/harita/sinir/<ad>.bindirme.png`
+      dosyasına GÖZLE baktım (kırmızı çizgi kaynağın renkli alanını izliyor
+      mu) ve artık raporunu okudum — yanlış bir maske SESSİZDİR, ne taşma
+      denetimi ne validate() onu yakalar
 - [ ] Bookmark/link sayısını doğruladım
 - [ ] (SADECE kullanıcı açıkça istediyse — bkz. en üstteki KRİTİK KURAL;
       istemediyse bu adımı ATLA ve kitaba dokunma) Yeni dersi

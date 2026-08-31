@@ -190,9 +190,9 @@ def indir(aday: Aday, hedef_klasor, yeni_ad: str = "") -> "tuple":
 
 
 def atif(aday: Aday) -> str:
-    """CommonsKaynak/CommonsGorsel `atif` alanı -- API'den üretilir, elle yazılmaz."""
+    """`MapBox.source` atıf satırı -- API'den üretilir, elle yazılmaz."""
     return (f"Harita: {aday.yazar}, Wikimedia Commons, {aday.lisans} — "
-            f"{aday.sayfa_url} · uyarlama da aynı lisanstadır.")
+            f"{aday.sayfa_url}")
 
 
 def kunye(aday: Aday, dosya_adi: str, kullanan: str, uyarlama: str = "") -> str:

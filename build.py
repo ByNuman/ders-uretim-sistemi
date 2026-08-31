@@ -54,7 +54,6 @@ from cekirdek import pdfx
 from cekirdek import donem as donem_mod
 
 from cekirdek import harita_cizim
-from cekirdek import harita_commons
 
 ROOT = Path(__file__).parent
 TEMPLATES = ROOT / "templates"
@@ -518,42 +517,13 @@ def haritalari_coz(pack, d: "donem_mod.Donem | None" = None) -> dict:
                 mb = data[0]
                 mb.gorsel_oran = f"{g} / {y}"
                 try:
-                    if isinstance(mb.commons, harita_commons.CommonsGorsel):
-                        # Hazır RASTER harita (PNG/JPG): uyarlanmaz, kırpılıp
-                        # küçültülerek gömülür. Atıf yine ZORUNLU.
-                        mb.svg, mb.gorsel_oran, mb.lejant = \
-                            harita_commons.gorsel_hazirla(mb.commons)
-                        mb.source = mb.commons.atif
-                        cizilen.append({"bolum": ch.number, "bolge": mb.region,
-                                        "kaynak": "commons"})
-                    elif mb.commons is not None:
-                        # Hazır Commons haritası: çizilmez, uyarlanır.
-                        # Atıf ZORUNLU -- CC BY-SA gereği source'u eziyoruz ki
-                        # bir dersin kendi source metni atfı gizleyemesin.
-                        mb.svg, mb.gorsel_oran, eksik_metin, mb.lejant = \
-                            harita_commons.uyarla(mb.commons)
-                        mb.source = mb.commons.atif
-                        for anahtar in eksik_metin:
-                            print(f"[UYARI] Bölüm {ch.number} haritası: '{anahtar}' "
-                                  f"metni kaynak SVG'de bulunamadı -- çeviri uygulanmadı "
-                                  f"(kaynak dosya güncellenmiş olabilir).")
-                        # Lejant istendi ama sökülemedi: harita lejantsız
-                        # basılırsa renkler anlamsızlaşır, sessiz kalmayalım.
-                        if getattr(mb.commons, "lejant", False) and not mb.lejant:
-                            print(f"[UYARI] Bölüm {ch.number} haritası: lejant kutusu "
-                                  f"SVG içinde bulunamadı -- HTML lejant basılamıyor "
-                                  f"(kaynak dosyanın düzeni değişmiş olabilir).")
-                        cizilen.append({"bolum": ch.number, "bolge": mb.region,
-                                        "kaynak": "commons"})
-                    else:
-                        # Kutu oranı bbox'tan türetilir: dikey coğrafya dikey
-                        # kutu alır, yoksa harita sabit 4:3'ün ortasına sıkışır.
-                        g2, y2 = harita_cizim.oran_hesapla(mb.bbox)
-                        mb.gorsel_oran = f"{g2:.4f} / {y2:.4f}"
-                        mb.svg = harita_cizim.svg_uret(mb, tema)
-                        cizilen.append({"bolum": ch.number, "bolge": mb.region,
-                                        "kaynak": "cizim"})
-                except (harita_cizim.VeriYok, harita_commons.KaynakYok) as e:
+                    # Kutu oranı bbox'tan türetilir: dikey coğrafya dikey
+                    # kutu alır, yoksa harita sabit 4:3'ün ortasına sıkışır.
+                    g2, y2 = harita_cizim.oran_hesapla(mb.bbox)
+                    mb.gorsel_oran = f"{g2:.4f} / {y2:.4f}"
+                    mb.svg = harita_cizim.svg_uret(mb, tema)
+                    cizilen.append({"bolum": ch.number, "bolge": mb.region})
+                except harita_cizim.VeriYok as e:
                     mb.svg = ""
                     eksik.append({"bolum": ch.number, "bolge": mb.region, "sebep": str(e)})
     return {"cizilen": cizilen, "eksik": eksik, "ders": ders_klasoru_of(pack), "tema": tema}
@@ -564,11 +534,8 @@ def harita_raporu(pack, sonuc: dict, d: "donem_mod.Donem | None" = None) -> None
     toplam = len(sonuc["cizilen"]) + len(sonuc["eksik"])
     if not toplam:
         return
-    ciz = sum(1 for c in sonuc["cizilen"] if c.get("kaynak") == "cizim")
-    com = sum(1 for c in sonuc["cizilen"] if c.get("kaynak") == "commons")
-    print(f"[harita] {toplam} harita kutusu: {ciz} çizildi (Natural Earth, sınırlar "
-          f"yaklaşık) · {com} Commons uyarlaması (CC BY-SA, atıf basılıyor) · "
-          f"{len(sonuc['eksik'])} eksik")
+    print(f"[harita] {toplam} harita kutusu: {len(sonuc['cizilen'])} çizildi "
+          f"(Natural Earth) · {len(sonuc['eksik'])} eksik")
     for e in sonuc["eksik"]:
         print(f"[UYARI] Bölüm {e['bolum']} haritası çizilemedi: {e['sebep']}")
 
@@ -826,12 +793,6 @@ def validate(pack) -> list[str]:
                 if kind != "mapsplit":
                     continue
                 mb = data[0]
-                if mb.commons is not None:
-                    if not (getattr(mb.commons, "atif", "") or "").strip():
-                        warnings.append(
-                            f"Bölüm {ch.number} haritası ('{mb.region}'): Commons kaynağının "
-                            f"atif alanı boş -- CC BY-SA atfı zorunludur, harita basılamaz.")
-                    continue
                 if not mb.region.strip():
                     warnings.append(f"Bölüm {ch.number}: MapBox.region boş -- harita prompt'u bölge adı olmadan kurulamaz.")
                 if not mb.bbox or len(mb.bbox) != 4:

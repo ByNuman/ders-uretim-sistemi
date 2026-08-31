@@ -23,7 +23,7 @@ HARİTA ARACI — kaynak bulur, indirir, adayları tarar, önizler, imleç denet
     python tools/harita.py --commons "Memlûk Devleti" --sec 1 --ders islam_tarihi_3
     python tools/harita.py --tara islam_tarihi_3 --sinif 2 --donem 2 --sinav final
     python tools/harita.py --onizle islam_tarihi_3 --sinif 2 --donem 2 --sinav final
-    python tools/harita.py --imlec islam_tarihi_3 --bolum 3 --sinif 2 --donem 2 --sinav final
+    python tools/harita.py --sinir-cikar mogol-imparatorlugu-genisleme-1206-1294.svg
 
 --veri-indir  Natural Earth 1:50m katmanlarını (kamu malı / CC0)
               assets/harita/ altına indirir. Bir kez yapılır; dosyalar
@@ -50,14 +50,17 @@ HARİTA ARACI — kaynak bulur, indirir, adayları tarar, önizler, imleç denet
               klasörüne yazar; tarayıcıda açıp koordinatları denetlemek için.
               (Derleme gerekmez.)
 
---imlec       Bir raster haritanın `Isaret` imleçlerini yüzde ızgarasıyla
-              birlikte PNG'ye basar. İmleç koordinatı SESSİZ bir hata
-              kaynağıdır (ölçüldü: "Halep" imleci bir kez Hama'nın üstüne
-              düşmüştü) ve taşma denetimi onu YAKALAMAZ -- gözle bakmak şart.
+--sinir-cikar Bir Commons haritasındaki renkli alanı GERÇEK lon/lat poligonuna
+              çevirir; sonuç `MapBox.territory` olur ve harita bizim
+              motorumuzla çizilir. Kaynak SVG ise önce Chromium'la basılır.
+              Çıkan `bindirme.png`ye GÖZLE bakmak zorunludur.
 
-NOT: Harita bir görüntü modeliyle ÜRETİLMEZ. Kendi çizimimiz her derlemede
-gerçek veriden yeniden çizilir (bkz. cekirdek/harita_cizim.py); Commons
-haritaları ise olduğu gibi gömülür. İkisi de ücretsiz ve deterministiktir.
+NOT: Harita bir görüntü modeliyle ÜRETİLMEZ ve hazır bir harita görüntüsü
+kitaba GÖMÜLMEZ. Tek yol var: sınır kaynaktan çıkarılır, geri kalan her şey
+(kıyı, nehir, şehir, etiket) kendi motorumuzla her derlemede yeniden çizilir
+(bkz. cekirdek/harita_cizim.py). Ücretsiz, deterministik, etiketler Türkçe
+ve baskıda vektör. Atıf yine ZORUNLUDUR: sınır CC BY-SA bir haritadan
+türetilmiştir.
 Renklendirme için bir görüntü modeli kullanma yolu 2026-08-31'de ÖLÇÜLÜP
 terk edildi: hem seedream hem gpt-image-2 kartografın yazılarını bozuyor
 (bkz. CLAUDE.md "Neden görüntü modeli yok").
@@ -79,7 +82,6 @@ if hasattr(sys.stdout, "reconfigure"):
 from cekirdek import donem as donem_mod        # noqa: E402
 from cekirdek import harita as H               # noqa: E402
 from cekirdek import harita_cizim as HC        # noqa: E402
-from cekirdek import harita_commons as HK      # noqa: E402
 from cekirdek import commons_ara as CA         # noqa: E402
 from cekirdek import sinir_cikar as SC         # noqa: E402
 import build as B                              # noqa: E402
@@ -158,39 +160,46 @@ def komut_commons(madde: str, sec: int, ders: str, wiki: str) -> None:
     if not 1 <= sec <= len(adaylar):
         raise SystemExit(f"[hata] --sec {sec} yok (1..{len(adaylar)})")
     a = adaylar[sec - 1]
-    HK.COMMONS.mkdir(parents=True, exist_ok=True)
-    yol, n = CA.indir(a, HK.COMMONS)
+    SC.COMMONS.mkdir(parents=True, exist_ok=True)
+    yol, n = CA.indir(a, SC.COMMONS)
     print("")
     print(f"[indirildi] {yol.relative_to(ROOT)}  ({n // 1024} KB)")
 
-    lisans_yol = HK.COMMONS / "LISANS.md"
+    lisans_yol = SC.COMMONS / "LISANS.md"
     kullanan = f"src/{ders}.py" if ders else "(dersi yazınca burayı doldurun)"
     mevcut = lisans_yol.read_text(encoding="utf-8") if lisans_yol.exists() else ""
     lisans_yol.write_text(mevcut + CA.kunye(a, yol.name, kullanan), encoding="utf-8")
     print(f"[künye]     {lisans_yol.relative_to(ROOT)} güncellendi "
           f"(yazar/lisans/bağlantı API'den okundu)")
 
-    sinif = "CommonsKaynak" if a.vektor else "CommonsGorsel"
     print("")
-    print("Derse yapıştırın:")
+    print("[sonraki adım] Sınırı bu haritadan ÇIKARIN (harita gömülmez, çizilir):")
+    print("")
+    print(f"  1. Çapa dosyası yazın: {yol.stem}.capa.json")
+    print("       {\"kirp\": [sol, ust, sag, alt], \"ton\": [alt_derece, ust_derece],")
+    print("        \"capalar\": [{\"ad\": \"Kahire\", \"lon\": 31.235, \"lat\": 30.044,")
+    print("                      \"x\": 0.195, \"y\": 0.392}, ...]}")
+    print("     x/y = KIRPILMIŞ görselin oranı. En az 6, tercihen 8-12 çapa;")
+    print("     haritanın DÖRT BİR YANINA dağıtın (kümelenmiş çapa sistematik")
+    print("     kayma verir: ölçüldü, 3 çapayla Mekke %22 kaymıştı).")
+    if a.vektor:
+        print("     Kaynak VEKTÖR: oranları gözle OKUMAYIN -- dosyanın kendi şehir")
+        print("     noktalarının (<use>/<circle> transform matrisi) tam değerlerini")
+        print("     viewBox ölçüsüne bölün. Ölçüldü: gözle okuma Moğol haritasında")
+        print("     ortalama %2,77 artık verirken dosyadan okuma %0,66'ya indi.")
+    print(f"  2. python tools/harita.py --sinir-cikar {yol.name}")
+    print("  3. assets/harita/sinir/*.bindirme.png dosyasına GÖZLE bakın.")
+    print("  4. Derse yapıştırın:")
     print("")
     print("        .add_map(MapBox(")
     print(f'            region="{madde}",')
-    print('            label="Tarihî harita",')
-    print(f"            commons={sinif}(")
-    print(f'                dosya="{yol.name}",')
-    print(f'                atif="{CA.atif(a)}",')
-    print("                # kirp=(...),        # boş kenarı / lejant kutusunu at")
-    print('                lejant_elle={"#rrggbb": "Türkçe lejant satırı"},')
-    if not a.vektor:
-        print('                # isaretler=[Isaret("Şehir", 0.50, 0.50)],')
-    print("            ),")
+    print('            label="Coğrafi konum",')
+    print("            bbox=(batı, güney, doğu, kuzey),")
+    print(f'            territory=sinir_yukle("{yol.stem}"),')
+    print('            cities=[Place("Şehir", lon, lat)],')
+    print(f'            source="Sınır: {CA.atif(a)}",')
     print('            caption="...",')
     print('        ), yan=[...], taraf="sag")')
-    if not a.vektor:
-        print("")
-        print("[sonraki adım] İmleç koyacaksanız koordinatları GÖZLE denetleyin:")
-        print("    python tools/harita.py --imlec <ders> --bolum N --sinif ...")
 
 
 def komut_sinir_cikar(dosya: str, eps: float, en_az: int, tek: bool) -> None:
@@ -302,93 +311,11 @@ def komut_onizle(modules: list[str]) -> None:
         for no, mb in _harita_kutulari(pack):
             if not mb.svg:
                 continue
-            # Raster haritada mb.svg bir <img> etiketidir, SVG değil: .html
-            # olarak yazılır ki tarayıcı doğru açsın (eskiden .svg yazılıyordu
-            # ve dosya hiç açılmıyordu).
-            raster = isinstance(mb.commons, HK.CommonsGorsel)
-            uzanti = "html" if raster else "svg"
-            yol = hedef_kok / f"harita-{m}-b{no}.{uzanti}"
-            govde = (f'<html><body style="margin:0">{mb.svg}</body></html>'
-                     if raster else mb.svg)
-            yol.write_text(govde, encoding="utf-8")
-            print(f"  Bölüm {no}: {yol}  ({len(govde) // 1024} KB)")
-            if not mb.commons:
-                print(f"      çerçeve {mb.bbox} · {len(mb.cities)} şehir · "
-                      f"{len(mb.territory)} yaklaşık alan")
-
-
-def komut_imlec(modules: list[str], bolum: int) -> None:
-    """Raster haritayı yüzde ızgarası + imleçlerle PNG'ye basar (gözle denetim).
-
-    Neden gerekli: `Isaret(x, y)` koordinatı kırpılmış görselin ORANIDIR ve
-    elle yazılır. Yanlış bir oran sessizdir -- ne taşma denetimi ne de
-    `validate()` onu görür, harita gayet düzgün basılır, sadece şehir yanlış
-    yerdedir. Enlem/boylamdan doğrusal tahmin de yetmez: kaynağın izdüşümü
-    bilinmediği için ilk denemede "Halep" imleci Hama'nın üstüne düşmüştü.
-    """
-    try:
-        from PIL import Image, ImageDraw, ImageFont
-    except ImportError:
-        raise SystemExit("[hata] Bu komut Pillow ister: pip install Pillow")
-
-    # Pillow'un gömülü bitmap fontu Türkçe harfleri kutu basıyor ("Kudüs" ->
-    # "Kud□s"), yani denetim görselinde şehir adı okunmuyor. Sistemde bulunan
-    # ilk TrueType fonta düşülür; hiçbiri yoksa varsayılanla devam edilir.
-    yazitipi = None
-    for aday in ("C:/Windows/Fonts/segoeui.ttf", "C:/Windows/Fonts/arial.ttf",
-                 "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
-                 "/Library/Fonts/Arial.ttf"):
-        try:
-            yazitipi = ImageFont.truetype(aday, 17)
-            break
-        except OSError:
-            continue
-    if yazitipi is None:
-        print("[uyarı] TrueType font bulunamadı — Türkçe harfler kutu görünebilir.")
-
-    hedef_kok = B.DONEM.gorsel_ders_notlari / "preview"
-    hedef_kok.mkdir(parents=True, exist_ok=True)
-    bulundu = 0
-    for m in modules:
-        pack = B.DONEM.import_ders(m).get_pack()
-        for no, mb in _harita_kutulari(pack, bolum):
-            if not isinstance(mb.commons, HK.CommonsGorsel):
-                print(f"[atlandı] Bölüm {no}: raster harita değil — imleç yalnızca "
-                      f"CommonsGorsel'de kullanılır")
-                continue
-            bulundu += 1
-            g = mb.commons
-            im = Image.open(HK.COMMONS / g.dosya).convert("RGB")
-            if g.kirp:
-                im = im.crop(tuple(int(v) for v in g.kirp))
-            if im.width < 1200:                       # okunur bir boya getir
-                im = im.resize((1200, round(im.height * 1200 / im.width)))
-            d = ImageDraw.Draw(im)
-            w, h = im.size
-            for k in range(1, 10):                    # %10'luk ızgara
-                x, y = w * k / 10, h * k / 10
-                d.line([(x, 0), (x, h)], fill=(0, 160, 220), width=1)
-                d.line([(0, y), (w, y)], fill=(0, 160, 220), width=1)
-                d.text((x + 3, 3), f"{k * 10}%", fill=(0, 110, 160))
-                d.text((3, y + 3), f"{k * 10}%", fill=(0, 110, 160))
-            for isaret in g.isaretler:
-                x, y, r = isaret.x * w, isaret.y * h, 14
-                d.line([(x - r, y), (x + r, y)], fill=(220, 0, 0), width=3)
-                d.line([(x, y - r), (x, y + r)], fill=(220, 0, 0), width=3)
-                # Etiket kaynağın kendi yazılarıyla çakışıyor: beyaz kutu
-                # olmadan hangi artının hangi şehir olduğu okunmuyor.
-                kutu = d.textbbox((x + r + 5, y - 9), isaret.ad, font=yazitipi)
-                d.rectangle([kutu[0] - 3, kutu[1] - 2, kutu[2] + 3, kutu[3] + 2],
-                            fill=(255, 255, 255), outline=(220, 0, 0))
-                d.text((x + r + 5, y - 9), isaret.ad, fill=(190, 0, 0), font=yazitipi)
-            yol = hedef_kok / f"imlec-{m}-b{no}.png"
-            im.save(yol)
-            print(f"[imleç] Bölüm {no}: {yol}")
-            print(f"        {len(g.isaretler)} imleç · kırpılmış ölçü {w}x{h}")
-    if bulundu:
-        print("")
-        print("[ZORUNLU] Her kırmızı artının GERÇEKTEN o şehrin üstünde olduğunu")
-        print("          gözle doğrulayın; yanlış imleç hiçbir denetimde görünmez.")
+            yol = hedef_kok / f"harita-{m}-b{no}.svg"
+            yol.write_text(mb.svg, encoding="utf-8")
+            print(f"  Bölüm {no}: {yol}  ({len(mb.svg) // 1024} KB)")
+            print(f"      çerçeve {mb.bbox} · {len(mb.cities)} şehir · "
+                  f"{len(mb.territory) or len(mb.katmanlar)} alan")
 
 
 def main() -> None:
@@ -416,16 +343,13 @@ def main() -> None:
     ap.add_argument("--tek-parca", action="store_true",
                     help="--sinir-cikar: yalnız EN BÜYÜK alanı tut (arazi gölgesi "
                          "kaynaklı sahte halkaları eler; tek parçalı devletlerde)")
-    ap.add_argument("--imlec", action="store_true",
-                    help="raster haritayı ızgara+imleçlerle PNG'ye bas (gözle denetim)")
-    ap.add_argument("--bolum", type=int, default=0, help="--imlec ile: bölüm numarası")
     ap.add_argument("--hepsi", action="store_true", help="dönemin kitap.py'sindeki tüm dersler")
     donem_mod.add_args(ap)
     a = ap.parse_args()
 
     if a.veri_indir:
         komut_veri_indir()
-        if not (a.tara or a.onizle or a.imlec):
+        if not (a.tara or a.onizle):
             return
 
     # --commons DÖNEMDEN BAĞIMSIZDIR: harita ararken ortada henüz bir ders
@@ -454,10 +378,8 @@ def main() -> None:
         komut_tara(modules)
     elif a.onizle:
         komut_onizle(modules)
-    elif a.imlec:
-        komut_imlec(modules, a.bolum)
     else:
-        raise SystemExit("[hata] --tara, --onizle ya da --imlec verin")
+        raise SystemExit("[hata] --tara ya da --onizle verin")
 
 
 if __name__ == "__main__":

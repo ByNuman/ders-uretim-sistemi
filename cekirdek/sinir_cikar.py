@@ -81,8 +81,11 @@ class CapaYok(FileNotFoundError):
 class Capa:
     """Kaynak haritada yeri BİLİNEN bir nokta: adı, gerçek koordinatı, oranı.
 
-    `x`/`y` KIRPILMIŞ görselin oranıdır (0-1) — `Isaret` ile aynı düzen, yani
-    `tools/harita.py --imlec` ızgarasından okunabilir.
+    `x`/`y` KIRPILMIŞ görselin oranıdır (0-1), sol üst köşeden ölçülür.
+    Kaynak VEKTÖRSE bu oranları gözle okumayın: dosyanın kendi şehir
+    noktalarının (`<use>`/`<circle>` transform matrisi) tam değerlerini
+    viewBox ölçüsüne bölün -- ölçüldü, gözle okuma Moğol haritasında
+    ortalama %2,77 artık verirken dosyadan okuma %0,66'ya indi.
     """
     ad: str
     lon: float
@@ -344,7 +347,7 @@ def capalari_oku(dosya: str) -> tuple:
     if not yol.exists():
         raise CapaYok(
             f"Çapa dosyası yok: {yol.name}\n"
-            f"Şu iskeletle oluşturun (koordinatları --imlec ızgarasından okuyun):\n"
+            f"Şu iskeletle oluşturun (x/y = KIRPILMIŞ görselin oranı):\n"
             f'{{"ton": [140, 175], "kirp": [sol, ust, sag, alt], "capalar": [\n'
             f'  {{"ad": "Kahire", "lon": 31.235, "lat": 30.044, "x": 0.195, "y": 0.392}}\n'
             f"]}}")
@@ -363,7 +366,13 @@ def cikar(dosya: str, en_az_hucre: int = 60, eps: float = 1.6,
     capalar, ton, kirp = capalari_oku(dosya)
     kal = izdusum_coz(capalar)
 
-    im = Image.open(kaynak).convert("RGB")
+    # Kaynak vektör olabilir: SVG'yi PIL açamaz, önce Chromium'la basılır.
+    # Vektör kaynakta çözünürlük bizim seçimimizdir (1800 px), yani kontur
+    # hassasiyeti raster kaynaklardakinden daha iyidir.
+    if kaynak.suffix.lower() == ".svg":
+        im = svg_rasterlestir(dosya)
+    else:
+        im = Image.open(kaynak).convert("RGB")
     if kirp:
         im = im.crop(tuple(int(v) for v in kirp))
     m, W, H = maske_uret(im, ton)
@@ -508,6 +517,16 @@ def svg_rasterlestir(dosya: str, genislik: int = 1800):
 
     Playwright zaten build.py'nin bağımlılığıdır, yani yeni bir gereksinim
     getirmez. Genişlik yüksek tutulur: kontur hassasiyeti buradan gelir.
+
+    Sarmalayıcı div'e genişlik vermek TEK BAŞINA yetmez: Illustrator'ın
+    dışa aktardığı SVG'lerde kök etiket `width="992.13px" height="595.28px"`
+    taşır ve bu öznitelikler div'in genişliğini EZER -- dosya kendi doğal
+    ölçüsünde basılır, sağına/altına beyaz boşluk kalır. Ölçüldü (Moğol
+    haritası): istenen 1800 px yerine 992 px basıldı, yani kontur
+    hassasiyetinin %45'i sessizce kayboluyordu. CSS ile `width:100%` +
+    `height:auto` bu öznitelikleri ezer; viewBox olduğu için oran korunur.
+    Inkscape kaynaklarında (Rum Selçuklu) kök etikette px ölçüsü yoktur,
+    onlar zaten ölçekleniyordu -- kural ikisinde de aynı sonucu verir.
     """
     import asyncio, tempfile
     from PIL import Image
@@ -516,7 +535,8 @@ def svg_rasterlestir(dosya: str, genislik: int = 1800):
     svg = (COMMONS / dosya).read_text(encoding="utf-8")
     gecici = Path(tempfile.gettempdir()) / f"_sinir_{Path(dosya).stem}.html"
     gecici.write_text(
-        f'<html><body style="margin:0;background:#fff">'
+        f'<html><head><style>svg{{width:100%!important;height:auto!important}}'
+        f'</style></head><body style="margin:0;background:#fff">'
         f'<div style="width:{genislik}px">{svg}</div></body></html>', encoding="utf-8")
     png = gecici.with_suffix(".png")
 
