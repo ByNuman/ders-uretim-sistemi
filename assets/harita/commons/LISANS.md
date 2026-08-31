@@ -83,3 +83,16 @@ kayıt altındadır ve kaynak dosya güncellenirse uyarlama yeniden uygulanabili
 | Biçim | Gerçek vektör SVG (226 path, 18 `<text>`, gömülü raster yok), viewBox 1577.9 × 721.3 |
 | Kullanan | `2-sinif/2-donem/final/src/islam_tarihi_3.py` — Bölüm 2 |
 | Uyarlama | Lejantın 4 satırı İtalyancadan Türkçeye çevrildi; "Divrigi" → "Divriği"; yazı tipi DejaVu Sans yapıldı; Inkscape künyesi/id'leri temizlendi. Metnin yanındaki dar sütuna sığsın diye ayrıca: çerçeve kırpıldı (viewBox 240 0 1215 672), şehirlerin altındaki antik karşılıklar ((Sebaste), (Iconio)…) kaldırıldı, etiket puntosu ×1,6 büyütüldü ve lejant kutusu SVG'den sökülüp haritanın altına HTML olarak taşındı. |
+
+### `caliphate-of-c-rdoba-under-almanzor-1000-ce.png`
+
+| | |
+|---|---|
+| Özgün ad | Caliphate of Córdoba under Almanzor - 1000 CE.png |
+| Yazar | DaniCBP |
+| Lisans | **CC BY 4.0** |
+| Kaynak | https://commons.wikimedia.org/wiki/File:Caliphate_of_C%C3%B3rdoba_under_Almanzor_-_1000_CE.png |
+| İndirilme | 2026-08-31 |
+| Biçim | Raster PNG, 2860 × 1992 |
+| Kullanan | `(dersi yazınca burayı doldurun)` |
+| Uyarlama | (henüz yazılmadı — kırpma/lejant kararını buraya yazın) |

@@ -61,6 +61,16 @@ from cekirdek.harita_cizim import _hex, _hsl
 ROOT = Path(__file__).resolve().parents[1]
 COMMONS = ROOT / "assets" / "harita" / "commons"
 
+# Eskiden CommonsKaynak/CommonsGorsel alanıydılar; hiçbir ders varsayılandan
+# başka bir değer vermediği için sabitleştirildiler (2026-08-31). Gerçekten
+# derse göre değişmesi gerekirse alan olarak geri eklenebilirler.
+YAZITIPI = "'DejaVu Sans', sans-serif"   # kitabın gövde yazı tipiyle aynı
+HALE_KALINLIK = 2.6      # etiket çevresindeki beyaz hale (viewBox birimi)
+EN_FAZLA_PX = 1400       # raster: 82mm sütunda ~430 dpi, fotokopi için fazlasıyla yeter
+JPEG_KALITE = 88
+TON_PARLAKLIK = 0.86     # <1 koyulaştırır
+TON_DOYGUNLUK = 0.55     # hedef doygunluk tavanı
+
 
 @dataclass
 class CommonsKaynak:
@@ -68,19 +78,10 @@ class CommonsKaynak:
     dosya: str                                   # assets/harita/commons/ altındaki ad
     atif: str                                    # ZORUNLU: yazar + lisans + bağlantı
     metin: dict = field(default_factory=dict)    # {"eski etiket": "yeni etiket"}
-    renkler: list = field(default_factory=list)  # koyudan açığa sıralı kaynak hex listesi
-    aciklik: tuple = (28.0, 44.0, 60.0, 78.0)    # temadan türetilecek tonların açıklığı
-    # TEK TIRNAK ŞART: bu değer style="..." özniteliğinin İÇİNE yazılıyor;
-    # çift tırnaklı bir font yığını özniteliği erkenden kapatıp SVG'yi
-    # geçersiz XML yapıyor (ölçüldü: Chromium dosyayı hiç açmadı).
-    yazitipi: str = "'DejaVu Sans', sans-serif"
     # Etiket rengi değişimi: {eski_hex: yeni_hex}. Renk uyarlaması kontrastı
     # BOZABİLİR -- kaynak haritada sarı etiketler koyu bordo zemine göre
     # seçilmişti; zemini açık maviye çekince okunmaz oldular.
     metin_renk: dict = field(default_factory=dict)
-    # Beyaz hale: etiketi hem açık hem koyu zeminde okunur kılar. Tek bir
-    # <style> ile bütün metinlere uygulanır; kaynak dosyaya dokunulmaz.
-    hale: bool = True
 
     # ---------------- YAN SÜTUN KİPİ (add_map(..., taraf="sag"/"sol")) -----
     # Bir tarihî harita genelde GENİŞTİR ve tam sayfa genişliği (186mm) için
@@ -113,13 +114,6 @@ class CommonsKaynak:
     # ~16). Karşılaştırma boşluktan bağımsızdır: kaynakta iki satıra bölünmüş
     # "Mamluk"/"Sultanate" tspan'leri "Mamluk Sultanate" yazımıyla eşleşir.
     koru: list = field(default_factory=list)
-    # Kaynak alanları yarı saydam bıraktıysa (altındaki nehirler görünsün diye)
-    # tema rengine çevrilen ton griye düşebilir; bu değer >0 verilirse
-    # `renkler` ile eşlenen alanların fill-opacity'si buna çekilir. 1.0 yapmayın.
-    # ÖLÇÜLDÜ (Delhi haritası, kaynak fill-opacity 0.392): yeşil bu opaklıkta
-    # yeşil kalıyordu ama lacivert krem zeminle karışıp griye düşüyordu; 0.78
-    # rengi geri getiriyor, altındaki nehirler hâlâ görünüyor.
-    dolgu_opaklik: float = 0.0
     # Lejantı SVG'den söküp HTML'e taşır. Yan sütunda ŞART: kaynaktaki lejant
     # kutusu haritanın %43'ü kadar geniştir; küçülünce hem kendisi okunmaz olur
     # hem de haritanın güneydoğusunu kapatır. HTML'e taşınınca sayfanın kendi
@@ -135,19 +129,6 @@ class CommonsKaynak:
 
 class KaynakYok(FileNotFoundError):
     """Commons SVG'si diskte yok."""
-
-
-def _renk_esle(kaynak_renkler: list, tema_hex: str, aciklik: tuple) -> dict:
-    """Kaynaktaki dönem tonlarını dersin tema rengiyle aynı aileden tonlara eşler.
-
-    Sıra ÖNEMLİDİR: `renkler` listesi koyudan açığa yazılır, `aciklik` da
-    aynı sırada; böylece haritadaki "en eski çekirdek en koyu" hiyerarşisi
-    korunur, yalnızca renk ailesi değişir.
-    """
-    h, s, _ = _hsl(tema_hex or "#3d5568")
-    doygunluk = max(26.0, min(52.0, s))
-    return {eski.lower(): _hex(h, doygunluk, aciklik[i] if i < len(aciklik) else 78.0)
-            for i, eski in enumerate(kaynak_renkler)}
 
 
 def _renkleri_degistir(svg: str, esleme: dict) -> str:
@@ -373,32 +354,6 @@ def _yazi_olcekle(svg: str, k: float) -> str:
     return svg
 
 
-def _dolgu_opakligi(svg: str, renkler: list, deger: float) -> str:
-    """Verilen dolgu renklerini taşıyan elemanların fill-opacity'sini değiştirir.
-
-    Neden gerekli: kartograf alanı yarı saydam bırakmış olabilir (Delhi
-    haritasında `fill-opacity:0.392`) ki altındaki nehirler görünsün. Kaynağın
-    yeşili bu opaklıkta hâlâ yeşil kalıyordu, ama tema rengine çevrilen
-    lacivert %39'da griye düşüyor -- çünkü krem zeminle karışınca mavi-sarı
-    karşıtlığı doygunluğu yiyor. Opaklığı ölçülü biçimde yükseltmek rengi geri
-    getirir; 1.0 yapmayın, altındaki coğrafya tamamen kaybolur.
-    """
-    hedef = {r.lower() for r in renkler}
-
-    def stil(m):
-        govde = m.group(1)
-        renk = re.search(r"fill\s*:\s*(#[0-9a-fA-F]{6})", govde)
-        if not renk or renk.group(1).lower() not in hedef:
-            return m.group(0)
-        if re.search(r"fill-opacity\s*:", govde):
-            govde = re.sub(r"fill-opacity\s*:\s*[\d.]+", f"fill-opacity:{deger:.3f}", govde)
-        else:
-            govde += f";fill-opacity:{deger:.3f}"
-        return f'style="{govde}"'
-
-    return re.sub(r'style="([^"]*)"', stil, svg)
-
-
 def _lejanti_cikar(svg: str) -> tuple[str, list]:
     """Lejant kutusunu SVG'den söker ve (renk, metin) çiftlerini döndürür.
 
@@ -530,7 +485,7 @@ def _olcu(svg: str) -> tuple[str, str]:
     return f"{g:.0f} / {y:.0f}", m.group(1)
 
 
-def uyarla(kaynak: CommonsKaynak, tema_hex: str) -> tuple[str, str, list, list]:
+def uyarla(kaynak: CommonsKaynak) -> tuple[str, str, list, list]:
     """Commons SVG'sini derse uyarlar.
 
     Dönen: (svg_metni, css_en_boy_orani, bulunamayan_metin_anahtarlari,
@@ -549,11 +504,6 @@ def uyarla(kaynak: CommonsKaynak, tema_hex: str) -> tuple[str, str, list, list]:
 
     svg = _sadelestir(svg)
     svg = _viewbox_tamamla(svg)
-    renk_esleme = _renk_esle(kaynak.renkler, tema_hex, kaynak.aciklik) if kaynak.renkler else {}
-    if renk_esleme:
-        svg = _renkleri_degistir(svg, renk_esleme)
-        if kaynak.dolgu_opaklik:
-            svg = _dolgu_opakligi(svg, list(renk_esleme.values()), kaynak.dolgu_opaklik)
     svg, bulunmayan = _metinleri_degistir(svg, kaynak.metin)
     if kaynak.metin_renk:
         svg = _renkleri_degistir(svg, {k.lower(): v for k, v in kaynak.metin_renk.items()})
@@ -565,13 +515,12 @@ def uyarla(kaynak: CommonsKaynak, tema_hex: str) -> tuple[str, str, list, list]:
     if kaynak.lejant:
         svg, lejant_ogeleri = _lejanti_cikar(svg)
     if kaynak.lejant_elle:
-        # Elle yazılan lejant: anahtarlar KAYNAK renkleridir, haritadakiyle
-        # aynı tema eşlemesinden geçirilir ki kutucuk ile alan aynı tonda olsun.
-        lejant_ogeleri = [(renk_esleme.get(k.lower(), k.lower()), v)
-                          for k, v in kaynak.lejant_elle.items()]
+        # Elle yazılan lejant: anahtarlar haritadaki GERÇEK renklerdir --
+        # kaynağın renkleri artık değiştirilmediği için kutucuk alanla aynı tonda.
+        lejant_ogeleri = [(k.lower(), v) for k, v in kaynak.lejant_elle.items()]
     svg, _silinen = _yaziyi_sil(svg, kaynak.sil_desen, kaynak.koru)
-    svg = re.sub(r"(font-family\s*:\s*)([^;\"']+)", r"\1" + kaynak.yazitipi, svg)
-    svg = re.sub(r'font-family\s*=\s*"[^"]*"', f'font-family="{kaynak.yazitipi}"', svg)
+    svg = re.sub(r"(font-family\s*:\s*)([^;\"']+)", r"\1" + YAZITIPI, svg)
+    svg = re.sub(r'font-family\s*=\s*"[^"]*"', f'font-family="{YAZITIPI}"', svg)
     if kaynak.yazi_araligi:
         if len(kaynak.yazi_araligi) != 2:
             raise ValueError(
@@ -579,15 +528,14 @@ def uyarla(kaynak: CommonsKaynak, tema_hex: str) -> tuple[str, str, list, list]:
                 f"verilen: {kaynak.yazi_araligi!r}")
         svg = _yazi_araligina_sikistir(svg, *kaynak.yazi_araligi)
     svg = _yazi_olcekle(svg, kaynak.yazi_olcek)
-    if kaynak.hale:
-        # paint-order:stroke -> hale metnin ALTINA çizilir, harfleri inceltmez.
-        # Tek <style> ile bütün etiketlere uygulanır; kaynak dosyaya dokunulmaz.
-        # Hale kalınlığı yazıyla birlikte ölçeklenir, yoksa büyütülmüş etiketin
-        # çevresinde saç teli gibi kalır.
-        stil = ("<style>text,tspan{paint-order:stroke;stroke:#FFFFFF;"
-                "stroke-width:%.2fpx;stroke-linejoin:round;stroke-opacity:.92;}</style>"
-                % (2.6 * kaynak.yazi_olcek))
-        svg = re.sub(r"(<svg\b[^>]*?>)", lambda m: m.group(1) + stil, svg, count=1)
+    # paint-order:stroke -> hale metnin ALTINA çizilir, harfleri inceltmez.
+    # Tek <style> ile bütün etiketlere uygulanır; kaynak dosyaya dokunulmaz.
+    # Hale kalınlığı yazıyla birlikte ölçeklenir, yoksa büyütülmüş etiketin
+    # çevresinde saç teli gibi kalır.
+    stil = ("<style>text,tspan{paint-order:stroke;stroke:#FFFFFF;"
+            "stroke-width:%.2fpx;stroke-linejoin:round;stroke-opacity:.92;}</style>"
+            % (HALE_KALINLIK * kaynak.yazi_olcek))
+    svg = re.sub(r"(<svg\b[^>]*?>)", lambda m: m.group(1) + stil, svg, count=1)
     if kaynak.kirp:
         if len(kaynak.kirp) != 4:
             raise ValueError(
@@ -651,11 +599,6 @@ class CommonsGorsel:
     dosya: str                                   # assets/harita/commons/ altındaki ad
     atif: str                                    # ZORUNLU: yazar + lisans + bağlantı
     kirp: tuple = ()                             # (sol, üst, sağ, alt) PİKSEL
-    # Baskı çözünürlüğü: 82mm'lik sütunda 1400 px ≈ 430 dpi, fotokopi için
-    # fazlasıyla yeterli. Kaynak dosyalar 3370 px / 16 MB'a kadar çıkabiliyor;
-    # küçültülmezse tek harita kitabı PDF'ini şişirir.
-    en_fazla_px: int = 1400
-    kalite: int = 88                             # JPEG kalitesi
     # Kırpılan lejantın yerine Türkçe açıklama: {hex: "açıklama"}.
     lejant_elle: dict = field(default_factory=dict)
 
@@ -671,8 +614,6 @@ class CommonsGorsel:
     # 50-70° -- yani aralığı dar tutmak toprağı denizden ayırıyor.
     renk_hedef: str = ""              # hedef hex (genelde dersin tema rengi)
     renk_ton: tuple = ()              # (en_kucuk_derece, en_buyuk_derece)
-    renk_parlaklik: float = 0.86      # <1 koyulaştırır; 1.0 = kaynağınki
-    renk_doygunluk: float = 0.55      # hedef doygunluk tavanı
 
     # Haritanın üstüne bindirilen yer imleçleri (bkz. Isaret)
     isaretler: list = field(default_factory=list)
@@ -702,9 +643,9 @@ def _gorsel_olcekle(veri: bytes, kaynak: CommonsGorsel) -> tuple[bytes, str, flo
             raise ValueError(f"CommonsGorsel.kirp (sol, üst, sağ, alt) olmalı; "
                              f"verilen: {kaynak.kirp!r}")
         im = im.crop(tuple(int(v) for v in kaynak.kirp))
-    if im.width > kaynak.en_fazla_px:
-        yeni_yuk = max(1, round(im.height * kaynak.en_fazla_px / im.width))
-        im = im.resize((kaynak.en_fazla_px, yeni_yuk), Image.LANCZOS)
+    if im.width > EN_FAZLA_PX:
+        yeni_yuk = max(1, round(im.height * EN_FAZLA_PX / im.width))
+        im = im.resize((EN_FAZLA_PX, yeni_yuk), Image.LANCZOS)
 
     tampon = io.BytesIO()
     saydam = im.mode in ("RGBA", "LA", "P")
@@ -712,7 +653,7 @@ def _gorsel_olcekle(veri: bytes, kaynak: CommonsGorsel) -> tuple[bytes, str, flo
         im.convert("RGBA").save(tampon, format="PNG", optimize=True)
         mime = "image/png"
     else:
-        im.convert("RGB").save(tampon, format="JPEG", quality=kaynak.kalite, optimize=True)
+        im.convert("RGB").save(tampon, format="JPEG", quality=JPEG_KALITE, optimize=True)
         mime = "image/jpeg"
     return tampon.getvalue(), mime, im.width / im.height
 
@@ -720,7 +661,7 @@ def _gorsel_olcekle(veri: bytes, kaynak: CommonsGorsel) -> tuple[bytes, str, flo
 def _tonu_kaydir(im, kaynak: CommonsGorsel):
     """Tonu `renk_ton` aralığında olan pikselleri `renk_hedef` ailesine çeker.
 
-    PARLAKLIK KORUNUR (yalnızca `renk_parlaklik` ile ölçeklenir): arazi gölgesi,
+    PARLAKLIK KORUNUR (yalnızca `TON_PARLAKLIK` ile ölçeklenir): arazi gölgesi,
     kesikli sınır çizgisi ve kaynağın kendi etiketleri olduğu gibi kalır. Bir
     görüntü modeliyle yapılan aynı işte bu üçü de sessizce kaybolmuştu.
 
@@ -740,8 +681,8 @@ def _tonu_kaydir(im, kaynak: CommonsGorsel):
             h, l, sat = colorsys.rgb_to_hls(r / 255, gg / 255, b / 255)
             if sat < 0.12 or not (alt <= h * 360 <= ust):
                 continue
-            nr, ng, nb = colorsys.hls_to_rgb(hedef_h, l * kaynak.renk_parlaklik,
-                                             min(kaynak.renk_doygunluk, sat + 0.35))
+            nr, ng, nb = colorsys.hls_to_rgb(hedef_h, l * TON_PARLAKLIK,
+                                             min(TON_DOYGUNLUK, sat + 0.35))
             px[i, j] = (int(nr * 255), int(ng * 255), int(nb * 255))
     return im
 

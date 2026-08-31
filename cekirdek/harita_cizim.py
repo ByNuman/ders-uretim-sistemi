@@ -74,7 +74,18 @@ VERI_KAYNAGI = ("https://raw.githubusercontent.com/nvkelso/natural-earth-vector"
                 "/master/geojson/")
 
 # Harita kutusunun en-boy oranı (SVG viewBox). Kutu CSS'i de bunu kullanır.
-ORAN = (4, 3)
+ORAN = (4, 3)          # varsayılan/yedek; asıl oran bbox'tan türetilir
+
+# Kutu oranının izin verilen aralığı (genişlik / yükseklik). Sabit 4:3, DİKEY
+# coğrafyalarda (Memlük: Mısır+Şam+Hicaz · Delhi: Hint alt kıtası) haritayı
+# kutunun ortasına küçük bir şerit hâlinde sıkıştırıyor, sağını solunu boş
+# bırakıyor ve sayfanın altında büyük bir boşluk açıyordu.
+#
+# Sınırlar KEYFİ DEĞİL, yerleşimden geliyor: yan sütun 82 mm geniştir;
+# 0.72 oranında kutu 114 mm olur ki metin sütunuyla birlikte sayfaya sığan
+# üst sınırdır. 1.60'ın üstünde ise kutu 51 mm'ye iner ve harita okunmaz.
+ORAN_EN_DAR = 0.72
+ORAN_EN_GENIS = 1.60
 GENISLIK = 800.0          # viewBox birimi; mm değil, ölçek serbest
 
 _ONBELLEK: dict[str, list] = {}
@@ -147,6 +158,20 @@ class Cerceve:
         x = (lon - self.lon0) * self.k * self.olcek + self.genislik / 2.0
         y = -(lat - self.lat0) * self.olcek + self.yukseklik / 2.0
         return x, y
+
+
+def oran_hesapla(bbox) -> tuple[float, float]:
+    """bbox'ın izdüşümdeki en-boy oranını kutu oranı olarak verir.
+
+    `Cerceve` bbox'ı kutuya uyacak şekilde GENİŞLETİR; kutu oranı içeriğe
+    yakınsa bu genişletme küçük kalır, yani harita çerçeveyi doldurur.
+    Sonuç [ORAN_EN_DAR, ORAN_EN_GENIS] aralığına kırpılır.
+    """
+    bati, guney, dogu, kuzey = bbox
+    lat0 = (guney + kuzey) / 2.0
+    dx = (dogu - bati) * math.cos(math.radians(lat0))
+    dy = (kuzey - guney) or 1e-9
+    return (max(ORAN_EN_DAR, min(ORAN_EN_GENIS, dx / dy)), 1.0)
 
 
 def _kesisiyor(bbox_a, bbox_b) -> bool:
@@ -391,11 +416,15 @@ def _yumusat(poligon, tur: int = 2):
 # ---------------------------------------------------------------------------
 # Ana çizim
 # ---------------------------------------------------------------------------
-def svg_uret(mb, tema_hex: str, genislik: float = GENISLIK) -> str:
-    """Bir MapBox'tan tam SVG metni üretir."""
+def svg_uret(mb, tema_hex: str, genislik: float = GENISLIK, oran=None) -> str:
+    """Bir MapBox'tan tam SVG metni üretir.
+
+    `oran` verilmezse bbox'tan türetilir (bkz. oran_hesapla) -- dikey
+    coğrafyalar dikey kutu alır.
+    """
     if not mb.bbox:
         raise ValueError(f"MapBox.bbox boş: {mb.region!r} -- harita çizilemez.")
-    c = Cerceve(mb.bbox, genislik)
+    c = Cerceve(mb.bbox, genislik, oran or oran_hesapla(mb.bbox))
     p = palet(tema_hex)
     # SVG'ler tek bir HTML belgesine GÖMÜLÜ olarak yan yana durur; clipPath
     # id'si belge genelinde benzersiz olmak zorundadır, yoksa beş harita da
@@ -441,6 +470,35 @@ def svg_uret(mb, tema_hex: str, genislik: float = GENISLIK) -> str:
     # gibi okunur (görüntü modelinin tekrar tekrar yaptığı hata buydu).
     # Kırpmayla kıyı kenarı GERÇEK veriden gelir, yaklaşıklık yalnızca kara
     # içindeki sınırlarda kalır. Göller hemen ardından ÜSTE çizilir.
+    if mb.katmanlar and kara_d:
+        # ÇOK KATMANLI: dönem dönem genişleme. En eski en KOYU tonla basılır;
+        # ton merdiveni tema renginden türer, yani harita dersin rengiyle
+        # aynı ailede kalır. Etiketler HTML lejanta taşınır (mb.lejant).
+        parca.append(f'<clipPath id="{kimlik}"><path d="{kara_d}" '
+                     f'clip-rule="evenodd"/></clipPath>')
+        parca.append(f'<g clip-path="url(#{kimlik})">')
+        h, sat, _l = _hsl(tema_hex)
+        n = len(mb.katmanlar)
+        lejant = []
+        for i, katman in enumerate(mb.katmanlar):
+            # 34 -> 68 açıklık merdiveni. Üst uç 76 DEĞİL: orada en açık bant
+            # denizin soluk mavisine yaklaşıyor ve "burası da su mu?" diye
+            # okunuyordu (ölçüldü: Rum Selçuklu, 4 bant). 68'de bantlar hem
+            # birbirinden hem denizden ayrışıyor.
+            aciklik = 34.0 + (34.0 * i / max(1, n - 1))
+            renk = _hex(h, max(28.0, min(56.0, sat)), aciklik)
+            for poligon in katman.get("halkalar", []):
+                y = _yol(_yumusat(poligon), c, en_kucuk_adim=0.0)
+                if y:
+                    parca.append(f'<path d="{y}" fill="{renk}" fill-opacity="0.88" '
+                                 f'stroke="{p["alan_kenar"]}" stroke-width="1.4" '
+                                 f'stroke-dasharray="7 4.5" stroke-linejoin="round"/>')
+            if katman.get("etiket"):
+                lejant.append((renk, katman["etiket"]))
+        parca.append("</g>")
+        if lejant and not mb.lejant:
+            mb.lejant = lejant
+
     if mb.territory and kara_d:
         parca.append(f'<clipPath id="{kimlik}"><path d="{kara_d}" '
                      f'clip-rule="evenodd"/></clipPath>')

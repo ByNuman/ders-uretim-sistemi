@@ -1,0 +1,99 @@
+{
+  "_not": "Cikarma kalibrasyonu: kaynak haritada yeri bilinen noktalar. x/y KIRPILMIS gorselin oranidir (tools/harita.py --imlec izgarasindan okunur). Ibrim cikarildi: artigi %2,36 idi (okuma supheli). Kalan 12 capa ile en buyuk artik %1,18, ortalama %0,37.",
+  "kirp": [
+    700,
+    80,
+    1780,
+    1500
+  ],
+  "ton": [
+    140,
+    175
+  ],
+  "capalar": [
+    {
+      "ad": "Kahire",
+      "lon": 31.235,
+      "lat": 30.044,
+      "x": 0.195,
+      "y": 0.392
+    },
+    {
+      "ad": "Şam",
+      "lon": 36.29,
+      "lat": 33.51,
+      "x": 0.475,
+      "y": 0.243
+    },
+    {
+      "ad": "Halep",
+      "lon": 37.16,
+      "lat": 36.2,
+      "x": 0.492,
+      "y": 0.134
+    },
+    {
+      "ad": "Kus",
+      "lon": 32.76,
+      "lat": 25.92,
+      "x": 0.285,
+      "y": 0.562
+    },
+    {
+      "ad": "Uswan",
+      "lon": 32.9,
+      "lat": 24.09,
+      "x": 0.293,
+      "y": 0.64
+    },
+    {
+      "ad": "Dongola",
+      "lon": 30.73,
+      "lat": 18.22,
+      "x": 0.173,
+      "y": 0.889
+    },
+    {
+      "ad": "Medine",
+      "lon": 39.61,
+      "lat": 24.47,
+      "x": 0.665,
+      "y": 0.623
+    },
+    {
+      "ad": "Yanbu",
+      "lon": 38.06,
+      "lat": 24.09,
+      "x": 0.576,
+      "y": 0.639
+    },
+    {
+      "ad": "Cidde",
+      "lon": 39.2,
+      "lat": 21.49,
+      "x": 0.641,
+      "y": 0.746
+    },
+    {
+      "ad": "Mekke",
+      "lon": 39.83,
+      "lat": 21.42,
+      "x": 0.677,
+      "y": 0.752
+    },
+    {
+      "ad": "Taif",
+      "lon": 40.42,
+      "lat": 21.27,
+      "x": 0.706,
+      "y": 0.751
+    },
+    {
+      "ad": "Sevakin",
+      "lon": 37.33,
+      "lat": 19.11,
+      "x": 0.539,
+      "y": 0.85
+    }
+  ]
+}

@@ -1,0 +1,120 @@
+{
+  "_not": "Cikarma kalibrasyonu. x/y KIRPILMIS gorselin oranidir; kaynagin kendi sehir noktalari (iri siyah daireler) izgara uzerinden okundu. Urgench okumasi dersteki mevcut Isaret ile (0.534/0.308) ortusuyor. Merv, ortacag Merv harabelerine (62.19E) cekildi -- modern Mary sehri (61.83E) artigi %2,05 yapiyordu. Tahran/Isfahan/Siraz noktalari %0,5 izgarayla yeniden okundu.",
+  "kirp": [
+    674,
+    218,
+    2865,
+    1740
+  ],
+  "ton": [
+    15,
+    30
+  ],
+  "capalar": [
+    {
+      "ad": "Gürgenç",
+      "lon": 59.15,
+      "lat": 42.34,
+      "x": 0.533,
+      "y": 0.309
+    },
+    {
+      "ad": "Buhara",
+      "lon": 64.42,
+      "lat": 39.77,
+      "x": 0.639,
+      "y": 0.38
+    },
+    {
+      "ad": "Semerkant",
+      "lon": 66.96,
+      "lat": 39.65,
+      "x": 0.71,
+      "y": 0.384
+    },
+    {
+      "ad": "Merv",
+      "lon": 62.19,
+      "lat": 37.66,
+      "x": 0.597,
+      "y": 0.457
+    },
+    {
+      "ad": "Belh",
+      "lon": 66.9,
+      "lat": 36.76,
+      "x": 0.707,
+      "y": 0.498
+    },
+    {
+      "ad": "Tebriz",
+      "lon": 46.29,
+      "lat": 38.08,
+      "x": 0.162,
+      "y": 0.474
+    },
+    {
+      "ad": "Meraga",
+      "lon": 46.24,
+      "lat": 37.39,
+      "x": 0.162,
+      "y": 0.512
+    },
+    {
+      "ad": "Tahran",
+      "lon": 51.39,
+      "lat": 35.69,
+      "x": 0.282,
+      "y": 0.543
+    },
+    {
+      "ad": "Nisabur",
+      "lon": 58.8,
+      "lat": 36.21,
+      "x": 0.487,
+      "y": 0.524
+    },
+    {
+      "ad": "Herat",
+      "lon": 62.2,
+      "lat": 34.34,
+      "x": 0.587,
+      "y": 0.59
+    },
+    {
+      "ad": "Kabil",
+      "lon": 69.18,
+      "lat": 34.53,
+      "x": 0.773,
+      "y": 0.588
+    },
+    {
+      "ad": "Gazne",
+      "lon": 68.42,
+      "lat": 33.55,
+      "x": 0.755,
+      "y": 0.63
+    },
+    {
+      "ad": "Isfahan",
+      "lon": 51.67,
+      "lat": 32.65,
+      "x": 0.312,
+      "y": 0.663
+    },
+    {
+      "ad": "Şiraz",
+      "lon": 52.53,
+      "lat": 29.61,
+      "x": 0.326,
+      "y": 0.773
+    },
+    {
+      "ad": "Zerenc",
+      "lon": 61.86,
+      "lat": 31.0,
+      "x": 0.572,
+      "y": 0.74
+    }
+  ]
+}

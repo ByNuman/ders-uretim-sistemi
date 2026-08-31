@@ -67,19 +67,21 @@ Thumbs.db
 #     python tools/harita.py --veri-indir
 assets/harita/*.geojson
 
-# fal.ai ile renklendirilmis haritalar: koddan (tools/harita_uret.py + yanindaki
-# .json uretim kunyesi) yeniden uretilebilir ikili dosyalar. Kunye JSON'lari
-# git'e GIRER -- hangi model, hangi prompt, hangi kaynak, hangi tarih.
-assets/harita/uretilmis/*.png
-assets/harita/uretilmis/*.jpg
-assets/harita/uretilmis/*.jpeg
-
 # Commons RASTER kaynaklari (PNG/JPG): git bunlari sikistiramaz -- ucu birden
 # 24,7 MB tutuyor ve depo 4,1 MB. Geojson ile ayni gerekce: koddan uretilemez
 # ama her an yeniden indirilebilir; her dosyanin Commons URL'si, yazari ve
 # lisansi assets/harita/commons/LISANS.md'de kayitlidir. Bunlari kullanan ders
 # modulleri (ornegin islam_tarihi_3.py) zaten sinif agacinda, yani gitignore'da.
 # SVG kaynaklar METIN oldugu icin git'te KALIR -- asagidaki kural onlara dokunmaz.
+# Sinir cikarma denetim gorselleri: koddan yeniden uretilir (tools/harita.py
+# --sinir-cikar), ikili dosya. Cikarilan SINIR JSON'u git'e GIRER -- kucuk,
+# metin ve degerli (raster kaynak .gitignore'da oldugu icin onsuz yeniden
+# uretilemez).
+assets/harita/sinir/*.bindirme.png
+assets/harita/sinir/*.cizim.png
+assets/harita/sinir/*.cizim.svg
+assets/harita/sinir/*.yanyana.png
+
 assets/harita/commons/*.png
 assets/harita/commons/*.jpg
 assets/harita/commons/*.jpeg

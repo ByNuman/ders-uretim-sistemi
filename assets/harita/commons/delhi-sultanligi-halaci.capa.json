@@ -1,0 +1,22 @@
+{
+  "_not": "Cikarma kalibrasyonu. x/y KIRPILMIS gorselin oranidir; kaynagin kendi sehir noktalari %5 izgarayla okundu.",
+  "kirp": [232, 280, 1673, 1828],
+  "ton": [40, 60],
+  "capalar": [
+    {"ad": "Atak",        "lon": 72.37, "lat": 33.77, "x": 0.366, "y": 0.065},
+    {"ad": "Lahor",       "lon": 74.33, "lat": 31.55, "x": 0.455, "y": 0.139},
+    {"ad": "Uch",         "lon": 71.06, "lat": 29.24, "x": 0.325, "y": 0.241},
+    {"ad": "Delhi",       "lon": 77.21, "lat": 28.61, "x": 0.554, "y": 0.256},
+    {"ad": "Nagor",       "lon": 73.73, "lat": 27.20, "x": 0.418, "y": 0.318},
+    {"ad": "Sehvan",      "lon": 67.86, "lat": 26.42, "x": 0.189, "y": 0.344},
+    {"ad": "Gvalyor",     "lon": 78.18, "lat": 26.22, "x": 0.614, "y": 0.360},
+    {"ad": "Kara",        "lon": 81.38, "lat": 25.72, "x": 0.729, "y": 0.381},
+    {"ad": "Benares",     "lon": 82.97, "lat": 25.32, "x": 0.800, "y": 0.389},
+    {"ad": "Dhar",        "lon": 75.30, "lat": 22.60, "x": 0.504, "y": 0.491},
+    {"ad": "Cunagad",     "lon": 70.46, "lat": 21.52, "x": 0.281, "y": 0.541},
+    {"ad": "Devletabad",  "lon": 75.22, "lat": 19.94, "x": 0.473, "y": 0.604},
+    {"ad": "Varangal",    "lon": 79.59, "lat": 17.98, "x": 0.661, "y": 0.685},
+    {"ad": "Kampili",     "lon": 76.62, "lat": 15.41, "x": 0.550, "y": 0.778},
+    {"ad": "Dvarasamudra","lon": 75.99, "lat": 13.21, "x": 0.505, "y": 0.861}
+  ]
+}

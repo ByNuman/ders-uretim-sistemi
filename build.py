@@ -531,7 +531,7 @@ def haritalari_coz(pack, d: "donem_mod.Donem | None" = None) -> dict:
                         # Atıf ZORUNLU -- CC BY-SA gereği source'u eziyoruz ki
                         # bir dersin kendi source metni atfı gizleyemesin.
                         mb.svg, mb.gorsel_oran, eksik_metin, mb.lejant = \
-                            harita_commons.uyarla(mb.commons, tema)
+                            harita_commons.uyarla(mb.commons)
                         mb.source = mb.commons.atif
                         for anahtar in eksik_metin:
                             print(f"[UYARI] Bölüm {ch.number} haritası: '{anahtar}' "
@@ -546,6 +546,10 @@ def haritalari_coz(pack, d: "donem_mod.Donem | None" = None) -> dict:
                         cizilen.append({"bolum": ch.number, "bolge": mb.region,
                                         "kaynak": "commons"})
                     else:
+                        # Kutu oranı bbox'tan türetilir: dikey coğrafya dikey
+                        # kutu alır, yoksa harita sabit 4:3'ün ortasına sıkışır.
+                        g2, y2 = harita_cizim.oran_hesapla(mb.bbox)
+                        mb.gorsel_oran = f"{g2:.4f} / {y2:.4f}"
                         mb.svg = harita_cizim.svg_uret(mb, tema)
                         cizilen.append({"bolum": ch.number, "bolge": mb.region,
                                         "kaynak": "cizim"})

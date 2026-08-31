@@ -163,6 +163,16 @@ class MapBox:
     cities: list = field(default_factory=list)                # list[Place]
     neighbors: list = field(default_factory=list)             # list[Place]
     territory: list = field(default_factory=list)             # list[list[(lon, lat)]]
+    # ÇOK KATMANLI alan: bir devletin dönem dönem genişlemesi. Her katman
+    # {"halkalar": [[(lon,lat), ...]], "etiket": "1240'a kadar"} biçimindedir
+    # ve liste ESKİDEN YENİYE sıralanır; çizim en eskiyi en koyu tonla basar
+    # ve etiketleri HTML lejanta taşır. `territory` ile birlikte KULLANILMAZ.
+    #
+    # Gerek: tarihî haritaların çoğu tek sınır değil, genişleme evreleri
+    # gösterir (Rum Selçuklu 4 bant, Moğol İmparatorluğu 7 bant). Hepsini tek
+    # poligona indirmek kaynaktaki asıl bilgiyi -- NE ZAMAN nereye yayıldığını
+    # -- yok eder.
+    katmanlar: list = field(default_factory=list)
     label: str = "Coğrafi konum"                              # kutu üstündeki başlık etiketi
     caption: str = ""                                         # kutunun altındaki açıklama
     source: str = ("Sınırlar yaklaşıktır (temsilî). Coğrafya: Natural Earth "

@@ -1,0 +1,92 @@
+{
+  "_not": "SVG kaynak; katman_cikar() once Chromium ile rasterlestirir. kirp, rasterlestirilmis 1800px genisligindeki goruntudeki beyaz kenarlari atar. x/y bu kirpilmis goruntunun oranidir. Kayseri ve Divrigi cikarildi: artiklari %2,5 ve %1,9 idi (isaret okumasi supheli). Kalan 11 capa ile en buyuk artik %0,95, ortalama %0,42.",
+  "kirp": [
+    0,
+    0,
+    1578,
+    721
+  ],
+  "ton": [
+    0,
+    360
+  ],
+  "capalar": [
+    {
+      "ad": "Sinop",
+      "lon": 35.15,
+      "lat": 42.03,
+      "x": 0.497,
+      "y": 0.069
+    },
+    {
+      "ad": "Amasya",
+      "lon": 35.83,
+      "lat": 40.65,
+      "x": 0.531,
+      "y": 0.263
+    },
+    {
+      "ad": "Ankara",
+      "lon": 32.86,
+      "lat": 39.93,
+      "x": 0.385,
+      "y": 0.369
+    },
+    {
+      "ad": "Sivas",
+      "lon": 37.02,
+      "lat": 39.75,
+      "x": 0.593,
+      "y": 0.392
+    },
+    {
+      "ad": "Erzincan",
+      "lon": 39.49,
+      "lat": 39.75,
+      "x": 0.713,
+      "y": 0.38
+    },
+    {
+      "ad": "Erzurum",
+      "lon": 41.28,
+      "lat": 39.9,
+      "x": 0.817,
+      "y": 0.355
+    },
+    {
+      "ad": "Eskişehir",
+      "lon": 30.52,
+      "lat": 39.78,
+      "x": 0.27,
+      "y": 0.401
+    },
+    {
+      "ad": "Ahlat",
+      "lon": 42.49,
+      "lat": 38.75,
+      "x": 0.888,
+      "y": 0.536
+    },
+    {
+      "ad": "Malatya",
+      "lon": 38.31,
+      "lat": 38.35,
+      "x": 0.659,
+      "y": 0.589
+    },
+    {
+      "ad": "Konya",
+      "lon": 32.48,
+      "lat": 37.87,
+      "x": 0.363,
+      "y": 0.672
+    },
+    {
+      "ad": "Antalya",
+      "lon": 30.71,
+      "lat": 36.88,
+      "x": 0.267,
+      "y": 0.796
+    }
+  ]
+}
