@@ -15,20 +15,13 @@
 # ayrıca <https://www.gnu.org/licenses/> adresinden edinebilirsiniz.
 #
 """
-HARİTA ARACI — kaynak bulur, indirir, adayları tarar, önizler, imleç denetler
+HARİTA ARACI — hazır Commons haritası bulur, indirir, adayları tarar, önizler
 ==============================================================================
 
-    python tools/harita.py --veri-indir
     python tools/harita.py --commons "Memlûk Devleti"
     python tools/harita.py --commons "Memlûk Devleti" --sec 1 --ders islam_tarihi_3
-    python tools/harita.py --tara islam_tarihi_3 --sinif 2 --donem 2 --sinav final
+    python tools/harita.py --tara   islam_tarihi_3 --sinif 2 --donem 2 --sinav final
     python tools/harita.py --onizle islam_tarihi_3 --sinif 2 --donem 2 --sinav final
-    python tools/harita.py --sinir-cikar mogol-imparatorlugu-genisleme-1206-1294.svg
-
---veri-indir  Natural Earth 1:50m katmanlarını (kamu malı / CC0)
-              assets/harita/ altına indirir. Bir kez yapılır; dosyalar
-              .gitignore'dadır (3 MB, koddan üretilemez ama her an
-              yeniden indirilebilir).
 
 --commons     Bir VİKİPEDİ MADDESİNİN gerçekten kullandığı haritaları listeler.
               Commons'ta ARAMA YAPMAZ: maddenin gömdüğü dosyalara bakar, çünkü
@@ -42,28 +35,27 @@ HARİTA ARACI — kaynak bulur, indirir, adayları tarar, önizler, imleç denet
               yapıştırılacak MapBox parçasını basar.
               Dönem SORULMAZ: bu komut hiçbir döneme dosya yazmaz.
 
---tara        Hangi bölümlerin harita adayı olduğunu puanlar. İçerik
-              ÜRETMEZ; şehir/komşu listesini ve yaklaşık sınır poligonunu
-              kaynağa bakarak siz yazarsınız.
+--tara        Hangi bölümlerin harita adayı olduğunu puanlar. İçerik ÜRETMEZ;
+              hangi haritanın uyduğuna kaynağa bakarak siz karar verirsiniz.
 
---onizle      Dersin haritalarını tek tek dönemin gorsel_ders_notlari/preview/
-              klasörüne yazar; tarayıcıda açıp koordinatları denetlemek için.
+--onizle      Dersin haritalarını, sayfaya gömüleceği ÖLÇÜDE, dönemin
+              gorsel_ders_notlari/preview/ klasörüne JPEG olarak yazar.
+              Etiketler bu ölçüde okunuyor mu -- gözle bakmak için.
               (Derleme gerekmez.)
 
---sinir-cikar Bir Commons haritasındaki renkli alanı GERÇEK lon/lat poligonuna
-              çevirir; sonuç `MapBox.territory` olur ve harita bizim
-              motorumuzla çizilir. Kaynak SVG ise önce Chromium'la basılır.
-              Çıkan `bindirme.png`ye GÖZLE bakmak zorunludur.
+NOT: Harita bir görüntü modeliyle ÜRETİLMEZ, ÇİZİLMEZ ve İÇİNE DOKUNULMAZ.
+Tek yol var: Commons'taki hazır harita olduğu gibi gömülür, yalnızca sütun
+genişliğine küçültülür (bkz. cekirdek/harita_gomme.py). Etiketler kaynağın
+dilinde kalır; Türkçe karşılıkları `MapBox.ad_anahtari` ile kutunun ALTINA
+basılır. Atıf ZORUNLUDUR -- artık türetilmiş bir poligon değil, görüntünün
+kendisi dağıtılıyor.
 
-NOT: Harita bir görüntü modeliyle ÜRETİLMEZ ve hazır bir harita görüntüsü
-kitaba GÖMÜLMEZ. Tek yol var: sınır kaynaktan çıkarılır, geri kalan her şey
-(kıyı, nehir, şehir, etiket) kendi motorumuzla her derlemede yeniden çizilir
-(bkz. cekirdek/harita_cizim.py). Ücretsiz, deterministik, etiketler Türkçe
-ve baskıda vektör. Atıf yine ZORUNLUDUR: sınır CC BY-SA bir haritadan
-türetilmiştir.
-Renklendirme için bir görüntü modeli kullanma yolu 2026-08-31'de ÖLÇÜLÜP
-terk edildi: hem seedream hem gpt-image-2 kartografın yazılarını bozuyor
-(bkz. CLAUDE.md "Neden görüntü modeli yok").
+Terk edilen iki yol, geri getirmeyin:
+  · Görüntü modeliyle çizme/renklendirme (2026-08-31 ölçüldü): kartografın
+    yazılarını bozuyor, bir haritada tarihi sessizce değiştirdi.
+  · Sınır çıkarıp kendi motorumuzla çizme (2026-09-01 söküldü): sonucu
+    güzeldi ama harita başına 6-34 çapa noktasının elle kalibrasyonunu
+    gerektiriyordu; asıl maliyet oradaydı.
 """
 
 import argparse
@@ -81,25 +73,9 @@ if hasattr(sys.stdout, "reconfigure"):
 
 from cekirdek import donem as donem_mod        # noqa: E402
 from cekirdek import harita as H               # noqa: E402
-from cekirdek import harita_cizim as HC        # noqa: E402
 from cekirdek import commons_ara as CA         # noqa: E402
-from cekirdek import sinir_cikar as SC         # noqa: E402
+from cekirdek import harita_gomme as HG        # noqa: E402
 import build as B                              # noqa: E402
-
-
-def komut_veri_indir() -> None:
-    HC.VERI.mkdir(parents=True, exist_ok=True)
-    for ad, dosya in HC.KATMANLAR.items():
-        hedef = HC.VERI / dosya
-        if hedef.exists():
-            print(f"[harita] {dosya} zaten var ({hedef.stat().st_size // 1024} KB)")
-            continue
-        url = HC.VERI_KAYNAGI + dosya
-        print(f"[harita] indiriliyor: {dosya}")
-        with urllib.request.urlopen(url, timeout=180) as r:
-            hedef.write_bytes(r.read())
-        print(f"[harita]   -> {hedef} ({hedef.stat().st_size // 1024} KB)")
-    print("[harita] Natural Earth 1:50m hazır (kamu malı / CC0).")
 
 
 def komut_commons(madde: str, sec: int, ders: str, wiki: str) -> None:
@@ -160,121 +136,40 @@ def komut_commons(madde: str, sec: int, ders: str, wiki: str) -> None:
     if not 1 <= sec <= len(adaylar):
         raise SystemExit(f"[hata] --sec {sec} yok (1..{len(adaylar)})")
     a = adaylar[sec - 1]
-    SC.COMMONS.mkdir(parents=True, exist_ok=True)
-    yol, n = CA.indir(a, SC.COMMONS)
+    HG.COMMONS.mkdir(parents=True, exist_ok=True)
+    yol, n = CA.indir(a, HG.COMMONS)
     print("")
     print(f"[indirildi] {yol.relative_to(ROOT)}  ({n // 1024} KB)")
 
-    lisans_yol = SC.COMMONS / "LISANS.md"
+    lisans_yol = HG.COMMONS / "LISANS.md"
     kullanan = f"src/{ders}.py" if ders else "(dersi yazınca burayı doldurun)"
     mevcut = lisans_yol.read_text(encoding="utf-8") if lisans_yol.exists() else ""
-    lisans_yol.write_text(mevcut + CA.kunye(a, yol.name, kullanan), encoding="utf-8")
-    print(f"[künye]     {lisans_yol.relative_to(ROOT)} güncellendi "
-          f"(yazar/lisans/bağlantı API'den okundu)")
+    # Aynı dosya ikinci kez indirilirse künye TEKRAR EKLENMEZ: build.py künyeyi
+    # ilk eşleşmeden okur, ikinci blok sessizce ölü kayıt olurdu.
+    if f"### `{yol.name}`" in mevcut:
+        print(f"[künye]     {yol.name} zaten kayıtlı, künye tekrar yazılmadı")
+    else:
+        lisans_yol.write_text(mevcut + CA.kunye(a, yol.name, kullanan), encoding="utf-8")
+        print(f"[künye]     {lisans_yol.relative_to(ROOT)} güncellendi "
+              f"(yazar/lisans/bağlantı API'den okundu)")
 
     print("")
-    print("[sonraki adım] Sınırı bu haritadan ÇIKARIN (harita gömülmez, çizilir):")
-    print("")
-    print(f"  1. Çapa dosyası yazın: {yol.stem}.capa.json")
-    print("       {\"kirp\": [sol, ust, sag, alt], \"ton\": [alt_derece, ust_derece],")
-    print("        \"capalar\": [{\"ad\": \"Kahire\", \"lon\": 31.235, \"lat\": 30.044,")
-    print("                      \"x\": 0.195, \"y\": 0.392}, ...]}")
-    print("     x/y = KIRPILMIŞ görselin oranı. En az 6, tercihen 8-12 çapa;")
-    print("     haritanın DÖRT BİR YANINA dağıtın (kümelenmiş çapa sistematik")
-    print("     kayma verir: ölçüldü, 3 çapayla Mekke %22 kaymıştı).")
-    if a.vektor:
-        print("     Kaynak VEKTÖR: oranları gözle OKUMAYIN -- dosyanın kendi şehir")
-        print("     noktalarının (<use>/<circle> transform matrisi) tam değerlerini")
-        print("     viewBox ölçüsüne bölün. Ölçüldü: gözle okuma Moğol haritasında")
-        print("     ortalama %2,77 artık verirken dosyadan okuma %0,66'ya indi.")
-    print(f"  2. python tools/harita.py --sinir-cikar {yol.name}")
-    print("  3. assets/harita/sinir/*.bindirme.png dosyasına GÖZLE bakın.")
-    print("  4. Derse yapıştırın:")
+    print("[sonraki adım] Haritayı derse yapıştırın -- görüntüye DOKUNULMAZ:")
     print("")
     print("        .add_map(MapBox(")
     print(f'            region="{madde}",')
     print('            label="Coğrafi konum",')
-    print("            bbox=(batı, güney, doğu, kuzey),")
-    print(f'            territory=sinir_yukle("{yol.stem}"),')
-    print('            cities=[Place("Şehir", lon, lat)],')
-    print(f'            source="Sınır: {CA.atif(a)}",')
+    print(f'            kaynak="{yol.name}",')
+    print('            # kirp=(sol, üst, sağ, alt),   # kaynağın ilgisiz kenarlarını atar')
+    print('            ad_anahtari=[("Manzikert", "Malazgirt"), ("Baghdad", "Bağdat")],')
     print('            caption="...",')
     print('        ), yan=[...], taraf="sag")')
-
-
-def komut_sinir_cikar(dosya: str, eps: float, en_az: int, tek: bool) -> None:
-    """Commons haritasindaki alani gercek koordinata cevirir (bkz. sinir_cikar)."""
-    try:
-        sonuc = SC.cikar(dosya, en_az_hucre=en_az, eps=eps, tek_parca=tek)
-    except (SC.CapaYok, FileNotFoundError) as e:
-        raise SystemExit(f"[hata] {e}")
-
-    kal = sonuc["kalibrasyon"]
-    tip = {1: "afin", 2: "2. derece polinom", 3: "3. derece polinom"}[kal.derece]
-    print(f"[izdüşüm] {tip} · {len(kal.artiklar)} çapa")
     print("")
-    print("  ARTIK HATALAR (kırpılmış görselin genişliğine oran):")
-    for ad, a in sorted(kal.artiklar, key=lambda t: -t[1]):
-        bayrak = "   <-- EŞİĞİ AŞIYOR" if a > SC.ARTIK_ESIGI else ""
-        print(f"    {ad:12} %{a * 100:5.2f}{bayrak}")
-    print("")
-    if kal.en_buyuk_artik > SC.ARTIK_ESIGI:
-        print(f"  [UYARI] En büyük artık %{kal.en_buyuk_artik * 100:.2f}, eşik "
-              f"%{SC.ARTIK_ESIGI * 100:.1f}. Büyük artık şu ÜÇ şeyden birini söyler:")
-        print("          (a) o çapanın x/y oranı yanlış okundu,")
-        print("          (b) lon/lat yanlış (aynı adlı başka bir yer olabilir),")
-        print("          (c) çapalar bir bölgede kümelenmiş — dört bir yana dağıtın.")
-    if kal.derece == 1:
-        print("  [UYARI] 6'dan az çapa: yalnızca afin çözüm. Tarihî haritaların çoğu")
-        print("          eşuzaklık DEĞİLDİR; afin çözüm çapalardan uzaklaştıkça kayar")
-        print("          (ölçüldü: 3 çapayla Mekke 240 px = %22 kaymıştı).")
-
-    print(f"  maske   : {sonuc['maske_ham']} -> {sonuc['maske_temiz']} piksel "
-          f"(tarama {sonuc['olcu'][0]}x{sonuc['olcu'][1]}, ton {sonuc['ton']})")
-    for i, (px, ham, sade) in enumerate(sonuc["parcalar"], 1):
-        print(f"  halka {i} : {px} piksel -> kontur {ham} -> sade {sade} nokta")
-    if not sonuc["halkalar"]:
-        raise SystemExit("[hata] Hiç halka çıkmadı. `ton` aralığı yanlış olabilir — "
-                         "kaynağın toprak rengini ÖLÇÜN, tahmin etmeyin.")
-
-    SC.SINIR.mkdir(parents=True, exist_ok=True)
-    ad = pathlib.Path(dosya).stem
-    veri = {"kaynak": dosya, "izdusum_derece": kal.derece,
-            "en_buyuk_artik": round(kal.en_buyuk_artik, 5),
-            "halkalar": [[[round(lo, 3), round(la, 3)] for lo, la in h]
-                         for h in sonuc["halkalar"]]}
-    hedef = SC.SINIR / f"{ad}.json"
-    hedef.write_text(json.dumps(veri, ensure_ascii=False, indent=1), encoding="utf-8")
-    print(f"\n[yazıldı] {hedef.relative_to(ROOT)}")
-
-    bindirme = SC.SINIR / f"{ad}.bindirme.png"
-    SC.bindirme_yaz(sonuc, bindirme)
-    print(f"[bindirme] {bindirme.relative_to(ROOT)}")
-
-    cizim = SC.SINIR / f"{ad}.cizim.svg"
-    bbox, n = SC.cizim_onizle(sonuc, cizim)
-    if n:
-        print(f"[çizim]    {cizim.relative_to(ROOT)}  (tarayıcıda açın)")
-        print(f"           çerçeve lon {bbox[0]:.1f}..{bbox[2]:.1f} · "
-              f"lat {bbox[1]:.1f}..{bbox[3]:.1f} · {n} nokta")
-    else:
-        print("[çizim]    atlandı: Natural Earth verisi yok "
-              "(python tools/harita.py --veri-indir)")
-    print("  [ZORUNLU] Bu görsele GÖZLE bakın: kırmızı çizgi kaynağın renkli alanını")
-    print("            izliyor mu? Kaynakta komşu bir devlet AYNI tonda boyanmışsa")
-    print("            maske onu da alır ve sonuç sessizce yanlış olur.")
-
-    print("\nDerse yapıştırın (harita artık ÇİZİLİR, raster gömülmez):")
-    print(f'        .add_map(MapBox(')
-    print(f'            region="...",')
-    print(f'            bbox=(batı, güney, doğu, kuzey),')
-    print(f'            cities=[Place("...", lon, lat)],')
-    print(f'            territory=json.loads((ROOT / "assets/harita/sinir/{ad}.json")')
-    print(f'                                 .read_text())["halkalar"],')
-    print(f'            source="Sınır: <yazar>, Wikimedia Commons, CC BY-SA — ...",')
-    print(f'        ), yan=[...], taraf="sag")')
-    print("\nAtıf ZORUNLUDUR: sınır CC BY-SA bir haritadan türetilmiştir,")
-    print("  'artık bizim çizimimiz' denemez.")
+    print("  · `source` YAZMAYIN: build.py künyeyi LISANS.md'den doldurur.")
+    print("  · `ad_anahtari`: haritada İngilizce görünen ama Türkçesi FARKLI olan")
+    print("    yer adları. Aynı yazılanları (Herat, Merv) yazmayın.")
+    print("  · Etiketler yan sütunda küçük kalıyorsa `taraf=\"tam\"` deneyin ya da")
+    print("    `kirp` ile ilgisiz kenarları atın; sonra --onizle ile GÖZLE bakın.")
 
 
 def komut_tara(modules: list[str]) -> None:
@@ -302,6 +197,13 @@ def _harita_kutulari(pack, bolum: int = 0):
 
 
 def komut_onizle(modules: list[str]) -> None:
+    """Haritaları sayfaya gömülecek ÖLÇÜDE dosyaya yazar.
+
+    Gömme kipinde denetlenecek tek şey okunabilirliktir: kaynak 3800 px
+    genişken sayfada 82mm sütuna (972 px) iniyor. Etiketler o ölçüde
+    okunuyor mu -- sayısal bir ölçüt bunu söylemez, gözle bakmak gerekir.
+    """
+    import base64
     hedef_kok = B.DONEM.gorsel_ders_notlari / "preview"
     hedef_kok.mkdir(parents=True, exist_ok=True)
     for m in modules:
@@ -309,13 +211,14 @@ def komut_onizle(modules: list[str]) -> None:
         sonuc = B.haritalari_coz(pack)
         B.harita_raporu(pack, sonuc)
         for no, mb in _harita_kutulari(pack):
-            if not mb.svg:
+            if not mb.gorsel_src:
                 continue
-            yol = hedef_kok / f"harita-{m}-b{no}.svg"
-            yol.write_text(mb.svg, encoding="utf-8")
-            print(f"  Bölüm {no}: {yol}  ({len(mb.svg) // 1024} KB)")
-            print(f"      çerçeve {mb.bbox} · {len(mb.cities)} şehir · "
-                  f"{len(mb.territory) or len(mb.katmanlar)} alan")
+            yol = hedef_kok / f"harita-{m}-b{no}.jpg"
+            yol.write_bytes(base64.b64decode(mb.gorsel_src.split(",", 1)[1]))
+            en, boy = mb.gorsel_oran.split(" / ")
+            print(f"  Bölüm {no}: {yol}  ({yol.stat().st_size // 1024} KB)")
+            print(f"      kaynak {mb.kaynak} · gömülen {en}x{boy} px · "
+                  f"{len(mb.ad_anahtari)} ad anahtarı")
 
 
 def main() -> None:
@@ -323,8 +226,6 @@ def main() -> None:
     # NOT: konumsal argümanın adı BİLEREK `dersler` -- olcum/dengele/kalibre
     # ile aynı; `--duz` bayrağıyla çakışmaz (bkz. CLAUDE.md "DÜZ KİP").
     ap.add_argument("dersler", nargs="*", help="ders modülleri (çıplak ad)")
-    ap.add_argument("--veri-indir", action="store_true",
-                    help="Natural Earth 1:50m katmanlarını indir (bir kez)")
     ap.add_argument("--commons", metavar="MADDE",
                     help="bir Vikipedi maddesinin kullandığı haritaları listele")
     ap.add_argument("--sec", type=int, default=0,
@@ -333,35 +234,17 @@ def main() -> None:
     ap.add_argument("--ders", default="",
                     help="--sec ile: LISANS.md künyesine yazılacak ders slug'ı")
     ap.add_argument("--tara", action="store_true", help="harita adayı bölümleri puanla")
-    ap.add_argument("--onizle", action="store_true", help="haritaları dosyaya yaz")
-    ap.add_argument("--sinir-cikar", metavar="DOSYA",
-                    help="Commons haritasındaki alanı lon/lat poligonuna çevir")
-    ap.add_argument("--eps", type=float, default=1.6,
-                    help="--sinir-cikar: sadeleştirme toleransı (tarama pikseli)")
-    ap.add_argument("--en-az", type=int, default=60,
-                    help="--sinir-cikar: bu kadar pikselden küçük lekeleri at")
-    ap.add_argument("--tek-parca", action="store_true",
-                    help="--sinir-cikar: yalnız EN BÜYÜK alanı tut (arazi gölgesi "
-                         "kaynaklı sahte halkaları eler; tek parçalı devletlerde)")
+    ap.add_argument("--onizle", action="store_true",
+                    help="haritaları gömülecek ölçüde dosyaya yaz (okunabilirlik denetimi)")
     ap.add_argument("--hepsi", action="store_true", help="dönemin kitap.py'sindeki tüm dersler")
     donem_mod.add_args(ap)
     a = ap.parse_args()
-
-    if a.veri_indir:
-        komut_veri_indir()
-        if not (a.tara or a.onizle):
-            return
 
     # --commons DÖNEMDEN BAĞIMSIZDIR: harita ararken ortada henüz bir ders
     # olmayabilir. KRİTİK KURAL 2 (dönem varsayılmaz) ders ÜRETİMİ içindir;
     # bu komut hiçbir döneme dosya yazmaz, yalnızca paylaşılan assets/'a indirir.
     if a.commons:
         komut_commons(a.commons, a.sec, a.ders, a.wiki)
-        return
-
-    # --sinir-cikar da dönemden BAĞIMSIZDIR: paylaşılan assets/ üzerinde çalışır.
-    if a.sinir_cikar:
-        komut_sinir_cikar(a.sinir_cikar, a.eps, a.en_az, a.tek_parca)
         return
 
     d = donem_mod.resolve(a)
@@ -372,7 +255,7 @@ def main() -> None:
     elif a.dersler:
         modules = a.dersler
     else:
-        raise SystemExit("[hata] ders verilmedi (ya da --hepsi / --veri-indir kullanın)")
+        raise SystemExit("[hata] ders verilmedi (ya da --hepsi kullanın)")
 
     if a.tara:
         komut_tara(modules)

@@ -19,7 +19,7 @@ HARİTA ADAYI TESPİTİ — hangi bölüme harita konmalı?
 =====================================================
 
 Bu modül YALNIZCA tespit yapar: bir bölümün içeriği mekânsal mı, yani harita
-kutusu hak ediyor mu? Haritanın kendisini `cekirdek/harita_cizim.py` çizer
+kutusu hak ediyor mu? Haritanın kendisi Commons'tan hazır gelir
 (Natural Earth verisi + gerçek koordinatlar).
 
 Tespit bir ÖNERİ üretir, harita İÇERİĞİ üretmez: şehir/komşu listesini ve
@@ -30,7 +30,7 @@ ICAT ETMEZ.
 TARİHÇE: 2026 Ağustos'a kadar bu dosyada fal.ai/gpt-image-2 ile harita
 ÜRETEN bir bölüm vardı (prompt şablonu, önbellek, maliyet defteri). Kaldırıldı:
 görüntü modeli sınırları ve şehir konumlarını uyduruyordu (gerekçe ve ölçülen
-hatalar için bkz. harita_cizim.py başlığı). Eski üretim defteri
+hatalar için bkz. harita_gomme.py başlığı). Eski üretim defteri
 <dönem>/kaynaklar/haritalar/uretim_kaydi.jsonl'de tarihî kayıt olarak durur.
 """
 

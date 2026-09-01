@@ -119,73 +119,44 @@ class Ayah:
 
 
 @dataclass
-class Place:
-    """Haritadaki tek bir işaret: şehir noktası ya da komşu bölge etiketi.
-
-    Koordinat GERÇEKTİR ve doğrulanabilir olmalıdır (WGS84, ondalık derece).
-    GeoJSON düzeniyle uyum için sıra `lon, lat`'tır — enlem/boylamı ters
-    yazmak haritayı sessizce bozar, yazarken dikkat edin.
-    """
-    name: str
-    lon: float                 # doğu +, batı -
-    lat: float                 # kuzey +, güney -
-    sag: bool = True           # etiket noktanın sağında mı yazılsın (kalabalıkta False yapın)
-
-
-@dataclass
 class MapBox:
     """Bölümün yanında duran coğrafi harita kutusu.
 
-    Harita BUILD SIRASINDA, gerçek kartografik veriden çizilir
-    (`cekirdek/harita_cizim.py`): kıyı/göl/nehir katmanları Natural Earth
-    1:50m (kamu malı), şehirler aşağıdaki gerçek koordinatlar. Üretim
-    ücretsiz ve deterministiktir; bir görüntü modeline sorulmaz.
+    Harita Wikimedia Commons'tan gelen HAZIR bir haritadır ve sayfaya
+    OLDUĞU GİBİ gömülür (`cekirdek/harita_gomme.py`): tek işlem, kutunun
+    genişliğine küçültmektir. Görüntünün içine dokunulmaz -- çeviri yok,
+    renk kaydırma yok, etiket silme yok.
 
     Alanlar:
-        region      Kutunun tanımladığı devlet/bölge adı (Türkçe)
-        bbox        (batı, güney, doğu, kuzey) ondalık derece — haritanın çerçevesi
-        cities      list[Place] — kırmızı nokta + etiket
-        neighbors   list[Place] — gri metin etiketi (nokta yok); "\\n" ile satır böl
-        territory   list[list[(lon, lat)]] — YAKLAŞIK alan poligon(lar)ı
+        region        Kutunun tanımladığı devlet/bölge adı (Türkçe) -- başlık/uyarı metni
+        kaynak        `assets/harita/commons/` altındaki dosya adı, uzantısıyla
+        kirp          (sol, üst, sağ, alt) piksel -- kaynağın ilgisiz kenarlarını atar
+        ad_anahtari   [("Manzikert", "Malazgirt"), ...] -- kutunun ALTINA basılan
+                      Türkçe okuma anahtarı
 
-    `territory` DÜRÜSTLÜK MESELESİDİR: ortaçağ siyasi sınırları için serbest
-    ve yetkeli bir veri kümesi yoktur (Natural Earth bugünün sınırlarıdır,
-    CShapes 1886'da başlar, Euratlas lisanslıdır). Poligon elle, kaba hatlarla
-    yazılır ve kutuda HER ZAMAN "yaklaşık" ibaresiyle görünür (`source`).
-    Sahte bir atlas künyesi (sayfa numaralı uydurma atıf) YAZMAYIN.
+    NEDEN AD ANAHTARI: kaynağa dokunmamanın bedeli, etiketlerin kaynağın
+    dilinde (genelde İngilizce) kalmasıdır. Türkçe bir ders kitabında öğrenci
+    "Manzikert" okur. Anahtar bu bedeli kapatır ve görüntünün içine değil,
+    kitabın kendi tipografisiyle haritanın ALTINA basılır -- yani kaynak
+    yine değiştirilmemiş olur. Kaynakta İngilizce görünen ama Türkçesi farklı
+    olan her yer adını yazın; aynı yazılanları (Herat, Merv) yazmayın.
 
-    ÖNEMLİ: cities/neighbors listelerine yalnızca ham kaynakta GEÇEN yer
-    adlarını yazın. Harita, metinde olmayan bir şehri göstermemelidir.
-    Bütün etiketler TÜRKÇE yazılır ("Gürgenç", "Semerkant", "Kara-Hıtaylar").
+    ATIF ZORUNLUDUR ve elle yazılmaz: `source` boş bırakılırsa build.py onu
+    `assets/harita/commons/LISANS.md` künyesinden doldurur. Artık türetilmiş
+    bir poligon değil, DAĞITILAN GÖRÜNTÜNÜN kendisi söz konusudur -- CC BY-SA
+    yazar + lisans + bağlantının görünür olmasını ister.
     """
     region: str
-    bbox: tuple = ()                                          # (batı, güney, doğu, kuzey)
-    cities: list = field(default_factory=list)                # list[Place]
-    neighbors: list = field(default_factory=list)             # list[Place]
-    territory: list = field(default_factory=list)             # list[list[(lon, lat)]]
-    # ÇOK KATMANLI alan: bir devletin dönem dönem genişlemesi. Her katman
-    # {"halkalar": [[(lon,lat), ...]], "etiket": "1240'a kadar"} biçimindedir
-    # ve liste ESKİDEN YENİYE sıralanır; çizim en eskiyi en koyu tonla basar
-    # ve etiketleri HTML lejanta taşır. `territory` ile birlikte KULLANILMAZ.
-    #
-    # Gerek: tarihî haritaların çoğu tek sınır değil, genişleme evreleri
-    # gösterir (Rum Selçuklu 4 bant, Moğol İmparatorluğu 7 bant). Hepsini tek
-    # poligona indirmek kaynaktaki asıl bilgiyi -- NE ZAMAN nereye yayıldığını
-    # -- yok eder.
-    katmanlar: list = field(default_factory=list)
+    kaynak: str = ""                                          # commons/ altındaki dosya adı
+    kirp: tuple = ()                                          # (sol, üst, sağ, alt) piksel
+    ad_anahtari: list = field(default_factory=list)           # [(kaynaktaki, Türkçesi)]
     label: str = "Coğrafi konum"                              # kutu üstündeki başlık etiketi
     caption: str = ""                                         # kutunun altındaki açıklama
-    source: str = ("Sınırlar yaklaşıktır (temsilî). Coğrafya: Natural Earth "
-                   "1:50m, kamu malı.")
+    source: str = ""                                          # boşsa LISANS.md'den doldurulur
 
     # --- build.py tarafından doldurulur (elle yazılmaz) ---
-    svg: str = ""             # çizilmiş harita; boşsa veri eksiktir (yer tutucu basılır)
+    gorsel_src: str = ""      # data: URI; boşsa kaynak diskte yok (yer tutucu basılır)
     gorsel_oran: str = "4 / 3"
-    # Haritanın ALTINA HTML olarak basılan lejant: [(renk_hex, "etiket"), ...].
-    # `katmanlar` doluyken harita_cizim tarafından doldurulur: lejant SVG'nin
-    # İÇİNDE değil ALTINDA durur, böylece harita yan sütuna küçültülünce
-    # lejant onunla birlikte küçülüp okunmaz olmaz.
-    lejant: list = field(default_factory=list)
 
 
 @dataclass

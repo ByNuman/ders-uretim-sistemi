@@ -351,8 +351,7 @@ ders-uretim-sistemi/
 │   ├── theme_engine.py     # Sınırsız renk teması motoru (tek hex'ten tam tema üretir)
 │   ├── renk_uretici.py     # DERSE ÖZEL VURGU RENGİ — build + ders-anlatim ORTAK kaynağı
 │   ├── harita.py           # HARİTA KUTUSU: hangi bölüm harita adayı (tespit)
-│   ├── harita_cizim.py     # HARİTA ÇİZİMİ: Natural Earth + gerçek koordinat -> SVG
-│   ├── sinir_cikar.py      # SINIR ÇIKARMA: Commons haritasının alanı -> lon/lat poligonu
+│   ├── harita_gomme.py     # HARİTA GÖMME: hazır Commons haritası -> kırp + küçült + veri URI
 │   ├── commons_ara.py      # KAYNAK BULMA: bir Vikipedi maddesinin kullandığı haritalar
 │   └── pdfx.py             # BASKI ÖNCESİ: TrimBox/BleedBox + Ghostscript ile PDF/X-4 CMYK
 ├── tools/
@@ -712,15 +711,15 @@ from cekirdek.content_model import (
   `len(headers)` uzunluğunda string listesi. Hücrelerde `<b>` kullanılabilir.
   2 veya 3 sütunlu tablolar en iyi sonucu verir.
 
-- **`Place(name, lon, lat, sag=True)`** — haritadaki tek işaret (şehir noktası
-  ya da komşu bölge etiketi). Koordinat GERÇEK ve doğrulanabilir olmalıdır;
-  sıra `lon, lat`'tır (GeoJSON düzeni), ters yazmak haritayı sessizce bozar.
-
-- **`MapBox(region, bbox, cities, neighbors, territory, label, caption, source)`**
+- **`MapBox(region, kaynak, kirp, ad_anahtari, label, caption, source)`**
   Coğrafi harita kutusu; `ChapterPage.add_map(mb, yan=[...], taraf="sag")` ile
-  eklenir. Harita build sırasında GERÇEK VERİDEN çizilir (bkz. aşağıdaki
-  "Harita Kutusu" bölümü); `svg`/`gorsel_oran` alanlarını build.py doldurur,
-  elle yazmayın. `territory` YAKLAŞIKTIR ve öyle etiketlenir.
+  eklenir. `kaynak`, `assets/harita/commons/` altındaki hazır Commons
+  haritasının dosya adıdır; harita build sırasında OLDUĞU GİBİ gömülür,
+  yalnızca kutu genişliğine küçültülür (bkz. aşağıdaki "Harita Kutusu"
+  bölümü). `gorsel_src`/`gorsel_oran` alanlarını build.py doldurur, elle
+  yazmayın; `source`'u da BOŞ BIRAKIN — LISANS.md künyesinden gelir.
+  `ad_anahtari`, kaynağın yabancı etiketlerinin Türkçe karşılığıdır ve
+  kutunun ALTINA basılır.
 
 - **`InfoCard(title, text, badge=None)`** — küçük 2-3'lü kart grid'i
   (`ChapterPage.add_info_cards(başlık, [InfoCard(...), ...])` ile eklenir).
@@ -895,55 +894,40 @@ oluyorsa o dersin hue'sunu birkaç derece kaydırmayı deneyin.
 ## Harita Kutusu (coğrafi bölümler — `MapBox` + `ChapterPage.add_map`)
 
 İçeriği mekânsal olan bölümlere (yer adları, devletler, sınırlar, sefer/göç
-rotaları) metnin YANINDA duran bir harita kutusu konur: iki sütunlu düzen,
-metin sütunu 1.2 / harita sütunu 1 oranında.
+rotaları) metnin YANINDA ya da sayfa genişliğinde duran bir harita kutusu konur.
 
 ### TEK KURAL
 
-> **Kaynağın içeriğini bir modele yeniden çizdirme.** Kaynaktan yalnızca
-> SİLEBİLİRSİN (etiket ayıklama) ya da BİREBİR EŞLEŞMEYLE değiştirebilirsin
-> (sözlükle çeviri). Eklemek istediğin her şey — Türkçe yer adı, lejant —
-> haritanın ÜSTÜNE HTML katmanı olarak biner, görüntünün içine yakılmaz.
+> **Kaynağın görüntüsüne DOKUNMA.** Wikimedia Commons'tan gelen hazır harita
+> sayfaya olduğu gibi gömülür; tek işlem onu kutunun genişliğine
+> **küçültmektir** (bir de istenirse ilgisiz kenarlarını KIRPMAK — bu bir
+> silme işlemidir, ekleme değil). Çeviri yok, renk kaydırma yok, etiket
+> silme yok. Eklemek istediğin her şey — Türkçe ad anahtarı, açıklama, künye
+> — haritanın ALTINA HTML katmanı olarak biner, görüntünün içine yakılmaz.
 
 Bu kural sistemi deterministik tutar: `build.py` hiçbir zaman internete
 çıkmaz, para harcamaz ve aynı girdi her derlemede aynı haritayı verir.
+Görüntüye hiç bakılmadığı için bir etiketin bozulması ya da bir tarihin
+değişmesi FİZİKSEL OLARAK mümkün değildir.
 
-### TEK YOL VAR: sınırı kaynaktan çıkar, geri kalanını biz çizelim
+### Bedeli açıkça: etiketler kaynağın dilinde kalır
 
+Haritada `Manzikert`, `Baghdad`, `Urgench` yazar — Malazgirt, Bağdat, Gürgenç
+değil. Karşılığı `MapBox.ad_anahtari`'dir: kutunun ALTINA, kitabın kendi
+tipografisiyle basılan Türkçe okuma anahtarı.
+
+```python
+ad_anahtari=[("Urgench", "Gürgenç"), ("Bukhara", "Buhara"), ("Balkh", "Belh")],
 ```
-tools/harita.py --commons     Vikipedi maddesinin kullandığı haritayı bul/indir
-        ↓
-tools/harita.py --sinir-cikar Renkli alanı gerçek lon/lat poligonuna çevir
-        ↓
-cekirdek/harita_cizim.py      Natural Earth üzerine BİZİM motorumuzla çiz
-```
 
-Üç dosya tek bir hattır, birbirinin alternatifi değildir: `sinir_cikar`
-çizimini `harita_cizim`e yaptırır, çıkaracağı kaynağı `commons_ara`dan alır.
-
-Sonuç: sınır kartografın, geri kalan her şey bizim. Bütün etiketler Türkçe,
-baskıda vektör, PDF'e megabaytlık raster gömülmüyor, harita kitabın kendi
-tipografisiyle basılıyor ve her derleme aynı çıktıyı veriyor.
-
-> **2026-08-31 — hazır harita GÖMME yolu söküldü.** Eskiden ikinci bir yol
-> vardı: Commons haritasını (SVG veya raster) olduğu gibi sayfaya gömüp
-> etiketlerini çevirmek/kırpmak (`cekirdek/harita_commons.py`,
-> `CommonsKaynak`, `CommonsGorsel`, `Isaret`, `--imlec`). Silindi. Raster
-> yarısı zaten ölü koddu — dört raster harita sınır çıkarmaya geçince hiçbir
-> ders kullanmıyordu. SVG yarısını yalnızca Moğol haritası tutuyordu ve o da
-> artık çiziliyor (aşağıdaki nota bakın). Geri getirmeyin: gömülü harita
-> yabancı dilde etiket, raster şişkinlik ve ikinci bir tipografi demekti.
-
-`MapBox.territory` (tek sınır) ya da `MapBox.katmanlar` (genişleme evreleri)
-alanına konan poligon **kartografın çizgisidir**, elle tahmin değildir — ama
-kesikli kenar yine kalır, çünkü kaynağın kendisi de sınırı yaklaşık ilan eder.
-Atıf ZORUNLUDUR (bkz. "`territory` dürüstlük meselesidir").
-
+Kaynakta yabancı görünen ama Türkçesi FARKLI olan her yer adını yazın; aynı
+yazılanları (Herat, Merv, Konya) yazmayın. Kaynağın lejantı yabancı dildeyse
+(Rum Selçuklu haritasının lejantı İtalyancadır) çevirisini `caption`'a bir
+cümleyle ekleyin — yine görüntünün DIŞINDA.
 
 ### Harita eklemenin yolu: `tools/harita.py --commons`
 
-Bir Vikipedi maddesinin **gerçekten kullandığı** haritayı bulmak eskiden en çok
-vakit yiyen adımdı. Artık tek komut:
+Bir Vikipedi maddesinin **gerçekten kullandığı** haritayı bulmak tek komuttur:
 
 ```bash
 python tools/harita.py --commons "Memlûk Devleti"
@@ -952,291 +936,140 @@ python tools/harita.py --commons "Memlûk Devleti" --sec 1 --ders islam_tarihi_3
 
 Yaptıkları: maddenin gömdüğü görselleri listeler → Commons **kategorisinden**
 haritaları ayıklar (bayrak/arma/sikke/fotoğraf/ikon elenir) → seçileni
-`assets/harita/commons/` altına indirir → `LISANS.md` künyesini yazar/lisans/
-bağlantı bilgisiyle **API'den otomatik** yazar → derse yapıştırılacak `MapBox`
-parçasını basar. Dönem SORULMAZ (hiçbir döneme dosya yazmaz).
+`assets/harita/commons/` altına indirir → `LISANS.md` künyesini API'den
+**otomatik** yazar → derse yapıştırılacak `MapBox` parçasını basar. Dönem
+SORULMAZ (hiçbir döneme dosya yazmaz). Aynı dosya ikinci kez indirilirse künye
+TEKRAR EKLENMEZ.
 
 Ölçülmüş üç davranış — bunlara güvenin:
 
 * **Commons'ta ARAMA yapmaz, maddeye bakar.** Arama (özellikle
   `filemime:image/svg+xml` ile daraltılmış olanı) maddedeki raster haritayı hiç
   göremiyor; bir kez bu yüzden sınır DEĞİL sefer gösteren yanlış harita
-  seçilmişti. Memlük maddesi `Mamluk Sultanate of Cairo 1317 AD.jpg` kullanıyor.
-* **Ayıklama ölçütü kategoridir, ad değil.** "Memlûk Devleti" maddesinde 34
-  görselin 33'ü harita değil; haritaların "Maps of ..." kategorisi var,
+  seçilmişti.
+* **Ayıklama ölçütü kategoridir, ad değil.** "Memlûk Devleti" maddesinde 30
+  görselin 29'u harita değil; haritaların "Maps of ..." kategorisi var,
   diğerlerinin yok.
-* **Yönlendirme ve dil farkı yakalanır.** "Harezmşahlar" görselsiz bir
-  yönlendirmedir (doğrusu "Harezmşahlar Devleti"); Türkçe maddede harita yoksa
-  dil bağlantısından İngilizce karşılığına bakılır, o da yoksa başlık önerisi
-  basılır. Yanlış başlık verirseniz araç **yanlış haritayı da bulabilir** —
-  listede yazar/lisans/ölçüyle birlikte gösterilir, seçim SİZİNDİR.
+* **Yönlendirme ve dil farkı yakalanır.** Türkçe maddede harita yoksa dil
+  bağlantısından İngilizce karşılığına bakılır. Yanlış başlık verirseniz araç
+  **yanlış haritayı da bulabilir** — listede yazar/lisans/ölçüyle gösterilir,
+  seçim SİZİNDİR. Türkçe başlık bulunamıyorsa İngilizcesini deneyin
+  (`--commons "Transoxiana" --wiki en`).
 
-### Neden görüntü modeli yok (ÖLÇÜLDÜ — geri getirmeyin)
+**Aradığın konuda madde yoksa harita da yoktur.** Ölçüldü: "Selçuklu mirası
+atabeyliklerin merkezleri" gibi TEMATİK bir harita Commons'ta bulunmaz
+(`--commons "Atabeylik"` → 0 harita). O bölümde harita kutusunu KALDIRIN,
+yan bloklarını normal sayfa akışına alın — konuyla ilgisiz bir haritayı
+"yakın" diye koymak, harita koymamaktan kötüdür.
 
-Bir görüntü modeline harita **çizdirme** yolu 2026 Ağustos'ta terk edildi:
-model kıyıyı ezberden benzetiyor, şehri uyduruyor. Ölçülen hatalar: Hazar
-Denizi üç haritada imparatorluk sınırının İÇİNDE kaldı; Cend, Seyhun yerine
-Hazar kıyısına düştü.
+Etiketsiz bir "yayılım alanı" haritası da öğretim değeri taşımaz: Memlükler
+için bulunan 4928 x 2500 px'lik `Map of the Mamluk Sultanate.png` tek bir yer
+adı içermiyordu, o yüzden kullanılmadı.
 
-Sonra "hiç değilse gerçek bir haritanın RENGİNİ değiştirsin" diye daha dar bir
-yol denendi. **O da 2026-08-31'de ölçülüp kapatıldı** — iki modelde birden:
+### Okunabilirlik: `taraf` kararı ÖLÇÜMLE verilir
 
-| Model | Sonuç |
-|---|---|
-| `bytedance/seedream/v5/pro/edit` | Etiketler eridi: `Al-Ruha` → "Aldbla", `Harran` → "Idbrran" |
-| `openai/gpt-image-2/edit` | Renk ve coğrafya iyi, kesikli sınır korundu — **ama yazılar yine bozuldu**: `HALAB (ALEPPO)` → "MALAK ALAKFBD)", `Ba'albakk` → "Bathaslih", `Dimashq` → "Aagmub" ve **`(Occupied in 1426)` → `(occupied in 1405)`** |
+Kutu genişliği iki değerden biridir ve etiket boyutunu bu belirler:
 
-Sonuncusu kritiktir: model bir **tarihi sessizce değiştirdi**. Ders kitabında
-bu, taşmadan beterdir — sayfa düzgün görünür, öğrenci yanlış bilgiyi doğru
-sanır.
+| `taraf` | Kutu genişliği | Kullanım |
+|---|---|---|
+| `"sag"` / `"sol"` (varsayılan) | **82,3 mm** | AZ ve BÜYÜK etiketli haritalar |
+| `"tam"` | **186 mm** | YOĞUN etiketli ya da GENİŞ (oran > 1,5) haritalar |
 
-Sayısal bir kapı da bunu kurtaramaz. gpt-image-2 çıktısı çözünürlük (1792 px)
-ve en-boy (%0,33 sapma) ölçütlerini geçti, toprak IoU'da **%94,1** ile
-%95 eşiğinin 0,9 puan altında kaldı — yani reddedildi ama **alakasız bir
-gerekçeyle**. Yazıların erimesini üç ölçütten hiçbiri görmüyor; IoU %95,2
-çıksaydı "1405" yazan harita kitaba girecekti.
+Ölçüldü (2026-09-01, İslâm Tarihi III vize): Gazneli ve Büyük Selçuklu
+haritaları yan sütunda ~0,9 mm harf yüksekliğine (≈2,5 pt) düşüyordu —
+okunmuyordu; `taraf="tam"` ile aynı haritalar ~2 mm'ye (≈5,5 pt) çıktı ve
+rahat okunur oldu. Buna karşılık Volga Bulgar ve Delhi haritaları (az sayıda
+büyük etiket) yan sütunda gayet okunur.
 
-`tools/harita_uret.py` ve `assets/harita/uretilmis/` bu yüzden SİLİNDİ.
-Dersin rengine çekme işi determinist yolla yapılır (aşağıda) — o yol tonu
-kaydırıp parlaklığı koruduğu için bir harfe dokunması fiziksel olarak
-mümkün değildir.
-
-
-### Sınır çıkarma: `--sinir-cikar`
-
-Kaynağın renkli alanını gerçek koordinata çevirir; sonuç `territory`
-olur ve harita `harita_cizim.py` ile ÇİZİLİR.
+**Karar sayısal değil GÖRSELDİR:** `--onizle` ile haritayı gömüleceği ÖLÇÜDE
+dosyaya yazdırın ve bakın. Hiçbir otomatik denetim "etiketler küçük" demez.
 
 ```bash
-python tools/harita.py --sinir-cikar memluk-sultanligi-1317.jpg
+python tools/harita.py --onizle islam_tarihi_3 --sinif 2 --donem 2 --sinav vize
 ```
 
-Yaptığı: çapalardan izdüşümü çözer → artık hataları basar → renk maskesini
-çıkarır → gürültüyü temizler → Moore sınır izleme + Douglas-Peucker →
-`assets/harita/sinir/<ad>.json` (lon/lat halkaları) + **bindirme görseli** yazar.
-Sonuç `MapBox.territory` alanına konur ve harita `harita_cizim.py` ile ÇİZİLİR.
+### `taraf="tam"` ile `yan=[...]` KULLANMAYIN
 
-#### Çapa noktaları — işin tek elle yapılan kısmı
+Tam kipte metin haritanın ALTINDA normal akışta gelir; `yan` listesine
+koyarsanız harita+metin tek **bölünemez** blok olur ve sayfayı taşırır
+(ölçüldü: 162 mm'lik harita + yan bloklar = 202 mm, sayfaya sığmıyordu).
+Yan blokları ayrı `.add_block()` / `.add_callout()` çağrıları yapın —
+`validate()` bunu artık uyarı olarak da söyler.
 
-Tarihî haritaların izdüşümü dosyada YAZMAZ, çıkarımı yapmak için haritada yeri
-bilinen noktalar gerekir. Bunlar kaynağın YANINDA, metin olarak yaşar:
-`assets/harita/commons/<dosya>.capa.json`. Bir kez yazılır, git'e girer,
-kaynak değişmedikçe yeniden kullanılır.
+### Kırpma (`kirp`) — ilgisiz kenarları atar, etiketi büyütür
 
-```json
-{"kirp": [700, 80, 1780, 1500], "ton": [140, 175], "capalar": [
-  {"ad": "Kahire", "lon": 31.235, "lat": 30.044, "x": 0.195, "y": 0.392}
-]}
-```
+`kirp=(sol, üst, sağ, alt)` KAYNAK GÖRÜNTÜNÜN piksel koordinatlarıdır.
+Kırpmak yalnızca yer kazandırmaz, **etiketleri de büyütür**: aynı kutu
+genişliğine daha az piksel sığdığı için ölçek artar. Gazneli haritasının alt
+yarısı boş okyanustu; `kirp=(200, 0, 2830, 1440)` ile etiketler belirgin
+biçimde büyüdü.
 
-`x`/`y` KIRPILMIŞ görselin oranıdır (vektör kaynakta dosyadan okunur,
-bkz. aşağısı). `ton`,
-kaynağın toprak renginin derece aralığıdır; ÖLÇÜN, tahmin etmeyin.
+İki tuzak:
+* **Lejantı kesmeyin.** Ölçüldü: Tolunoğulları haritasında sol kenardan
+  60 px kırpmak lejant kutusunun etiketlerini (`Al-Qatta'i`, `MISR`) yarıda
+  bıraktı. Kırpmadan sonra HER ZAMAN `--onizle` ile bakın.
+* **Dikey coğrafyada tam kip taşar.** Memlük haritası (Anadolu'dan Hicaz'a)
+  0,89 oranıyla 186 mm genişlikte **208 mm** yüksekliğe çıkıyordu. Çözüm
+  kırpmayı YATAYLAŞTIRMAKTIR (sağ/sol bağlamı da alarak), dikey içeriği
+  atmak değil.
 
-**Gürültü halkalarına dikkat:** kaynağın dağ gölgeleri toprak rengiyle aynı
-ton aralığına düşebilir (ölçüldü: Hârezmşâhlar haritasında Zagros ve Hindukuş
-gölgeleri 4 sahte halka üretti). `--en-az <piksel>` ile küçük bileşenleri
-eleyin; `--en-az 3000` o haritada yalnız gerçek sınırı bıraktı.
+### SVG kaynaklar
 
-**En az 6 çapa verin (tercihen 8-12) ve HARİTANIN DÖRT BİR YANINA DAĞITIN.**
-6'nın altında araç yalnızca afin çözüme düşer ve bunu uyarı olarak söyler.
-Ölçüldü (2026-08-31, Memlük haritası): kuzeyde kümelenmiş **3 çapayla** afin
-çözüm güneye inildikçe sistematik olarak doğuya kaydı —
+Vektör kaynaklar (`.svg`) METİN oldukları için depoda kalır; build sırasında
+Chromium ile bir kez 2400 px'e basılıp yanına `<ad>.raster.png` olarak
+önbelleklenir (`.gitignore`'da). İki zorunlu düzeltme `harita_gomme.py`'de
+zaten var, kaldırmayın:
 
-| Nokta | Kayma |
-|---|---|
-| İskenderiye | ~25 px |
-| Uswan | ~130 px |
-| Sawakin | ~200 px |
-| **Mekke** | **~240 px = %22 ≈ 4-5° boylam** |
+* **`<meta charset="utf-8">`** — yoksa Chromium yerel HTML'i Latin-1 sayar ve
+  SVG'nin UTF-8 etiketleri bozulur (ölçüldü: "Eskişehir" rasterde
+  "EskiÅŸehir" çıktı).
+* **`viewBox` tamamlama** — kök etikette viewBox yoksa `width:100%` kutuyu
+  büyütür ama ÇİZİMİ büyütmez (ölçüldü: Transoxiana haritasında 2400 px'lik
+  kutuda içerik 1304 px'te kaldı, rasterin %70'i boştu).
 
-Sebep: kaynak eşuzaklık değil, meridyenleri güneye doğru açılan koni benzeri
-bir izdüşümdedir. **12 çapa + 2. derece polinom** ile aynı harita: en büyük
-artık %1,18, ortalama %0,37 (≈4 px).
+Her ikisi de **SESSİZ** bozulmalardır: ne taşma denetimi ne `validate()`
+görür, yalnızca göze çarpar.
 
-#### Artık raporunu OKUYUN
+### Atıf ZORUNLUDUR ve ELLE YAZILMAZ
 
-Araç her çapanın artığını basar ve `ARTIK_ESIGI`'ni (%1,2) aşanı işaretler.
-Büyük artık üç şeyden birini söyler: (a) o çapanın oranı yanlış okundu,
-(b) lon/lat yanlış, (c) çapalar kümelenmiş. Ölçülen örnek: "Ibrim" çapası
-%2,36 artık verdi, listeden çıkarılınca en büyük artık %1,18'e indi —
-yani araç yanlış okumamı kendisi buldurdu.
+Artık türetilmiş bir poligon değil, **görüntünün kendisi** dağıtılıyor;
+CC BY-SA yazar + lisans + bağlantının görünür olmasını ister. Bu yüzden
+`MapBox.source` alanını **boş bırakın**: `build.py` künyeyi
+`assets/harita/commons/LISANS.md`'den okur ve kutunun altına basar. Kaynak
+orada kayıtlı değilse build `[ATIF UYARISI]` verir — sahte künye üretmez.
 
-#### Polinom derecesi: KUADRATİK TAVANDIR (kübiği denemeyin)
+**Sahte atıf YAZMAYIN** (sayfa numaralı uydurma atlas künyesi).
 
-Araç 6+ çapada 2. dereceye geçer, daha yükseğine ÇIKMAZ. Hârezmşâhlar
-haritasında (15 çapa, ~25° boylam) ölçülen en büyük artıklar: afin %2,44 ·
-kuadratik %1,49 · **kübik %1,16**. Sayıya bakıp kübiğe geçmek cazip görünüyor
-ve bir kez geçildi de — ama `bindirme.png` şunu gösterdi: kübik uyum
-**çapaların dışında savruluyor** (Runge olgusu). Kuzey sınırı haritanın
-dışına düz bir çizgi hâlinde fırladı, güney sınırı Basra Körfezi'ne taştı.
-Kuadratik aynı haritada her yerde alanı düzgün izliyor.
-
-**Ders:** artık hatası yalnızca ÇAPA NOKTALARINDA ölçülür; çapasız bölgede ne
-olduğunu söylemez. Bu yüzden sayısal ölçüt tek başına asla yetmez.
-
-#### Çok katmanlı alan: genişleme evreleri
-
-Tarihî haritaların çoğu tek sınır değil, **dönem dönem genişleme** gösterir
-(Rum Selçuklu 4 bant: 1100/1174/1182/1240 · Moğol 7 bant). Hepsini tek
-poligona indirmek kaynağın asıl bilgisini — NE ZAMAN nereye yayıldığını —
-yok eder. Bunun yerine her renk bandı ayrı çıkarılır ve `MapBox.katmanlar`
-alanına ESKİDEN YENİYE konur; çizim en eskiyi en koyu tonla basar ve
-etiketleri kutunun altındaki HTML lejanta taşır.
-
-```python
-katmanlar=katman_yukle("rum-selcuklu-genisleme-1100-1240"),
-```
-
-**Vektör kaynakta renk BİREBİR eşlenir**, ton penceresiyle değil:
-`svg_rasterlestir()` SVG'yi Chromium ile 1800 px'e basar, `renk_maskesi()`
-kaynağın düz vektör rengini tam değerle arar. Raster kaynaklarda pencere
-gerekiyordu çünkü arazi gölgesi rengi sürekli kaydırıyordu. Tolerans ÖNEMLİ:
-Moğol haritasında komşu bantlar kanal başına yalnızca ~9 birim farklıdır;
-tolerans 8'de iki bandın maskesi 1526 pikselde çakışırken **tolerans 4'te
-çakışma sıfırdır**.
-
-#### Çapaları GÖZLE okumayın — vektör kaynakta dosyadan okuyun
-
-Moğol İmparatorluğu haritası bir kez "çıkarılamaz" ilan edilmişti: 17 çapa
-küçültülmüş ızgaradan gözle okunmuş, ortalama artık %2,77 / en büyük %8,3
-çıkmıştı. Boylam eğimi ölçülüp (Kostantiniyye→Bağdat 0,247 %/derece,
-Kaifeng→Hangzhou 1,947 %/derece — sekiz kat fark) "sorun izdüşümde değil
-OKUMADA" teşhisi konmuştu. **Teşhis doğruydu, sonuç yanlıştı:** çözüm haritadan
-vazgeçmek değil, okumayı bırakmaktı.
-
-Kaynak VEKTÖRSE çapa koordinatı dosyanın içinde tam değer olarak yazılıdır.
-Bu haritada şehirler `<use xlink:href="#New_Symbol_2" transform="matrix(...)">`
-ile basılmış; 65 noktanın konumu matristen alınıp en yakın `<text>` etiketiyle
-eşleştirildi (çoğu 4 px içinde eşleşti, ikinci en yakın etiket 20+ px uzakta —
-yani eşleşmeler tekildi). Aynı harita, aynı izdüşüm modeli:
-
-| | gözle okuma (17 çapa) | dosyadan okuma (34 çapa) |
-|---|---|---|
-| ortalama artık | %2,77 | **%0,66** |
-| en büyük artık | %8,3 | **%1,79** |
-
-`Capa.x/y` hâlâ kırpılmış görselin oranıdır; değişen tek şey o oranın nereden
-geldiği. Raster kaynakta gözle okumak zorundasınız — orada çapaları dört bir
-yana dağıtmak (bkz. yukarıdaki Memlük ölçümü) tek savunmanızdır.
-
-Kalan %1,79'u kovalamayın: 34 çapa haritanın dört bir yanına dağılmış
-durumda, yani artık modelin yarım küre ölçeğindeki sınırıdır, okuma hatası
-değil. Üç çapayı (Esztergom, Bolgar, Seul) tek tek çıkarmak denendi — en
-büyük artık %1,83 ve %1,89'a ÇIKTI. Kuadratik hâlâ tavandır (bkz. yukarısı).
-
-
-#### Sahte halkalar: `--tek-parca`
-
-Kaynağın arazi gölgeleri toprakla AYNI ton aralığına düşebilir ve mutlak
-eşikle (`--en-az`) elenemeyecek kadar büyük sahte parçalar üretir. Ölçüldü
-(Delhi haritası): Himalayalar 11.039 ve 3.768 pikselik iki halka verdi —
-gerçek sınırın %34'ü ve %12'si. Devlet tek parçaysa `--tek-parca` verin,
-yalnızca en büyük alan tutulur. Ada/eksklav içeren bir devlette KULLANMAYIN.
-
-#### Bindirme görseli atlanamaz
-
-`assets/harita/sinir/<ad>.bindirme.png` çıkarılan sınırı KAYNAĞIN ÜSTÜNE
-çizer. Sayısal hiçbir ölçüt "maske yanlış yeri seçti" demez: kaynakta komşu
-bir devlet AYNI tonda boyanmışsa maske onu da alır ve sonuç sessizce yanlış
-olur. Kırmızı çizgi kaynağın renkli alanını izliyor mu — gözle bakın.
-
-#### Atıf yükümlülüğü DEVAM EDER
-
-Sınır CC BY-SA bir haritadan türetilmiştir. Kendi motorumuzla çizmek onu
-"bizim çizimimiz" yapmaz; `MapBox.source` alanına kaynağın künyesi yazılır.
-Bu, `territory`nin normalde "yaklaşık" olan durumundan da farklıdır: burada
-sınır ELLE TAHMİN EDİLMEMİŞTİR, kartografın çizgisidir — ama kesikli kenar
-yine de kalır, çünkü kaynağın kendisi de sınırı yaklaşık ilan ediyor.
-
-### Kendi çizdiğimiz haritanın kullanımı
+### Kullanımı
 
 ```python
 .add_map(MapBox(
-    region="Hârezmşâhlar Devleti (1097-1231)",
-    bbox=(46.0, 28.5, 75.0, 48.5),          # (batı, güney, doğu, kuzey)
-    cities=[
-        Place("Gürgenç", 59.15, 42.34),      # DİKKAT: sıra lon, lat
-        Place("Buhara", 64.42, 39.77, sag=False),   # etiket noktanın soluna
-    ],
-    neighbors=[Place("Kara-Hıtaylar", 72.0, 44.5)], # "\n" ile satır bölünür
-    territory=[[(52.5, 40.5), (54.5, 44.0), ...]],  # YAKLAŞIK, (lon, lat)
+    region="Gazneliler Devleti",
+    label="Coğrafi konum",
+    kaynak="map-of-the-ghaznavid-empire-drab.png",   # assets/harita/commons/ altında
+    kirp=(200, 0, 2830, 1440),                       # opsiyonel; kaynağın piksel kutusu
+    ad_anahtari=[("Urgench", "Gürgenç"), ("Ghazni", "Gazne")],
     caption="Kutunun altındaki tek satır açıklama",
-), yan=[BulletBlock(1, "Coğrafi Bağlam", [...])], taraf="sag")
+    # source= YAZMAYIN -- LISANS.md'den doldurulur
+), taraf="tam")
 ```
 
-Çizimi `cekirdek/harita_cizim.py` yapar: bağımlılık yoktur (GeoJSON `json`
-ile okunur, izdüşüm ve SVG saf Python'dur), çıktı SVG'dir, üretim ücretsiz
-ve **deterministiktir**.
+`yan=` listesi (yalnız `"sag"`/`"sol"` kipinde) BulletBlock, Callout,
+ComparisonTable, FlowDiagram, Person ve `list[KeyTerm]` kabul eder. Tüm çağrı
+TEK bir item'dır: `tools/olcum.py` ve `tools/dengele.py` onu bölünemez blok
+olarak görür.
 
-**Kutu oranı `bbox`'tan TÜRETİLİR**, sabit değildir (`oran_hesapla`). Eskiden
-sabit 4:3'tü ve dikey coğrafyaları eziyordu: Memlük (Mısır+Şam+Hicaz) ve Delhi
-(Hint alt kıtası) kutunun ortasına dar bir şerit hâlinde sıkışıp sağını solunu
-boş bırakıyor, sayfanın altında da büyük bir boşluk açıyordu. Ölçülen düzelme:
-82 mm'lik sütunda Memlük kutusu 62 -> **107 mm**, Delhi 62 -> **89 mm**.
-Oran `ORAN_EN_DAR` (0,72) ile `ORAN_EN_GENIS` (1,60) arasına kırpılır —
-alt sınır kutunun sayfaya sığdığı, üst sınır haritanın okunur kaldığı yerdir.
-
-| Katman | Kaynak | Güvenilirlik |
-|---|---|---|
-| Kıyı, kara, göl, nehir | Natural Earth 1:50m (kamu malı / CC0) | gerçek veri |
-| Şehir konumları | `Place(ad, lon, lat)` — elle yazılan gerçek koordinat | doğrulanabilir |
-| Devlet/bölge alanı | `MapBox.territory` — elle yazılan kaba poligon | **yaklaşık** |
-
-`yan=` listesi BulletBlock, Callout, ComparisonTable, FlowDiagram, Person ve
-`list[KeyTerm]` kabul eder. Tüm çağrı TEK bir item'dır: `tools/olcum.py` ve
-`tools/dengele.py` onu bölünemez blok olarak görür (ölçülen yükseklik: yan
-yana kipte ~88-104mm, `taraf="tam"` kipinde harita oranına bağlı).
-
-`taraf`: `"sag"` (varsayılan) / `"sol"` — metnin yanında iki sütun;
-`"tam"` — sayfa genişliğinde, metin altında akar.
-
-**Koordinat sırası `lon, lat`'tır** (GeoJSON düzeni). Ters yazarsanız harita
-sessizce bozulur; `validate()` çerçeve dışına düşen her işareti uyarı olarak
-basar, ama doğru çerçeve içinde yanlış yere düşen bir noktayı yakalayamaz —
-`--onizle` ile gözle denetleyin.
-
-### `territory` dürüstlük meselesidir
-
-Ortaçağ siyasi sınırları için **serbest ve yetkeli bir veri kümesi yoktur**:
-Natural Earth bugünün sınırlarıdır, CShapes 1886'da başlar, Euratlas
-lisanslıdır, OpenHistoricalMap'in kapsamı deliktir. Bu yüzden alan poligonu
-elle, kaba hatlarla yazılır ve çizimde üç şeyle "yaklaşık" olduğu söylenir:
-
-1. **Kesikli kenar** — kartografyada "sınır kesin değil" demektir.
-2. **Yumuşatma** (Chaikin) — genelleştirilmiş hat, ölçülmüş sınır gibi durmaz.
-3. **Kutu altındaki kaynak satırı** (`MapBox.source`, `.geomap-source`) —
-   her kutuda basılır, kaldırmayın.
-
-**Sahte atıf YAZMAYIN** (sayfa numaralı uydurma atlas künyesi). `source`
-alanının varsayılanı iddiayı zaten doğru kurar.
-
-Alan dolgusu **karaya kırpılır** (`clipPath`): elle yazılan kaba poligon
-kıyıyı birebir izleyemez, kırpma olmadan denize sarkar ve "deniz de bu
-devletin toprağıydı" gibi okunur. Göller dolgunun ÜSTÜNE çizilir, böylece
-bir göl boyanamaz.
-
-### Komutlar
-
-```bash
-python tools/harita.py --veri-indir                                     # bir kez (Natural Earth)
-python tools/harita.py --commons "<Vikipedi maddesi>"                   # kaynak harita ara
-python tools/harita.py --commons "<madde>" --sec N --ders <slug>        # indir + künye + kod parçası
-python tools/harita.py --sinir-cikar <dosya.jpg>                        # sınırı lon/lat poligonuna çevir
-python tools/harita.py --tara   <slug> --sinif X --donem Y --sinav Z    # aday bölümler
-python tools/harita.py --onizle <slug> --sinif X --donem Y --sinav Z    # haritaları dosyaya yaz
-```
-
-`assets/harita/*.geojson` (3 MB) ve Commons raster kaynakları `.gitignore`'dadır;
-klonlayan kişi `--veri-indir` / `--commons` ile alır. Veri yoksa **build
-DURMAZ** — aynı ölçüde bir yer tutucu basılır ve indirme komutunu söyleyen bir
-uyarı verilir. SVG kaynaklar METİN olduğu için git'te kalır.
+> **`tools/dengele.py` uyarısı:** büyük bölünemez bir harita bloğu varken
+> dengeleyici bölümün İLK sayfasını boş bırakabiliyor (ölçüldü: %39 dolu bir
+> sayfa; harita bir sonrakine düşmüştü, oysa banner + terimler + harita
+> 267 mm ile sayfaya sığıyordu). Harita kutusu olan bölümlerde dengele
+> çıktısını okuyun; ilk sayfa seyrek kaldıysa sayfa sınırını ELLE kurun ve
+> dengele'yi bir daha ÇALIŞTIRMAYIN (yeniden dağıtır).
 
 ### Otomatik tespit — ÖNERİR, İÇERİK ÜRETMEZ
 
-`--tara` her bölümü puanlar ama harita içeriğini (şehir listesi, koordinat,
-sınır) ASLA otomatik doldurmaz; onu kaynağa bakarak siz yazarsınız — harita
-metinde geçmeyen bir şehri göstermemelidir.
+`--tara` her bölümü puanlar ama hangi haritanın uyduğuna kaynağa bakarak siz
+karar verirsiniz.
 
 Puanlama **önce kapı, sonra puan** çalışır. Kapıdan geçmek için gerçek mekân
 kanıtı gerekir: "Coğraf..." ile başlayan bir alt başlık, VEYA en az 2 farklı
@@ -1253,6 +1086,59 @@ ismi + 1 toprak hareketi ("fethetti", "istila"). Kapı kapalıysa puan 0'dır.
 
 Ölçülen ayrım: İslam Tarihi III 5/5 bölüm aday · Psikoloji, Sosyoloji,
 Edebiyat, Öğretim İlke ve Yöntemleri 0 · Çağdaş Felsefe 1/7.
+
+### Terk edilen iki yol — GERİ GETİRMEYİN
+
+**1. Görüntü modeliyle çizme/renklendirme (2026-08-31 ölçüldü).** Model kıyıyı
+ezberden benzetiyor, şehri uyduruyor: Hazar Denizi üç haritada imparatorluk
+sınırının İÇİNDE kaldı. Daha dar bir yol — "hiç değilse gerçek bir haritanın
+RENGİNİ değiştirsin" — iki modelde birden ölçülüp kapatıldı:
+
+| Model | Sonuç |
+|---|---|
+| `bytedance/seedream/v5/pro/edit` | Etiketler eridi: `Al-Ruha` → "Aldbla", `Harran` → "Idbrran" |
+| `openai/gpt-image-2/edit` | Renk ve coğrafya iyi — **ama yazılar yine bozuldu**: `Ba'albakk` → "Bathaslih" ve **`(Occupied in 1426)` → `(occupied in 1405)`** |
+
+Sonuncusu kritiktir: model bir **tarihi sessizce değiştirdi**. Ders kitabında
+bu, taşmadan beterdir — sayfa düzgün görünür, öğrenci yanlış bilgiyi doğru
+sanır. Sayısal bir kapı da bunu kurtaramaz: gpt-image-2 çıktısı çözünürlük ve
+en-boy ölçütlerini geçti, toprak IoU'da %94,1 ile %95 eşiğinin 0,9 puan
+altında kalıp **alakasız bir gerekçeyle** reddedildi. Yazıların erimesini üç
+ölçütten hiçbiri görmüyordu.
+
+**2. Sınır çıkarıp kendi motorumuzla çizme (2026-09-01 söküldü).** Kaynağın
+renkli alanı gerçek lon/lat poligonuna çevriliyor, harita Natural Earth
+üzerine bizim motorumuzla çiziliyordu (`harita_cizim.py`, `sinir_cikar.py`,
+`*.capa.json`, `assets/harita/sinir/`, Natural Earth GeoJSON'ları). Sonuç
+güzeldi — bütün etiketler Türkçe, baskıda vektör — ama **maliyeti harita
+başına 6-34 çapa noktasının ELLE kalibrasyonuydu**: çapaları gözle okumak,
+artık raporunu okumak, `bindirme.png`'ye bakmak, ton/parlaklık penceresi ve
+Douglas-Peucker toleransı denemek. Beş harita bir gecede onlarca iterasyon
+yedi. Gömme yolunda aynı iş üç satırdır.
+
+Bu yoldan öğrenilenler (bir gün geri dönülürse diye): kuadratik izdüşüm
+TAVANDI (kübik, çapaların dışında Runge olgusuyla savruluyordu); artık hatası
+yalnızca ÇAPA NOKTALARINDA ölçülür, çapasız bölgede ne olduğunu söylemez; ve
+vektör kaynakta çapa koordinatı dosyanın içinde tam değer olarak yazılıdır
+(gözle okuma Moğol haritasında %2,77 ortalama artık verirken dosyadan okuma
+%0,66'ya inmişti).
+
+### Komutlar
+
+```bash
+python tools/harita.py --commons "<Vikipedi maddesi>"                   # kaynak harita ara
+python tools/harita.py --commons "<madde>" --wiki en                    # İngilizce maddede ara
+python tools/harita.py --commons "<madde>" --sec N --ders <slug>        # indir + künye + kod parçası
+python tools/harita.py --tara   <slug> --sinif X --donem Y --sinav Z    # aday bölümler
+python tools/harita.py --onizle <slug> --sinif X --donem Y --sinav Z    # gömülecek ölçüde yaz (GÖZLE BAK)
+```
+
+Commons **raster** kaynakları (4-35 MB) ve SVG rasterleştirme önbellekleri
+`.gitignore`'dadır; klonlayan kişi `--commons` ile yeniden alır. SVG
+kaynaklar METİN olduğu için depoda kalır. Kaynak diskte yoksa **build
+DURMAZ** — aynı ölçüde bir yer tutucu basılır ve indirme komutunu söyleyen
+bir uyarı verilir.
+
 
 ## Test + Cevap Anahtarı (sınav bölümü — GÜNCEL format)
 
@@ -1678,11 +1564,10 @@ python tools/olcum.py <slug> --sinif X --donem Y --sinav Z
 python tools/dengele.py <slug> --sinif X --donem Y --sinav Z   # --kuru = sadece raporla
 python tools/kalibre.py --sinif X --donem Y --sinav Z          # sayfa boyutu değiştiyse
 
-# Harita: hazır kaynak bul/indir · veriyi indir · aday tara · önizle · imleç denetle
+# Harita: hazır Commons haritası bul/indir · aday tara · gömülecek ölçüde önizle
 python tools/harita.py --commons "<Vikipedi maddesi>"
+python tools/harita.py --commons "<madde>" --wiki en
 python tools/harita.py --commons "<madde>" --sec N --ders <slug>
-python tools/harita.py --sinir-cikar <dosya.jpg>
-python tools/harita.py --veri-indir
 python tools/harita.py --tara <slug> --sinif X --donem Y --sinav Z
 python tools/harita.py --onizle <slug> --sinif X --donem Y --sinav Z
 
@@ -1745,10 +1630,13 @@ python cekirdek/theme_engine.py
       harita gerekiyorsa `--commons "<madde>"` ile buldum (LISANS.md künyesi
       otomatik yazıldı) ve build çıktısındaki "[harita] N harita kutusu ...
       0 eksik" satırını gördüm
-- [ ] Yeni bir sınır çıkardıysam `assets/harita/sinir/<ad>.bindirme.png`
-      dosyasına GÖZLE baktım (kırmızı çizgi kaynağın renkli alanını izliyor
-      mu) ve artık raporunu okudum — yanlış bir maske SESSİZDİR, ne taşma
-      denetimi ne validate() onu yakalar
+- [ ] Her harita kutusunu `--onizle` ile gömüleceği ÖLÇÜDE dosyaya yazıp
+      GÖZLE baktım: etiketler okunuyor mu (okunmuyorsa `taraf="tam"` ya da
+      daha dar `kirp`), kırpma lejantı kesmiş mi, SVG kaynakta yazılar
+      bozulmamış mı — bunların hiçbirini taşma denetimi ya da validate()
+      yakalamaz, hepsi SESSİZDİR
+- [ ] Her harita kutusunda `source=` alanını BOŞ bıraktım (künye
+      LISANS.md'den gelir) ve build çıktısında `[ATIF UYARISI]` görmedim
 - [ ] Bookmark/link sayısını doğruladım
 - [ ] (SADECE kullanıcı açıkça istediyse — bkz. en üstteki KRİTİK KURAL;
       istemediyse bu adımı ATLA ve kitaba dokunma) Yeni dersi

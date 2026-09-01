@@ -541,27 +541,31 @@ table.ctable td:first-child { font-weight:700; color: var(--ink); }
   border: 1px solid var(--line); border-radius: 8px; overflow: hidden;
   background: var(--paper); box-shadow: var(--shadow-sm);
 }
-.geomap-frame > svg { display: block; width: 100%; height: 100%; }
-/* Harita lejantı: SVG'nin içinden sökülüp HTML'e taşınmış renk açıklamaları.
-   Sayfanın kendi puntosuyla basıldığı için harita küçülünce lejant küçülmez --
-   yan sütun kipinin (taraf="sag"/"sol") çalışabilmesinin ön koşuludur. */
-.geomap-legend {
-  list-style: none; margin: 1.8mm 0 0; padding: 0;
-  font-size: 7pt; line-height: 1.45; color: var(--ink-soft);
+.geomap-frame > img { display: block; width: 100%; height: 100%; object-fit: cover; }
+/* Türkçe okuma anahtarı: kaynağın (genelde İngilizce) etiketleri değiştirilmediği
+   için karşılıkları haritanın ALTINDA, sayfanın kendi puntosuyla basılır. Harita
+   yan sütuna küçülünce anahtar onunla küçülmez -- gömme kipinin okunabilir
+   kalmasının ön koşuludur. */
+.geomap-key {
+  margin-top: 1.8mm; font-size: 6.8pt; line-height: 1.5; color: var(--ink-soft);
+  display: flex; flex-wrap: wrap; column-gap: 1.6mm; row-gap: 0;
 }
-.geomap-legend li { display: flex; gap: 1.6mm; align-items: baseline; }
-.geomap-legend li + li { margin-top: .6mm; }
-.geomap-swatch {
-  width: 3.4mm; height: 2.2mm; flex: 0 0 auto; border-radius: 1px;
-  border: .3pt solid var(--line); transform: translateY(.2mm);
-}
+.geomap-key > b { color: var(--accent-dark); }
+/* Her çift KENDİ İÇİNDE bölünmez ("Oxus River = Ceyhun" ortadan ayrılmaz) ama
+   çiftler ARASINDA satır başı olabilir. Bu yüzden kutu bir flex sarmalayıcıdır:
+   düz metin akışında bitişik <span>'lar arasında satır sonu fırsatı YOKTUR ve
+   anahtar tek satırda kalıp sağ kenardan kesilir -- ölçüldü, 14 çiftin 3'ü
+   görünüyordu. */
+.geomap-kv { white-space: nowrap; }
+.geomap-kv + .geomap-kv::before { content: "· "; color: var(--ink-faint); }
 .geomap-note {
   font-size: 7.6pt; color: var(--ink-faint); line-height: 1.4; margin-top: 1.8mm;
 }
-/* Kaynak/çekince satırı: sınırların YAKLAŞIK olduğunu söyler. Haritayı
-   kartografik bir iddia gibi göstermemek için bilerek her kutuda basılır --
-   kaldırmayın (bkz. cekirdek/harita_cizim.py başlığı). */
+/* Künye satırı: yazar + lisans + bağlantı. Görüntü kitaba OLDUĞU GİBİ
+   girdiği için bu bir CC BY-SA yükümlülüğüdür, üslup tercihi değil --
+   kaldırmayın (bkz. cekirdek/harita_gomme.py -> kunye). */
 .geomap-source {
+  overflow-wrap: anywhere;
   font-size: 6.4pt; color: var(--ink-faint); line-height: 1.35; margin-top: 1mm;
   font-style: italic; opacity: .85;
 }
