@@ -141,6 +141,12 @@ DERS_RENKLERI = {
     # --- Tarih ------------------------------------------------------------
     "ISLAMMEDENIYETITARIHI":    "#776931",  # bronz / altin cag    H48
     "ISLAMMEZHEPLERITARIHI":    "#776931",  # (ayni ruh, farkli donem)
+    # Siyasi tarih ayri bir ailedir: medeniyet/mezhep tarihi kulturel bir
+    # birikimi (bronz), siyasi tarih ise devlet-ordu-sinir eksenini anlatir.
+    # Cini laciverti bu eksenin rengidir; 2-sinif/2-donem/final'deki
+    # islam_tarihi_3.py bu tonla basildi, vize kitabi da ayni tonu surdurur.
+    "ISLAMTARIHI":              "#1D4E79",  # cini laciverti       H212
+    "ISLAMTARIHI3":             "#1D4E79",  # (Arap rakamli yazim: "ISLAM TARIHI 3")
     # --- Dil / edebiyat ---------------------------------------------------
     "ARAPDILIVEEDEBIYATI":      "#8C2F21",  # terracotta / col     H8
     # --- Egitim / din hizmetleri -----------------------------------------
