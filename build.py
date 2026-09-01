@@ -53,7 +53,6 @@ from cekirdek.renk_uretici import pack_rengi, belirlenmis_renk
 from cekirdek import pdfx
 from cekirdek import donem as donem_mod
 
-from cekirdek import harita_gomme
 
 ROOT = Path(__file__).parent
 TEMPLATES = ROOT / "templates"
@@ -493,55 +492,6 @@ def uygula_kayitli_renk(pack) -> None:
               f"kasıtlı değilse ikisini eşitleyin.")
 
 
-# ============================================================================
-# HARİTA KUTULARI
-# build.py harita ÇİZMEZ ve ÜRETMEZ: Commons'tan gelen hazır haritayı olduğu
-# gibi, yalnızca sütun genişliğine küçülterek gömer. Gerekçe ve kaynak bulma
-# yolu için bkz. cekirdek/harita_gomme.py ve tools/harita.py --commons.
-# ============================================================================
-def haritalari_coz(pack, d: "donem_mod.Donem | None" = None) -> dict:
-    """CoursePack'teki her MapBox için kaynağı gömülebilir hâle getirir.
-
-    Kaynak diskte yoksa build DURMAZ -- aynı ölçüde bir yer tutucu basılır ve
-    indirme komutunu söyleyen bir uyarı verilir (raster kaynaklar
-    `.gitignore`'dadır, klonlayan kişide bulunmaz).
-    """
-    gomulen, eksik = [], []
-    for ch in pack.chapters:
-        for page in ch.pages:
-            for kind, data in page.items:
-                if kind != "mapsplit":
-                    continue
-                mb, _, taraf = data
-                try:
-                    mb.gorsel_src, mb.gorsel_oran = harita_gomme.gorsel(
-                        mb.kaynak, mb.kirp, taraf)
-                    if not mb.source:
-                        mb.source = harita_gomme.kunye(mb.kaynak)
-                    gomulen.append({"bolum": ch.number, "bolge": mb.region,
-                                    "kunye": bool(mb.source)})
-                except harita_gomme.KaynakYok as e:
-                    mb.gorsel_src = ""
-                    eksik.append({"bolum": ch.number, "bolge": mb.region, "sebep": str(e)})
-    return {"gomulen": gomulen, "eksik": eksik, "ders": ders_klasoru_of(pack)}
-
-
-def harita_raporu(pack, sonuc: dict, d: "donem_mod.Donem | None" = None) -> None:
-    """Harita durumunu konsola basar."""
-    toplam = len(sonuc["gomulen"]) + len(sonuc["eksik"])
-    if not toplam:
-        return
-    print(f"[harita] {toplam} harita kutusu: {len(sonuc['gomulen'])} gömüldü "
-          f"(Commons, ölçeklendirildi) · {len(sonuc['eksik'])} eksik")
-    for e in sonuc["eksik"]:
-        print(f"[UYARI] Bölüm {e['bolum']} haritası gömülemedi: {e['sebep']}")
-    # Künyesiz bir görüntü dağıtmak CC BY-SA ihlalidir; sessiz geçilmez.
-    for g in sonuc["gomulen"]:
-        if not g["kunye"]:
-            print(f"[ATIF UYARISI] Bölüm {g['bolum']} haritası ('{g['bolge']}'): künye yok. "
-                  f"assets/harita/commons/LISANS.md'ye kayıt ekleyin.")
-
-
 def build(module_name: str, d: "donem_mod.Donem | None" = None):
     if d is not None:
         set_donem(d)
@@ -550,8 +500,6 @@ def build(module_name: str, d: "donem_mod.Donem | None" = None):
     mod = DONEM.import_ders(module_name)
     pack = mod.get_pack()
     uygula_kayitli_renk(pack)
-
-    harita_sonuc = haritalari_coz(pack)
 
     ctx = course_context(pack)
     page_starts = ctx["page_starts"]
@@ -584,7 +532,6 @@ def build(module_name: str, d: "donem_mod.Donem | None" = None):
     warnings = validate(pack)
     for w in warnings:
         print(f"[UYARI] {w}")
-    harita_raporu(pack, harita_sonuc)
 
     render_pdf(html_path, pdf_path, expected_pages=page_starts["end"])
     optimize_pdf(pdf_path)
@@ -789,29 +736,6 @@ def validate(pack) -> list[str]:
             q = next((q for q in pack.test_questions if q.number == a.number), None)
             if q and a.correct not in q.options:
                 warnings.append(f"Cevap anahtarı {a.number}: '{a.correct}' seçeneği soruda yok.")
-    for ch in pack.chapters:
-        for page in ch.pages:
-            for kind, data in page.items:
-                if kind != "mapsplit":
-                    continue
-                mb = data[0]
-                if not mb.region.strip():
-                    warnings.append(f"Bölüm {ch.number}: MapBox.region boş -- kutu başlıksız kalır.")
-                if not mb.kaynak.strip():
-                    warnings.append(f"Bölüm {ch.number} haritası ('{mb.region}'): kaynak dosya adı boş -- "
-                                    f"python tools/harita.py --commons \"<madde>\" ile bir harita seçin.")
-                if mb.kirp and len(mb.kirp) != 4:
-                    warnings.append(f"Bölüm {ch.number} haritası ('{mb.region}'): kirp 4 değer almalı "
-                                    f"(sol, üst, sağ, alt) -- verilen: {len(mb.kirp)}.")
-                # taraf="tam" kipinde harita sayfa genişliğindedir ve metin ALTINDA
-                # normal akışta gelir -- yan listesi boş olmalıdır (doluysa blok
-                # bölünemez tek parça olur ve sayfayı taşırır).
-                if data[2] != "tam" and not data[1]:
-                    warnings.append(f"Bölüm {ch.number} haritası ('{mb.region}'): yanında metin bloğu yok; "
-                                    f"iki sütunlu düzenin metin sütunu boş kalacak.")
-                if data[2] == "tam" and data[1]:
-                    warnings.append(f"Bölüm {ch.number} haritası ('{mb.region}'): taraf=\"tam\" ile yan=[...] "
-                                    f"verilmiş; blok bölünemez hale gelir. Yan blokları ayrı .add_*() yapın.")
     for yol, metin in _metinleri_gez(pack):
         if "<" not in metin:
             continue

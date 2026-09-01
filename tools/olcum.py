@@ -112,11 +112,6 @@ const {{ chromium }} = require('playwright');
 def render_html(module_name: str) -> tuple[Path, object]:
     """build.py ile BİREBİR aynı HTML'i üretir (aynı css + aynı ctx)."""
     pack = B.DONEM.import_ders(module_name).get_pack()
-    # Harita görsellerini build.py ile AYNI şekilde çöz. Bu satır olmazsa
-    # ölçüm, gerçek PNG yerine "üretilmedi" yer tutucusunu ölçer ve harita
-    # bloğunu olduğundan kısa görür (ölçüldü: 84mm yerine ~96mm) --
-    # dengele.py o yanlış yükseklikle plan yapıp taşan sayfa üretiyordu.
-    B.haritalari_coz(pack)
     ctx = B.course_context(pack)
     env = Environment(loader=FileSystemLoader(str(B.TEMPLATES)))
     html = env.get_template("master.html.j2").render(

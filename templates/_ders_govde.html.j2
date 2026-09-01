@@ -143,55 +143,6 @@
 {% endfor %}
 {% endmacro %}
 
-{# Harita kutusu + yanındaki metin sütunu (ChapterPage.add_map).
-   Görsel build.py tarafından çözülür (cekirdek/harita_gomme.py): Commons
-   haritası OLDUĞU GİBİ gömülür, yalnızca sütun genişliğine küçültülür.
-   m.gorsel_src boşsa kaynak diskte yoktur ve sayfa BOZULMAZ -- yerine ölçüsü
-   aynı bir yer tutucu basılır (böylece taşma denetimi yine gerçeği ölçer). #}
-{% macro render_geomap(m) %}
-<figure class="geomap">
-  <figcaption class="geomap-cap">{{ m.label }}</figcaption>
-  <div class="geomap-frame" style="aspect-ratio: {{ m.gorsel_oran }};">
-    {% if m.gorsel_src %}
-    <img src="{{ m.gorsel_src }}" alt="{{ m.region }}">
-    {% else %}
-    <div class="geomap-missing">
-      <b>Harita kaynağı bulunamadı</b>
-      <span>{{ m.region }}</span>
-      <span class="geomap-file">python tools/harita.py --commons "&lt;madde&gt;"</span>
-    </div>
-    {% endif %}
-  </div>
-  {# Türkçe okuma anahtarı: kaynağın etiketleri kendi dilinde kaldığı için
-     kutunun ALTINA, kitabın kendi tipografisiyle basılır. Görüntünün İÇİNE
-     yazmak kaynağı değiştirmek olurdu -- bkz. cekirdek/harita_gomme.py. #}
-  {% if m.ad_anahtari %}
-  <div class="geomap-key">
-    <b>Haritadaki adlar:</b>
-    {% for kaynakta, turkcesi in m.ad_anahtari %}<span class="geomap-kv">{{ kaynakta }} = <b>{{ turkcesi }}</b></span>{% endfor %}
-  </div>
-  {% endif %}
-  {% if m.caption %}<div class="geomap-note">{{ m.caption | safe }}</div>{% endif %}
-  {% if m.source %}<div class="geomap-source">{{ m.source }}</div>{% endif %}
-</figure>
-{% endmacro %}
-
-{% macro render_mapsplit(m, yan_items, taraf) %}
-{% if taraf == 'tam' %}
-<div class="mapfull">
-  {{ render_geomap(m) }}
-  {% for kind, data in yan_items %}{{ render_item(kind, data) }}{% endfor %}
-</div>
-{% else %}
-<div class="mapsplit {{ 'map-left' if taraf == 'sol' else 'map-right' }}">
-  <div class="mapsplit-text">
-    {% for kind, data in yan_items %}{{ render_item(kind, data) }}{% endfor %}
-  </div>
-  <div class="mapsplit-figure">{{ render_geomap(m) }}</div>
-</div>
-{% endif %}
-{% endmacro %}
-
 {% macro render_summary(text) %}
 <div class="chsummary"><b>Bölüm Özeti</b>{{ text | safe }}</div>
 {% endmacro %}
@@ -230,7 +181,6 @@
   {% elif kind == "table" %}{{ render_table(data) }}
   {% elif kind == "ayat" %}{{ render_ayat(data[0], data[1]) }}
   {% elif kind == "info_cards" %}{{ render_info_cards(data[0], data[1]) }}
-  {% elif kind == "mapsplit" %}{{ render_mapsplit(data[0], data[1], data[2]) }}
   {% elif kind == "summary" %}{{ render_summary(data) }}
   {% endif %}
 {% endmacro %}

@@ -119,78 +119,12 @@ class Ayah:
 
 
 @dataclass
-class MapBox:
-    """Bölümün yanında duran coğrafi harita kutusu.
-
-    Harita Wikimedia Commons'tan gelen HAZIR bir haritadır ve sayfaya
-    OLDUĞU GİBİ gömülür (`cekirdek/harita_gomme.py`): tek işlem, kutunun
-    genişliğine küçültmektir. Görüntünün içine dokunulmaz -- çeviri yok,
-    renk kaydırma yok, etiket silme yok.
-
-    Alanlar:
-        region        Kutunun tanımladığı devlet/bölge adı (Türkçe) -- başlık/uyarı metni
-        kaynak        `assets/harita/commons/` altındaki dosya adı, uzantısıyla
-        kirp          (sol, üst, sağ, alt) piksel -- kaynağın ilgisiz kenarlarını atar
-        ad_anahtari   [("Manzikert", "Malazgirt"), ...] -- kutunun ALTINA basılan
-                      Türkçe okuma anahtarı
-
-    NEDEN AD ANAHTARI: kaynağa dokunmamanın bedeli, etiketlerin kaynağın
-    dilinde (genelde İngilizce) kalmasıdır. Türkçe bir ders kitabında öğrenci
-    "Manzikert" okur. Anahtar bu bedeli kapatır ve görüntünün içine değil,
-    kitabın kendi tipografisiyle haritanın ALTINA basılır -- yani kaynak
-    yine değiştirilmemiş olur. Kaynakta İngilizce görünen ama Türkçesi farklı
-    olan her yer adını yazın; aynı yazılanları (Herat, Merv) yazmayın.
-
-    ATIF ZORUNLUDUR ve elle yazılmaz: `source` boş bırakılırsa build.py onu
-    `assets/harita/commons/LISANS.md` künyesinden doldurur. Artık türetilmiş
-    bir poligon değil, DAĞITILAN GÖRÜNTÜNÜN kendisi söz konusudur -- CC BY-SA
-    yazar + lisans + bağlantının görünür olmasını ister.
-    """
-    region: str
-    kaynak: str = ""                                          # commons/ altındaki dosya adı
-    kirp: tuple = ()                                          # (sol, üst, sağ, alt) piksel
-    ad_anahtari: list = field(default_factory=list)           # [(kaynaktaki, Türkçesi)]
-    label: str = "Coğrafi konum"                              # kutu üstündeki başlık etiketi
-    caption: str = ""                                         # kutunun altındaki açıklama
-    source: str = ""                                          # boşsa LISANS.md'den doldurulur
-
-    # --- build.py tarafından doldurulur (elle yazılmaz) ---
-    gorsel_src: str = ""      # data: URI; boşsa kaynak diskte yok (yer tutucu basılır)
-    gorsel_oran: str = "4 / 3"
-
-
-@dataclass
 class BulletBlock:
     """Numaralı alt-başlık altındaki düz anlatım: başlık + madde listesi."""
     number: int
     title: str
     bullets: list[str]           # her biri düz metin; "**vurgu**" markdown-benzeri kalın için kullanılabilir
     subtitle: Optional[str] = None
-
-
-def _item_kind(obj) -> str:
-    """Bir içerik nesnesini şablonun tanıdığı item tipine çevirir.
-
-    `ChapterPage.add_map(..., yan=[...])` için gerekir: orada bloklar
-    `.add_block()` gibi tip adıyla değil, doğrudan nesne olarak verilir.
-    """
-    if isinstance(obj, BulletBlock):
-        return "block"
-    if isinstance(obj, Callout):
-        return "callout"
-    if isinstance(obj, ComparisonTable):
-        return "table"
-    if isinstance(obj, FlowDiagram):
-        return "flow"
-    if isinstance(obj, Person):
-        return "person"
-    if isinstance(obj, list) and obj and all(isinstance(x, KeyTerm) for x in obj):
-        return "terms"
-    raise TypeError(
-        f"add_map(yan=[...]) bu tipi tanımıyor: {type(obj).__name__}. "
-        "Desteklenenler: BulletBlock, Callout, ComparisonTable, FlowDiagram, "
-        "Person, list[KeyTerm]."
-    )
 
 
 @dataclass
@@ -226,25 +160,6 @@ class ChapterPage:
         self.items.append(("info_cards", (title, cards))); return self
     def add_summary(self, text: str):
         self.items.append(("summary", text)); return self
-
-    def add_map(self, harita: "MapBox", yan: list | None = None, taraf: str = "sag"):
-        """Harita kutusunu, YANINDAKİ metin bloklarıyla birlikte iki sütuna koyar.
-
-            .add_map(MapBox(...), yan=[BulletBlock(1, "Coğrafi Bağlam", [...])])
-
-        `yan` listesindeki nesneler metin sütununda, normal sayfa akışındaki
-        gibi render edilir (BulletBlock, Callout, ComparisonTable, KeyTerm
-        listesi, Person, FlowDiagram desteklenir). `taraf` "sag" ya da "sol":
-        haritanın hangi sütuna düşeceğini belirler.
-
-        Bu çağrı TEK bir item üretir; ölçüm/dengeleme araçları (tools/olcum.py,
-        tools/dengele.py) onu bölünemez tek blok olarak görür.
-        """
-        if taraf not in ("sag", "sol", "tam"):
-            raise ValueError(f"taraf 'sag', 'sol' veya 'tam' olmalı, verilen: {taraf!r}")
-        yan_items = [(_item_kind(o), o) for o in (yan or [])]
-        self.items.append(("mapsplit", (harita, yan_items, taraf)))
-        return self
 
 
 @dataclass

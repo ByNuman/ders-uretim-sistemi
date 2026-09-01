@@ -105,7 +105,6 @@ const files = {files};
 def render(module_name: str, tag: str):
     """Mevcut build sabitleriyle bir dersin HTML'ini üretir."""
     pack = B.DONEM.import_ders(module_name).get_pack()
-    B.haritalari_coz(pack)      # bkz. tools/olcum.py'deki aynı satırın gerekçesi
     ctx = B.course_context(pack)
     env = Environment(loader=FileSystemLoader(str(B.TEMPLATES)))
     html = env.get_template("master.html.j2").render(

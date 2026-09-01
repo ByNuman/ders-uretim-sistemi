@@ -61,17 +61,3 @@ venv/
 _kapak_onizleme.js
 .DS_Store
 Thumbs.db
-
-# Wikimedia Commons harita kaynaklari: kitaba OLDUGU GIBI gomulen hazir
-# haritalar. Raster olanlar 4-35 MB'dir ve depoya girmez; her birinin kunyesi
-# assets/harita/commons/LISANS.md'de kayitlidir (yazar/lisans/baglanti).
-# Bunlari kullanan ders yeniden derlenecekse once:
-#     python tools/harita.py --commons "<Vikipedi maddesi>" --sec N
-# SVG kaynaklar METIN oldugu icin depoda KALIR.
-#
-# .raster.png: SVG kaynagin Chromium ile bir kez basilmis onbellegi
-# (cekirdek/harita_gomme.py); koddan yeniden uretilir.
-assets/harita/commons/*.raster.png
-assets/harita/commons/*.png
-assets/harita/commons/*.jpg
-assets/harita/commons/*.jpeg
