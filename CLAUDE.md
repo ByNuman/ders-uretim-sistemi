@@ -14,7 +14,7 @@ Bu dosya *ne yapacağını* söyler. *Neden öyle olduğunu* öğrenmen gerekirs
 | "Bu sabiti değiştirebilir miyim? Bu sayı nereden geldi?" | `docs/OLCUMLER.md` — sayfa geometrisi, sayfalama sabitleri, İçindekiler kapasitesi, PDF/X-4 CMYK |
 | "Bu CSS kuralına neden dokunmamalıyım?" | `docs/TUZAKLAR.md` — 19 madde, geçmişte düzeltilmiş buglar |
 | "Renk motoru nasıl çalışıyor? Tasarım nasıl kurulu?" | `docs/TASARIM.md` — tema motoru, `DERS_RENKLERI`, tasarım sistemi |
-| "Bu yön kararı neden alındı?" | GozdeOS vault → `knowledge/kararlar/` (ayrı, özel depo) |
+| "Bu yön kararı neden alındı?" | Bu deponun dışında — sürdürenin kişisel karar arşivinde. Klonlayan biri için erişilebilir değildir; kodu kullanmak için gerekmez. |
 
 **Bir tasarım/ölçüm sorunu bildirilirse ilgili `docs/` dosyasını AÇ** — oradaki
 gerekçeyi okumadan `templates/style.css` veya `build.py` sabitlerine dokunma.
@@ -665,8 +665,8 @@ Coğrafi bölümlere harita kutusu koyma yolu 1 Eylül 2026'da TAMAMEN söküld�
 ÖNERME, arama, ekleme — kullanıcı açıkça istemedikçe.
 
 Üç kez kuruldu, üçünde de söküldü; ortak bedel TOKEN'dı, kod değil. Kullanıcı yine
-harita isterse, yolu yeniden kurmadan ÖNCE bu maliyeti söyle. Üç denemenin dökümü:
-GozdeOS vault → `knowledge/kararlar/2026-09-01-harita-sistemi-sokuldu.md`.
+harita isterse, yolu yeniden kurmadan ÖNCE bu maliyeti söyle. Üç denemenin ayrıntılı dökümü bu deponun
+dışında, sürdürenin kişisel karar arşivinde tutuluyor.
 
 ---
 
