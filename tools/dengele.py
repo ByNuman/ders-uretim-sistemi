@@ -61,6 +61,7 @@ import build as B                     # noqa: E402
 from tools import olcum               # noqa: E402
 
 SAFETY_MM = 4.0        # ölçüm/render oynamalarına karşı pay
+NL = chr(10)
 RE_APPEND = re.compile(r"^    (\w+)\.pages\.append\($")
 RE_CTOR = re.compile(r"^        ChapterPage\(")
 RE_ADD = re.compile(r"^        \.add_(\w+)\(")
@@ -305,6 +306,16 @@ def balance(module_name: str, dry: bool = False) -> bool:
         if var not in by_var:
             raise SystemExit(f"{path.name}: {var} kaynakta bulunamadı")
         chb = by_var[var]
+        # Bir bölümün ilk ve son pages.append'i arasındaki HER ŞEY yeniden
+        # yazılır; aradaki başka kod (ör. bir MapBox tanımı) sessizce silinirdi.
+        for onceki, sonraki in zip(chb, chb[1:]):
+            arada = [l for l in lines[onceki.end + 1:sonraki.start] if l.strip()]
+            if arada:
+                raise SystemExit(
+                    f"[dengele] {module_name}: {var} sayfa blokları arasında kod var "
+                    f"(satır {onceki.end + 2}): {arada[0].strip()[:60]}" + NL +
+                    f"          Bu satırlar yeniden yazımda kaybolurdu. Tanımları "
+                    f"ilk `{var}.pages.append(` satırının ÜSTÜNE taşıyın.")
         segs = [seg for b in chb for seg in b.segments]
         meas = by_ch[ch_no]
         items = [it for pg in meas for it in pg["items"]]
