@@ -444,12 +444,14 @@ PDF'i kullanıcının erişebileceği çıktı konumuna kopyala ve sun.
 from cekirdek.content_model import (
     Person, KeyTerm, Callout, FlowStep, FlowDiagram, ComparisonTable,
     InfoCard, Ayah, BulletBlock, Chapter, ChapterPage, Concept, CoursePack,
+    MapBox, MapLegendItem,                   # harita kutusu (bkz. "Harita ve portre")
     TestQuestion, AnswerItem,               # GÜNCEL sınav formatı — bunları kullan
     QAItem, DistinctionPair, MatchRow,       # LEGACY — yeni derslerde KULLANMA
 )
 ```
 
-- **`Person(id, name, years, tagline, bio, key_work=None, initials=None)`**
+- **`Person(id, name, years, tagline, bio, key_work=None, initials=None,
+  portre=None, portre_odak="50% 22%", portre_yakinlik=1.0)`**
   Bir düşünür/kişi kartı. `bio` bir liste ama sadece `bio[0]` render edilir — tek,
   dolu bir paragraf yaz. **Tek kaynak ilkesi**: bir kişinin tarihleri/eserleri sadece
   burada tanımlanır; sözlükte veya eşleştirme tablosunda aynı bilgiyi elle tekrar
@@ -472,6 +474,15 @@ from cekirdek.content_model import (
 - **`InfoCard(title, text, badge=None)`** — küçük 2-3'lü kart grid'i
   (`ChapterPage.add_info_cards(başlık, [InfoCard(...), ...])` ile eklenir).
 
+- **`MapBox(title, gorsel, legend=[], caption="", px=1200)`** — Commons haritası.
+  `gorsel`, `assets/gorsel/` altındaki uzantısız dosya adıdır; atıf satırı
+  `<ad>.json` künyesinden otomatik gelir. `legend`, `MapLegendItem(kind, label,
+  color)` listesidir — `kind` ∈ `"swatch"` | `"hatch"` | `"dash"` | `"marker"`,
+  `color` HARİTANIN KENDİ rengidir, ders temasından gelmez. Sayfaya
+  `ChapterPage.add_map(MapBox(...))` (tam genişlik) ya da
+  `add_block_map(BulletBlock(...), MapBox(...))` (numaralı blokla yan yana) ile
+  konur. Örnek: `2-sinif/2-donem/final/src/islam_tarihi_3.py`, 2. Bölüm.
+
 - **`Ayah(reference, arabic, meal, etymology="")`** — bir ayet/hadis kartı. `arabic`
   RTL olarak, DejaVu Sans ile doğru şekillendirmeyle render edilir (Arapça glyph
   desteği bizzat görsel olarak doğrulanmıştır — harfler doğru bitişiyor, harekeler
@@ -490,7 +501,7 @@ from cekirdek.content_model import (
   `add_person(Person)`, `add_person_row(list[Person])`, `add_block(BulletBlock)`,
   `add_callout(Callout)`, `add_flow(FlowDiagram)`, `add_table(ComparisonTable)`,
   `add_ayat(title, list[Ayah])`, `add_info_cards(title, list[InfoCard])`,
-  `add_summary(text)`.
+  `add_map(MapBox)`, `add_block_map(BulletBlock, MapBox)`, `add_summary(text)`.
   `continue_tag` artık **render EDİLMEZ** ("N. Bölüm · Devam" rozeti kaldırıldı) —
   vermek ZORUNLU DEĞİL, sadece geriye dönük uyumluluk için kabul ediliyor.
 
@@ -657,16 +668,29 @@ Build çıktısındaki **dört denetim**: taşma (kitapta ayrıca hangi dersin k
 sayfası olduğu yazılır) · sayfa numarası zinciri · render doğrulaması · boyut
 optimizasyonu. Biri hata verirse **PDF'i teslim etme**, önce sebebini bul.
 
-## Harita YOKTUR
+## Harita ve portre görselleri
 
-Coğrafi bölümlere harita kutusu koyma yolu 1 Eylül 2026'da TAMAMEN söküldü
-(`MapBox`, `ChapterPage.add_map`, `cekirdek/harita*.py`, `cekirdek/commons_ara.py`,
-`tools/harita.py`, `assets/harita/`). Bir ders ne kadar coğrafi olursa olsun harita
-ÖNERME, arama, ekleme — kullanıcı açıkça istemedikçe.
+Harita kutusu ve kişi kartı portresi VARDIR (2 Eylül 2026, commit `1459a90`).
+Görsel **yalnızca Wikimedia Commons**'tan gelir ve **olduğu gibi** kullanılır:
+renklendirme, AI ile yeniden çizim, sınır düzeltme YOK — tek işlem orantılı
+küçültmedir. Genel web aramasına açma.
 
-Üç kez kuruldu, üçünde de söküldü; ortak bedel TOKEN'dı, kod değil. Kullanıcı yine
-harita isterse, yolu yeniden kurmadan ÖNCE bu maliyeti söyle. Üç denemenin ayrıntılı dökümü bu deponun
-dışında, sürdürenin kişisel karar arşivinde tutuluyor.
+```bash
+python tools/commons.py ara "Seljuk Empire map"
+python tools/commons.py indir "File:....png" --ad buyuk-selcuklu-1092
+python tools/commons.py yenile     # temiz klonda eksik görselleri geri çeker
+```
+
+Görselin ikilisi git'te DEĞİLDİR; yanındaki `<ad>.json` künyesi git'tedir ve
+atıf satırı ondan üretilir. **Künyesi olmayan görsel derlemeyi durdurur.**
+
+**Kendiliğinden harita ÖNERME.** Yol üç kez kurulup söküldü; pahalı olan kod
+değil İŞ AKIŞIYDI — her görsel sayfayı PNG'ye basıp gözle denetlemek ve harita
+bölünemez bir blok olduğu için sayfa dengeleme döngüsünü tetiklemesi. Kullanıcı
+isterse kullan, sonra sayfayı mutlaka gözle kontrol et. Şu an yalnızca
+**İSLAM TARİHİ III · 2. Bölüm**'de pilot olarak kullanılıyor; başka bölüme ya da
+derse yaymak kullanıcı onayına bağlıdır. Önceki üç denemenin dökümü bu deponun
+dışında, sürdürenin kişisel karar arşivindedir.
 
 ---
 
@@ -690,6 +714,11 @@ python cekirdek/renk_uretici.py --tablo
 
 # Ghostscript + ICC profili teşhisi
 python cekirdek/pdfx.py
+
+# Harita/portre görseli ara-indir (yalnızca Wikimedia Commons)
+python tools/commons.py ara "<terim>"
+python tools/commons.py indir "File:<dosya>" --ad <kisa-ad>
+python tools/commons.py yenile          # künyesi olup dosyası eksik olanları çek
 
 # BİR DÖNEMİN tüm derslerini tek kitap halinde derle (src/kitap.py sırasına göre)
 python build_kitap.py --sinif X --donem Y --sinav Z
