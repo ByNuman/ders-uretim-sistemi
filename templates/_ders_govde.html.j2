@@ -68,6 +68,7 @@
       <div class="person-name">{{ p.name }}</div>
       <div class="person-tag">{{ p.years }} · {{ p.tagline }}</div>
       <div class="person-bio">{{ p.bio[0] | safe }}</div>
+      {% if p.portre %}<div class="person-credit">Portre: {{ p.portre_atif() }}</div>{% endif %}
     </div>
   </div>
   {% endfor %}
