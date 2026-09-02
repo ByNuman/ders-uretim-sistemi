@@ -474,10 +474,10 @@ from cekirdek.content_model import (
 - **`InfoCard(title, text, badge=None)`** — küçük 2-3'lü kart grid'i
   (`ChapterPage.add_info_cards(başlık, [InfoCard(...), ...])` ile eklenir).
 
-- **`MapBox(title, gorsel, legend=[], caption="", px=1200)`** — Commons haritası.
+- **`MapBox(title, gorsel, legend=[], caption="")`** — Commons haritası.
   `gorsel`, `assets/gorsel/` altındaki uzantısız dosya adıdır; atıf satırı
   `<ad>.json` künyesinden otomatik gelir. `legend`, `MapLegendItem(kind, label,
-  color)` listesidir — `kind` ∈ `"swatch"` | `"hatch"` | `"dash"` | `"marker"`,
+  color)` listesidir — `kind` ∈ `"swatch"` | `"hatch"` | `"marker"`,
   `color` HARİTANIN KENDİ rengidir, ders temasından gelmez. Sayfaya
   `ChapterPage.add_map(MapBox(...))` (tam genişlik) ya da
   `add_block_map(BulletBlock(...), MapBox(...))` (numaralı blokla yan yana) ile

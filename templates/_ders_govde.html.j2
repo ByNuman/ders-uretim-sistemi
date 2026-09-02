@@ -149,8 +149,8 @@
 </div>
 {% endmacro %}
 
-{% macro render_block_map(block, m, oran) %}
-<div class="block-map" style="grid-template-columns: {{ oran }}">
+{% macro render_block_map(block, m) %}
+<div class="block-map">
   <div>{{ render_block(block) }}</div>
   <div>{{ render_map(m) }}</div>
 </div>
@@ -222,7 +222,7 @@
   {% elif kind == "table" %}{{ render_table(data) }}
   {% elif kind == "ayat" %}{{ render_ayat(data[0], data[1]) }}
   {% elif kind == "map" %}{{ render_map(data) }}
-  {% elif kind == "block_map" %}{{ render_block_map(data[0], data[1], data[2]) }}
+  {% elif kind == "block_map" %}{{ render_block_map(data[0], data[1]) }}
   {% elif kind == "info_cards" %}{{ render_info_cards(data[0], data[1]) }}
   {% elif kind == "summary" %}{{ render_summary(data) }}
   {% endif %}

@@ -81,15 +81,12 @@ def atif(ad: str) -> str:
 def hazirla(ad: str, px: int = VARSAYILAN_PX) -> str:
     """Görseli en fazla `px` genişliğe orantılı küçültüp file:/// yolunu döndürür.
     Kaynak zaten küçükse dokunulmaz, doğrudan kendisi verilir."""
-    kaynak = _kaynak_dosya(ad)
-    try:
-        from PIL import Image, PngImagePlugin
-        # Commons PNG'lerinde büyük metin (zTXt) parçaları olabiliyor; Pillow'un
-        # varsayılan sınırı bunları "zip bombası" sanıp açmayı reddediyor.
-        PngImagePlugin.MAX_TEXT_CHUNK = 64 * 1024 * 1024
-    except ImportError:
-        return kaynak.resolve().as_uri()
+    from PIL import Image, PngImagePlugin
+    # Commons PNG'lerinde büyük metin (zTXt) parçaları olabiliyor; Pillow'un
+    # varsayılan sınırı bunları "zip bombası" sanıp açmayı reddediyor.
+    PngImagePlugin.MAX_TEXT_CHUNK = 64 * 1024 * 1024
 
+    kaynak = _kaynak_dosya(ad)
     with Image.open(kaynak) as im:
         if im.width <= px:
             return kaynak.resolve().as_uri()

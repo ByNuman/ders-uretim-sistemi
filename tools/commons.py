@@ -29,7 +29,6 @@ from __future__ import annotations
 
 import argparse
 import html
-import io
 import json
 import re
 import sys
@@ -52,13 +51,6 @@ def _api(params: dict) -> dict:
     req = urllib.request.Request(url, headers={"User-Agent": UA})
     with urllib.request.urlopen(req, timeout=45) as resp:
         return json.load(resp)
-
-
-def _cikti(satir: str) -> None:
-    """Windows konsolu (cp1254) Commons başlıklarını basamayabilir; kodlanamayan
-    karakterleri '?' ile değiştirip yine de okunur bir çıktı ver."""
-    enc = sys.stdout.encoding or "utf-8"
-    sys.stdout.write(satir.encode(enc, errors="replace").decode(enc) + "\n")
 
 
 # ---------------------------------------------------------------------------
@@ -128,12 +120,10 @@ def indir(baslik: str, ad: str, genislik: int = 1500) -> Path:
     with urllib.request.urlopen(req, timeout=90) as resp:
         veri = resp.read()
 
-    uzanti = {"image/jpeg": ".jpg", "image/png": ".png",
-              "image/svg+xml": ".png"}.get(meta["mime"], ".png")
-    if url.lower().endswith(".jpg") or url.lower().endswith(".jpeg"):
-        uzanti = ".jpg"
-    elif url.lower().endswith(".png"):
-        uzanti = ".png"
+    # Thumb URL'sinin uzantisi kaynagin gercek bicimini verir (SVG thumb'i .png,
+    # TIFF thumb'i .jpg olur). Beklenmedik bir uzantiyi diske yazma.
+    uz = Path(urllib.parse.urlparse(url).path).suffix.lower()
+    uzanti = uz if uz in (".png", ".jpg", ".jpeg", ".webp") else ".png"
 
     GORSEL_DIR.mkdir(parents=True, exist_ok=True)
     hedef = GORSEL_DIR / f"{ad}{uzanti}"
@@ -144,14 +134,8 @@ def indir(baslik: str, ad: str, genislik: int = 1500) -> Path:
     (GORSEL_DIR / f"{ad}.json").write_text(
         json.dumps(meta, ensure_ascii=False, indent=2), encoding="utf-8")
 
-    try:
-        from PIL import Image
-        with Image.open(io.BytesIO(veri)) as im:
-            meta["px"] = f"{im.width}x{im.height}"
-    except Exception:
-        meta["px"] = "?"
-    _cikti(f"[commons] indirildi: {hedef}  ({len(veri)//1024} KB, {meta['px']})")
-    _cikti(f"[commons] lisans   : {meta['lisans']}  |  {meta['yazar'][:60]}")
+    print(f"[commons] indirildi: {hedef}  ({len(veri)//1024} KB)")
+    print(f"[commons] lisans   : {meta['lisans']}  |  {meta['yazar'][:60]}")
     return hedef
 
 
@@ -173,14 +157,16 @@ def yenile() -> int:
         genislik = meta.get("thumb_genislik") or 1500
         indir(meta["baslik"], ad, genislik)
         n += 1
-    _cikti(f"[commons] {n} gorsel yeniden indirildi." if n
-           else "[commons] Eksik gorsel yok. ✓")
+    print(f"[commons] {n} gorsel yeniden indirildi." if n
+          else "[commons] Eksik gorsel yok. ✓")
     return n
 
 
 # ---------------------------------------------------------------------------
 
 def main() -> None:
+    # Windows konsolu (cp1254) Commons basliklarini basamayabilir.
+    sys.stdout.reconfigure(errors="replace")
     ap = argparse.ArgumentParser(description="Wikimedia Commons gorsel araci")
     alt = ap.add_subparsers(dest="komut", required=True)
 
@@ -194,9 +180,9 @@ def main() -> None:
     a = ap.parse_args()
     if a.komut == "ara":
         for t in ara(a.terim, a.adet):
-            _cikti("  " + t)
+            print("  " + t)
     elif a.komut == "bilgi":
-        _cikti(json.dumps(bilgi(a.baslik), ensure_ascii=False, indent=2))
+        print(json.dumps(bilgi(a.baslik), ensure_ascii=False, indent=2))
     elif a.komut == "yenile":
         yenile()
     else:

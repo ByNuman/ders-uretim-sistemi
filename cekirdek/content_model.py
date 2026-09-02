@@ -128,8 +128,7 @@ class InfoCard:
 class MapLegendItem:
     """Harita kutusunun lejant satırı. Renk, GÖRSELİN KENDİ rengidir — ders
     temasından gelmez; lejant haritayı açıklar, onu yeniden renklendirmez.
-    kind ∈ 'swatch' (dolu alan) | 'hatch' (taralı alan) | 'dash' (kesikli çizgi)
-          | 'marker' (nokta/işaret)"""
+    kind ∈ 'swatch' (dolu alan) | 'hatch' (taralı alan) | 'marker' (nokta/işaret)"""
     kind: str
     label: str
     color: str = "#8a8a8a"
@@ -147,11 +146,10 @@ class MapBox:
     gorsel: str
     legend: list[MapLegendItem] = field(default_factory=list)
     caption: str = ""
-    px: int = 1200               # gömülecek genişlik (90 mm'de ≈ 340 dpi)
 
     def src(self) -> str:
         from cekirdek.gorsel import hazirla
-        return hazirla(self.gorsel, self.px)
+        return hazirla(self.gorsel)
 
     def atif(self) -> str:
         from cekirdek.gorsel import atif
@@ -207,10 +205,10 @@ class ChapterPage:
     def add_map(self, m: MapBox):
         """Tek başına, sayfa genişliğinde harita kutusu."""
         self.items.append(("map", m)); return self
-    def add_block_map(self, block: BulletBlock, m: MapBox, oran: str = "1.02fr 1fr"):
-        """Numaralı blok SOLDA, harita SAĞDA — iki sütunlu tek satır.
-        `oran`, CSS grid-template-columns değeridir (sol/sağ genişlik oranı)."""
-        self.items.append(("block_map", (block, m, oran))); return self
+    def add_block_map(self, block: BulletBlock, m: MapBox):
+        """Numaralı blok SOLDA, harita SAĞDA — iki sütunlu tek satır
+        (sütun oranı .block-map CSS kuralındadır)."""
+        self.items.append(("block_map", (block, m))); return self
     def add_ayat(self, title: str, ayat: list[Ayah]):
         self.items.append(("ayat", (title, ayat))); return self
     def add_info_cards(self, title: str, cards: list[InfoCard]):

@@ -475,9 +475,6 @@ em { font-style: italic; }
   background: repeating-linear-gradient(45deg,
     var(--mleg-color) 0 1.1px, rgba(255,255,255,0) 1.1px 3.2px);
 }
-.mleg-key.dash {
-  height: 0; border-top: 1.7px dashed var(--mleg-color); border-radius: 0;
-}
 .mleg-key.marker {
   width: 3.1mm; height: 3.1mm; border-radius: 50%;
   background: var(--mleg-color); border: 1px solid rgba(20,22,27,0.28);
@@ -486,7 +483,7 @@ em { font-style: italic; }
 .map-caption { font-size: 7.6pt; color: var(--ink-soft); font-style: italic; margin-top: 1.2mm; line-height: 1.4; }
 
 /* Blok + harita yan yana: iki sütun aynı üst hizadan başlar. */
-.block-map { display: grid; gap: 6mm; align-items: start; }
+.block-map { display: grid; grid-template-columns: 1.02fr 1fr; gap: 6mm; align-items: start; }
 .block-map .block { margin-top: 5.8mm; }
 .block-map .mapbox { margin-top: 5.8mm; }
 
