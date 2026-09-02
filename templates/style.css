@@ -429,6 +429,66 @@ em { font-style: italic; }
 .person-bio { font-size: 8.3pt; color: var(--ink-soft); line-height:1.5; }
 .person-row { display:flex; gap: 6mm; margin-top:5.5mm; }
 .person-row .person-card { flex:1; margin-top:0; }
+.person-main { min-width: 0; }
+
+/* --- Portre rozeti -----------------------------------------------------
+   Baş harf rozetiyle AYNI daire: aynı çap, aynı gölge, aynı konum. Fark
+   yalnızca içinin dolduruluşudur; Person.portre boşsa bu sınıf hiç basılmaz
+   ve kart eskisi gibi baş harfle render edilir. */
+.person-avatar.has-portrait {
+  padding: 0; overflow: hidden; background: var(--accent-soft);
+  border: 1.6px solid #fff;
+  box-shadow: 0 0 0 1.4px var(--accent-dark), var(--shadow-sm);
+}
+.person-avatar.has-portrait img {
+  width: 100%; height: 100%; object-fit: cover; display: block;
+}
+.person-credit { font-size: 6.3pt; color: var(--ink-faint); margin-top: 1.8mm; line-height: 1.3; }
+
+
+/* ---------- Harita kutusu (Wikimedia Commons görseli) ---------- */
+.mapbox { margin-top: 5.5mm; }
+.map-title {
+  font-family: "DejaVu Serif", serif; font-size: 9.6pt; font-weight: 700;
+  color: var(--accent-dark); text-align: center; margin-bottom: 2.4mm;
+}
+.map-frame {
+  position: relative; border: 1px solid var(--line); border-radius: 8px;
+  overflow: hidden; background: var(--paper); box-shadow: var(--shadow-sm);
+}
+.map-img { display: block; width: 100%; height: auto; }
+/* Lejant, görselin ÜSTÜNE binen ayrı bir açıklama kutusudur -- haritanın
+   pikselleri değişmez. Renkler haritanın kendi renkleridir (--mleg-color). */
+.map-legend {
+  position: absolute; left: 2.6mm; bottom: 2.6mm;
+  background: rgba(255,255,255,0.93); border: 1px solid rgba(20,22,27,0.18);
+  border-radius: 5px; padding: 1.9mm 2.6mm;
+  display: flex; flex-direction: column; gap: 1.5mm;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+}
+.mleg-row { display: flex; align-items: center; gap: 2.2mm; }
+.mleg-label { font-size: 6.9pt; color: var(--ink); line-height: 1.2; }
+.mleg-key { flex: 0 0 auto; width: 6.4mm; height: 3.1mm; border-radius: 2px; }
+.mleg-key.swatch { background: var(--mleg-color); border: 1px solid rgba(20,22,27,0.28); }
+.mleg-key.hatch {
+  border: 1px solid rgba(20,22,27,0.28);
+  background: repeating-linear-gradient(45deg,
+    var(--mleg-color) 0 1.1px, rgba(255,255,255,0) 1.1px 3.2px);
+}
+.mleg-key.dash {
+  height: 0; border-top: 1.7px dashed var(--mleg-color); border-radius: 0;
+}
+.mleg-key.marker {
+  width: 3.1mm; height: 3.1mm; border-radius: 50%;
+  background: var(--mleg-color); border: 1px solid rgba(20,22,27,0.28);
+}
+.map-credit { font-size: 6.3pt; color: var(--ink-faint); margin-top: 1.5mm; line-height: 1.3; }
+.map-caption { font-size: 7.6pt; color: var(--ink-soft); font-style: italic; margin-top: 1.2mm; line-height: 1.4; }
+
+/* Blok + harita yan yana: iki sütun aynı üst hizadan başlar. */
+.block-map { display: grid; gap: 6mm; align-items: start; }
+.block-map .block { margin-top: 5.8mm; }
+.block-map .mapbox { margin-top: 5.8mm; }
 
 /* ---------- Numaralı içerik blokları ---------- */
 .block { margin-top: 5.8mm; }

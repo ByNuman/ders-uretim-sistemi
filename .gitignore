@@ -61,3 +61,18 @@ venv/
 _kapak_onizleme.js
 .DS_Store
 Thumbs.db
+
+# ============================================================
+# COMMONS GÖRSELLERİ — ikili dosyalar depoda tutulmaz, künyeleri tutulur.
+# `<ad>.json` künyesi git'tedir; içindeki Commons başlığından görselin
+# kendisi her an geri çekilir:
+#     python tools/commons.py yenile
+# Böylece 4-5 MB'lık PNG'ler depoyu şişirmez (bkz. çıktı kuralları) ama
+# hangi görselin hangi lisansla kullanıldığı sürüm geçmişinde kalır.
+# _onbellek/ ise cekirdek/gorsel.py'nin ölçeklediği türev kopyalardır.
+# ============================================================
+assets/gorsel/*.png
+assets/gorsel/*.jpg
+assets/gorsel/*.jpeg
+assets/gorsel/*.webp
+assets/gorsel/_onbellek/
