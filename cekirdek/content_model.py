@@ -132,7 +132,7 @@ class ChapterPage:
     """Bir bölümün TEK fiziksel sayfası. items sırayla render edilir.
     Her item şu tuple biçimindedir: (tip, veri)
     tip ∈ {"terms","person","person_row","block","callout","flow","table",
-           "ayat","info_cards","summary","continue_tag"}
+           "ayat","info_cards","block_gorsel","summary","continue_tag"}
     Yükseklik önceden bilinemediği için (CSS render-zamanlı) sayfa bölünmesine
     içerik yazarken KENDİM karar veririm — bu, önceki sistemdeki taşma/kesilme
     risklerini ortadan kaldırır.
@@ -154,6 +154,16 @@ class ChapterPage:
         self.items.append(("flow", flow)); return self
     def add_table(self, table: ComparisonTable):
         self.items.append(("table", table)); return self
+    def add_block_gorsel(self, block: BulletBlock, baslik: str = ""):
+        """Numaralı blok SOLDA, ELLE DOLDURULACAK boş görsel kutusu SAĞDA.
+
+        Sistem görsel ARAMAZ, İNDİRMEZ, GÖMMEZ — yalnızca 4:3 oranında boş bir
+        çerçeve bırakır; haritayı/resmi üretilen PDF'e kullanıcı kendisi koyar.
+        `baslik` opsiyoneldir ve ders metninden yazılır (çerçevenin üstünde
+        küçük punto). Kutunun altına açıklama satırı KONMAZ: onu yazmak
+        görselin içindekini bilmeyi gerektirir, o da bu sistemin işi değildir.
+        """
+        self.items.append(("block_gorsel", (block, baslik))); return self
     def add_ayat(self, title: str, ayat: list[Ayah]):
         self.items.append(("ayat", (title, ayat))); return self
     def add_info_cards(self, title: str, cards: list[InfoCard]):

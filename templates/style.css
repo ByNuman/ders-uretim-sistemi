@@ -431,6 +431,24 @@ em { font-style: italic; }
 .person-row .person-card { flex:1; margin-top:0; }
 .person-main { min-width: 0; }
 
+/* ---------- Elle doldurulacak görsel kutusu ----------
+   İçi BİLEREK boştur: haritayı/resmi kullanıcı PDF'e kendisi yapıştırır.
+   Yükseklik aspect-ratio'dan (4:3) türer, elle mm verilmez. Sütun oranı ve
+   boşluklar eski harita kutusundan devralındı (ölçülmüş değerler). */
+.gorsel-kutu { margin-top: 5.5mm; }
+.gk-baslik {
+  font-family: "DejaVu Serif", serif; font-size: 9.6pt; font-weight: 700;
+  color: var(--accent-dark); text-align: center; margin-bottom: 2.4mm;
+}
+.gk-alan {
+  aspect-ratio: 4 / 3;
+  border: 1px solid var(--line); border-radius: 8px;
+  background: var(--paper); box-shadow: var(--shadow-sm);
+}
+.block-gorsel { display: grid; grid-template-columns: 1.02fr 1fr; gap: 6mm; align-items: start; }
+.block-gorsel .block { margin-top: 5.8mm; }
+.block-gorsel .gorsel-kutu { margin-top: 5.8mm; }
+
 /* ---------- Numaralı içerik blokları ---------- */
 .block { margin-top: 5.8mm; }
 .block-head { display:flex; align-items:baseline; gap: 2.8mm; margin-bottom: 2.6mm; }

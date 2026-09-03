@@ -490,7 +490,7 @@ from cekirdek.content_model import (
   `add_person(Person)`, `add_person_row(list[Person])`, `add_block(BulletBlock)`,
   `add_callout(Callout)`, `add_flow(FlowDiagram)`, `add_table(ComparisonTable)`,
   `add_ayat(title, list[Ayah])`, `add_info_cards(title, list[InfoCard])`,
-  `add_summary(text)`.
+  `add_block_gorsel(BulletBlock, baslik="")`, `add_summary(text)`.
   `continue_tag` artık **render EDİLMEZ** ("N. Bölüm · Devam" rozeti kaldırıldı) —
   vermek ZORUNLU DEĞİL, sadece geriye dönük uyumluluk için kabul ediliyor.
 
@@ -657,6 +657,32 @@ Build çıktısındaki **dört denetim**: taşma (kitapta ayrıca hangi dersin k
 sayfası olduğu yazılır) · sayfa numarası zinciri · render doğrulaması · boyut
 optimizasyonu. Biri hata verirse **PDF'i teslim etme**, önce sebebini bul.
 
+---
+
+## Harita/resim: SADECE boş kutu bırak
+
+**Görsel ARAMA, İNDİRME, GÖMME.** Harita ve resimleri üretilen PDF'e kullanıcı
+kendisi yerleştirir. Senin işin, gerektiği yerde metnin yanında doğru ölçüde bir
+boşluk bırakmak:
+
+```python
+.add_block_gorsel(BulletBlock(1, "Coğrafi Bağlam", [...]), "Hârezmşâh İmparatorluğu (1215)")
+```
+
+Solda numaralı blok, sağda üstte küçük başlık + altında **4:3** boş çerçeve
+(≈88 × 66 mm). `baslik` opsiyoneldir ve **ders metninden** yazılır; kutunun
+altına açıklama satırı KONMAZ — onu yazmak görselin içindekini bilmeyi
+gerektirir, o da bu sistemin işi değildir.
+
+- Nereye konacağına ham metin karar verir: coğrafya/yayılma/sınır anlatan bir
+  blok varsa kutuyu onun yanına koy, başka yere serpme.
+- Kutu **bölünemez bir bloktur** — sayfa dengelemesini tetikler. Ekledikten
+  sonra taşma çıktısını oku ve sayfayı gözle kontrol et.
+- **Şahsiyet kartlarına dokunma.** Yuvarlak baş harf rozeti zaten resmin yerini
+  gösteriyor; oraya ekstra kutu/alan açma.
+
+---
+
 ## Hızlı komut özeti
 
 ```bash
@@ -712,6 +738,8 @@ for it in r.outline: print(it.title, '->', r.get_destination_page_number(it)+1)
 - [ ] Kapak (renk doğru mu?) + içindekiler + genel bakış + her bölüm ilk sayfası + en
       az bir tablo sayfası + sözlük/test/cevap anahtarı son sayfalarını görsel kontrol
       ettim
+- [ ] Harita/resim gereken yerlere `add_block_gorsel(...)` ile BOŞ KUTU bıraktım
+      (görsel aramadım/indirmedim; şahsiyet kartlarına dokunmadım)
 - [ ] Her bölümün TÜM sayfalarını inceleyip devam sayfalarının (son sayfa hariç)
       %90-95 dolulukta olduğunu doğruladım; gerekirse mevcut içeriği taşıdım/
       birleştirdim — asla yeni içerik uydurmadım, taşan denemeleri geri aldım

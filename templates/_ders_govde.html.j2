@@ -119,6 +119,24 @@
 </div>
 {% endmacro %}
 
+{# ---- Elle doldurulacak görsel kutusu ---------------------------------
+   İçi BİLEREK boştur: sistem görsel indirmez, kullanıcı haritayı/resmi
+   üretilen PDF'e kendisi yerleştirir. Oran 4:3 (CSS aspect-ratio), yani
+   yükseklik sütun genişliğinden türer — elle mm vermeye gerek yoktur. #}
+{% macro render_gorsel_kutu(baslik) %}
+<div class="gorsel-kutu">
+  {% if baslik %}<div class="gk-baslik">{{ baslik }}</div>{% endif %}
+  <div class="gk-alan"></div>
+</div>
+{% endmacro %}
+
+{% macro render_block_gorsel(block, baslik) %}
+<div class="block-gorsel">
+  <div>{{ render_block(block) }}</div>
+  <div>{{ render_gorsel_kutu(baslik) }}</div>
+</div>
+{% endmacro %}
+
 {% macro render_info_cards(title, cards) %}
 <div class="block-subtitle" style="margin-left:0; font-weight:700; color:var(--ink); font-size:8.6pt; margin-top:5.5mm; margin-bottom:2mm;">{{ title }}</div>
 <div class="info-grid">
@@ -184,6 +202,7 @@
   {% elif kind == "flow" %}{{ render_flow(data) }}
   {% elif kind == "table" %}{{ render_table(data) }}
   {% elif kind == "ayat" %}{{ render_ayat(data[0], data[1]) }}
+  {% elif kind == "block_gorsel" %}{{ render_block_gorsel(data[0], data[1]) }}
   {% elif kind == "info_cards" %}{{ render_info_cards(data[0], data[1]) }}
   {% elif kind == "summary" %}{{ render_summary(data) }}
   {% endif %}
