@@ -307,7 +307,7 @@ def balance(module_name: str, dry: bool = False) -> bool:
             raise SystemExit(f"{path.name}: {var} kaynakta bulunamadı")
         chb = by_var[var]
         # Bir bölümün ilk ve son pages.append'i arasındaki HER ŞEY yeniden
-        # yazılır; aradaki başka kod (ör. bir MapBox tanımı) sessizce silinirdi.
+        # yazılır; aradaki başka kod (ör. bir yardımcı değişken tanımı) sessizce silinirdi.
         for onceki, sonraki in zip(chb, chb[1:]):
             arada = [l for l in lines[onceki.end + 1:sonraki.start] if l.strip()]
             if arada:

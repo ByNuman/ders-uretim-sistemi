@@ -58,22 +58,6 @@ class Person:
     key_work: Optional[str] = None   # başyapıtı / en önemli eseri
     initials: Optional[str] = None   # avatar baş harfleri; boşsa isimden türetilir
 
-    # --- Portre (opsiyonel) ---
-    # assets/gorsel/ altındaki Commons görselinin uzantısız adı. VERİLMEZSE
-    # kart eskisi gibi yuvarlak baş harf rozetiyle render edilir — portre,
-    # rozet sistemini DEĞİŞTİRMEZ, sadece bulunduğunda onun yerine geçer.
-    portre: Optional[str] = None
-    portre_odak: str = "50% 22%"     # CSS object-position: dairede yüzü ortalar
-    portre_yakinlik: float = 1.0     # daire içindeki çerçeveleme (1.0 = kadraj olduğu gibi)
-
-    def portre_src(self) -> str:
-        from cekirdek.gorsel import hazirla
-        return hazirla(self.portre, 700)
-
-    def portre_atif(self) -> str:
-        from cekirdek.gorsel import atif
-        return atif(self.portre)
-
     def avatar(self) -> str:
         if self.initials:
             return self.initials
@@ -125,38 +109,6 @@ class InfoCard:
 
 
 @dataclass
-class MapLegendItem:
-    """Harita kutusunun lejant satırı. Renk, GÖRSELİN KENDİ rengidir — ders
-    temasından gelmez; lejant haritayı açıklar, onu yeniden renklendirmez.
-    kind ∈ 'swatch' (dolu alan) | 'hatch' (taralı alan) | 'marker' (nokta/işaret)"""
-    kind: str
-    label: str
-    color: str = "#8a8a8a"
-
-
-@dataclass
-class MapBox:
-    """Tarihî harita kutusu. Görsel YALNIZCA Wikimedia Commons'tan gelir ve
-    OLDUĞU GİBİ kullanılır: renklendirme, yeniden çizim, sınır düzeltme YOK.
-    Tek işlem, baskı çözünürlüğüne orantılı küçültmedir (cekirdek/gorsel.py).
-
-    gorsel: assets/gorsel/ altındaki uzantısız dosya adı. Yanındaki <ad>.json
-    künyesinden lisans/atıf satırı otomatik üretilir."""
-    title: str
-    gorsel: str
-    legend: list[MapLegendItem] = field(default_factory=list)
-    caption: str = ""
-
-    def src(self) -> str:
-        from cekirdek.gorsel import hazirla
-        return hazirla(self.gorsel)
-
-    def atif(self) -> str:
-        from cekirdek.gorsel import atif
-        return atif(self.gorsel)
-
-
-@dataclass
 class Ayah:
     """Bir ayet-i kerime kartı: orijinal Arapça metin + referans + Türkçe meal + etimoloji.
     Arapça metin DejaVu Sans ile (tam GSUB/Arabic-shaping desteği doğrulanmış) render edilir."""
@@ -180,7 +132,7 @@ class ChapterPage:
     """Bir bölümün TEK fiziksel sayfası. items sırayla render edilir.
     Her item şu tuple biçimindedir: (tip, veri)
     tip ∈ {"terms","person","person_row","block","callout","flow","table",
-           "ayat","info_cards","map","block_map","summary","continue_tag"}
+           "ayat","info_cards","summary","continue_tag"}
     Yükseklik önceden bilinemediği için (CSS render-zamanlı) sayfa bölünmesine
     içerik yazarken KENDİM karar veririm — bu, önceki sistemdeki taşma/kesilme
     risklerini ortadan kaldırır.
@@ -202,13 +154,6 @@ class ChapterPage:
         self.items.append(("flow", flow)); return self
     def add_table(self, table: ComparisonTable):
         self.items.append(("table", table)); return self
-    def add_map(self, m: MapBox):
-        """Tek başına, sayfa genişliğinde harita kutusu."""
-        self.items.append(("map", m)); return self
-    def add_block_map(self, block: BulletBlock, m: MapBox):
-        """Numaralı blok SOLDA, harita SAĞDA — iki sütunlu tek satır
-        (sütun oranı .block-map CSS kuralındadır)."""
-        self.items.append(("block_map", (block, m))); return self
     def add_ayat(self, title: str, ayat: list[Ayah]):
         self.items.append(("ayat", (title, ayat))); return self
     def add_info_cards(self, title: str, cards: list[InfoCard]):
