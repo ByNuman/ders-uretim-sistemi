@@ -61,9 +61,3 @@ venv/
 _kapak_onizleme.js
 .DS_Store
 Thumbs.db
-
-# ============================================================
-# assets/gorsel/ — harita/portre katmanı sistemden kaldırıldı.
-# Klasör diskte kalabilir (elle indirilmiş görseller), depoya girmez.
-# ============================================================
-assets/gorsel/
