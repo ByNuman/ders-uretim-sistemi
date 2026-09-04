@@ -147,6 +147,12 @@ DERS_RENKLERI = {
     # islam_tarihi_3.py bu tonla basildi, vize kitabi da ayni tonu surdurur.
     "ISLAMTARIHI":              "#1D4E79",  # cini laciverti       H212
     "ISLAMTARIHI3":             "#1D4E79",  # (Arap rakamli yazim: "ISLAM TARIHI 3")
+    # --- Akil aleti -------------------------------------------------------
+    # Mantik "alet ilmi"dir; klasik amblemi Porphyrios agacidir (cins-tur
+    # dallanmasi). Defne/yaprak yesili bu agacin rengidir. H112 -- mushaf
+    # yesilinden (Tefsir, H150) ve zeytinden (Din Egitimi, H82) 30 dereceden
+    # fazla uzaktir, ayni kitapta yan yana gelince ayrisir.
+    "MANTIK":                   "#2E5E26",  # Porphyrios agaci yesili  H112
     # --- Dil / edebiyat ---------------------------------------------------
     "ARAPDILIVEEDEBIYATI":      "#8C2F21",  # terracotta / col     H8
     # --- Egitim / din hizmetleri -----------------------------------------
