@@ -38,13 +38,30 @@ buradaki modelde bilinçli olarak şu kurallar var:
    değişince güncellenmeyi unutma riski ortadan kalkar.
 """
 
+import base64
+import mimetypes
 from dataclasses import dataclass, field
+from pathlib import Path
 from typing import Optional
 
 
 # ---------------------------------------------------------------------------
 # Temel / paylaşılan varlıklar
 # ---------------------------------------------------------------------------
+
+def resim_data_uri(yol) -> str:
+    """Bir resim dosyasını base64 `data:` URI'sine çevirir.
+
+    Kişi kartı avatarı gibi PDF'e gömülecek küçük görseller için kullanılır.
+    Dosya yolu yerine data URI kullanmanın nedeni: Playwright'ın file:// sayfa
+    içinden yüklediği alt kaynaklarda Türkçe karakter/boşluk içeren dosya
+    yollarının URL kodlamasıyla uğraşmamak ve görseli PDF'in kendisine
+    (harici dosyaya bağımlı olmadan) gömmektir.
+    """
+    yol = Path(yol)
+    mime = mimetypes.guess_type(yol.name)[0] or "image/jpeg"
+    veri = base64.b64encode(yol.read_bytes()).decode("ascii")
+    return f"data:{mime};base64,{veri}"
 
 @dataclass
 class Person:
@@ -57,6 +74,8 @@ class Person:
     bio: list[str]               # biyografi maddeleri (madde imli)
     key_work: Optional[str] = None   # başyapıtı / en önemli eseri
     initials: Optional[str] = None   # avatar baş harfleri; boşsa isimden türetilir
+    photo: Optional[str] = None      # `resim_data_uri()` ile üretilmiş data: URI; verilirse
+                                      # yuvarlak avatarda baş harf yerine bu fotoğraf gösterilir
 
     def avatar(self) -> str:
         if self.initials:
@@ -154,16 +173,20 @@ class ChapterPage:
         self.items.append(("flow", flow)); return self
     def add_table(self, table: ComparisonTable):
         self.items.append(("table", table)); return self
-    def add_block_gorsel(self, block: BulletBlock, baslik: str = ""):
-        """Numaralı blok SOLDA, ELLE DOLDURULACAK boş görsel kutusu SAĞDA.
+    def add_block_gorsel(self, block: BulletBlock, baslik: str = "", image: Optional[str] = None):
+        """Numaralı blok SOLDA, görsel çerçeve SAĞDA.
 
-        Sistem görsel ARAMAZ, İNDİRMEZ, GÖMMEZ — yalnızca 4:3 oranında boş bir
-        çerçeve bırakır; haritayı/resmi üretilen PDF'e kullanıcı kendisi koyar.
-        `baslik` opsiyoneldir ve ders metninden yazılır (çerçevenin üstünde
-        küçük punto). Kutunun altına açıklama satırı KONMAZ: onu yazmak
-        görselin içindekini bilmeyi gerektirir, o da bu sistemin işi değildir.
+        Sistem görsel ARAMAZ, İNDİRMEZ — yalnızca 4:3 oranında bir çerçeve
+        bırakır. `image` verilmezse çerçeve ELLE DOLDURULACAK BOŞTUR; kullanıcı
+        haritayı/resmi üretilen PDF'e kendisi koyar. `image` yalnızca kullanıcı
+        görseli kendisi bulup bir klasöre koyduğunda ve açıkça yerleştirilmesini
+        istediğinde, `resim_data_uri()` ile üretilmiş bir data: URI olarak
+        verilir (bkz. `Person.photo` ile aynı ilke). `baslik` opsiyoneldir ve
+        ders metninden yazılır (çerçevenin üstünde küçük punto). Kutunun altına
+        açıklama satırı KONMAZ: onu yazmak görselin içindekini bilmeyi
+        gerektirir, o da bu sistemin işi değildir.
         """
-        self.items.append(("block_gorsel", (block, baslik))); return self
+        self.items.append(("block_gorsel", (block, baslik, image))); return self
     def add_ayat(self, title: str, ayat: list[Ayah]):
         self.items.append(("ayat", (title, ayat))); return self
     def add_info_cards(self, title: str, cards: list[InfoCard]):
@@ -255,6 +278,13 @@ class BookPack:
     # --- Ön kısım (kapak / künye / önsöz / rehber / ana içindekiler / harita) ---
     cover_kicker: str = "Görsel Ders Notu Kitabı · Dönem Cildi"
     cover_code: str = ""                          # kapakta başlığın üstündeki küçük etiket
+    cover_image: Optional[str] = None             # `resim_data_uri()` ile üretilmiş data: URI.
+                                                  # Verilirse ANA KAPAK, CSS ile çizilen amblem/
+                                                  # başlık/istatistik düzeni yerine bu tam sayfa
+                                                  # görseli kullanır. Görsel A4 oranında (210×297)
+                                                  # hazırlanmış olmalı. Künye ve içindekiler
+                                                  # sayfaları bundan ETKİLENMEZ; sayfa sayısı ve
+                                                  # yer imleri de değişmez (kapak yine 1 sayfa).
     imprint_rows: list[tuple] = field(default_factory=list)   # [("Dönem", "2025-2026 Bahar"), ...]
     imprint_note: str = ""
     preface_lead: str = ""                        # önsözün koyu zeminli giriş paragrafı

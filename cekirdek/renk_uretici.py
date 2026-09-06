@@ -133,6 +133,12 @@ DERS_RENKLERI = {
     # --- Akil / itikad ----------------------------------------------------
     "SISTEMATIKKELAM":          "#592F79",  # mor / soyut akil     H274
     "ISLAMFELSEFESITARIHI":     "#2F2D76",  # gece mavisi          H242
+    # Inanc Esaslari (Akaid): temel itikad metinleri (ör. el-Fikhu'l-Ekber) --
+    # Kelam'in (soyut/tartismaci akil, H274) analitik yontemiyle Tasavvuf'un
+    # (H322) kalbi teslimiyeti arasinda, ikisinden de ~22-26 derece uzakta
+    # duran bir eflatun/erguvan -- itikadin hem akla hem kalbe hitap eden
+    # koprü konumunu yansitir.
+    "ISLAMINANCESASLARI":       "#742F79",  # eflatun / itikad     H296
     # --- Hukum ------------------------------------------------------------
     "ISLAMHUKUKU":              "#7A2433",  # visne / muhur        H350
     "ISLAMHUKUKUSULU":          "#7A2433",  # (ayni aile: fikih usulu)
@@ -155,6 +161,11 @@ DERS_RENKLERI = {
     "MANTIK":                   "#2E5E26",  # Porphyrios agaci yesili  H112
     # --- Dil / edebiyat ---------------------------------------------------
     "ARAPDILIVEEDEBIYATI":      "#8C2F21",  # terracotta / col     H8
+    # Turk-Islam edebiyati: ilk mutasavviflarin Hikmet/Ilahi gelenegi -- eski
+    # yazma kagidinin/tezhibin koyu altin sarisi. H55, Hadis'in deri kahvesi
+    # (H28) ile Din Egitimi'nin zeytini (H82) arasinda, ikisinden de ~27
+    # derece uzakta durur.
+    "TURKISLAMEDEBIYATI":       "#746E2F",  # eski yazma altin sarisi  H55
     # --- Egitim / din hizmetleri -----------------------------------------
     "SINIFYONETIMI":                       "#1F4775",  # cini laciverti  H212
     "EGITIMDEOLCMEVEDEGERLENDIRME":        "#1F4775",  # (ayni ruh, farkli donem)

@@ -174,3 +174,15 @@ Bunlar `templates/style.css` içinde zaten düzeltilmiş durumda — sadece
     olarak basılıyor ve şablondaki `{% if title %}` koruması sayesinde başlık
     TEKRAR EDİLMİYOR (uydurma "devamı" başlığı üretilmiyor).
 
+20. **`add_person_row()` 4 kişiyle yatay taşabiliyordu**: madde 17'deki aynı
+    "flex öğesi min-content'in altına inemez" hatası `.person-row
+    .person-card`'da da vardı — `.ov-flow-step`/`.flowdiag .fstep`'e uygulanan
+    `min-width:0; overflow-wrap: break-word;` koruması bu bileşene hiç
+    eklenmemişti. 4 kişilik bir satırda (İSLAM İNANÇ ESASLARI, Hulefâ-i
+    Râşidîn örneği) son kart sayfa kenarından taştı; taşma denetimi bunu
+    YAKALAMADI çünkü o sadece dikey (sayfa yüksekliği) sınırını kontrol eder,
+    yatay taşmayı değil. `templates/style.css`'te `.person-row .person-card`
+    kuralına da aynı iki özellik eklendi. 2-3 kişilik satırlarda görsel fark
+    yaratmaz; sadece içerik sığmadığında satır atlamasını (taşma yerine)
+    sağlar. Yeni bir flex-satır bileşeni eklerseniz aynı korumayı baştan koyun.
+

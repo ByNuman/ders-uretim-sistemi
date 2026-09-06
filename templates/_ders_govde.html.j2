@@ -40,7 +40,11 @@
 {% endmacro %}
 
 {% macro person_avatar(p) %}
+{% if p.photo %}
+<div class="person-avatar person-avatar--photo" style="background-image:url('{{ p.photo }}')"></div>
+{% else %}
 <div class="person-avatar">{{ p.avatar() }}</div>
+{% endif %}
 {% endmacro %}
 
 {% macro render_person(p) %}
@@ -123,17 +127,21 @@
    İçi BİLEREK boştur: sistem görsel indirmez, kullanıcı haritayı/resmi
    üretilen PDF'e kendisi yerleştirir. Oran 4:3 (CSS aspect-ratio), yani
    yükseklik sütun genişliğinden türer — elle mm vermeye gerek yoktur. #}
-{% macro render_gorsel_kutu(baslik) %}
+{% macro render_gorsel_kutu(baslik, image=None) %}
 <div class="gorsel-kutu">
   {% if baslik %}<div class="gk-baslik">{{ baslik }}</div>{% endif %}
+  {% if image %}
+  <div class="gk-alan gk-alan--foto" style="background-image:url('{{ image }}')"></div>
+  {% else %}
   <div class="gk-alan"></div>
+  {% endif %}
 </div>
 {% endmacro %}
 
-{% macro render_block_gorsel(block, baslik) %}
+{% macro render_block_gorsel(block, baslik, image=None) %}
 <div class="block-gorsel">
   <div>{{ render_block(block) }}</div>
-  <div>{{ render_gorsel_kutu(baslik) }}</div>
+  <div>{{ render_gorsel_kutu(baslik, image) }}</div>
 </div>
 {% endmacro %}
 
@@ -202,7 +210,7 @@
   {% elif kind == "flow" %}{{ render_flow(data) }}
   {% elif kind == "table" %}{{ render_table(data) }}
   {% elif kind == "ayat" %}{{ render_ayat(data[0], data[1]) }}
-  {% elif kind == "block_gorsel" %}{{ render_block_gorsel(data[0], data[1]) }}
+  {% elif kind == "block_gorsel" %}{{ render_block_gorsel(data[0], data[1], data[2]) }}
   {% elif kind == "info_cards" %}{{ render_info_cards(data[0], data[1]) }}
   {% elif kind == "summary" %}{{ render_summary(data) }}
   {% endif %}

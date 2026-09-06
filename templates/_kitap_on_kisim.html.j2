@@ -33,6 +33,14 @@
 {% macro front_matter(book, courses, fm) %}
 
 {# ---------------- 1. ANA KAPAK ---------------- #}
+{% if book.cover_image %}
+{# Tam sayfa görsel kapak: CSS ile çizilen amblem/başlık/istatistik düzeninin
+   yerine geçer. Künye ve içindekiler sayfaları değişmez, sayfa sayısı aynı
+   kalır (kapak yine tek sayfa -> #kitap-kapak çapası ve offset korunur). #}
+<section class="page cover image-cover kitap" id="kitap-kapak">
+  <img class="cover-image" src="{{ book.cover_image }}" alt="{{ book.title }}">
+</section>
+{% else %}
 <section class="page cover kitap" id="kitap-kapak">
   <div class="cover-corner tl"></div>
   <div class="cover-corner tr"></div>
@@ -70,6 +78,7 @@
     </div>
   </div>
 </section>
+{% endif %}
 
 {# ---------------- 2. KÜNYE ---------------- #}
 <section class="page body-page kitap" id="kitap-kunye">

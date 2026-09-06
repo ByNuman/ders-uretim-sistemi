@@ -107,6 +107,18 @@ oluyorsa o dersin hue'sunu birkaç derece kaydırmayı deneyin.
   değil.
 - Kapak: çok katmanlı gradient + döner amblem (halka + saat çentikleri +
   sunburst) + 4 köşede ince "cilt" süsü + dev soluk motif harfi.
+- **Birleşik kitabın ANA kapağı isteğe bağlı olarak tam sayfa bir GÖRSEL
+  olabilir.** `BookPack.cover_image`'e `resim_data_uri()` ile üretilmiş bir
+  data: URI verilirse (kişi fotoğrafı / görsel kutu ile aynı ilke), yukarıdaki
+  CSS amblem/başlık/istatistik düzeni yerine `.cover.image-cover` devreye
+  girer: görsel A4 oranında (210×297) hazırlanmış olmalı, `object-fit:cover`
+  ile tam sayfayı kaplar, bleed yoktur (fotokopide koyu zeminde ~5mm beyaz
+  kenar normaldir). **Künye, önsöz, rehber, ana içindekiler ve ders haritası
+  sayfaları bundan hiç etkilenmez**; kapak yine tek sayfadır, sayfa offset'i
+  ve yer imleri değişmez. Kapaktaki dinamik istatistik çubuğu (X ders · Y
+  kavram · Z soru · toplam sayfa) görselde gösterilemez — bu sayım künye
+  sayfasında zaten vardır. Tek ders PDF'lerinin kapağı HER ZAMAN CSS ile
+  çizilir; görsel kapak yalnızca birleşik kitaba özgüdür.
 - **SAYFA ARKA PLANI DÜZDÜR — nokta deseni/doku YOKTUR.** Hem kapakta hem iç
   sayfalarda (içindekiler, genel bakış, bölümler, sözlük, test, cevap
   anahtarı) eskiden düşük opaklıklı bir nokta matrisi (`.body-page::before`
