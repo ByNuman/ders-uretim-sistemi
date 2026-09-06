@@ -5,16 +5,18 @@
 #}
 {# ============================================================
    KİTABIN ÖN KISMI — ana kapak, künye, önsöz, sayfa rehberi,
-   ana içindekiler, ders haritası.
+   ana içindekiler.
 
    Bu sayfalar derslerden ÖNCE gelir ve derslerin sayfa offset'ini
    belirler; sayfa numaraları build_kitap.py'deki front_matter_pages()
    tarafından hesaplanır (fm sözlüğü), burada elle sayı yazılmaz.
 
-   fm: cover/imprint/preface/guide/toc/map -> sayfa numaraları
+   fm: cover/imprint/preface/guide/toc -> sayfa numaraları
        toc_chunks -> ana içindekiler sayfalarına bölünmüş ders listesi
        stats -> kitap geneli sayımlar
-   ============================================================ #}
+
+   Not: "Ders Haritası" sayfası 2026-09'da kaldırıldı — dersin sayfa
+   sayısı/aralığı zaten Ana İçindekiler satırında yazıyordu. #}
 
 {# callout ikonları ders gövdesiyle AYNI kaynaktan gelir — ikinci bir kopya tutulmaz #}
 {% import "_ders_govde.html.j2" as ders %}
@@ -134,7 +136,10 @@
   {{ bfooter(book, fm.preface) }}
 </section>
 
-{# ---------------- 4. SAYFA REHBERİ (LEGEND) ---------------- #}
+{# ---------------- 4. SAYFA REHBERİ (LEGEND) — 8 örnek TEK sayfada ----------------
+   Eski 175x250mm sayfada 8 örnek sığmayıp 4+4 bölünüyordu; 210x297mm'e
+   geçişle (metin alanı 186x270mm) tek sayfaya alındı (2026-09). Örnek
+   eklemeyin: 8 örnek 4x2 grid'in güvenli sınırıdır. #}
 <section class="page body-page kitap" id="kitap-rehber">
   {{ bband(book, "Sayfa Rehberi") }}
   <div class="toc-kicker">Sayfaları Okuma Kılavuzu</div>
@@ -182,15 +187,6 @@
       </div>
     </div>
 
-  </div>
-  {{ bfooter(book, fm.guide) }}
-</section>
-
-{# Rehberin ikinci yarısı: 8 örnek tek sayfaya sığmıyor.
-   Sayfa sayısı build_kitap.py'deki FRONT_FIXED_PAGES ile birebir tutmalı. #}
-<section class="page body-page kitap">
-  {{ bband(book, "Sayfa Rehberi · Devam") }}
-  <div class="guide-grid">
     <div class="guide-item">
       <div class="guide-cap">Bölüm Özeti<span>Her bölümün sonundaki toparlama. Hızlı tekrarda tek başına okunabilir.</span></div>
       <div class="guide-demo">
@@ -241,9 +237,9 @@
   </div>
 
   {% if book.guide_note %}
-  <div class="imprint-note" style="margin-top:6mm;">{{ book.guide_note | safe }}</div>
+  <div class="imprint-note" style="margin-top:5mm;">{{ book.guide_note | safe }}</div>
   {% endif %}
-  {{ bfooter(book, fm.guide + 1) }}
+  {{ bfooter(book, fm.guide) }}
 </section>
 
 {# ---------------- 5. ANA İÇİNDEKİLER ---------------- #}
@@ -270,7 +266,7 @@
         {{ c.pack.chapter_count() }} bölüm · {{ c.pack.concept_count() }} kavram<br>
         {{ c.question_count }} soru · {{ c.page_count }} sayfa
       </div>
-      <div class="btoc-range" style="background: {{ c.accent }};">s.{{ c.first_page }}</div>
+      <div class="btoc-range" style="background: {{ c.accent }};">s.{{ c.first_page }}–{{ c.last_page }}</div>
     </a>
     {% endfor %}
   </div>
@@ -278,28 +274,5 @@
 </section>
 {% set tocno.n = tocno.n + 1 %}
 {% endfor %}
-
-{# ---------------- 6. DERS HARİTASI ---------------- #}
-<section class="page body-page kitap" id="kitap-harita">
-  {{ bband(book, "Ders Haritası") }}
-  <div class="toc-kicker">Renk Anahtarı</div>
-  <div class="toc-title">Ders Haritası</div>
-  {% if book.map_lede %}<div class="toc-lede">{{ book.map_lede }}</div>{% endif %}
-  <div class="map-list">
-    {% for c in courses %}
-    <div class="map-row">
-      <div class="map-name">{{ c.plain_title }}</div>
-      <div class="map-track">
-        <div class="map-fill" style="width: {{ c.bar_pct }}%; background: linear-gradient(90deg, {{ c.accent_dark }}, {{ c.accent }});">
-          <span>{{ c.page_count }} s.</span>
-        </div>
-      </div>
-      <div class="map-range">s.{{ c.first_page }}-{{ c.last_page }}</div>
-    </div>
-    {% endfor %}
-  </div>
-  {% if book.map_note %}<div class="map-note" style="margin-top:7mm;">{{ book.map_note | safe }}</div>{% endif %}
-  {{ bfooter(book, fm.map) }}
-</section>
 
 {% endmacro %}

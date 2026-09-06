@@ -737,16 +737,36 @@ table.matchtable tr:nth-child(even) td { background: var(--accent-tint); }
 .btoc-sub { font-size: 8.3pt; color: var(--ink-faint); margin-top: 0.8mm; }
 .btoc-meta { flex: 0 0 auto; font-size: 7.8pt; color: var(--ink-faint); text-align:right; line-height:1.5; }
 .btoc-range {
-  flex: 0 0 auto; font-size: 9.2pt; font-weight:700; color: #fff;
-  padding: 1.8mm 3.2mm; border-radius: 6px; min-width: 20mm; text-align:center;
+  flex: 0 0 auto; font-size: 9pt; font-weight:700; color: #fff; white-space: nowrap;
+  padding: 1.8mm 3.2mm; border-radius: 6px; min-width: 24mm; text-align:center;
 }
 
-/* --- Ders haritası (sırt görünümü) --- */
-.map-note { font-size: 8.8pt; color: var(--ink-soft); line-height:1.6; margin-top: 3mm; }
-.map-list { margin-top: 7mm; display:flex; flex-direction:column; gap: 3.2mm; }
-.map-row { display:flex; align-items:center; gap: 4mm; }
-.map-name { flex: 0 0 52mm; font-size: 8.8pt; font-weight:700; color: var(--ink); }
-.map-track { flex: 1 1 auto; height: 6.6mm; background: var(--paper-tint); border: 1px solid var(--line); border-radius: 999px; overflow:hidden; }
-.map-fill { height: 100%; border-radius: 999px; display:flex; align-items:center; justify-content:flex-end; padding-right: 2.4mm; }
-.map-fill span { font-size: 7.4pt; font-weight:700; color: #fff; }
-.map-range { flex: 0 0 24mm; text-align:right; font-size: 8.2pt; font-weight:700; color: var(--ink-faint); }
+/* --- Kenar sekmesi / thumb index (DENEME) — SADECE birleşik kitap ---------
+   Dersin sırasına (--ti / --tn) göre sayfanın DIŞ kenarında dikey konumlanan
+   renkli bant. Renk dersin kendi --accent'idir (macro inline veriyor).
+   Fotokopi güvenli bölgede: kenardan (var(--bleed) + 3mm) içeride durur —
+   kapalı kitap kenarında görünmez ama açık sayfada / çevirirken ders
+   konumunu gösterir. Matbaa (--cmyk) kipinde --bleed büyüyünce kenara
+   yaklaşır. Dış boşlukta (12mm) durur, metin alanına girmez; footer sağ
+   alt köşede, bu bant ondan daha dışta -> çakışmaz. */
+.thumb-tab {
+  position: absolute;
+  right: calc(var(--bleed) + 2.5mm);
+  /* 11 ders -> sayfa boyunca eşit aralıklı, taşmayan merdiven */
+  top: calc(15mm + (var(--page-h) - 58mm) * (var(--ti) - 1) / (var(--tn) - 1));
+  width: 7.6mm; height: 23mm;
+  border: 1px solid rgba(255,255,255,0.92);   /* aynı renk içeriğin üstünde bile ayrışsın */
+  border-right: none;
+  border-radius: 3px 0 0 3px;
+  box-shadow: -1.5px 1.5px 4px rgba(0,0,0,0.22);
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+  z-index: 4;
+}
+.thumb-tab span {
+  writing-mode: vertical-rl;
+  font-family: "DejaVu Sans", "Liberation Sans", Arial, sans-serif;
+  font-size: 5pt; font-weight: 700; letter-spacing: 0;
+  text-transform: uppercase; white-space: nowrap;
+  color: #fff;
+}

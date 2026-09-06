@@ -28,6 +28,13 @@
 
 {% macro arrow_svg() %}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="19" y2="12"/><polyline points="13 6 19 12 13 18"/></svg>{% endmacro %}
 
+{# Kenar sekmesi (thumb index) — SADECE birleşik kitapta çağrılır (tab != None).
+   tab: {i, n, accent, accent_dark}. Dersin sırasına (i/n) göre sayfanın dış
+   kenarında dikey konumlanır; bkz. style.css .thumb-tab (DENEME). #}
+{% macro thumb_tab(tab) %}
+{%- if tab and tab.n > 1 %}<div class="thumb-tab" style="--ti:{{ tab.i }};--tn:{{ tab.n }};background:linear-gradient(160deg,{{ tab.accent_dark }},{{ tab.accent }});"><span>{{ tab.label }}</span></div>{% endif %}
+{%- endmacro %}
+
 {% macro render_terms(terms) %}
 <div class="terms-grid">
   {% for t in terms %}
@@ -223,7 +230,7 @@
 </div>
 {% endmacro %}
 
-{% macro course(pack, ctx) %}
+{% macro course(pack, ctx, tab=None) %}
 {# ============================================================
    1. KAPAK
    ============================================================ #}
@@ -271,6 +278,7 @@
 {% set toc_pageno = namespace(n=ctx.page_starts["toc"]) %}
 {% for trows in ctx.toc_pages %}
 <section class="page body-page{{ ctx.pagecls }}">
+  {{ thumb_tab(tab) }}
   <div class="pageband"><div>{{ pack.title }}</div><div class="pageband-course">{{ pack.course_code }}</div></div>
   <div class="toc-kicker">Kitap Planı</div>
   <div class="toc-title">İçindekiler</div>
@@ -303,6 +311,7 @@
    bölümü tekrar ikiye ayırın.)
    ============================================================ #}
 <section class="page body-page{{ ctx.pagecls }}">
+  {{ thumb_tab(tab) }}
   <div class="pageband"><div>{{ pack.title }}</div><div class="pageband-course">{{ pack.course_code }}</div></div>
   <div class="toc-kicker">Dersin Büyük Resmi</div>
   <div class="toc-title">Genel Bakış</div>
@@ -349,6 +358,7 @@
      buradan okur). Yorum düğümlerinin ve data-* niteliklerinin render'a
      hiçbir etkisi yoktur; sayfa dengeleme yaparken silmeyin. #}
   <section class="page body-page{{ ctx.pagecls }}" data-ch="{{ ch.number }}" data-cp="{{ loop.index0 }}"{% if loop.first %} id="{{ ctx.prefix }}ch-{{ ch.number }}"{% endif %}>
+    {{ thumb_tab(tab) }}
     <div class="pageband"><div>{{ pack.title }}</div><div class="pageband-course">Bölüm {{ ch.number }}</div></div>
 
     {% if loop.first %}
@@ -373,6 +383,7 @@
 {% set gloss_pageno = namespace(n=ctx.page_starts["glossary"]) %}
 {% for gpage in ctx.glossary_pages %}
 <section class="page body-page{{ ctx.pagecls }}"{% if loop.first %} id="{{ ctx.prefix }}glossary"{% endif %}>
+  {{ thumb_tab(tab) }}
   <div class="pageband"><div>{{ pack.title }}</div><div class="pageband-course">Genel Tekrar</div></div>
   {% if loop.first %}
     <div class="section-kicker">Genel Tekrar</div>
@@ -411,6 +422,7 @@
 {% set test_pageno = namespace(n=ctx.page_starts["test"]) %}
 {% for tpage in ctx.test_pages %}
 <section class="page body-page{{ ctx.pagecls }}"{% if loop.first %} id="{{ ctx.prefix }}exam"{% endif %}>
+  {{ thumb_tab(tab) }}
   <div class="pageband"><div>{{ pack.title }}</div><div class="pageband-course">{{ "Sınav" if loop.first else "Test · Devam" }}</div></div>
   {% if loop.first %}
     <div class="section-kicker">Sınav</div>
@@ -436,6 +448,7 @@
 {% set answer_pageno = namespace(n=ctx.page_starts["answer_key"]) %}
 {% for apage in ctx.answer_pages %}
 <section class="page body-page{{ ctx.pagecls }}"{% if loop.first %} id="{{ ctx.prefix }}answer-key"{% endif %}>
+  {{ thumb_tab(tab) }}
   <div class="pageband"><div>{{ pack.title }}</div><div class="pageband-course">{{ "Cevap Anahtarı" if loop.first else "Çözümler · Devam" }}</div></div>
   {% if loop.first %}
     <div class="section-kicker">Çözümler</div>
@@ -459,6 +472,7 @@
    ============================================================ #}
 {% set exam_pageno = namespace(n=ctx.page_starts["exam"]) %}
 <section class="page body-page{{ ctx.pagecls }}" id="{{ ctx.prefix }}exam">
+  {{ thumb_tab(tab) }}
   <div class="pageband"><div>{{ pack.title }}</div><div class="pageband-course">{{ pack.sinav_etiketi }} Tekrarı</div></div>
   <div class="section-kicker">{{ pack.sinav_etiketi }} Tekrarı</div>
   <div class="section-title">Sınav Hazırlık</div>
@@ -495,6 +509,7 @@
 {# Fazladan distinctions sayfaları (nadiren gerekir; veri kaybını önler) #}
 {% for dpage in ctx.distinctions_pages[1:] %}
 <section class="page body-page{{ ctx.pagecls }}">
+  {{ thumb_tab(tab) }}
   <div class="pageband"><div>{{ pack.title }}</div><div class="pageband-course">{{ pack.sinav_etiketi }} Tekrarı</div></div>
   <div class="chcontinue"><div class="tag">Sınav Hazırlık · Devam</div><div class="cctitle">Karıştırılan Ayrımlar (devamı)</div></div>
   <div class="dist-grid">
@@ -513,6 +528,7 @@
 {# Fazladan eşleştirme tablosu sayfaları (nadiren gerekir; veri kaybını önler) #}
 {% for mpage in ctx.matchtable_pages[1:] %}
 <section class="page body-page{{ ctx.pagecls }}">
+  {{ thumb_tab(tab) }}
   <div class="pageband"><div>{{ pack.title }}</div><div class="pageband-course">{{ pack.sinav_etiketi }} Tekrarı</div></div>
   <div class="chcontinue"><div class="tag">Sınav Hazırlık · Devam</div><div class="cctitle">Eşleştirme Tablosu (devamı)</div></div>
   <div class="match-table-wrap">
@@ -534,6 +550,7 @@
 {% for qpage in ctx.qa_pages %}
 {% if qpage %}
 <section class="page body-page{{ ctx.pagecls }}">
+  {{ thumb_tab(tab) }}
   <div class="pageband"><div>{{ pack.title }}</div><div class="pageband-course">{{ pack.sinav_etiketi }} Tekrarı</div></div>
   <div class="chcontinue"><div class="tag">Sınav Hazırlık · Devam</div><div class="cctitle">Hızlı Soru-Cevap</div></div>
   <div class="qa-grid">

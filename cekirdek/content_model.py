@@ -293,8 +293,8 @@ class BookPack:
     guide_lede: str = ""
     guide_note: str = ""
     toc_lede: str = ""
-    map_lede: str = ""
-    map_note: str = ""
+    # NOT: map_lede / map_note (Ders Haritası sayfası) 2026-09'da kaldırıldı —
+    # dersin sayfa aralığı zaten Ana İçindekiler satırında yazıyor.
 
     def course_count(self) -> int:
         return len(self.course_modules)

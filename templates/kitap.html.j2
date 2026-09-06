@@ -25,7 +25,7 @@
 {{ on.front_matter(book, courses, fm) }}
 
 {% for c in courses %}
-{{ ders.course(c.pack, c.ctx) }}
+{{ ders.course(c.pack, c.ctx, tab={"i": c.index, "n": courses|length, "accent": c.accent, "accent_dark": c.accent_dark, "label": c.pack.course_code or c.plain_title}) }}
 {% endfor %}
 
 </body>

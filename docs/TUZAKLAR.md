@@ -117,8 +117,9 @@ Bunlar `templates/style.css` içinde zaten düzeltilmiş durumda — sadece
     ders sayısından ÖNCE hesaplanabilir olmak zorundadır (ana içindekiler kaç
     sayfa tutacak → dersler nereden başlayacak). Ön kısma yeni bir sayfa
     eklersen `FRONT_FIXED_PAGES` sabitini de artır; unutursan `build_front_matter()`
-    içindeki assert derhal patlar (harita sayfası ile toplam uyuşmaz) — bu
-    kasıtlıdır, sessiz kaymaya izin verme.
+    içindeki assert derhal patlar (son içindekiler sayfası ile toplam uyuşmaz) —
+    bu kasıtlıdır, sessiz kaymaya izin verme. (Ön kısım 2026-09'da 8→5 sayfaya
+    indi: Sayfa Rehberi 2→1, Ana İçindekiler 2→1, Ders Haritası tamamen kaldırıldı.)
 
 13. **Ghostscript'te `-dPDFX` PDF/X-3 kipidir, PDF/X-4 değil**: bu bayrak
     `CompatibilityLevel`'ı zorla 1.3'e çeker ve saydamlığı düzleştirir.

@@ -113,12 +113,23 @@ oluyorsa o dersin hue'sunu birkaç derece kaydırmayı deneyin.
   CSS amblem/başlık/istatistik düzeni yerine `.cover.image-cover` devreye
   girer: görsel A4 oranında (210×297) hazırlanmış olmalı, `object-fit:cover`
   ile tam sayfayı kaplar, bleed yoktur (fotokopide koyu zeminde ~5mm beyaz
-  kenar normaldir). **Künye, önsöz, rehber, ana içindekiler ve ders haritası
+  kenar normaldir). **Künye, önsöz, rehber ve ana içindekiler
   sayfaları bundan hiç etkilenmez**; kapak yine tek sayfadır, sayfa offset'i
   ve yer imleri değişmez. Kapaktaki dinamik istatistik çubuğu (X ders · Y
   kavram · Z soru · toplam sayfa) görselde gösterilemez — bu sayım künye
   sayfasında zaten vardır. Tek ders PDF'lerinin kapağı HER ZAMAN CSS ile
   çizilir; görsel kapak yalnızca birleşik kitaba özgüdür.
+- **Birleşik kitapta her dersin gövde sayfalarında KENAR SEKMESİ (thumb index)
+  vardır** (`.thumb-tab`, `_ders_govde.html.j2` içindeki `thumb_tab()` makrosu —
+  yalnızca `course()` makrosuna `tab` verildiğinde, yani kitap derlemesinde
+  çizilir; tek ders PDF'inde YOK). Dersin sırasına göre (`--ti`/`--tn`) sayfanın
+  dış kenarında dikey konumlanır; renk dersin `--accent`'i, üstünde dikey yazılı
+  `course_code`. Kenardan **2,5 mm içeride** durur (fotokopi makinesi kenardan
+  ~5 mm basamaz) — kapalı kitap sırtında merdiven görünmez, açık sayfada/çevirirken
+  ders konumunu verir. Bilerek "sıfır yaslı" YAPILMADI: matbaa bleed'i olmayan
+  bir çıktıda kenara sıfır sekme kırpılır (kullanıcı kararı, 2026-09). 11 derste
+  ölçüldü; sekme yüksekliği/font'u o sınıra göre kalibre (`docs/OLCUMLER.md`
+  mantığı) — elle büyütme.
 - **SAYFA ARKA PLANI DÜZDÜR — nokta deseni/doku YOKTUR.** Hem kapakta hem iç
   sayfalarda (içindekiler, genel bakış, bölümler, sözlük, test, cevap
   anahtarı) eskiden düşük opaklıklı bir nokta matrisi (`.body-page::before`

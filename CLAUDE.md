@@ -634,20 +634,23 @@ python build_kitap.py --sinif X --donem Y --sinav Z
 COURSE_MODULES = ["tefsir2", ..., "yeni_ders"]
 ```
 
-Başka hiçbir yeri elle güncellemek gerekmez — sayfa numaraları, ana içindekiler, ders
-haritası, kapak istatistikleri, yer imleri hepsi hesaplanır.
+Başka hiçbir yeri elle güncellemek gerekmez — sayfa numaraları, ana içindekiler,
+kapak istatistikleri, yer imleri hepsi hesaplanır.
 
 ### Yapısı ve denetimleri
 
 | Bölüm | İçerik |
 |---|---|
-| Ön kısım | Ana kapak · Künye · Nasıl Kullanılır · Sayfa Rehberi · Ana İçindekiler · Ders Haritası |
+| Ön kısım | Ana kapak · Künye · Nasıl Kullanılır · Sayfa Rehberi · Ana İçindekiler |
 | Gövde | Her ders, tek ders PDF'iyle BİREBİR aynı sayfalarla |
 
-Ön kısım 11 derse kadar 6, 12+ derste 7 sayfadır (`front_matter_page_count()` — ilk
-dersin sayfa offset'i buna bağlı). Kitabın kendi metinleri (kapak başlığı, künye,
-önsöz, rehber) `src/kitap.py`'deki `BookPack` alanlarındadır; ders içeriğiyle
-karıştırma.
+Ön kısım **5 sayfadır** (kapak · künye · önsöz · rehber · ana içindekiler);
+11'den fazla ders olursa ana içindekiler dengeli biçimde ikinci sayfaya bölünür
+ve ön kısım 6 sayfa olur (`front_matter_page_count()` — ilk dersin sayfa
+offset'i buna bağlı).
+Kitabın kendi metinleri (kapak başlığı, künye, önsöz, rehber) `src/kitap.py`'deki
+`BookPack` alanlarındadır; ders içeriğiyle karıştırma. Kapak isteğe bağlı olarak
+tam sayfa görsel olabilir (`BookPack.cover_image` — bkz. `docs/TASARIM.md`).
 
 Mimari: `_ders_govde.html.j2` TEK KAYNAKTIR; `master.html.j2` (tek ders) ve
 `kitap.html.j2` (kitap) onu ortak kullanır — "tek derste doğru, kitapta yanlış numara"

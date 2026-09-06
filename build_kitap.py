@@ -40,7 +40,7 @@ her derse bir SAYFA OFFSET'i verilmesidir:
 Bu sayede alt bilgideki numara, dersin kendi İçindekiler'indeki "s.12"
 referansı ve ana içindekiler kitap boyunca AYNI kesintisiz numarayı gösterir.
 Derslerin offset'i, kitabın ön kısmı (kapak/künye/önsöz/rehber/ana
-içindekiler/ders haritası) kadar kaydırılmış olarak başlar.
+içindekiler) kadar kaydırılmış olarak başlar.
 """
 
 import sys
@@ -61,15 +61,18 @@ from cekirdek.theme_engine import resolve_theme_css, generate_theme_vars_from_he
 
 
 # --- Ön kısım sayfa düzeni ---------------------------------------------------
-# 175x250mm'de "Sayfa Rehberi" 8 örneğiyle tek sayfaya sığmıyor (ölçüldü:
-# ~274mm / 215mm), bu yüzden 4+4 olarak iki sayfaya bölündü.
-FRONT_FIXED_PAGES = 5      # ana kapak + künye + önsöz + sayfa rehberi (2 sayfa)
-TOC_PER_PAGE = 10          # ana içindekilerde sayfa başına ders satırı
-                           # (satır yüksekliği sabit değil: alt başlığı iki
-                           #  satıra saran dersler ~15mm yerine ~22mm tutuyor.
-                           #  11'de ölçüldü -> 11 derslik tek sayfa ~3mm taştı;
-                           #  10'da hepsi sığıyor. Artırmadan önce mutlaka
-                           #  build_kitap.py taşma çıktısını okuyun.)
+# 210x297mm sayfada (metin alanı 186x270mm) "Sayfa Rehberi" 8 örneğiyle TEK
+# sayfaya sığar; eski 175x250mm'de sığmayıp 4+4 bölünüyordu (2026-09 birleşti).
+# "Ders Haritası" sayfası da kaldırıldı: dersin sayfa aralığı/sayısı zaten Ana
+# İçindekiler satırında yazıyor.
+FRONT_FIXED_PAGES = 4      # ana kapak + künye + önsöz + sayfa rehberi (1 sayfa)
+TOC_PER_PAGE = 11          # ana içindekilerde sayfa başına ders satırı. 11 ders
+                           #  210x297mm sayfayı DOLU ama taşmadan dolduruyor
+                           #  (ölçüldü). 12+ derste liste otomatik dengeli iki
+                           #  sayfaya bölünür (toc_chunks: 12 -> 6+6). Satır
+                           #  yüksekliği sabit değil (3 satıra saran ders adı
+                           #  ~26mm, tek satırlık ~18mm); artırmadan önce mutlaka
+                           #  build_kitap.py taşma çıktısını okuyun.
 
 
 def toc_chunks(courses: list) -> list[list]:
@@ -84,16 +87,16 @@ def toc_chunks(courses: list) -> list[list]:
 
 def front_matter_page_count(n_courses: int) -> int:
     """Derslerin offset'i buna bağlı olduğu için ders sayısından ÖNCE
-    hesaplanabilir olmalı: sabit sayfalar + içindekiler + ders haritası."""
+    hesaplanabilir olmalı: sabit sayfalar + ana içindekiler sayfaları."""
     pages = max(1, -(-n_courses // TOC_PER_PAGE))
-    return FRONT_FIXED_PAGES + pages + 1
+    return FRONT_FIXED_PAGES + pages
 
 
 def theme_accents_from_css(css: str) -> dict:
     """style.css'teki sabit .theme-XXXX bloklarından --accent/--accent-dark
-    okur. LEGACY derslerin (theme_color'ı olmayan) rengi ana içindekiler ve
-    ders haritası için gerekir; renk değerini Python'a elle kopyalamak yerine
-    TEK kaynaktan (style.css) okuyoruz."""
+    okur. LEGACY derslerin (theme_color'ı olmayan) rengi ana içindekiler
+    satır çipi/rozeti için gerekir; renk değerini Python'a elle kopyalamak
+    yerine TEK kaynaktan (style.css) okuyoruz."""
     import re
     out = {}
     for m in re.finditer(r"\.theme-([a-z]+)\s*\{(.*?)\}", css, re.S):
@@ -144,10 +147,6 @@ def collect_courses(book, offset: int = 0, css: str = "") -> list[dict]:
         })
         offset += ctx["page_starts"]["total"]
 
-    # ders haritasındaki çubuk uzunlukları (en uzun ders = %100)
-    longest = max((c["page_count"] for c in courses), default=1)
-    for c in courses:
-        c["bar_pct"] = round(c["page_count"] / longest * 100, 1)
     return courses
 
 
@@ -157,8 +156,8 @@ def build_front_matter(book, courses: list[dict], fm_pages: int) -> dict:
     chunks = toc_chunks(courses)
     fm = {
         "cover": 1, "imprint": 2, "preface": 3, "guide": 4,
-        # rehber FRONT_FIXED_PAGES-3 sayfa tutar (şu an 2: s.4 ve s.5)
-        "toc": FRONT_FIXED_PAGES + 1, "map": FRONT_FIXED_PAGES + 1 + len(chunks),
+        # rehber tek sayfa (s.4); ana içindekiler s.5'ten başlar
+        "toc": FRONT_FIXED_PAGES + 1,
         "toc_chunks": chunks,
         "total": fm_pages,
         "stats": {
@@ -169,8 +168,10 @@ def build_front_matter(book, courses: list[dict], fm_pages: int) -> dict:
             "pages": fm_pages + sum(c["page_count"] for c in courses),
         },
     }
-    assert fm["map"] == fm_pages, (
-        f"Ön kısım sayfa hesabı tutarsız: harita s.{fm['map']}, toplam {fm_pages}")
+    last_front = FRONT_FIXED_PAGES + len(chunks)
+    assert last_front == fm_pages, (
+        f"Ön kısım sayfa hesabı tutarsız: son içindekiler s.{last_front}, "
+        f"toplam {fm_pages}")
     return fm
 
 
@@ -183,8 +184,7 @@ def add_book_bookmarks(pdf_path: Path, courses: list[dict], fm: dict):
     writer.append(reader)
     total = 0
     for label, key in [("Künye", "imprint"), ("Bu Kitap Nasıl Kullanılır", "preface"),
-                       ("Sayfa Rehberi", "guide"), ("Ana İçindekiler", "toc"),
-                       ("Ders Haritası", "map")]:
+                       ("Sayfa Rehberi", "guide"), ("Ana İçindekiler", "toc")]:
         writer.add_outline_item(label, fm[key] - 1)
         total += 1
     for c in courses:
@@ -273,7 +273,7 @@ def build_book(module_name: str = "kitap", d: "donem_mod.Donem | None" = None):
 
     print(f"[kitap] Ön kısım {fm_pages} sayfa (kapak s.1, künye s.{fm['imprint']}, "
           f"önsöz s.{fm['preface']}, rehber s.{fm['guide']}, "
-          f"içindekiler s.{fm['toc']}, harita s.{fm['map']})")
+          f"içindekiler s.{fm['toc']})")
     print(f"[kitap] {len(courses)} ders birleştiriliyor:")
     for c in courses:
         print(f"    {c['index']:2d}. {B.strip_tags(c['pack'].title):42s} "
