@@ -79,6 +79,12 @@ alanından okunur. Aynı kural `ders-anlatim` skill'inin çıktı klasörleri i�
 geçerlidir. Tek istisna birleşik kitaptır: tek bir derse ait olmadığı için
 `gorsel_ders_notlari/` **köküne** yazılır.
 
+Dönem boyunca ders haftalık işlenir ve `<DERS ADI>/` altında `NN-hafta/` alt
+klasörleri birikir; ham haftalık materyal `ders_kaynaklari/<DERS ADI>/NN-hafta/`,
+haftalık kısa özet `özetlenmiş_dersler/<DERS ADI>/NN-hafta/` altına konur. Sınav
+özeti ve görsel ders notu üretilirken **kitap ana kaynak**, haftalık özetler kapsam
+süzgeci + hoca vurgusu katmanıdır. Ayrıntı: "Haftalık ders akışı" bölümü.
+
 ## KRİTİK KURAL 4: İçindekiler TEK SAYFADIR
 
 Ders kaç bölümlü olursa olsun İçindekiler ASLA ikinci sayfaya taşmaz.
@@ -217,6 +223,74 @@ paketi bulunamaz. Veri şeması hep `from cekirdek.content_model import ...` ile
 
 ---
 
+## Haftalık ders akışı (dönem boyunca biriken katman)
+
+Her ders haftada bir işlenir. Kullanıcı, o hafta işlenen dersin materyalini —
+**işlenen kitap bölümü/sayfaları VE kendi ders notları (foto/metin) birlikte** —
+haftalık olarak yükler. Bu, dönem başındaki müfredat paketinin ve (belliyse) tam
+kitabın **üstüne** biriken bir katmandır; onların yerine geçmez.
+
+### Haftalık materyal nereye konur
+
+Kullanıcı "1. hafta", "bu hafta" vb. diyerek dosya verdiğinde:
+
+```
+<D>/kaynaklar/ders_kaynaklari/<DERS ADI>/
+├── <ders> MÜFREDAT BİLGİ PAKETİ.pdf      # dönem başı (varsa)
+├── <tam kitap ...>.pdf                    # kitap belli olunca (varsa)
+├── 01-hafta/                              # o haftanın ham materyali
+│   ├── kitap/    → işlenen bölüm / sayfalar
+│   └── notlar/   → kullanıcının kendi ders notları
+├── 02-hafta/
+└── ...
+```
+
+- Klasör adı **`NN-hafta`** — iki haneli, sıfır dolgulu (`01`..`14`) ki dosya sistemi
+  doğru sıralasın. Klasör yoksa sen aç.
+- `kitap/` ve `notlar/` alt ayrımı **önerilir ama zorunlu değil**; kullanıcı karışık
+  attıysa tek klasörde bırak, içerikten ayırt et.
+- Bir dersin haftalık materyalini **başka dersin veya başka haftanın** klasörüne KOYMA.
+- Hangi hafta olduğu belirsizse SOR; tahminle numaralandırma. Aynı hafta klasörüne
+  sonradan ek dosya gelebilir (üstüne yaz değil, yanına ekle).
+
+### Her hafta yüklemesinden sonra: kısa haftalık özet
+
+`<D>/kaynaklar/özetlenmiş_dersler/<DERS ADI>/NN-hafta/<slug>-NN-hafta-ozet.md`
+(kullanıcı isterse ayrıca `.pdf` — `tools`'ta değil, basit md→pdf).
+
+Bu haftalık özet **kitabı yeniden anlatmaz** (o iş sınav özetinde yapılır). Hafif,
+tarayıcı üslupta, 1–2 sayfa. Şunları YAKALAR:
+
+1. **Kapsam kaydı:** O hafta kitabın hangi bölümü / hangi konu başlıkları işlendi
+   (mümkünse sayfa aralığıyla). Atlanan/hızlı geçilen yerleri de yaz.
+2. **Hocanın vurgusu:** Derste özellikle üstünde durulan noktalar.
+3. **Derste geçen ek bilgi ve örnekler:** Kitapta OLMAYIP hocanın anlattığı örnek,
+   açıklama, güncel bağlantı, fıkra.
+4. **Sınav sinyalleri:** "Bu çıkar", "not alın", "önemli" gibi açık işaretler.
+5. **Kullanıcının kendi notlarındaki** kavram, soru, karışıklık.
+
+Materyal gelmeyen haftayı ATLA; eksikliği ilgili sınav özeti hazırlanırken belirt.
+Haftalık özette de içerik UYDURMA — yalnızca yüklenen materyalde olan.
+
+### Sınav (vize/final) özeti ve görsel ders notu — haftalık loglarla
+
+Sınav zamanı geldiğinde (KRİTİK KURAL 2: dönem/hafta kapsamı yine SORULUR):
+
+- **ANA KAYNAK = kitabın ilgili bölümleri.** Bütünlüklü, yapısal içerik ve görsel
+  ders notunun bölüm iskeleti oradan gelir.
+- **HAFTALIK ÖZETLER iki işi görür:**
+  - **Kapsam süzgeci:** Sınav özetine SADECE haftalık loglarda "işlendi" diye geçen
+    bölümleri al. Kitapta olup derste işlenmeyen kısmı DAHİL ETME.
+  - **Vurgu / zenginleştirme katmanı:** Hocanın vurguladığı yerleri öne çıkar; derste
+    verilen örnek ve ek bilgileri ilgili bölüme göm; sınav sinyallerini `Callout`
+    (`focus`) veya özel not olarak işaretle.
+- "Kitabı mı özetleyeyim, haftalık özetleri mi derleyeyim" diye SEÇİM YOK — **kitabı
+  özetle, haftalık loglarla kapsamı daralt ve zenginleştir.**
+- Kitap hiç yüklenmediyse: mecburen haftalık özetlerin birleşimi + müfredat iskeleti
+  ile üret, ama kullanıcıya "kitap gelince baştan üretilecek" olduğunu bildir.
+
+---
+
 ## Uçtan uca iş akışı
 
 ### 0. Dönemi belirle, sonra kaynağı bul
@@ -242,6 +316,12 @@ Ders adıyla eşleşen (esnek eşleştir — büyük/küçük harf, Türkçe kar
 **başka dönemlere BAKMA** (yanlış dönemin kaynağını kullanmak sessiz bir hatadır);
 kullanıcıdan PDF'i eklemesini ya da doğru dönemin `kaynaklar/ders_kaynaklari/`
 klasörüne koymasını iste.
+
+Dersin `<DERS ADI>/` klasöründe **`NN-hafta/` alt klasörleri** varsa: haftalık
+akış işliyor demektir (bkz. "Haftalık ders akışı"). Sınav özeti / görsel ders notu
+üretirken bunları kapsam süzgeci + vurgu katmanı olarak kullan; kitabı ana kaynak al.
+Kullanıcı sadece "bu haftayı işle / haftalık özet çıkar" diyorsa yeni `NN-hafta/`
+klasörüne kaydet, sınav üretimine GEÇME.
 
 İşlenen bir dersin kaynağını bu klasörden SİLME — revizyon istenebilir.
 
@@ -493,6 +573,10 @@ from cekirdek.content_model import (
   `add_block_gorsel(BulletBlock, baslik="")`, `add_summary(text)`.
   `continue_tag` artık **render EDİLMEZ** ("N. Bölüm · Devam" rozeti kaldırıldı) —
   vermek ZORUNLU DEĞİL, sadece geriye dönük uyumluluk için kabul ediliyor.
+  **`add_summary(text)` içinde `<b>` KULLANMA:** özet kutusu bold'u blok seviyeli,
+  büyük harfli bir "anahtar kelime çipi" olarak render eder ve cümleyi satır satır
+  böler. Özet düz metin yazılır. (`<b>` yalnızca `Callout.text`, `BulletBlock`
+  maddeleri ve `AnswerItem.explanation` içinde güvenli.)
 
 - **`Chapter(number, title, subtitle, pages=[], key_terms=[])`** — `pages` listesine
   `ChapterPage` nesnelerini sırayla ekle. `key_terms` hem ilk sayfadaki 4'lü kutunun
@@ -727,6 +811,9 @@ for it in r.outline: print(it.title, '->', r.get_destination_page_number(it)+1)
 - [ ] Kaynak eklenmediyse o dönemin `kaynaklar/` klasörlerinde ders adıyla eşleşen
       dosyayı aradım (yoksa kullanıcıdan istedim — başka döneme BAKMADIM)
 - [ ] Ham metni tamamen okudum (atlamadım)
+- [ ] `NN-hafta/` klasörleri varsa: haftalık özetleri okudum, kapsam süzgeci olarak
+      SADECE işlenen bölümleri aldım, hocanın vurgu/örnek/sınav sinyallerini içine
+      gömdüm; kitap ana kaynak kaldı
 - [ ] 5-7 bölüme, ham içeriğin doğal yapısını takip ederek ayırdım
 - [ ] Rengi `cekirdek/renk_uretici.py` tablosundan aldım (kendim seçmedim), tek harfli
       Latin `icon_text` verdim
