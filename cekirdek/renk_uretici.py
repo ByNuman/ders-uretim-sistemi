@@ -144,6 +144,15 @@ DERS_RENKLERI = {
     "ISLAMHUKUKUSULU":          "#7A2433",  # (ayni aile: fikih usulu)
     # --- Kalp -------------------------------------------------------------
     "TASAVVUF":                 "#7B3260",  # gul / erik           H322
+    # Turk Mutasavviflar (alan disi secmeli, IADS309): Tasavvuf ailesinden
+    # AYRI bir ders -- konusu evliya menakibi (Yesevi, Yunus Emre, Haci Bayram,
+    # Aksemseddin ...). Rengi "gul" degil "velayet" ekseninde: yesil, Hizir'in
+    # (el-Hadir, "yesil olan") ve evliya hirkasinin/sarigin rengi; menakibname
+    # gelenegi Hizir karsilasmalariyla doludur. Zumrut yesili H129 -- mushaf
+    # yesili (Tefsir H150, ~21 derece), Porphyrios yesili (Mantik H112,
+    # farkli sinif) ve zeytin (Din Egitimi H82) disinda kendi tonu.
+    "TURKMUTASAVVIFLAR":        "#24702F",  # zumrut / velayet     H129
+    "TURKMUTASAVVIFLARI":       "#24702F",  # (programdaki "Turk Mutasavviflari" yazimi)
     # --- Tarih ------------------------------------------------------------
     "ISLAMMEDENIYETITARIHI":    "#776931",  # bronz / altin cag    H48
     "ISLAMMEZHEPLERITARIHI":    "#776931",  # (ayni ruh, farkli donem)
