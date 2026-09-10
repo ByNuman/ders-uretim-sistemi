@@ -240,7 +240,7 @@
   <div class="cover-corner bl"></div>
   <div class="cover-corner br"></div>
   <div class="cover-top">
-    <div class="cover-kicker">Görsel Ders Notu Kitabı · {{ pack.sinav_etiketi }} Özeti</div>
+    <div class="cover-kicker">Ders Notu Kitabı · {{ pack.sinav_etiketi }} Özeti</div>
     <div class="cover-emblem">
       <div class="ring-outer"></div>
       <div class="ring-mid"></div>
@@ -414,11 +414,6 @@
    ============================================================ #}
 {% if pack.test_questions %}
 
-{% set tchips = [
-  (pack.test_questions|length, "Soru"),
-  ("Çoktan", "Seçmeli"),
-  ("5", "Seçenek (A-E)"),
-] %}
 {% set test_pageno = namespace(n=ctx.page_starts["test"]) %}
 {% for tpage in ctx.test_pages %}
 <section class="page body-page{{ ctx.pagecls }}"{% if loop.first %} id="{{ ctx.prefix }}exam"{% endif %}>
@@ -426,16 +421,12 @@
   <div class="pageband"><div>{{ pack.title }}</div><div class="pageband-course">{{ "Sınav" if loop.first else "Test · Devam" }}</div></div>
   {% if loop.first %}
     <div class="section-kicker">Sınav</div>
-    <div class="section-title">{{ pack.test_title }}</div>
-    {% if pack.test_subtitle %}<div class="section-lede">{{ pack.test_subtitle }}</div>{% endif %}
-    <div class="test-chip-row">
-      {% for num, label in tchips %}
-      <div class="test-chip"><b>{{ num }}</b><span>{{ label }}</span></div>
-      {% endfor %}
+    <div class="section-title section-title--tight">{{ pack.test_title }}</div>
+    <div class="test-meta">
+      <b>{{ pack.test_questions|length }} soru</b> · çoktan seçmeli · 5 seçenek (A–E){% if pack.test_instructions %} · {{ pack.test_instructions }}{% endif %}
     </div>
-    {% if pack.test_instructions %}<div class="test-instructions">{{ pack.test_instructions }}</div>{% endif %}
   {% else %}
-    <div class="chcontinue"><div class="tag">Test · Devam</div><div class="cctitle">{{ pack.test_title }}</div></div>
+    <div class="chcontinue chcontinue--test"><div class="tag">Test · Devam</div></div>
   {% endif %}
   <div class="tq-list">
     {% for q in tpage %}{{ render_test_question(q) }}{% endfor %}

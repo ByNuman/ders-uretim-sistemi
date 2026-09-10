@@ -616,28 +616,29 @@ table.matchtable tr:nth-child(even) td { background: var(--accent-tint); }
 .section-lede { font-size: 9pt; color: var(--ink-soft); margin-top: 2.6mm; }
 
 /* ================= TEST (20 Soruluk Değerlendirme) ================= */
-.test-chip-row { display:flex; gap: 3.4mm; margin-top: 5.5mm; }
-.test-chip {
-  flex:1; text-align:center; background: var(--accent-tint); border: 1px solid var(--line);
-  border-radius: 8px; padding: 3mm 2mm;
+/* 2026-09: sınav bölümü 3 -> 2 sayfaya indirildi. İlk sayfanın başlık bloğu
+   (H1 + 3 kutulu bilgi çubuğu + ayrı talimat kutusu, ~58mm) tek ince şeride
+   (~16mm) toplandı; soru aralıkları ölçülerek sıkıştırıldı. Kapasite sabitleri
+   build.py'de bu CSS'e göre tools/kalibre.py ile yeniden ölçüldü. */
+.section-title--tight { font-size: 15pt; margin-top: 1.4mm; }
+.test-meta {
+  margin-top: 2.4mm; padding: 2mm 3.4mm; background: var(--accent-tint);
+  border: 1px solid var(--line); border-radius: 7px;
+  font-size: 8pt; line-height: 1.45; color: var(--ink-soft);
 }
-.test-chip b { display:block; font-family:"DejaVu Serif",serif; font-size: 12.5pt; color: var(--accent-dark); }
-.test-chip span { font-size: 7pt; font-weight:700; letter-spacing:.4px; text-transform:uppercase; color: var(--ink-faint); }
-.test-instructions {
-  margin-top: 4mm; background: var(--caution-bg); border: 1px solid #b9cdf2; color: var(--caution-ink);
-  border-radius: 8px; padding: 3mm 4mm; font-size: 8.4pt; line-height:1.5;
-}
-.tq-list { margin-top: 6mm; column-count: 2; column-gap: 8mm; column-fill: balance; }
-.tq { break-inside: avoid; -webkit-column-break-inside: avoid; margin-bottom: 5.5mm; }
-.tq-head { display:flex; align-items:flex-start; gap: 2.8mm; margin-bottom: 2.2mm; }
+.test-meta b { color: var(--accent-dark); }
+.chcontinue--test { margin-bottom: 2.5mm; }
+.tq-list { margin-top: 2.4mm; column-count: 2; column-gap: 8mm; column-fill: balance; }
+.tq { break-inside: avoid; -webkit-column-break-inside: avoid; margin-bottom: 2.5mm; }
+.tq-head { display:flex; align-items:flex-start; gap: 2.8mm; margin-bottom: 1.2mm; }
 .tq-num {
   flex:0 0 auto; width: 6.4mm; height:6.4mm; border-radius:6px;
   background: var(--accent-dark); color:#fff; font-size: 8.4pt; font-weight:700;
   display:flex; align-items:center; justify-content:center; box-shadow: var(--shadow-sm); font-family:"DejaVu Serif",serif;
 }
-.tq-stem { font-size: 9.1pt; font-weight:700; color: var(--ink); line-height:1.4; padding-top:0.4mm; }
-.tq-options { margin-left: 9.2mm; display:flex; flex-direction:column; gap: 1.6mm; }
-.tq-options li { list-style:none; display:flex; gap: 2.4mm; align-items:flex-start; font-size: 8.6pt; color: var(--ink-soft); line-height:1.4; }
+.tq-stem { font-size: 9.1pt; font-weight:700; color: var(--ink); line-height:1.33; padding-top:0.4mm; }
+.tq-options { margin-left: 9.2mm; display:flex; flex-direction:column; gap: 0.95mm; }
+.tq-options li { list-style:none; display:flex; gap: 2.4mm; align-items:flex-start; font-size: 8.6pt; color: var(--ink-soft); line-height:1.33; }
 .opt-letter {
   flex:0 0 auto; width:4.6mm; height:4.6mm; border-radius:50%; border: 1.3px solid var(--accent);
   color: var(--accent-dark); font-size: 6.8pt; font-weight:700;
@@ -744,14 +745,15 @@ table.matchtable tr:nth-child(even) td { background: var(--accent-tint); }
 /* --- Kenar sekmesi / thumb index (DENEME) — SADECE birleşik kitap ---------
    Dersin sırasına (--ti / --tn) göre sayfanın DIŞ kenarında dikey konumlanan
    renkli bant. Renk dersin kendi --accent'idir (macro inline veriyor).
-   Fotokopi güvenli bölgede: kenardan (var(--bleed) + 3mm) içeride durur —
-   kapalı kitap kenarında görünmez ama açık sayfada / çevirirken ders
-   konumunu gösterir. Matbaa (--cmyk) kipinde --bleed büyüyünce kenara
-   yaklaşır. Dış boşlukta (12mm) durur, metin alanına girmez; footer sağ
-   alt köşede, bu bant ondan daha dışta -> çakışmaz. */
+   2026-09 (kullanıcı isteği): kenara SIFIR yaslı — bant bitmiş sayfa kenarına
+   (trim = var(--bleed)) dayanır, iç boşluk yok. Kapalı kitapta yandan
+   görünür bir başlık merdiveni oluşturur. UYARI: fotokopi makineleri kâğıt
+   kenarından ~5mm basamaz; sıfır yaslı bant fotokopide kırpılabilir/eksik
+   çıkabilir. Matbaada (kenardan taşan bleed ile) sorun olmaz. Dış boşlukta
+   (12mm) durur, metin alanına girmez; footer'la çakışmaz. */
 .thumb-tab {
   position: absolute;
-  right: calc(var(--bleed) + 2.5mm);
+  right: var(--bleed);
   /* 11 ders -> sayfa boyunca eşit aralıklı, taşmayan merdiven */
   top: calc(15mm + (var(--page-h) - 58mm) * (var(--ti) - 1) / (var(--tn) - 1));
   width: 7.6mm; height: 23mm;

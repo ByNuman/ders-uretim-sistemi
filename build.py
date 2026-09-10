@@ -415,11 +415,16 @@ GLOSSARY_PER_PAGE = 22     # 2 sütun x 6 satır
 QA_PER_PAGE = 12            # LEGACY
 DISTINCTIONS_PER_PAGE = 8  # LEGACY
 MATCHTABLE_PER_PAGE = 11    # LEGACY
-TEST_PER_PAGE_FIRST = 7    # ilk test sayfasında bilgi çubuğu + talimat kutusu da var
-                           # (2026-08: kalibre.py'ye eklendi ve ilk kez ÖLÇÜLDÜ --
-                           #  elle konmuş 7 değeri A4'te de doğru çıktı; 8'de bazı
-                           #  derslerin uzun soru metinleri ilk sayfayı taşırıyor)
-TEST_PER_PAGE = 8          # devam sayfalarında (2 sütunlu düzen, 5 seçenekli MCQ)
+TEST_PER_PAGE_FIRST = 10   # 2026-09: sınav bölümü 3 -> 2 sayfaya indirildi (20 soru
+                           #  => 10+10). İlk sayfanın başlık bloğu (H1 + 3 kutulu
+                           #  bilgi çubuğu + ayrı talimat kutusu, ~58mm) tek ince
+                           #  .test-meta şeridine (~16mm) toplandı; devam sayfasının
+                           #  büyük başlık tekrarı kaldırıldı; .tq soru aralıkları
+                           #  ölçülerek sıkıştırıldı (style.css TEST bölümü).
+                           #  Not: 10/10, 19 dersin 17'sinde doğrudan sığdı; kelam_tarihi
+                           #  ve ogretim_ilke_yontem'de birkaç aşırı uzun şık metni
+                           #  kısaltıldı (CLAUDE.md: "sabiti değil metni kısalt").
+TEST_PER_PAGE = 10         # devam sayfalarında (2 sütunlu düzen, 5 seçenekli MCQ)
 ANSWER_PER_PAGE = 23       # sayfa başına çözümlü cevap (2 sütunlu düzen)
 
 # İÇİNDEKİLER HER ZAMAN TEK SAYFADIR (proje kuralı, bkz. CLAUDE.md).

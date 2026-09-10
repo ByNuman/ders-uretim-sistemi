@@ -128,6 +128,15 @@ iç 12 / dış 12 mm (simetrik), metin alanı 186 × 270 mm, gövde 9,6 pt. Matb
 RGB bırakır). Kenarları daha da daraltmayın: fotokopi makineleri kağıt kenarından
 ~5 mm basamaz. Ayrıntı ve gerekçe: `docs/OLCUMLER.md`.
 
+**Üretilen belgelerdeki ürün etiketi "Ders Notu"dur, "Görsel Ders Notu" DEĞİL**
+(2026-09-10 kullanıcı kararı). Ders kapağı kicker'ı "Ders Notu Kitabı · <Sınav> Özeti",
+birleşik kitap kicker'ı "Ders Notu Kitabı · Dönem Cildi" yazar. Sistemin/komutun/
+skill'in adı ("görsel ders notu üretim sistemi", "görsel ders notu oluştur") ve
+kod içi teknik terimler ("görsel kutusu", "görsel dil") AYNEN kalır — değişen yalnız
+son kullanıcının gördüğü belge metnidir. Kaynak: `templates/_ders_govde.html.j2`
+cover-kicker + `cekirdek/content_model.py` `cover_kicker` varsayılanı. Yeni bir
+`src/kitap.py` yazarken `cover_kicker`/`imprint` metinlerine "görsel" KOYMA.
+
 ---
 
 ## Klasör yapısı: sınıf / dönem / sınav / DERS
@@ -421,6 +430,10 @@ Ayrıca:
   ("ÖĞRETİM TEKNOLOJİLERİ" → "ÖĞR. TEKNOLOJİLERİ").
 - **Sınav bölümü Test + Cevap Anahtarı'dır** (LEGACY "Sınav Hazırlık" değil):
   20 soruluk çoktan seçmeli test + her soru için çözümlü cevap anahtarı.
+  **Test = 2 sayfa (10+10), cevap anahtarı = 1 sayfa** (2026-09: eski 3+1 idi, sınav
+  bölümü sıkıştırıldı — ilk sayfanın başlık bloğu tek `.test-meta` şeridi, `.tq`
+  aralıkları ölçülü). Soru KÖKLERİNİ ve ŞIKLARINI kısa yaz: uzun tam-cümle şıklar
+  10/sayfa düzenini taşırır. Bir şık 2 satırı geçiyorsa kısalt.
 - Vize dersinde `sinav_etiketi="Vize"` yaz (varsayılan "Final"); `subtitle`'a ayrıca
   "— Vize Özeti" ekleme, tekrar olur.
 
@@ -688,8 +701,8 @@ def get_pack() -> CoursePack:
 
 ```python
 GLOSSARY_PER_PAGE = 22     # sözlük sayfası başına kavram (2 sütun)
-TEST_PER_PAGE_FIRST = 7    # ilk test sayfası (bilgi çubuğu + talimat kutusu var)
-TEST_PER_PAGE = 8          # test devam sayfaları
+TEST_PER_PAGE_FIRST = 10   # 2026-09: sınav 3 -> 2 sayfaya indirildi (20 soru = 10+10)
+TEST_PER_PAGE = 10         # test devam sayfaları
 ANSWER_PER_PAGE = 23       # cevap anahtarı (20 soru -> tek sayfa)
 TOC_COMPACT_THRESHOLD = 7  # bu kadar satırı aşınca İçindekiler sıkışık kipe geçer
 OVERVIEW_PAGES = 1         # Genel Bakış TEK sayfa

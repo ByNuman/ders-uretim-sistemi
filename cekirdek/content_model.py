@@ -276,7 +276,7 @@ class BookPack:
     icon_text: str = "K"
 
     # --- Ön kısım (kapak / künye / önsöz / rehber / ana içindekiler / harita) ---
-    cover_kicker: str = "Görsel Ders Notu Kitabı · Dönem Cildi"
+    cover_kicker: str = "Ders Notu Kitabı · Dönem Cildi"
     cover_code: str = ""                          # kapakta başlığın üstündeki küçük etiket
     cover_image: Optional[str] = None             # `resim_data_uri()` ile üretilmiş data: URI.
                                                   # Verilirse ANA KAPAK, CSS ile çizilen amblem/
@@ -337,7 +337,7 @@ class CoursePack:
     ders_klasoru: str = ""
 
     # --- Kapaktaki sınav etiketi ---
-    # Kapak kickerinde ("Görsel Ders Notu Kitabı · <X> Özeti"), kapak istatistik
+    # Kapak kickerinde ("Ders Notu Kitabı · <X> Özeti"), kapak istatistik
     # kutusunda ve alt bilgide görünen sınav adı. Varsayılan "Final"dir; vize
     # kitapları için "Vize" yazılır. LEGACY "Sınav Hazırlık" bölümünün pageband
     # etiketi de ("<X> Tekrarı") bu değerden türetilir.
