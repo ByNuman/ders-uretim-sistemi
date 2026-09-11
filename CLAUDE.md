@@ -401,6 +401,13 @@ Ham metnin doğal başlık yapısını takip et (uydurma bölümleme yapma). Her
 özeti. Bölüm başına ortalama 2 sayfa hedefle (1-3 kabul edilebilir) — yoğun bölümleri
 en baştan 2-3 `ChapterPage`'e böl, tek dev sayfaya sıkıştırmaya çalışma.
 
+Bu planlama sırasında her bölüm için **görsel destek türünü de belirle** — bkz.
+"Görsel destek: haritadan kavramsal illüstrasyona" bölümü: sıralı önerme/süreç
+zincirleri `FlowDiagram`'a (native, AI gerekmez), somut yer/yapı/eser
+`add_block_gorsel` boş kutusuna, tamamen soyut ama görselleştirilebilir kavramsal
+ilişkiler ise AI-üretimi görsel kutusuna (öneri metni yazılır, sonra kullanıcının
+görseliyle bağlanır) aday olur.
+
 ### 3. `<D>/src/<ders_slug>.py` dosyasını yaz
 
 Aşağıdaki API referansına birebir uy. En hızlı yol: mevcut bir dersi
@@ -780,6 +787,55 @@ optimizasyonu. Biri hata verirse **PDF'i teslim etme**, önce sebebini bul.
 
 ---
 
+## Görsel destek: haritadan kavramsal illüstrasyona
+
+Her ders planlanırken (adım 2, bölümlere ayırma sırasında) **her bölüm için iki
+soru sor**: "(A) bu bölümde sıralı bir önerme/süreç/mantık zinciri var mı?" ve
+"(B) bu bölümde tek bir görselde özetlenebilecek soyut/kavramsal bir ilişki var
+mı?" Cevap evet ise ilgili aracı kullan — aşağıdaki iki yol birbirinden bağımsız,
+aynı derste ikisi de olabilir (bkz. `sistematik_kelam_ogretmen_notlari.py`: 2
+`FlowDiagram` + 7 `add_block_gorsel` kutusu bir arada).
+
+### A) Akış şeması (`FlowDiagram`) — native, AI GEREKMEZ
+
+Metin **sıralı bir önerme zinciri veya süreç** içeriyorsa (öncül→öncül→sonuç,
+aşama aşama ilerleyen bir süreç) `add_flow(FlowDiagram(...))` ile doğrudan kodla
+üret — görsel arama/üretme gerekmez, `FlowStep` listesi yeterli. Örnekler: bir
+delilin mantık zinciri ("Âlem hâdistir → her hâdisin muhdisi vardır → muhdis
+Allah'tır"), bilginin oluşum aşamaları (cehalet→vehm→şek→zan→yakîn), bir
+istidlal yönteminin adım adım işleyişi. 3-5 adım idealdir. **Dallanan (ağaç/karar
+ağacı) yapılar için bu bileşen UYGUN DEĞİL** — `FlowDiagram` tek sıra yatay
+oktur, dallanma göstermez; dallanan ilişkiler B'ye gider.
+
+### B) Soyut/kavramsal konular için AI-üretimi görsel
+
+Bölüm **somut bir yer/yapı/eser içermiyor ama** (kavram haritası, karar ağacı,
+karşılaştırmalı diyagram, süreç illüstrasyonu ile) görselleştirilebilecek soyut
+bir ilişki anlatıyorsa — klasik "harita/resim" kutusunun (aşağıda) kapsamına
+girmez ama yine de görsel destekten faydalanır. Bu durumda görseli SEN ÜRETMEZSİN;
+kullanıcı kendi AI aracıyla üretecektir. İki aşamalı iş akışı:
+
+1. **Öneri aşaması:** `add_block_gorsel(block, "AI görsel önerisi: <somut, "
+   "çizilebilir tarif>")` — `baslik` alanına görselin TAM olarak ne göstermesi
+   gerektiğini yaz: kompozisyon, etiketler, renk/vurgu talimatı dahil. Bu metin
+   kullanıcının AI aracına doğrudan verebileceği bir prompt olmalı — ne kadar
+   somut/çizilebilir yazarsan üretilen görsel o kadar isabetli olur. Örnekler:
+   "Suje-Obje-Bağ üçgeni — üç köşeli basit bir diyagram; köşelerde 'Suje (Özne)',
+   'Obje (Nesne)', 'Bağ/İlişki' etiketleri, ortasında 'BİLGİ' yazısı", "Hükmün
+   dallanmasını gösteren bir karar ağacı — kökte 'HÜKÜM', iki dala ayrılır 'Dinî'
+   ve 'Aklî'; ... (4 uç yaprak)".
+2. **Bağlama aşaması:** kullanıcı görselleri üretip `görseller/` klasörüne koyup
+   "ekle" dediğinde, HER `add_block_gorsel` çağrısındaki `baslik` metnini SİL
+   (kaldır, boş bırak) ve yerine `image=_foto("<dosya-adı>.jpg")` ekle — `_foto()`/
+   `_GORSELLER` helper'ı aşağıdaki harita/resim bölümündekiyle birebir aynı
+   (dosyanın başına ekle, bkz. `sistematik_kelam.py`). Kullanıcı dosya adlarını
+   açıklayıcı seçtiyse (`"bilgi nedir.jpg"`) hangi görselin hangi bloğa ait
+   olduğu tahmin gerektirmeden netleşir; adlar belirsizse önce kullanıcıya sor.
+
+**Bu, yalnız soyut derslerde devreye girer** — ders zaten somut yer/yapı/eser
+içeriyorsa (tarih, coğrafya ağırlıklı) önce aşağıdaki harita/resim akışını
+kullan; B sadece hiçbir alt türün uymadığı, tamamen soyut bölümler içindir.
+
 ## Harita/resim: SADECE boş kutu bırak
 
 **Görsel ARAMA, İNDİRME, GÖMME.** Harita ve resimleri üretilen PDF'e kullanıcı
@@ -793,7 +849,10 @@ boşluk bırakmak:
 Solda numaralı blok, sağda üstte küçük başlık + altında **4:3** boş çerçeve
 (≈88 × 66 mm). `baslik` opsiyoneldir ve **ders metninden** yazılır; kutunun
 altına açıklama satırı KONMAZ — onu yazmak görselin içindekini bilmeyi
-gerektirir, o da bu sistemin işi değildir.
+gerektirir, o da bu sistemin işi değildir. (İstisna: yukarıdaki B akışında
+`baslik`, kullanıcının AI aracına vereceği bir tarif olarak kasıtlı doldurulur,
+sonra görsel gelince silinir — bu, "ders metninden yaz" kuralının bilinçli
+istisnasıdır.)
 
 - Nereye konacağına ham metin karar verir: coğrafya/yayılma/sınır anlatan bir
   blok varsa kutuyu onun yanına koy, başka yere serpme.
@@ -864,6 +923,10 @@ for it in r.outline: print(it.title, '->', r.get_destination_page_number(it)+1)
       ettim
 - [ ] Harita/resim gereken yerlere `add_block_gorsel(...)` ile BOŞ KUTU bıraktım
       (görsel aramadım/indirmedim; şahsiyet kartlarına dokunmadım)
+- [ ] Her bölüm için görsel destek türünü değerlendirdim: sıralı önerme/süreç
+      zincirleri için `FlowDiagram` (native) ekledim; tamamen soyut ama
+      görselleştirilebilir kavramsal ilişkiler için AI-görsel kutusu (net,
+      çizilebilir tarifle `baslik` alanına) açtım — zorlama kutu koymadım
 - [ ] Her bölümün TÜM sayfalarını inceleyip devam sayfalarının (son sayfa hariç)
       %90-95 dolulukta olduğunu doğruladım; gerekirse mevcut içeriği taşıdım/
       birleştirdim — asla yeni içerik uydurmadım, taşan denemeleri geri aldım
