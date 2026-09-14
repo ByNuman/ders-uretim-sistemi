@@ -197,6 +197,29 @@ zaten var; aynı adı kullanmak argparse `dest`'ini ezip o üç aracı bozuyor.
 `dersler/src/ornek_ders.py` yayımlanan tek ders modülüdür ve kurulum doğrulaması
 olarak kullanılır.
 
+### AÇIK ÖĞRETİM LİSESİ (AÖL) KİPİ (`acik-ogretim-lisesi/`)
+
+Üniversite derslerinden bağımsız Açık Öğretim Lisesi üretim hattı:
+
+```
+acik-ogretim-lisesi/<donem>/
+├── kaynaklar/
+│   ├── ders_kaynaklari/<DERS ADI>/     # GİRDİ: MEB resmi ders kitabı (PDF)
+│   └── özetlenmiş_dersler/<DERS ADI>/  # ARA:   kazanım odaklı yazılı özet
+├── src/                                # <ders>.py modülleri + kitap.py
+└── gorsel_ders_notlari/<DERS ADI>/     # ÇIKTI: tekil ders PDF'i + kökte birleşik kitap
+```
+
+**Önemli Kurallar:**
+1. **Yalın Yapı:** Gereksiz ara katmanlar (sınav klasörü, öğretmen notları, ders anlatımları) yoktur; doğrudan `<donem>/` altında `kaynaklar/`, `src/` ve `gorsel_ders_notlari/` bulunur.
+2. **Ders Yeniden Kullanımı (Dönemler Arası Paylaşım):** Bir ders bir dönemde (ör. `2026-1`) üretildikten sonra öğrenci o dersi sonraki dönemde (ör. `2026-2`) tekrar alıyorsa, dersi sıfırdan yeniden üretme; mevcut ders modülünü doğrudan yeni dönemin `kitap.py` dosyasına dahil et.
+3. **Komutlar:**
+   ```bash
+   python build.py <ders_slug> --aol --donem 2026-1
+   python build_kitap.py --aol --donem 2026-1
+   ```
+4. **4 Seçenekli Test:** MEB Açık Öğretim Lisesi sınav formatında testler 4 seçeneklidir (A, B, C, D).
+
 ### Çıktılar ve kaynaklar git'e GİRMEZ
 
 `gorsel_ders_notlari/`, `calisma_rehberleri/`, `ders_anlatimlari/` ve `kaynaklar/`
@@ -263,6 +286,28 @@ Kullanıcı "1. hafta", "bu hafta" vb. diyerek dosya verdiğinde:
 - Bir dersin haftalık materyalini **başka dersin veya başka haftanın** klasörüne KOYMA.
 - Hangi hafta olduğu belirsizse SOR; tahminle numaralandırma. Aynı hafta klasörüne
   sonradan ek dosya gelebilir (üstüne yaz değil, yanına ekle).
+
+### Derse özel yöntem dosyası: `00-YONTEM.md`
+
+Bir dersin `<D>/kaynaklar/özetlenmiş_dersler/<DERS ADI>/` klasöründe **`00-YONTEM.md`**
+varsa, o ders için haftalık belge veya sınav özeti üretmeden ÖNCE onu baştan sona OKU.
+Orası dersin kendi üretim talimatıdır: kaynağın nasıl okunacağı, ünite/hafta eşlemesi,
+o derse özel belge katmanları, çözülmemiş belirsizlikler. **Çelişirse `00-YONTEM.md`
+kazanır** (yalnız o ders için); buradaki genel akış onun üstüne binmez, altına serilir.
+
+Neden var: bu dosyalar farklı AI araçlarıyla çalışıldığında bile haftalar arasında
+biçim/derinlik farkı oluşmasın diye yazılır. Dosya varsa formatı kendi kafana göre
+"iyileştirme" — aynen uygula; gerçekten değişmesi gerekiyorsa önce dosyayı güncelle,
+sonuna "Değişiklik kaydı" satırı düş, sonra üret.
+
+Yeni bir ders bu formatta ilerleyecekse (özellikle **metin tahlili / dil dersleri**
+gibi standart "bölüm özeti" kalıbının yetmediği dersler) ilk haftayla birlikte bir
+`00-YONTEM.md` de yaz. İçinde en az şunlar bulunmalı: kaynağın kimliği ve okunma
+yöntemi (taranmışsa render DPI'ı ve sayfa ofseti) · ünite↔hafta eşleme tablosu ·
+sınav kapsamı · haftalık belgenin zorunlu katmanları · yasaklar · kontrol listesi.
+Örnek: `3-sinif/1-donem/vize/kaynaklar/özetlenmiş_dersler/ARAP DİLİ VE EDEBİYATI V/00-YONTEM.md`.
+
+**Bu dosyalar `kaynaklar/` altında olduğu için git'e GİRMEZ** — tek kopyadır, silme.
 
 ### Her hafta yüklemesinden sonra: haftalık çalışma belgesi
 
@@ -346,6 +391,9 @@ Ders adıyla eşleşen (esnek eşleştir — büyük/küçük harf, Türkçe kar
 kullanıcıdan PDF'i eklemesini ya da doğru dönemin `kaynaklar/ders_kaynaklari/`
 klasörüne koymasını iste.
 
+Dersin `özetlenmiş_dersler/<DERS ADI>/` klasöründe **`00-YONTEM.md`** varsa, başka
+hiçbir şey yapmadan ÖNCE onu oku — o dersin üretim talimatı odur.
+
 Dersin `<DERS ADI>/` klasöründe **`NN-hafta/` alt klasörleri** varsa: haftalık
 akış işliyor demektir (bkz. "Haftalık ders akışı"). Sınav özeti / görsel ders notu
 üretirken haftalık çalışma belgeleri + (varsa) kitabı birlikte kullan; belgeler
@@ -393,6 +441,35 @@ metin onlarla birebir örtüşüyorsa yöntem güvenilirdir. Tipik ToUnicode ona
 *döndürülmüş* geliyorsa doğru sırayı `﴿﴾` parantez dengesi ve kaynaktaki Türkçe
 çeviriyle kur. Her alıntıyı üretilen PDF üzerinde görsel olarak oku; **emin olamadığın
 kısmı EKLEME.**
+
+**Kaynakta Arapça varsa görsel ders notuna da eklenir — transliterasyon TEK BAŞINA
+YETMEZ.** Öğretmen notunda/kaynakta bir ayet, hadis veya Arapça ıstılah gerçek Arapça
+harflerle yazılıysa ("يَد", "قُلْ هُوَ اللّٰهُ أَحَدٌ" gibi), bunu Latin harfli okunuşa
+("Kul hüvallâhu ehad") indirgeyip Arapçasını atlama — ikisini birlikte ver. Kaynak
+sadece transliterasyon içeriyorsa (Arapça harf yoksa) uydurma; yalnızca kaynakta
+GERÇEKTEN Arapça yazılmış yerler için geçerlidir.
+
+- **Bağımsız bir ayet/hadis kartı** olacaksa (`ChapterPage.add_ayat`) `Ayah(reference,
+  arabic, meal, etymology)` kullan — RTL yerleşim ve büyük punto zaten `.ayah-arabic`
+  CSS sınıfıyla sağlanır, ekstra işlem gerekmez.
+- **Bir bloğun/tablonun/callout'un içine serpiştirilmiş kısa destekleyici alıntılar**
+  için (çoğu sıfat/delil cümlesi bu haldedir) tam bir `Ayah` kartı açmak sayfa dengesini
+  bozar; bunun yerine Arapçayı **`<bdi>...</bdi>` ile sarıp** transliterasyonun yanına
+  parantezle ekle: `"<bdi>لَيْسَ كَمِثْلِهٖ شَيْءٌ</bdi> ('Leyse ke-mislihî şey')"`. `<bdi>`
+  (bidirectional isolate) tarayıcının kendi HTML5 elemanıdır; Türkçe cümle içine gömülü
+  Arapçanın yön karışıklığı yaşamadan sağdan sola akmasını sağlar, `style.css`'e
+  dokunmaya GEREK YOKTUR (gövde fontu zaten `"DejaVu Sans"` — Arapça glif desteği var).
+- Bunu değiştirdikten sonra `tools/olcum.py` ile taşma/doluluk kontrolünü tekrarla —
+  Arapça ekleme metni uzatır, önceden dengelenmiş bir sayfa yeniden taşabilir.
+- **Arapça hiçbir yerde Türkçesiz bırakılmaz** (2026-09-14 kullanıcı kararı). Bu, Arapça
+  ekleme kuralının ikiz kardeşidir: Arapçayı atlamak da, Arapçayı karşılıksız bırakmak da
+  öğrenmeyi durdurur. Kelime listelerinde ayrı Türkçe sütunu; alıştırma soru/cevaplarında
+  Arapçanın altına italik çeviri; şık, kısa öge ve kelime havuzlarında parantez içinde
+  inline karşılık. Bir alıştırmanın yalnız cevabını çevirip sorusunu Arapça bırakma.
+  Haftalık çalışma belgeleri ve görsel ders notları için aynen geçerlidir.
+- Tek tek Arapça ıstılah adları (istitaat, kesb, meşiet gibi) zaten Türkçe teolojik
+  yazımda transliterasyonla kullanılır — kaynakta bunlar Arapça harfle yazılmadıysa
+  zorla Arapça ekleme; kural yalnızca kaynağın GERÇEKTEN Arapça yazdığı yerler içindir.
 
 ### 2. İçeriği 5-7 bölüme planla
 
@@ -904,6 +981,8 @@ for it in r.outline: print(it.title, '->', r.get_destination_page_number(it)+1)
 - [ ] Kaynak eklenmediyse o dönemin `kaynaklar/` klasörlerinde ders adıyla eşleşen
       dosyayı aradım (yoksa kullanıcıdan istedim — başka döneme BAKMADIM)
 - [ ] Ham metni tamamen okudum (atlamadım)
+- [ ] `özetlenmiş_dersler/<DERS ADI>/00-YONTEM.md` varsa onu baştan sona okudum ve
+      formatına birebir uydum (yoksa ve ders metin tahlili/dil dersiyse yazdım)
 - [ ] `NN-hafta/` klasörleri varsa: haftalık çalışma belgelerini okudum, kapsam
       süzgeci olarak SADECE işlenen bölümleri aldım, hocanın vurgu/örnek/sınav
       sinyallerini içine gömdüm; hiçbir vurgu kaybolmadı
