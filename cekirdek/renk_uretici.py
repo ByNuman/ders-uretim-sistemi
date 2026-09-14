@@ -180,20 +180,44 @@ DERS_RENKLERI = {
     "EGITIMDEOLCMEVEDEGERLENDIRME":        "#1F4775",  # (ayni ruh, farkli donem)
     "DINEGITIMI":                          "#51662E",  # zeytin / fide   H82
     "DINHIZMETLERINDEREHBERLIKVEILETISIM": "#51662E",  # (ayni ruh, farkli donem)
+    # --- Açık Öğretim Lisesi (AÖL) / Lise Ortak Dersleri ------------------
+    "TURKDILIVEEDEBIYATI":                 "#7A2433",  # visne / edebi estetik
+    "EDEBIYAT":                            "#7A2433",
+    "TARIH":                               "#776931",  # bronz / tarihsel bellek
+    "TCINKILAPTARIHIVETATATURKCULUK":      "#8C2F21",  # terracotta / inkilap
+    "INKILAPTARIHI":                       "#8C2F21",
+    "COGRAFYA":                            "#386641",  # haki yesili / cografya yeryuzu
+    "FELSEFE":                             "#2F2D76",  # gece mavisi / felsefi derinlik
+    "DINKULTURUVEAHLAKBILGISI":            "#206040",  # mushaf yesili / dini metin
+    "DINKULTURU":                          "#206040",
+    "MATEMATIK":                           "#1F4775",  # cini laciverti / analitik mantik
+    "FIZIK":                               "#1B4965",  # derin mavi / temel bilim
+    "KIMYA":                               "#2A6F97",  # petrol mavisi / reaksiyon
+    "BIYOLOJI":                            "#2D6A4F",  # orman yesili / canli yasam
+    "INGILIZCE":                           "#8B5A2B",  # kehribar / dunya dili
+    "ALMANCA":                             "#7D4E57",  # morumsu kahve
+    "FRANSIZCA":                           "#5C4D7D",  # lavanta koyusu
+    "SAGLIKBILGISIVETRAFIKKULTURU":        "#336655",  # guvenlik / saglik yesili
+    "DEMOKRASIVEINSANHAKLARI":             "#6B3074",  # mor / hak ve adalet
+    "PEYGAMBERIMIZINHAYATI":               "#24702F",  # zumrut / nebevi hatira
+    "SIYER":                               "#24702F",
 }
 
-_ROMEN = {"I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X"}
+_ROMEN_VE_SAYILAR = {
+    "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X",
+    "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"
+}
 
 
 def _aile_anahtari(ders_adi: str) -> str:
-    """Ders adını aile anahtarına çevirir: sondaki Roma rakamı AYRI BİR KELİME
-    ise atılır, kalan kısım normalize edilir.
+    """Ders adını aile anahtarına çevirir: sondaki Roma rakamı veya Arap rakamı
+    AYRI BİR KELİME ise atılır, kalan kısım normalize edilir (örn. 'TARİH 1' -> 'TARIH').
 
-    Roma rakamı ayıklaması kelime bazında yapılır; normalize edilmiş metnin
-    sonundan harf kırpmak "DİN EĞİTİMİ" -> "DINEGITIM" gibi yanlış anahtar
+    Rakam ayıklaması kelime bazında yapılır; normalize edilmiş metnin
+    sonundan harf kırpmak 'DİN EĞİTİMİ' -> 'DINEGITIM' gibi yanlış anahtar
     üretirdi (sondaki 'I' rakam değil, kelimenin parçası)."""
     kelimeler = (ders_adi or "").split()
-    while kelimeler and kelimeler[-1].translate(_TR_FOLD).upper() in _ROMEN:
+    while kelimeler and kelimeler[-1].translate(_TR_FOLD).upper() in _ROMEN_VE_SAYILAR:
         kelimeler.pop()
     return normalize_ders_adi(" ".join(kelimeler))
 

@@ -50,6 +50,7 @@ if hasattr(sys.stdout, "reconfigure"):
 
 from cekirdek.theme_engine import resolve_theme_css
 from cekirdek.renk_uretici import pack_rengi, belirlenmis_renk
+from cekirdek.content_model import ders_kapak_uri
 from cekirdek import pdfx
 from cekirdek import donem as donem_mod
 
@@ -385,6 +386,11 @@ def course_context(pack, offset: int = 0, prefix: str = "", pagecls: str = "") -
     """_ders_govde.html.j2 makrosunun ihtiyaç duyduğu her şeyi tek sözlükte
     toplar. Tek ders build'i ve kitap build'i AYNI fonksiyonu kullanır --
     sayfalama mantığının iki yerde ayrışması böylece imkansız olur."""
+    if getattr(pack, "cover_image", None) is None:
+        try:
+            pack.cover_image = ders_kapak_uri(course_out_dir(pack))
+        except Exception:
+            pass
     page_starts = compute_page_numbers(pack, offset)
     return {
         "page_starts": page_starts,
@@ -704,6 +710,8 @@ def _metinleri_gez(nesne, yol="pack", derinlik=0):
             yield from _metinleri_gez(v, f"{yol}[{k!r}]", derinlik + 1)
     elif dataclasses.is_dataclass(nesne):
         for f in dataclasses.fields(nesne):
+            if f.name == "cover_image":
+                continue
             yield from _metinleri_gez(getattr(nesne, f.name), f"{yol}.{f.name}", derinlik + 1)
 
 

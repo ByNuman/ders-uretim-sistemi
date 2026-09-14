@@ -278,6 +278,8 @@ em { font-style: italic; }
 .cover.image-cover {
   padding: 0;
   display: block;
+  line-height: 0;
+  font-size: 0;
   background: var(--cover-grad-2, #10233f);
 }
 .cover.image-cover::after { display: none; }   /* iç "cilt" çerçevesi görselde zaten var */

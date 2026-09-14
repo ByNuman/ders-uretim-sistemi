@@ -63,6 +63,23 @@ def resim_data_uri(yol) -> str:
     veri = base64.b64encode(yol.read_bytes()).decode("ascii")
     return f"data:{mime};base64,{veri}"
 
+
+def ders_kapak_uri(ders_klasoru_yolu) -> Optional[str]:
+    """Bir dersin çıktı klasöründeki kapak görselini (*kapak.{png,jpg,jpeg,webp})
+    bulup base64 `data:` URI döner; görsel yoksa None döner."""
+    if not ders_klasoru_yolu:
+        return None
+    p = Path(ders_klasoru_yolu)
+    if not p.exists():
+        return None
+    for f in sorted(p.glob("*kapak.*")):
+        if f.suffix.lower() in {".png", ".jpg", ".jpeg", ".webp"}:
+            return resim_data_uri(f)
+    for f in sorted(p.glob("*KAPAK.*")):
+        if f.suffix.lower() in {".png", ".jpg", ".jpeg", ".webp"}:
+            return resim_data_uri(f)
+    return None
+
 @dataclass
 class Person:
     """Bir düşünür/bilim insanı/yazar. TEK KAYNAK: tarihler burada tanımlanır,
@@ -312,6 +329,7 @@ class CoursePack:
     chapters: list[Chapter]
     glossary: list[Concept]
     theme_color: Optional[str] = None   # hex (ör. "#7A2438") verilirse `theme` yerine bunu kullan — sınırsız tema
+    cover_image: Optional[str] = None   # `resim_data_uri()` ile üretilmiş data: URI (tam sayfa görsel kapak)
     distinctions: list[DistinctionPair] = field(default_factory=list)   # LEGACY — yeni derslerde kullanmayın
     match_table: list[MatchRow] = field(default_factory=list)           # LEGACY — yeni derslerde kullanmayın
     qa_items: list[QAItem] = field(default_factory=list)                 # LEGACY — yeni derslerde kullanmayın

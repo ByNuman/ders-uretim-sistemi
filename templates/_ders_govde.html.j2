@@ -234,6 +234,11 @@
 {# ============================================================
    1. KAPAK
    ============================================================ #}
+{% if pack.cover_image %}
+<section class="page cover image-cover{{ ctx.pagecls }}" id="{{ ctx.prefix }}cover">
+  <img class="cover-image" src="{{ pack.cover_image }}" alt="{{ pack.title | striptags | e }}">
+</section>
+{% else %}
 <section class="page cover{{ ctx.pagecls }}" id="{{ ctx.prefix }}cover">
   <div class="cover-corner tl"></div>
   <div class="cover-corner tr"></div>
@@ -270,6 +275,7 @@
     </div>
   </div>
 </section>
+{% endif %}
 
 {# ============================================================
    2. İÇİNDEKİLER — dar sayfada satırlar tek sayfaya sığmayabildiği için
@@ -422,8 +428,10 @@
   {% if loop.first %}
     <div class="section-kicker">Sınav</div>
     <div class="section-title section-title--tight">{{ pack.test_title }}</div>
+    {% set first_opts_len = pack.test_questions[0].options|length if pack.test_questions else 5 %}
+    {% set last_letter = "D" if first_opts_len == 4 else "E" %}
     <div class="test-meta">
-      <b>{{ pack.test_questions|length }} soru</b> · çoktan seçmeli · 5 seçenek (A–E){% if pack.test_instructions %} · {{ pack.test_instructions }}{% endif %}
+      <b>{{ pack.test_questions|length }} soru</b> · çoktan seçmeli · {{ first_opts_len }} seçenek (A–{{ last_letter }}){% if pack.test_instructions %} · {{ pack.test_instructions }}{% endif %}
     </div>
   {% else %}
     <div class="chcontinue chcontinue--test"><div class="tag">Test · Devam</div></div>

@@ -63,13 +63,18 @@ SINIFLAR = ("2", "3")
 DONEMLER = ("1", "2")
 SINAVLAR = ("vize", "final")
 
+# Açık Öğretim Lisesi (AÖL)
+AOL_KLASOR = "acik-ogretim-lisesi"
+AOL_VARSAYILAN_DONEM = "2026-1"
+AOL_VARSAYILAN_SINAV = "donem-sinavi"
+
 # DÜZ ("dersler/") KİPİ — sınıf/dönem/sınav ağacı OLMAYAN kurulumlar için.
 # Bu depo GitHub'da yalnızca boş bir `dersler/` iskeletiyle yayımlanır; sınıf
 # ağaçları (`2-sinif/`, `3-sinif/`) .gitignore'dadır ve klonlayan kişide hiç
 # bulunmaz. O kişi tek bir çalışma klasörü kullanır: `dersler/`.
 DUZ_KLASOR = "dersler"
 
-# Bir dönem klasörünün alt yapısı — iskeleti kurarken de bu liste kullanılır.
+# Üniversite dönemi alt yapısı
 ALT_KLASORLER = (
     "kaynaklar/ders_kaynaklari",      # GİRDİ  — ham ders metni      (ders adı alt klasörü)
     "kaynaklar/ogretmen_notlari",     # GİRDİ  — ham dikte notu      (ders adı alt klasörü)
@@ -78,6 +83,14 @@ ALT_KLASORLER = (
     "src",
     "calisma_rehberleri",
     "ders_anlatimlari",
+)
+
+# Açık Öğretim Lisesi alt yapısı (Doğrudan dönem altına kaynaklar, src, gorsel_ders_notlari)
+AOL_ALT_KLASORLER = (
+    "kaynaklar/ders_kaynaklari",      # GİRDİ  — ham ders kitabı     (ders adı alt klasörü)
+    "kaynaklar/özetlenmiş_dersler",   # ARA    — yazılı özet         (ders adı alt klasörü)
+    "gorsel_ders_notlari",            # ÇIKTI  — build.py kitap PDF  (ders adı alt klasörü)
+    "src",
 )
 
 
@@ -89,12 +102,15 @@ class Donem:
     donem: str
     sinav: str
     duz: bool = False          # True ise sınıf/dönem/sınav yok, kök `dersler/`
+    aol: bool = False          # True ise Açık Öğretim Lisesi
 
     # --- yollar -------------------------------------------------------------
     @property
     def root(self) -> Path:
         if self.duz:
             return ROOT / DUZ_KLASOR
+        if self.aol or self.sinif in ("aol", "acik-ogretim-lisesi"):
+            return ROOT / AOL_KLASOR / self.donem
         return ROOT / f"{self.sinif}-sinif" / f"{self.donem}-donem" / self.sinav
 
     @property
@@ -156,18 +172,23 @@ class Donem:
     def __str__(self) -> str:
         if self.duz:
             return "dersler (düz kip — sınıf/dönem ayrımı yok)"
+        if self.aol or self.sinif in ("aol", "acik-ogretim-lisesi"):
+            return f"Açık Öğretim Lisesi / {self.donem}"
         return f"{self.sinif}. sınıf / {self.donem}. dönem / {self.sinav}"
 
     @property
     def etiket(self) -> str:
         if self.duz:
             return DUZ_KLASOR
+        if self.aol or self.sinif in ("aol", "acik-ogretim-lisesi"):
+            return f"{AOL_KLASOR}/{self.donem}"
         return f"{self.sinif}-sinif/{self.donem}-donem/{self.sinav}"
 
     # --- kurulum / import ---------------------------------------------------
     def ensure(self) -> "Donem":
         """Dönemin alt klasörlerini (yoksa) oluşturur."""
-        for alt in ALT_KLASORLER:
+        alt_liste = AOL_ALT_KLASORLER if (self.aol or self.sinif in ("aol", "acik-ogretim-lisesi")) else ALT_KLASORLER
+        for alt in alt_liste:
             (self.root / alt).mkdir(parents=True, exist_ok=True)
         return self
 
@@ -212,12 +233,14 @@ class Donem:
 
 def add_args(parser) -> None:
     """--sinif / --donem / --sinav argümanlarını bir ArgumentParser'a ekler."""
-    parser.add_argument("--sinif", choices=SINIFLAR,
-                        help="Sınıf (2 veya 3). Verilmezse sorulur.")
-    parser.add_argument("--donem", choices=DONEMLER,
-                        help="Dönem (1 veya 2). Verilmezse sorulur.")
-    parser.add_argument("--sinav", choices=SINAVLAR,
-                        help="Sınav dönemi (vize veya final). Verilmezse sorulur.")
+    parser.add_argument("--sinif",
+                        help="Sınıf (üniversite için 2 veya 3; AÖL için aol). Verilmezse sorulur.")
+    parser.add_argument("--donem",
+                        help="Dönem (üniversite için 1 veya 2; AÖL için 2026-1 vb.). Verilmezse sorulur.")
+    parser.add_argument("--sinav",
+                        help="Sınav dönemi (üniversite için vize/final; AÖL için donem-sinavi). Verilmezse sorulur.")
+    parser.add_argument("--aol", action="store_true",
+                        help="Açık Öğretim Lisesi kipi: acik-ogretim-lisesi/<donem>/<sinav> ağacını kullanır.")
     # DİKKAT: bayrağın adı --duz'dur, --dersler DEĞİL. tools/olcum.py,
     # tools/dengele.py ve tools/kalibre.py'de `dersler` adında KONUMSAL bir
     # argüman (ölçülecek ders listesi) zaten var; aynı adı kullanmak argparse
@@ -237,7 +260,7 @@ def _sorulamadi(alan: str) -> SystemExit:
     return SystemExit(
         f"[hata] --{alan} verilmedi ve interaktif olarak sorulamıyor.\n"
         f"        Varsayılan bir dönem YOKTUR; açıkça belirtin:\n"
-        f"        --sinif 2 --donem 2 --sinav final\n"
+        f"        --sinif 2 --donem 2 --sinav final  (veya Açık Lise için: --aol --donem 2026-1)\n"
         f"        (ya da DERS_{alan.upper()} ortam değişkenini ayarlayın)"
     )
 
@@ -267,6 +290,51 @@ def resolve(args=None, *, ensure: bool = True) -> Donem:
     Öncelik sırası: komut satırı argümanı -> ortam değişkeni -> interaktif soru.
     Hiçbir aşamada varsayılan bir değer VARSAYILMAZ.
     """
+    # --- DÜZ KİP -----------------------------------------------------------
+    if getattr(args, "duz", False):
+        d = Donem("", "", "", duz=True)
+        if ensure:
+            d.ensure()
+        return d
+
+    # --- AÇIK ÖĞRETİM LİSESİ KİPİ -------------------------------------------
+    is_aol = getattr(args, "aol", False) or (os.environ.get("DERS_AOL", "").lower() in ("1", "true", "yes"))
+    sinif_val = getattr(args, "sinif", None) or os.environ.get("DERS_SINIF")
+    if sinif_val and str(sinif_val).strip().lower() in ("aol", "acik-ogretim-lisesi", "lise"):
+        is_aol = True
+
+    if is_aol:
+        donem_val = getattr(args, "donem", None) or os.environ.get("DERS_DONEM")
+        if not donem_val:
+            aol_dir = ROOT / AOL_KLASOR
+            mevcut = [p.name for p in aol_dir.iterdir() if p.is_dir() and not p.name.startswith(".")] if aol_dir.exists() else []
+            if len(mevcut) == 1:
+                donem_val = mevcut[0]
+            elif sys.stdin.isatty() and mevcut:
+                donem_val = _sor("donem", tuple(mevcut))
+            else:
+                donem_val = AOL_VARSAYILAN_DONEM
+
+        sinav_val = getattr(args, "sinav", None) or os.environ.get("DERS_SINAV") or ""
+
+        d = Donem(sinif="aol", donem=str(donem_val).strip(), sinav=str(sinav_val).strip(), aol=True)
+        if ensure:
+            d.ensure()
+        d.activate()
+        return d
+
+    # --- TEMİZ KLON KONTROLÜ ------------------------------------------------
+    verilen = [getattr(args, a, None) if args is not None else None
+               for a in ("sinif", "donem", "sinav")]
+    if not any(verilen) and not _sinif_agaci_var():
+        print(f"[donem] Sınıf/dönem ağacı bulunamadı; düz kipe geçildi "
+              f"-> {DUZ_KLASOR}/  (açıkça seçmek için: --duz)")
+        d = Donem("", "", "", duz=True)
+        if ensure:
+            d.ensure()
+        return d
+
+    # --- ÜNİVERSİTE KİPİ ----------------------------------------------------
     def al(alan, secenekler):
         deger = getattr(args, alan, None) if args is not None else None
         if not deger:
@@ -280,30 +348,6 @@ def resolve(args=None, *, ensure: bool = True) -> Donem:
                 )
             return deger
         return _sor(alan, secenekler)
-
-    # --- DÜZ KİP -----------------------------------------------------------
-    # İki yoldan girilir:
-    #   1) --dersler açıkça verilmişse,
-    #   2) sınıf ağacı DİSKTE HİÇ YOKSA (temiz klon) ve kullanıcı da sınıf/
-    #      dönem/sınav vermemişse.
-    # (2) KRİTİK KURAL 2'yi ("varsayım yapma") çiğnemez: ortada seçilebilecek
-    # bir dönem yoktur, dolayısıyla yanlış döneme yazma riski de yoktur.
-    # Sınıf ağacı varsa bu kip KENDİLİĞİNDEN devreye girmez; dönem yine sorulur.
-    if getattr(args, "duz", False):
-        d = Donem("", "", "", duz=True)
-        if ensure:
-            d.ensure()
-        return d
-
-    verilen = [getattr(args, a, None) if args is not None else None
-               for a in ("sinif", "donem", "sinav")]
-    if not any(verilen) and not _sinif_agaci_var():
-        print(f"[donem] Sınıf/dönem ağacı bulunamadı; düz kipe geçildi "
-              f"-> {DUZ_KLASOR}/  (açıkça seçmek için: --duz)")
-        d = Donem("", "", "", duz=True)
-        if ensure:
-            d.ensure()
-        return d
 
     d = Donem(al("sinif", SINIFLAR), al("donem", DONEMLER), al("sinav", SINAVLAR))
     if ensure:

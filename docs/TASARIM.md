@@ -117,8 +117,10 @@ oluyorsa o dersin hue'sunu birkaç derece kaydırmayı deneyin.
   sayfaları bundan hiç etkilenmez**; kapak yine tek sayfadır, sayfa offset'i
   ve yer imleri değişmez. Kapaktaki dinamik istatistik çubuğu (X ders · Y
   kavram · Z soru · toplam sayfa) görselde gösterilemez — bu sayım künye
-  sayfasında zaten vardır. Tek ders PDF'lerinin kapağı HER ZAMAN CSS ile
-  çizilir; görsel kapak yalnızca birleşik kitaba özgüdür.
+  sayfasında zaten vardır. Ders kapakları da `CoursePack.cover_image`
+  ile (veya `ders_kapak_uri` üzerinden çıktı klasöründeki `*kapak.png` taranarak)
+  tam sayfa görsel kapak olarak ayarlanabilir; görsel verilmemişse varsayılan
+  CSS amblem kapağı çizilir.
 - **Birleşik kitapta her dersin gövde sayfalarında KENAR SEKMESİ (thumb index)
   vardır** (`.thumb-tab`, `_ders_govde.html.j2` içindeki `thumb_tab()` makrosu —
   yalnızca `course()` makrosuna `tab` verildiğinde, yani kitap derlemesinde
