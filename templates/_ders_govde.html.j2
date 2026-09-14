@@ -386,6 +386,7 @@
 {# ============================================================
    5. SÖZLÜK — taşma riski olmasın diye N'li sayfalara bölünmüş halde basılır
    ============================================================ #}
+{% if pack.glossary and ctx.page_starts.get("glossary") %}
 {% set gloss_pageno = namespace(n=ctx.page_starts["glossary"]) %}
 {% for gpage in ctx.glossary_pages %}
 <section class="page body-page{{ ctx.pagecls }}"{% if loop.first %} id="{{ ctx.prefix }}glossary"{% endif %}>
@@ -411,6 +412,7 @@
 </section>
 {% set gloss_pageno.n = gloss_pageno.n + 1 %}
 {% endfor %}
+{% endif %}
 
 {# ============================================================
    6. TEST + CEVAP ANAHTARI (standart) — pack.test_questions doluysa bu
@@ -464,7 +466,7 @@
 {% set answer_pageno.n = answer_pageno.n + 1 %}
 {% endfor %}
 
-{% else %}
+{% elif ctx.has_legacy_exam and ctx.page_starts.get("exam") %}
 
 {# ============================================================
    LEGACY: SINAV HAZIRLIK — ayrımlar + eşleştirme + hızlı soru-cevap

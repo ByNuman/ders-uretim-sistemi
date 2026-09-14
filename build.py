@@ -338,14 +338,15 @@ def compute_page_numbers(pack, offset: int = 0) -> dict:
     for ch in pack.chapters:
         starts[ch.number] = n
         n += ch.page_count()
-    starts["glossary"] = n
-    n += len(paginate_capped(pack.glossary, GLOSSARY_PER_PAGE))
+    if pack.glossary:
+        starts["glossary"] = n
+        n += len(paginate_capped(pack.glossary, GLOSSARY_PER_PAGE))
     if pack.test_questions:
         starts["test"] = n
         n += len(paginate_capped(pack.test_questions, TEST_PER_PAGE_FIRST, TEST_PER_PAGE))
         starts["answer_key"] = n
         n += len(paginate_capped(pack.answer_key_items, ANSWER_PER_PAGE))
-    else:
+    elif pack.distinctions or pack.match_table or pack.qa_items:
         starts["exam"] = n
         n += exam_page_count(pack)
     starts["end"] = n - 1
@@ -359,16 +360,17 @@ def toc_rows(pack, page_starts: dict) -> list[dict]:
     rows = [{"num": str(ch.number), "alt": False, "anchor": f"ch-{ch.number}",
              "title": ch.title, "sub": ch.subtitle, "page": page_starts[ch.number]}
             for ch in pack.chapters]
-    rows.append({"num": "A", "alt": True, "anchor": "glossary",
-                 "title": "Anahtar Kavramlar Sözlüğü",
-                 "sub": f"Tanımlı ve bağlamlandırılmış {pack.concept_count()} kavram",
-                 "page": page_starts["glossary"]})
-    if pack.test_questions:
+    if pack.glossary and "glossary" in page_starts:
+        rows.append({"num": "A", "alt": True, "anchor": "glossary",
+                     "title": "Anahtar Kavramlar Sözlüğü",
+                     "sub": f"Tanımlı ve bağlamlandırılmış {pack.concept_count()} kavram",
+                     "page": page_starts["glossary"]})
+    if pack.test_questions and "test" in page_starts:
         rows.append({"num": "B", "alt": True, "anchor": "exam", "title": pack.test_title,
                      "sub": f"{len(pack.test_questions)} soruluk çoktan seçmeli test "
                             "ve çözümlü cevap anahtarı",
                      "page": page_starts["test"]})
-    else:
+    elif "exam" in page_starts:
         rows.append({"num": "B", "alt": True, "anchor": "exam", "title": "Sınav Hazırlık",
                      "sub": "Karıştırılan ayrımlar, eşleştirmeler ve son kontrol",
                      "page": page_starts["exam"]})
@@ -403,6 +405,7 @@ def course_context(pack, offset: int = 0, prefix: str = "", pagecls: str = "") -
         "matchtable_pages": paginate_capped(pack.match_table, MATCHTABLE_PER_PAGE),
         "test_pages": paginate_capped(pack.test_questions, TEST_PER_PAGE_FIRST, TEST_PER_PAGE),
         "answer_pages": paginate_capped(pack.answer_key_items, ANSWER_PER_PAGE),
+        "has_legacy_exam": bool(pack.distinctions or pack.match_table or pack.qa_items),
         "prefix": prefix,
         "pagecls": pagecls,
     }
@@ -624,11 +627,12 @@ def add_bookmarks(pdf_path: Path, pack, page_starts: dict):
     writer.append(reader)
     for ch in pack.chapters:
         writer.add_outline_item(f"{ch.number}. {ch.title}", page_starts[ch.number] - 1)
-    writer.add_outline_item("Anahtar Kavramlar Sözlüğü", page_starts["glossary"] - 1)
-    if pack.test_questions:
+    if pack.glossary and "glossary" in page_starts:
+        writer.add_outline_item("Anahtar Kavramlar Sözlüğü", page_starts["glossary"] - 1)
+    if pack.test_questions and "test" in page_starts:
         writer.add_outline_item(pack.test_title, page_starts["test"] - 1)
         writer.add_outline_item("Cevap Anahtarı ve Çözümler", page_starts["answer_key"] - 1)
-    else:
+    elif "exam" in page_starts:
         writer.add_outline_item("Sınav Hazırlık", page_starts["exam"] - 1)
     with open(pdf_path, "wb") as f:
         writer.write(f)
