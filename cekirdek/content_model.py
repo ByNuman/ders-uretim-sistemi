@@ -330,6 +330,9 @@ class CoursePack:
     glossary: list[Concept]
     theme_color: Optional[str] = None   # hex (ör. "#7A2438") verilirse `theme` yerine bunu kullan — sınırsız tema
     cover_image: Optional[str] = None   # `resim_data_uri()` ile üretilmiş data: URI (tam sayfa görsel kapak)
+    glossary_per_page_first: Optional[int] = None   # İlk sözlük sayfası kapasitesi (None = varsayılan)
+    glossary_per_page: Optional[int] = None         # Devam sözlük sayfası kapasitesi (None = varsayılan)
+    slug: Optional[str] = None                      # Çıktı dosya adı slug'ı (None ise başlıktan türetilir)
     distinctions: list[DistinctionPair] = field(default_factory=list)   # LEGACY — yeni derslerde kullanmayın
     match_table: list[MatchRow] = field(default_factory=list)           # LEGACY — yeni derslerde kullanmayın
     qa_items: list[QAItem] = field(default_factory=list)                 # LEGACY — yeni derslerde kullanmayın

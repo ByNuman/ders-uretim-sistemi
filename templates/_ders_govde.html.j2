@@ -245,7 +245,7 @@
   <div class="cover-corner bl"></div>
   <div class="cover-corner br"></div>
   <div class="cover-top">
-    <div class="cover-kicker">Ders Notu Kitabı · {{ pack.sinav_etiketi }} Özeti</div>
+    <div class="cover-kicker">Ders Notu Kitabı · {% if "Özet" in pack.sinav_etiketi or "Kitap" in pack.sinav_etiketi or "Anlatım" in pack.sinav_etiketi %}{{ pack.sinav_etiketi }}{% else %}{{ pack.sinav_etiketi }} Özeti{% endif %}</div>
     <div class="cover-emblem">
       <div class="ring-outer"></div>
       <div class="ring-mid"></div>
@@ -267,11 +267,11 @@
     <div class="cover-stats">
       <div class="cover-stat"><b>{{ pack.chapter_count() }}</b>Bölüm</div>
       <div class="cover-stat"><b>{{ pack.concept_count() }}</b>Anahtar Kavram</div>
-      <div class="cover-stat"><b>{{ pack.sinav_etiketi }}</b>Sınav Hazırlık</div>
+      <div class="cover-stat"><b>{{ pack.sinav_etiketi }}</b>{% if "Kitap" in pack.sinav_etiketi or "Anlatım" in pack.sinav_etiketi %}Kapsamlı İçerik{% else %}Sınav Hazırlık{% endif %}</div>
     </div>
     <div class="cover-foot">
       <div>Ders Notu Serisi</div>
-      <div>{{ pack.chapter_count() }} Bölüm · {{ pack.sinav_etiketi }} Sınavı Hazırlığı</div>
+      <div>{{ pack.chapter_count() }} Bölüm · {% if "Kitap" in pack.sinav_etiketi or "Anlatım" in pack.sinav_etiketi %}{{ pack.sinav_etiketi }}{% else %}{{ pack.sinav_etiketi }} Sınavı Hazırlığı{% endif %}</div>
     </div>
   </div>
 </section>

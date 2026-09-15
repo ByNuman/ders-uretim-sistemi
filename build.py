@@ -340,7 +340,9 @@ def compute_page_numbers(pack, offset: int = 0) -> dict:
         n += ch.page_count()
     if pack.glossary:
         starts["glossary"] = n
-        n += len(paginate_capped(pack.glossary, GLOSSARY_PER_PAGE))
+        g_first = getattr(pack, "glossary_per_page_first", None) or getattr(pack, "glossary_per_page", None) or GLOSSARY_PER_PAGE
+        g_rest = getattr(pack, "glossary_per_page", None) or GLOSSARY_PER_PAGE
+        n += len(paginate_capped(pack.glossary, g_first, g_rest))
     if pack.test_questions:
         starts["test"] = n
         n += len(paginate_capped(pack.test_questions, TEST_PER_PAGE_FIRST, TEST_PER_PAGE))
@@ -378,9 +380,12 @@ def toc_rows(pack, page_starts: dict) -> list[dict]:
 
 
 def toc_page_count(pack) -> int:
-    """İçindekiler HER ZAMAN TEK SAYFADIR (proje kuralı, bkz. CLAUDE.md).
-    Satır sayısı ne olursa olsun bölünmez; sığdırma işini CSS'teki
-    `.toc-compact` kipi yapar (bkz. TOC_COMPACT_THRESHOLD)."""
+    """İçindekiler standart derslerde (12 bölüme kadar) TEK SAYFADIR.
+    12+ bölümlü kapsamlı konu anlatım kitaplarında ise taşmayı önlemek
+    için dengeli 2 sayfaya bölünür."""
+    n_rows = len(pack.chapters) + (1 if pack.glossary else 0) + (1 if getattr(pack, "test_questions", None) or getattr(pack, "qa_items", None) else 0)
+    if n_rows > TOC_MAX_ROWS:
+        return 2
     return 1
 
 
@@ -394,12 +399,24 @@ def course_context(pack, offset: int = 0, prefix: str = "", pagecls: str = "") -
         except Exception:
             pass
     page_starts = compute_page_numbers(pack, offset)
+    t_rows = toc_rows(pack, page_starts)
+    if len(t_rows) > TOC_MAX_ROWS:
+        half = (len(t_rows) + 1) // 2
+        toc_pages = [t_rows[:half], t_rows[half:]]
+        toc_compact = False
+    else:
+        toc_pages = [t_rows]
+        toc_compact = len(t_rows) > TOC_COMPACT_THRESHOLD
+
     return {
         "page_starts": page_starts,
-        # İçindekiler bölünmez -- tek sayfa, tek parça (bkz. toc_page_count).
-        "toc_pages": [toc_rows(pack, page_starts)],
-        "toc_compact": len(pack.chapters) + 2 > TOC_COMPACT_THRESHOLD,
-        "glossary_pages": paginate_capped(pack.glossary, GLOSSARY_PER_PAGE),
+        "toc_pages": toc_pages,
+        "toc_compact": toc_compact,
+        "glossary_pages": paginate_capped(
+            pack.glossary,
+            getattr(pack, "glossary_per_page_first", None) or getattr(pack, "glossary_per_page", None) or GLOSSARY_PER_PAGE,
+            getattr(pack, "glossary_per_page", None) or GLOSSARY_PER_PAGE
+        ),
         "qa_pages": paginate_capped(pack.qa_items, QA_PER_PAGE),
         "distinctions_pages": paginate_capped(pack.distinctions, DISTINCTIONS_PER_PAGE),
         "matchtable_pages": paginate_capped(pack.match_table, MATCHTABLE_PER_PAGE),
@@ -534,7 +551,7 @@ def build(module_name: str, d: "donem_mod.Donem | None" = None):
         pack=pack, css=css, theme_override_css=theme_override_css, ctx=ctx,
     )
 
-    slug = slugify(pack.title)
+    slug = (getattr(pack, "slug", None) or "").strip() or slugify(pack.title)
     ders_dir = course_out_dir(pack)
     html_path = ders_dir / f"{slug}.html"
     pdf_path = ders_dir / f"{slug}.pdf"
@@ -725,8 +742,8 @@ def validate(pack) -> list[str]:
     chapter_numbers = [c.number for c in pack.chapters]
     if chapter_numbers != list(range(1, len(chapter_numbers) + 1)):
         warnings.append(f"Bölüm numaraları sıralı/ardışık değil: {chapter_numbers}")
-    toc_rows = len(pack.chapters) + 2          # bölümler + sözlük + test
-    if toc_rows > TOC_MAX_ROWS:
+    toc_rows = len(pack.chapters) + (1 if pack.glossary else 0) + (1 if getattr(pack, "test_questions", None) or getattr(pack, "qa_items", None) else 0)
+    if toc_rows > TOC_MAX_ROWS and toc_page_count(pack) == 1:
         warnings.append(
             f"İçindekiler {toc_rows} satır; sıkışık kipin ölçülmüş kapasitesi "
             f"{TOC_MAX_ROWS} satır. İçindekiler TEK SAYFA olmak zorunda olduğu "
