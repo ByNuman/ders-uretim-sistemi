@@ -257,6 +257,22 @@ def verify_page_numbers(courses: list[dict], pdf_path: Path, fm: dict):
     return problems
 
 
+def _splice_cover_pdf(pdf_path: Path, cover_pdf_path: Path):
+    """Vektörel PDF kapağı (ör. 01-guz-vize-a4.pdf) kitabın 1. sayfası (s.1)
+    olarak yerleştirir. Orijinal vektör metin ve grafik kalitesi korunur."""
+    import fitz
+    doc = fitz.open(pdf_path)
+    cover_doc = fitz.open(cover_pdf_path)
+    doc.delete_page(0)
+    doc.insert_pdf(cover_doc, from_page=0, to_page=0, start_at=0)
+    tmp_path = pdf_path.with_suffix(".tmp.pdf")
+    doc.save(tmp_path)
+    doc.close()
+    cover_doc.close()
+    tmp_path.replace(pdf_path)
+    print(f"[kitap] Vektörel PDF kapak yerleştirildi: {cover_pdf_path.name} -> s.1")
+
+
 def build_book(module_name: str = "kitap", d: "donem_mod.Donem | None" = None):
     if d is not None:
         B.set_donem(d)
@@ -298,6 +314,9 @@ def build_book(module_name: str = "kitap", d: "donem_mod.Donem | None" = None):
     overflow = B.render_pdf(html_path, pdf_path, expected_pages=fm["stats"]["pages"],
                             geo=B.BOOK_GEOMETRY)
     report_overflow(overflow, courses)
+    cover_pdf = getattr(book, "cover_pdf", None)
+    if cover_pdf and Path(cover_pdf).exists():
+        _splice_cover_pdf(pdf_path, Path(cover_pdf))
     B.optimize_pdf(pdf_path)
     verify_page_numbers(courses, pdf_path, fm)
     n = add_book_bookmarks(pdf_path, courses, fm)

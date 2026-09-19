@@ -302,6 +302,7 @@ class BookPack:
                                                   # hazırlanmış olmalı. Künye ve içindekiler
                                                   # sayfaları bundan ETKİLENMEZ; sayfa sayısı ve
                                                   # yer imleri de değişmez (kapak yine 1 sayfa).
+    cover_pdf: Optional[str] = None               # Doğrudan vektörel PDF kapak yolu (ör. 01-guz-vize-a4.pdf)
     imprint_rows: list[tuple] = field(default_factory=list)   # [("Dönem", "2025-2026 Bahar"), ...]
     imprint_note: str = ""
     preface_lead: str = ""                        # önsözün koyu zeminli giriş paragrafı
