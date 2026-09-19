@@ -88,32 +88,32 @@
 }
 
 /* ---------- Tema paletleri ----------
-   Her paper tonu kasıtlı çok hafiftir (L≈98%) — beyazdan ayırt edilir ama
-   metin kontrastını bozmaz; --line de aynı ton ailesinden seçilmiştir. */
+   Baskı ve fotokopide kağıdın kenar payını bozmamak için --paper daima saf beyazdır (#ffffff).
+   --line de aynı ton ailesinden seçilmiştir. */
 .theme-indigo {
   --accent: #3a4fb0; --accent-dark: #232f6e; --accent-soft: #eef0fc; --accent-tint: #f5f6fd;
   --cover-grad-1: #12163a; --cover-grad-2: #33449e; --cover-grad-3: #5468d4; --gold: #dfba68; --gold-ink: #6b5310;
-  --paper: #fbfbfe; --paper-tint: #f3f4fb; --line: #e2e3f0; --line-soft: #ececf6;
+  --paper: #ffffff; --paper-tint: #f3f4fb; --line: #e2e3f0; --line-soft: #ececf6;
 }
 .theme-burgundy {
   --accent: #8c2a3c; --accent-dark: #5c1522; --accent-soft: #fbeef0; --accent-tint: #fdf6f6;
   --cover-grad-1: #31090f; --cover-grad-2: #7a2433; --cover-grad-3: #a8394c; --gold: #d1ab5c; --gold-ink: #6b4f10;
-  --paper: #fefbfa; --paper-tint: #fcf4f3; --line: #f0dfdd; --line-soft: #f6ecea;
+  --paper: #ffffff; --paper-tint: #fcf4f3; --line: #f0dfdd; --line-soft: #f6ecea;
 }
 .theme-forest {
   --accent: #14665a; --accent-dark: #0b3e37; --accent-soft: #e9f5f2; --accent-tint: #f4faf9;
   --cover-grad-1: #041a15; --cover-grad-2: #0f5049; --cover-grad-3: #1c8272; --gold: #d3bd76; --gold-ink: #6b5710;
-  --paper: #fafefd; --paper-tint: #f2faf8; --line: #dcefe9; --line-soft: #e9f5f1;
+  --paper: #ffffff; --paper-tint: #f2faf8; --line: #dcefe9; --line-soft: #e9f5f1;
 }
 .theme-slate {
   --accent: #3d5568; --accent-dark: #24333f; --accent-soft: #edf2f5; --accent-tint: #f6f9fa;
   --cover-grad-1: #0e161d; --cover-grad-2: #324556; --cover-grad-3: #52738c; --gold: #d0b476; --gold-ink: #6b5510;
-  --paper: #fafcfd; --paper-tint: #f2f6f8; --line: #e0e8ec; --line-soft: #edf2f4;
+  --paper: #ffffff; --paper-tint: #f2f6f8; --line: #e0e8ec; --line-soft: #edf2f4;
 }
 .theme-plum {
   --accent: #6a3b8c; --accent-dark: #3f2255; --accent-soft: #f4eef9; --accent-tint: #faf7fc;
   --cover-grad-1: #1c0d2e; --cover-grad-2: #59317a; --cover-grad-3: #8552ac; --gold: #d5b168; --gold-ink: #6b4f10;
-  --paper: #fdfaff; --paper-tint: #f7f2fb; --line: #eae0f2; --line-soft: #f2ebf8;
+  --paper: #ffffff; --paper-tint: #f7f2fb; --line: #eae0f2; --line-soft: #f2ebf8;
 }
 
 /* ---------- Reset & font sistemi ---------- */
@@ -135,7 +135,7 @@ em { font-style: italic; }
   width: var(--page-w);
   height: var(--page-h);
   overflow: hidden;
-  background: var(--paper);
+  background: var(--paper, #ffffff);
   page-break-after: always;
   break-after: page;
   display: flex;
@@ -742,35 +742,4 @@ table.matchtable tr:nth-child(even) td { background: var(--accent-tint); }
 .btoc-range {
   flex: 0 0 auto; font-size: 9pt; font-weight:700; color: #fff; white-space: nowrap;
   padding: 1.8mm 3.2mm; border-radius: 6px; min-width: 24mm; text-align:center;
-}
-
-/* --- Kenar sekmesi / thumb index (DENEME) — SADECE birleşik kitap ---------
-   Dersin sırasına (--ti / --tn) göre sayfanın DIŞ kenarında dikey konumlanan
-   renkli bant. Renk dersin kendi --accent'idir (macro inline veriyor).
-   2026-09 (kullanıcı isteği): kenara SIFIR yaslı — bant bitmiş sayfa kenarına
-   (trim = var(--bleed)) dayanır, iç boşluk yok. Kapalı kitapta yandan
-   görünür bir başlık merdiveni oluşturur. UYARI: fotokopi makineleri kâğıt
-   kenarından ~5mm basamaz; sıfır yaslı bant fotokopide kırpılabilir/eksik
-   çıkabilir. Matbaada (kenardan taşan bleed ile) sorun olmaz. Dış boşlukta
-   (12mm) durur, metin alanına girmez; footer'la çakışmaz. */
-.thumb-tab {
-  position: absolute;
-  right: var(--bleed);
-  /* 11 ders -> sayfa boyunca eşit aralıklı, taşmayan merdiven */
-  top: calc(15mm + (var(--page-h) - 58mm) * (var(--ti) - 1) / (var(--tn) - 1));
-  width: 7.6mm; height: 23mm;
-  border: 1px solid rgba(255,255,255,0.92);   /* aynı renk içeriğin üstünde bile ayrışsın */
-  border-right: none;
-  border-radius: 3px 0 0 3px;
-  box-shadow: -1.5px 1.5px 4px rgba(0,0,0,0.22);
-  display: flex; align-items: center; justify-content: center;
-  overflow: hidden;
-  z-index: 4;
-}
-.thumb-tab span {
-  writing-mode: vertical-rl;
-  font-family: "DejaVu Sans", "Liberation Sans", Arial, sans-serif;
-  font-size: 5pt; font-weight: 700; letter-spacing: 0;
-  text-transform: uppercase; white-space: nowrap;
-  color: #fff;
 }

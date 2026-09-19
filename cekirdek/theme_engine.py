@@ -69,7 +69,7 @@ def generate_theme_vars(hue: float, sat: float = 50.0, light: float = 34.0) -> d
     g1 = _hsl_to_hex(hue, min(sat + 12, 78), 10)
     g2 = _hsl_to_hex(hue, sat, max(light - 5, 8))
     g3 = _hsl_to_hex(hue, max(sat - 8, 20), min(light + 10, 60))
-    paper = _hsl_to_hex(hue, 35, 99)
+    paper = "#ffffff"  # Çıktı/fotokopide kenar boşluğu beyaz kalıp arka planı bozmasın diye daima saf beyaz
     paper_tint = _hsl_to_hex(hue, 32, 96.8)
     line = _hsl_to_hex(hue, 28, 90.5)
     line_soft = _hsl_to_hex(hue, 30, 94.2)

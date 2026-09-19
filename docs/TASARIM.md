@@ -19,10 +19,11 @@ Düzeltme yapılacak yerler (TÜM derslerde paylaşılır):
 
 5 sabit tema (`indigo/burgundy/forest/slate/plum`) hâlâ çalışıyor, ama
 YENİ derslerde bunlarla sınırlı kalmanıza gerek yok. `cekirdek/theme_engine.py`,
-TEK bir hex renkten (`--accent`, `--accent-dark`, kapak gradyanı, `--paper`
-zemin tonu dahil) tüm CSS değişkenlerini otomatik türetir — mevcut 5
-temanın HSL değerleri geriye doğru analiz edilerek kalibre edilmiştir,
-yani üretilen her yeni ton AYNI görsel kalite çizgisindedir.
+TEK bir hex renkten (`--accent`, `--accent-dark`, kapak gradyanı dahil; `--paper`
+ise baskıda kenar taşması olmaması için daima saf beyaz `#ffffff` tutulur) tüm CSS
+değişkenlerini otomatik türetir — mevcut 5 temanın HSL değerleri geriye doğru
+analiz edilerek kalibre edilmiştir, yani üretilen her yeni ton AYNI görsel kalite
+çizgisindedir.
 
 ```python
 return CoursePack(
@@ -98,8 +99,9 @@ oluyorsa o dersin hue'sunu birkaç derece kaydırmayı deneyin.
 ## Tasarım sistemi özeti (referans amaçlı — değiştirmen gerekmemeli)
 
 - Gövde fontu DejaVu Sans, başlıklar DejaVu Serif (kitap/akademik his).
-- Her tema kendi `--accent`, `--accent-dark`, `--gold`, `--paper` (hafif
-  tonlu, beyaz değil) setini tanımlar; callout renkleri
+- Her tema kendi `--accent`, `--accent-dark`, `--gold` setini tanımlar; `--paper`
+  ise yazıcı/fotokopi kenar paylarında beyaz boşluk ve ton farkı oluşmasını
+  engellemek için daima saf beyazdır (`#ffffff`); callout renkleri
   (`focus/caution/insight/route`) tema-bağımsız sabittir. 5 sabit isimli
   tema (`indigo/burgundy/forest/slate/plum`) hâlâ var, ama `theme_color`
   ile `cekirdek/theme_engine.py` üzerinden SINIRSIZ sayıda özel renk üretilebilir
@@ -121,25 +123,20 @@ oluyorsa o dersin hue'sunu birkaç derece kaydırmayı deneyin.
   ile (veya `ders_kapak_uri` üzerinden çıktı klasöründeki `*kapak.png` taranarak)
   tam sayfa görsel kapak olarak ayarlanabilir; görsel verilmemişse varsayılan
   CSS amblem kapağı çizilir.
-- **Birleşik kitapta her dersin gövde sayfalarında KENAR SEKMESİ (thumb index)
-  vardır** (`.thumb-tab`, `_ders_govde.html.j2` içindeki `thumb_tab()` makrosu —
-  yalnızca `course()` makrosuna `tab` verildiğinde, yani kitap derlemesinde
-  çizilir; tek ders PDF'inde YOK). Dersin sırasına göre (`--ti`/`--tn`) sayfanın
-  dış kenarında dikey konumlanır; renk dersin `--accent`'i, üstünde dikey yazılı
-  `course_code`. Kenardan **2,5 mm içeride** durur (fotokopi makinesi kenardan
-  ~5 mm basamaz) — kapalı kitap sırtında merdiven görünmez, açık sayfada/çevirirken
-  ders konumunu verir. Bilerek "sıfır yaslı" YAPILMADI: matbaa bleed'i olmayan
-  bir çıktıda kenara sıfır sekme kırpılır (kullanıcı kararı, 2026-09). 11 derste
-  ölçüldü; sekme yüksekliği/font'u o sınıra göre kalibre (`docs/OLCUMLER.md`
-  mantığı) — elle büyütme.
+- **KENAR SEKMESİ (thumb index) KALDIRILDI.** Birleşik kitapta denenen
+  dış kenar sekmeleri (`.thumb-tab`), fotokopi ve masaüstü yazıcıların kâğıt
+  kenarlarında bıraktığı ~5mm basılamayan donanım boşluğu sebebiyle istenen
+  sonucu vermediğinden ve kenar çizgilerini bozduğundan 2026 Eylül'ünde
+  projeden tamamen kaldırılmıştır. Sayfalar artık kenara sıfır sekme içermez.
 - **SAYFA ARKA PLANI DÜZDÜR — nokta deseni/doku YOKTUR.** Hem kapakta hem iç
   sayfalarda (içindekiler, genel bakış, bölümler, sözlük, test, cevap
   anahtarı) eskiden düşük opaklıklı bir nokta matrisi (`.body-page::before`
   ve `.cover::before` üzerinde tekrarlayan `radial-gradient`) vardı; 2026
   Ağustos'unda kullanıcı isteğiyle KALDIRILDI. İç sayfaların zemini artık
-  yalnızca `--paper` tonu, kapağınki yalnızca gradyan katmanlarıdır. Yeni bir
-  bileşen eklerken sayfa arka planına nokta/doku/desen **ekleme**; bu iki
-  kuralı geri getirme. (Bölüm banner'ının kendi içindeki çok hafif doku
+  saf A4 kağıt beyazıdır (`#ffffff`, `--paper`), kapağınki yalnızca gradyan katmanlarıdır.
+  Böylece A4 kağıda çıktı alındığında kenarlarda beyaz çerçeve oluşmaz ve kağıdın
+  orijinal beyazlığı ile bütünleşir. Yeni bir bileşen eklerken sayfa arka planına nokta/doku/desen
+  **ekleme**; bu iki kuralı geri getirme. (Bölüm banner'ının kendi içindeki çok hafif doku
   `.chbanner::before` bir KUTU dokusudur, sayfa zemini değildir ve bilerek
   bırakılmıştır.)
 - Her sayfa A4 (210×297mm, bleed yok), `.page` sınıfı `overflow:hidden` — taşma her
