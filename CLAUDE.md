@@ -514,10 +514,13 @@ Ayrıca:
   ("ÖĞRETİM TEKNOLOJİLERİ" → "ÖĞR. TEKNOLOJİLERİ").
 - **Sınav bölümü Test + Cevap Anahtarı'dır** (LEGACY "Sınav Hazırlık" değil):
   20 soruluk çoktan seçmeli test + her soru için çözümlü cevap anahtarı.
-  **Test = 2 sayfa (10+10), cevap anahtarı = 1 sayfa** (2026-09: eski 3+1 idi, sınav
-  bölümü sıkıştırıldı — ilk sayfanın başlık bloğu tek `.test-meta` şeridi, `.tq`
-  aralıkları ölçülü). Soru KÖKLERİNİ ve ŞIKLARINI kısa yaz: uzun tam-cümle şıklar
-  10/sayfa düzenini taşırır. Bir şık 2 satırı geçiyorsa kısalt.
+  **Test = 2 sayfa (10+10), cevap anahtarı = 1 sayfa** (2026-09: sınav bölümü sıkıştırıldı).
+  **Zorluk Dengesi:** 5–6 kolay (%25–30 motivasyon), 8–9 orta (%40–45 kavrama), 5–6 zor/tam sınav
+  sorusu (%25–30 öncüllü, çeldiricisi güçlü, metin/ibare analizi).
+  **Arapça Kuralı:** Ders Arapça ağırlıklı ise en az 6–10 soru doğrudan Arapça kök/şık veya hibrit
+  metin olmalı; cevap anahtarında Türkçe çevirisi (`.ans-trans`) ve kural gerekçesi eksiksiz verilmeli.
+  Soru KÖKLERİNİ ve ŞIKLARINI öz ve vurucu yaz: uzun tam-cümle şıklar 10/sayfa düzenini taşırır.
+  Bir şık 2 satırı geçiyorsa kısalt. Detaylar: "Test + Cevap Anahtarı" bölümü.
 - Vize dersinde `sinav_etiketi="Vize"` yaz (varsayılan "Final"); `subtitle`'a ayrıca
   "— Vize Özeti" ekleme, tekrar olur.
 
@@ -810,8 +813,57 @@ Test ve Cevap Anahtarı **2 sütunlu** render edilir (`column-count: 2` +
 
 `pack.test_questions` doluysa şablon otomatik bu formatı render eder: banner + 3'lü
 bilgi çubuğu ("20 Soru / Çoktan Seçmeli / 5 Seçenek") + talimat kutusu + numaralı
-sorular; ardından ayrı bir "Cevap Anahtarı ve Çözümler" bölümü. 20 soru standarttır
-ama sayı serbesttir. Şablon olarak `src/sosyoloji.py` ve `src/psikoloji.py`'yi kullanın.
+sorular; ardından ayrı bir "Cevap Anahtarı ve Çözümler" bölümü. 20 soru standarttır.
+
+### 1. Pedagojik Zorluk Piramidi (20 Soru Dağılımı)
+
+Soruların tümü basit bilgi/tanım sorusu olamaz. Gerçek sınav ağırlığını yakalamak
+için 20 soru şu üç seviyeye dengeli dağıtılır:
+
+- **Kolay (Seviye 1 — %25–30 / 5–6 soru):** Temel kavram tanımları, anahtar eser-müellif
+  bilgisi. Öğrencinin özgüvenini ve motivasyonunu pekiştirir.
+- **Orta (Seviye 2 — %40–45 / 8–9 soru):** İki kavram/ekol arası kıyas, neden-sonuç
+  ilişkisi, temel kural tatbiki, boşluk doldurma. Kavrama ve uygulama düzeyini ölçer.
+- **Zor / Tam Sınav Formatı (Seviye 3 — %25–30 / 5–6 soru):**
+  - **Öncüllü sorular:** `I. ...`, `II. ...`, `III. ...` maddeleri verilerek "hangisi
+    doğrudur / yanlıştır?" kurgusu.
+  - **Metin / İbare analizi:** Verilen bir metin, ayet, hadis veya düşünür alıntısı
+    üzerinden derinlikli çıkarım.
+  - **Güçlü çeldiriciler:** Sınavda öğrencilerin en çok karıştırdığı ince ayrımları
+    sorgulayan ve yüzeysel ezberi eleyen tuzaklar.
+  - **Olumsuz soru kökleri:** "Hangisi söylenemez?", "Hangisi bu kapsamda yer almaz?".
+
+### 2. Arapça ve İslami İlimler Derslerinde Soru Standartları
+
+Ders Arapça ağırlıklı ise (Arap Dili ve Edebiyatı) veya Arapça metin/ıstılah içeriyorsa
+(Tefsir, Hadis, Fıkıh, Kelam), sorular salt Türkçe sorulamaz:
+
+- **Denge Kuralı:** 20 sorunun en az 6–10'u doğrudan Arapça metin, ibare veya dil kuralı
+  içermelidir. Denge şu 3 modelle kurulur:
+  1. **Tam Arapça Soru (Kök + Şıklar Arapça):** Özellikle sarf kalıpları, nahiv/irab,
+     eş/zıt anlam, edat kullanımı veya cümle tamamlama için.
+     Örnek stem: `«مَا رَأَيْتُ إِلَّا زَيْدًا» - مَا إِعْرَابُ كَلِمَةِ (زَيْدًا) فِي الْجُمْلَةِ؟`
+     Şıklar: `A) فَاعِلٌ مَرْفُوعٌ`, `B) مَفْعُولٌ بِهِ مَنْصُوبٌ` vb.
+  2. **Hibrit Soru (Arapça Metin/Öncül + Türkçe Analiz):** Arapça ayet, hadis, şiir
+     veya nesir pasajı verilir; Türkçe soru köküyle edebi sanat, tefsir/kelam hükmü
+     veya dilbilgisi özelliği sorulur.
+  3. **Türkçe Kök + Arapça Şıklar:** Türkçe tarif edilen bir kaideye uygun Arapça
+     cümle veya ibarenin şıklardan bulunması istenir.
+- **Tipografi ve Yazım:** Arapça kısımlar `<span class="ar">...</span>` veya `<bdi class="ar">...`
+  ile sarılır. Harekeler (özellikle irab veya sarf sorularında) eksiksiz konur.
+- **Cevap Anahtarı Zorunluluğu ("Arapça hiçbir yerde Türkçesiz bırakılmaz"):**
+  Arapça sorulan veya Arapça öncüllü her sorunun `AnswerItem.explanation` alanında:
+  1. Sorunun ve ibarenin **tam Türkçe çevirisi** (`<span class="ans-trans">"..."</span>`).
+  2. Doğru şıkkın dilbilgisi / edebi / mantıksal **analitik gerekçesi**
+  mutlaka birlikte verilir. Öğrenci sınavda zorlanır ancak çözüm sayfasında tam kavrar.
+
+### 3. Sayfalama ve Taşma Disiplini (Hayati!)
+
+- **Test = 2 sayfa (10+10), Cevap Anahtarı = 1 sayfa (20 çözüm):**
+  Zor veya Arapça soru yazarken cümleleri gereksiz uzatma. Uzun paragraflar yerine
+  yoğun, vurucu ve net öncüller kullan. Bir şık 2 satırı geçiyorsa sadeleştir.
+- Öncüllü sorularda şablon:
+  `<div class="tq-lead">...</div><ul class="tq-premises"><li><span class="tq-roman">I.</span> ...</li>...</ul>Yukarıdakilerden hangileri doğrudur?`
 
 ## Birleşik Kitap (`build_kitap.py`)
 
