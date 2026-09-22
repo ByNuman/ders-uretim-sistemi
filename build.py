@@ -681,7 +681,16 @@ def optimize_pdf(pdf_path: Path) -> tuple[int, int]:
         tmp.unlink(missing_ok=True)
         print("[UYARI] Boyut optimizasyonu içeriği değiştirdi -- atlandı, PDF olduğu gibi bırakıldı.")
         return before, before
-    os.replace(str(tmp), str(pdf_path))
+    import time
+    for _ in range(5):
+        try:
+            os.replace(str(tmp), str(pdf_path))
+            break
+        except PermissionError:
+            time.sleep(0.5)
+    else:
+        tmp.unlink(missing_ok=True)
+        return before, before
     after = pdf_path.stat().st_size
     print(f"[build] Boyut: {before/1024/1024:.1f} MB -> {after/1024/1024:.1f} MB "
           f"(%{round((1 - after / before) * 100)} küçüldü, tekrar eden nesneler birleştirildi)")

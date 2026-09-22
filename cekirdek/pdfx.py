@@ -41,7 +41,19 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import time
 from pathlib import Path
+
+
+def _safe_replace(src: Path, dst: Path, retries: int = 5, delay: float = 0.5):
+    """Windows dosya kilitleme ve anlık erişim engellerine karşı döngülü dosya değiştirme."""
+    for _ in range(retries):
+        try:
+            os.replace(str(src), str(dst))
+            return
+        except PermissionError:
+            time.sleep(delay)
+    os.replace(str(src), str(dst))
 
 # --- doğrudan çalıştırma desteği ------------------------------------------
 # Bu modül hem paket olarak (`from cekirdek.X import ...`) hem de doğrudan
@@ -139,7 +151,7 @@ def set_print_boxes(pdf_path: Path, trim_w_mm: float, trim_h_mm: float,
     tmp = pdf_path.with_name(pdf_path.stem + "._boxes.pdf")
     doc.save(str(tmp), garbage=0, deflate=True)
     doc.close()
-    os.replace(str(tmp), str(pdf_path))
+    _safe_replace(tmp, pdf_path)
     if too_small and not quiet:
         print(f"[UYARI] {too_small} sayfanın levhası beklenen "
               f"{trim_w_mm + 2 * bleed_mm:g}x{trim_h_mm + 2 * bleed_mm:g}mm'den küçük -- "
@@ -394,7 +406,7 @@ def write_pdfx_xmp(pdf_path: Path, title: str, version: str = "PDF/X-4") -> None
     tmp = pdf_path.with_name(pdf_path.stem + "._xmp.pdf")
     with open(tmp, "wb") as fh:
         writer.write(fh)
-    os.replace(str(tmp), str(pdf_path))
+    _safe_replace(tmp, pdf_path)
 
     # Sessiz kayıp olmasın: PDF/X kimliği dosyada gerçekten duruyor mu?
     import pymupdf

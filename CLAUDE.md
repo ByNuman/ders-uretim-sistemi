@@ -100,6 +100,13 @@ değerlendir. `.toc-compact` değerlerini elle küçültme — ölçümle bağl�
 
 Ölçümler ve eşiklerin nereden geldiği: `docs/OLCUMLER.md`.
 
+## KRİTİK KURAL 5: Kapak Tasarımı — Varsayılan Klasik Vektörel Kapaktır (cover_image="")
+
+Görsel ders notu üretilirken kapak için **her zaman sistemin yerel CSS/HTML vektörel kapağı kullanılır (`cover_image=""`)**:
+- Harici bir kapak görseli (`cover_image`) otomatik olarak aranmaz, resim/difüzyon yapay zekasıyla üretilmez veya görsel manipülasyonla yamalanmaz.
+- Klasik vektörel kapak; dersin renk temasında degrade zemin, usturlap amblemi, altın köşe süsleri, amblem harfi, başlık/alt başlık, cam efektli istatistik kutuları ve kurumsal alt bilgiyi kusursuz, jilet gibi net vektörel formatta otomatik çizer.
+- Özel kapak görseli **SADECE ve SADECE** kullanıcı açıkça *"şu kapağı kullan"*, *"kapağı şu görsel ile değiştir"* dediğinde ilgili derse atanır.
+
 ---
 
 ## Sistemin amacı
