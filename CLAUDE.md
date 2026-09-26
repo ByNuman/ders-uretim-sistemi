@@ -108,6 +108,20 @@ Görsel ders notu üretilirken kapak için **her zaman sistemin yerel CSS/HTML v
 - Klasik vektörel kapak; dersin renk temasında degrade zemin, usturlap amblemi, altın köşe süsleri, amblem harfi, başlık/alt başlık, cam efektli istatistik kutuları ve kurumsal alt bilgiyi kusursuz, jilet gibi net vektörel formatta otomatik çizer.
 - Özel kapak görseli **SADECE ve SADECE** kullanıcı açıkça *"şu kapağı kullan"*, *"kapağı şu görsel ile değiştir"* dediğinde ilgili derse atanır.
 
+## KRİTİK KURAL 6: Müfredat Bilgi Paketleri Eski ve Bağlayıcı Değildir — Tek Bağlayıcı Kaynak Ders Kitapları ve Öğretmenin Verdiği Ek Kaynaklardır (Tüm Dersler İçin Geçerli)
+
+Üniversite bilgi sistemi / Bologna müfredat bilgi paketleri (`<ders> MÜFREDAT BİLGİ PAKETİ.pdf`) sıklıkla eski, revize edilmemiş ve fiili ders işleyişiyle uyuşmayan evraklardır. **Bu paketler bağlayıcı DEĞİLDİR.**
+- Ders notu, haftalık çalışma belgesi veya görsel ders notu üretilirken **asla "müfredat–kitap karşılaştırması", "metin sapması", "müfredat vs. kitap çelişkisi" gibi bölümler, tablolar veya uyarılar eklenmez**.
+- Sorumlu olunan yegâne kaynak: `<D>/kaynaklar/ders_kaynaklari/` altındaki ders kitapları / materyalleri ve öğretmenin doğrudan bildirdiği ek kaynaklardır.
+- Öğretmen ek bir kaynak veya farklı bir metin bildirirse, kullanıcı bunu belirtecektir. Aksi takdirde ders kitabının ünite ve konu akışı doğrudan esas alınır.
+- Bu kural sistemdeki **TÜM DERSLER** için istisnasız geçerlidir.
+
+## KRİTİK KURAL 7: Öğretmen İsimleri Ders Programındaki Resmî İsimlerle Birebir Yazılır
+
+Ders notlarında, kapaklarda veya metin içi ders künyelerinde öğretim elemanı adı geçecekse:
+- Adlandırma rastgele veya tahmini yapılamaz.
+- Doğrudan haftalık ders programındaki resmî unvan ve isim (ör. "Öğr. Gör. Muhammed Salih SÜRÜCÜ", "Doç. Dr. ...") birebir esas alınır.
+
 ---
 
 ## Sistemin amacı
