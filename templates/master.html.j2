@@ -10,6 +10,7 @@
 <title>{{ pack.title }}</title>
 <style>{{ css }}</style>
 {% if theme_override_css %}<style>{{ theme_override_css }}</style>{% endif %}
+{% if pack.custom_css %}<style>{{ pack.custom_css }}</style>{% endif %}
 </head>
 <body class="theme-{{ 'custom' if pack.theme_color else pack.theme }}">
 {% import "_ders_govde.html.j2" as ders %}

@@ -299,6 +299,18 @@ def build_book(module_name: str = "kitap", d: "donem_mod.Donem | None" = None):
         for w in B.validate(c["pack"]):
             print(f"[UYARI] {B.strip_tags(c['pack'].title)}: {w}")
 
+    out_dir = B.out_dir()
+    if getattr(book, "cikti_klasoru", None):
+        out_dir = out_dir / book.cikti_klasoru
+        out_dir.mkdir(parents=True, exist_ok=True)
+
+    if getattr(book, "cover_image", None) is None:
+        try:
+            from cekirdek.content_model import ders_kapak_uri
+            book.cover_image = ders_kapak_uri(out_dir)
+        except Exception:
+            pass
+
     env = Environment(loader=FileSystemLoader(str(B.TEMPLATES)))
     html = env.get_template("kitap.html.j2").render(
         book=book, css=css, courses=courses, fm=fm,
@@ -306,8 +318,8 @@ def build_book(module_name: str = "kitap", d: "donem_mod.Donem | None" = None):
     )
 
     slug = B.slugify(book.title)
-    html_path = B.out_dir() / f"{slug}.html"
-    pdf_path = B.out_dir() / f"{slug}.pdf"
+    html_path = out_dir / f"{slug}.html"
+    pdf_path = out_dir / f"{slug}.pdf"
     html_path.write_text(html, encoding="utf-8")
     print(f"[kitap] HTML yazıldı: {html_path} ({len(html) // 1024} KB)")
 

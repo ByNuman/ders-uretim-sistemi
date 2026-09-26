@@ -291,6 +291,7 @@ class BookPack:
     theme: str = "slate"               # kitabın kendi ön kısmı için (dersler kendi temasını korur)
     theme_color: Optional[str] = None
     icon_text: str = "K"
+    cikti_klasoru: Optional[str] = None           # Opsiyonel alt çıktı klasörü (ör. 'HAFTALIK DERSLER/1. Hafta')
 
     # --- Ön kısım (kapak / künye / önsöz / rehber / ana içindekiler / harita) ---
     cover_kicker: str = "Ders Notu Kitabı · Dönem Cildi"
@@ -357,6 +358,7 @@ class CoursePack:
     # Ders programındaki BÜYÜK HARFLİ tam ad yazılır, ör. "KELÂM TARİHİ".
     # Boş bırakılırsa build.py başlıktan türetilen slug'a düşer (geriye dönük uyumluluk).
     ders_klasoru: str = ""
+    custom_css: str = ""   # Derse özel ek CSS kuralları (opsiyonel)
 
     # --- Kapaktaki sınav etiketi ---
     # Kapak kickerinde ("Ders Notu Kitabı · <X> Özeti"), kapak istatistik

@@ -76,8 +76,9 @@ Bu üç aşama **ayrı şeylerdir, birbirinin yerine geçmez**:
 
 `build.py` bu alt klasörü otomatik oluşturur. Klasör adı `CoursePack.ders_klasoru`
 alanından okunur. Aynı kural `ders-anlatim` skill'inin çıktı klasörleri için de
-geçerlidir. Tek istisna birleşik kitaptır: tek bir derse ait olmadığı için
-`gorsel_ders_notlari/` **köküne** yazılır.
+geçerlidir. Birleşik kitaplarda:
+- **Dönem Birleşik Kitabı:** Tek bir derse ait olmadığı için `gorsel_ders_notlari/` **köküne** yazılır (`donem-ders-notlari-kitabi.pdf`).
+- **Haftalık Birleşik Kitaplar (Kullanıcı Kuralı 2026-09):** Kullanıcı haftalık dersleri birleştirmeyi istediğinde, çıktı mutlaka `gorsel_ders_notlari/HAFTALIK DERSLER/<N>. Hafta/` klasörüne yazılır (ör. `HAFTALIK DERSLER/1. Hafta/haftalik-ders-1-hafta.pdf`). `BookPack.cikti_klasoru="HAFTALIK DERSLER/<N>. Hafta"` alanı bunu yönetir. İlgili haftanın kapak görseli (`haftalik-ders-<N>-hafta-kapak.png`) varsa `cover_image` olarak atanır.
 
 Dönem boyunca ders haftalık işlenir ve `<DERS ADI>/` altında `NN-hafta/` alt
 klasörleri birikir; ham haftalık materyal `ders_kaynaklari/<DERS ADI>/NN-hafta/`,
@@ -871,6 +872,30 @@ Ders Arapça ağırlıklı ise (Arap Dili ve Edebiyatı) veya Arapça metin/ıst
   yoğun, vurucu ve net öncüller kullan. Bir şık 2 satırı geçiyorsa sadeleştir.
 - Öncüllü sorularda şablon:
   `<div class="tq-lead">...</div><ul class="tq-premises"><li><span class="tq-roman">I.</span> ...</li>...</ul>Yukarıdakilerden hangileri doğrudur?`
+
+## Tipografi ve Okunabilirlik Hiyerarşisi (2026-09 Kullanıcı Kuralı)
+
+Kullanıcının 2026-09 tarihli doğrudan talimatı gereği, görsel ders notlarında küçük yazıların ve özellikle Arapça harekeli ibarelerin rahat okunabilmesi için aşağıdaki boyut hiyerarşisi esas alınır:
+
+### 1. Arapça ve Harekeli İbareler (`<bdi>`, `.ar`, `[dir="rtl"]`)
+- **Ölçek:** Bulunduğu ebeveyn elemanın font boyutuna göre **`%125` (`1.25em`)** oranında büyütülür (madde imlerinde ~11.7 pt, tablolarda ~10.6 pt).
+- **Satır Yüksekliği (`line-height`):** En az **`1.65 – 1.68`** olmalıdır. Böylece üstteki fetha/şedde ile alttaki kesre işaretleri birbirine veya satır sınırlarına yapışmaz, fotokopide silikleşmez.
+- **Etiketleme Disiplini:** Madde imleri, tablolar, soru kökleri ve şıklardaki tüm Arapça ibareler `<bdi>` (veya `.ar`) ile sarılır.
+
+### 2. Genel Metin ve Küçük Punto İyileştirmesi
+- **Madde Metinleri (`.block li`):** `9.35 pt` (line-height: `1.50`, margin-bottom: `1.4mm`).
+- **Tablo Hücreleri (`table.ctable td`):** `8.65 pt` (line-height: `1.38`, padding: `2.0mm 3.2mm`).
+- **Tablo Başlıkları (`table.ctable th`):** `8.3 pt` (padding: `2.1mm 3.2mm`).
+- **Anahtar Terim Kutuları (`.term-box`):** Terim adı `9.7 pt`, tanım `8.75 pt` (line-height: `1.44`).
+- **Sözlük (`.gloss-*`):** Terim başlığı `10.4 pt`, tanım `8.75 pt` (line-height: `1.44`), bağlam `7.7 pt`.
+- **Vurgu/Uyarı Kutuları (`.callout`):** Başlık `8.8 pt`, metin `9.15 pt` (line-height: `1.50`, padding: `3.4mm 4.4mm`).
+- **Test ve Seçenekler (`.tq-*`):** Soru kökü `9.1 pt` (line-height: `1.32`), şıklar `8.65 pt` (line-height: `1.28`), şık harfi `6.8 pt`, soru alt boşluğu `1.6mm`, şık aralığı `0.65mm`.
+- **Çözümlü Cevap Anahtarı (`.ans-*`):** Açıklama `8.7 pt` (line-height: `1.38`), tercüme `.ans-trans` `8.1 pt`, doğru cevap rozeti `7.7 pt`.
+
+### 3. Teknik Uygulama ve Taşma Güvencesi
+- `CoursePack.custom_css` alanı üzerinden ders bazlı enjekte edilir (`master.html.j2` ve `kitap.html.j2` tarafından otomatik dahil edilir).
+- Punto büyütüldüğünde sayfa taşmasını önlemek için tablo dikey dolguları (`padding: 2.0mm 3.2mm`) ve blok üst boşlukları (`margin-top: 4.4mm – 4.6mm`) dengelenir.
+- Her derlemeden sonra `build.py`'nin taşma denetimi (`[build] Taşma denetimi: tüm sayfalar 210x297mm sınırları içinde. ✓`) mutlaka teyit edilir.
 
 ## Birleşik Kitap (`build_kitap.py`)
 

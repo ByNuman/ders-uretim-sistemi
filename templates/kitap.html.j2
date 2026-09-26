@@ -12,6 +12,7 @@
 {# Her dersin tema bloğu KENDİ kapsamıyla enjekte edilir (.ders-N). ":root"
    kullanılsaydı 14 dersin teması birbirini ezerdi — bkz. theme_engine.py. #}
 {% for c in courses %}{% if c.theme_css %}<style>{{ c.theme_css }}</style>
+{% endif %}{% if c.pack.custom_css %}<style>{{ c.pack.custom_css }}</style>
 {% endif %}{% endfor %}
 {# kitabın kendi ön kısmı da aynı mantıkla kendi kapsamını (.kitap) alır #}
 {% if front_theme_css %}<style>{{ front_theme_css }}</style>{% endif %}
