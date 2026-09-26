@@ -488,6 +488,102 @@ em { font-style: italic; }
 .block li { font-size: 8.9pt; color: var(--ink-soft); margin-bottom: 1.7mm; line-height:1.5; list-style: none; position:relative; }
 .block li::before { content:"–"; position:absolute; left:-4.2mm; color: var(--accent); font-weight:700; }
 .block li b, .block li strong { color: var(--ink); font-weight:700; }
+.block li i, .block li em { color: var(--ink-soft); font-style: italic; }
+.block li u {
+  text-decoration: underline;
+  text-decoration-color: var(--gold);
+  text-underline-offset: 1.6px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+/* ---------- Tipografik Hiyerarşi & Görsel Vurgu Standartları (2026-09) ---------- */
+.k-badge {
+  display: inline-block;
+  font-size: 6.8pt;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  background: var(--accent-tint);
+  color: var(--accent-dark);
+  border: 1px solid var(--accent);
+  padding: 0.2mm 1.6mm;
+  border-radius: 4px;
+  margin-right: 1.2mm;
+  vertical-align: 0.6px;
+  line-height: 1.2;
+}
+.k-badge.gold {
+  background: #fdf8eb;
+  color: #8c5d08;
+  border-color: #d4a017;
+}
+.k-badge.alert {
+  background: #fcf1ef;
+  color: #ad281d;
+  border-color: #f0a8a0;
+}
+.k-badge.subtle {
+  background: var(--accent-soft);
+  color: var(--accent-dark);
+  border-color: var(--line);
+}
+.k-title {
+  font-size: 8.9pt;
+  font-weight: 700;
+  color: var(--ink);
+  font-family: "DejaVu Serif", serif;
+}
+.k-subitem {
+  display: block;
+  margin-top: 0.7mm;
+  margin-left: 1.2mm;
+  padding-left: 2mm;
+  border-left: 2px solid var(--accent);
+  font-size: 8.2pt;
+  line-height: 1.36;
+  color: var(--ink-soft);
+}
+.k-subitem b, .k-subitem strong {
+  color: var(--ink);
+  font-weight: 700;
+}
+.k-subitem u {
+  text-decoration: underline;
+  text-decoration-color: var(--accent);
+  text-underline-offset: 1.4px;
+}
+.k-nass {
+  display: block;
+  margin: 0.7mm 0 0.9mm 0;
+  padding: 1.2mm 2.2mm;
+  background: var(--accent-tint);
+  border-radius: 5px;
+  border-left: 2.6px solid var(--accent);
+}
+.k-nass .ar, .k-nass [dir="rtl"] {
+  font-size: 9.5pt;
+  line-height: 1.4;
+  display: block;
+  margin-bottom: 0.5mm;
+  color: var(--ink);
+}
+.k-nass .meal {
+  font-size: 7.7pt;
+  font-style: italic;
+  color: var(--ink-soft);
+  display: block;
+  line-height: 1.3;
+}
+
+/* Anahtar Terim Kutularında Tanım Yüklemleri */
+.term-box .term-def u {
+  text-decoration: underline;
+  text-decoration-color: var(--accent);
+  text-underline-offset: 1.4px;
+  font-weight: 600;
+  color: var(--ink);
+}
 
 /* ---------- Callout kutuları (gerçek SVG ikonlarla) ---------- */
 .callout { border-radius: 9px; padding: 3.8mm 4.8mm; margin-top: 5.2mm; display:flex; gap: 3.4mm; box-shadow: var(--shadow-sm); }

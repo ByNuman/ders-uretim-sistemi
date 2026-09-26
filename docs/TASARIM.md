@@ -148,4 +148,5 @@ oluyorsa o dersin hue'sunu birkaç derece kaydırmayı deneyin.
   Anahtarı (`#answer-key` anchor) sayfa grubundan oluşur; LEGACY formatta
   tek bir "Sınav Hazırlık" (`#exam` anchor) sayfa grubudur — hangisinin
   render edileceğine `pack.test_questions` doluluğu karar verir.
+- **Tipografik Hiyerarşi & Görsel Vurgu Standartları (2026 Eylül):** Düz metin yığınlarını engellemek için `.k-badge` (kategori rozetleri: varsayılan tema tonu, `.gold`, `.alert`, `.subtle`), `.k-title` (serif madde başlığı), `.k-subitem` (solu dikey renk çizgili girintili açıklama bloğu), `.k-nass` (Arapça metin + meal için hafif zeminli nass/kural kartı) ve renkli alt çizgi (`<u>`) standartlaştırılmıştır. Tüm derslerde paylaşılır.
 

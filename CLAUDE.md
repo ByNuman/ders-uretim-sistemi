@@ -806,6 +806,45 @@ def get_pack() -> CoursePack:
 
 ---
 
+## Tipografik Hiyerarşi ve Görsel Estetik Standartları (2026-09 Standardı)
+
+Görsel ders notlarının tekdüze metin yığınlarına dönüşmesini engellemek, okuma hızını ve görsel akılda kalıcılığı en üst düzeye çıkarmak için `templates/style.css`'te tanımlı şu tipografik bileşenler **tüm derslerde standarttır**:
+
+### 1. Kategori Rozetleri (`.k-badge`)
+Maddelerin veya kavramların kategorisini/türünü belirtmek için `li` veya başlık başında kullanılır:
+- `<span class="k-badge">...</span>`: Temel tema renginde standart rozet (örn: `[Şart 1]`, `[Madde 1]`).
+- `<span class="k-badge gold">...</span>`: Altın sarısı/amber rozet; ilâhî nass, âyet veya yüksek kıymetli ilkeler için (örn: `[Âyet 1]`, `[1. Din]`).
+- `<span class="k-badge alert">...</span>`: Kırmızı/mercan rozet; cezalar, yasaklar, kritik problemler veya zıtlıklar için (örn: `[1. Ceza]`, `[Problem 1]`, `[Haram]`).
+- `<span class="k-badge subtle">...</span>`: Yumuşak pastel zeminli rozet; tarihsel aşamalar, hadisler veya usûl adımları için (örn: `[Hadis 1]`, `[Dönüşüm]`, `[Kök 1]`).
+
+### 2. Belirgin Madde Başlıkları (`.k-title`)
+Her `li` maddesi düz metin yerine açık, kalın ve serif bir başlıkla açılır:
+`<b class="k-title">Kavram / Madde Başlığı:</b>`
+
+### 3. Girintili ve Sol Kenar Çizgili Alt Maddeler (`.k-subitem`)
+Açıklama, pedagojik analiz veya fıkhî gerekçeler başlığın altına blok olarak yerleştirilir:
+`<div class="k-subitem">Açıklama metni, <u>can alıcı kural</u> ve fıkhî çıkarım.</div>`
+- Sol tarafında `var(--accent)` renginde 2px dikey çizgi ve girinti bulunur.
+- Başlık ile açıklama görsel olarak ayrılır; öğrenci nereye odaklanacağını hemen görür.
+
+### 4. Arapça Nass / Âyet / Hadis / Kural Kartı (`.k-nass`)
+Önemli âyetler, hadisler veya klasik fıkıh/kelâm metinleri için:
+```html
+<div class="k-nass">
+  <span class="ar">﴿Arapça Harekeli Metin﴾</span>
+  <span class="meal">«Türkçe meal veya tercüme»</span>
+</div>
+```
+Yumuşak tema zeminine (`var(--accent-tint)`) ve sol dikey renk çizgisine sahiptir.
+
+### 5. Vurgulama Kuralları (`<b>`, `<i>`, `<u>`)
+- **Ham Markdown Yasaktır:** İçerik metinlerinde raw `**kalın**` veya `*eğik*` ASLA bırakılmaz; daima HTML etiketleri (`<b>`, `<i>`, `<u>`) kullanılır.
+- **`<u>...</u>` (Renkli Alt Çizgi):** Maddelerde ve `KeyTerm` tanımlarında can alıcı yüklem veya temel kural için kullanılır (`--accent` veya `--gold` renginde ince alt çizgiyle şık bir kontrast oluşturur).
+- **`<b>...</b>` (Koyu):** Önemli terimler, isimler ve anahtar kelimeler.
+- **`<i>...</i>` (Eğik):** Arapça terim telaffuzları, eser adları veya doğrudan alıntılar.
+
+---
+
 ## Sayfalama sabitleri (build.py)
 
 ```python
