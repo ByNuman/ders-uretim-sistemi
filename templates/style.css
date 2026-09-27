@@ -500,18 +500,18 @@ em { font-style: italic; }
 /* ---------- Tipografik Hiyerarşi & Görsel Vurgu Standartları (2026-09) ---------- */
 .k-badge {
   display: inline-block;
-  font-size: 6.8pt;
+  font-size: 7.5pt;
   font-weight: 700;
   letter-spacing: 0.3px;
   text-transform: uppercase;
   background: var(--accent-tint);
   color: var(--accent-dark);
   border: 1px solid var(--accent);
-  padding: 0.2mm 1.6mm;
+  padding: 0.35mm 2.2mm;
   border-radius: 4px;
   margin-right: 1.2mm;
   vertical-align: 0.6px;
-  line-height: 1.2;
+  line-height: 1.25;
 }
 .k-badge.gold {
   background: #fdf8eb;
@@ -529,19 +529,19 @@ em { font-style: italic; }
   border-color: var(--line);
 }
 .k-title {
-  font-size: 8.9pt;
+  font-size: 9.4pt;
   font-weight: 700;
   color: var(--ink);
   font-family: "DejaVu Serif", serif;
 }
 .k-subitem {
   display: block;
-  margin-top: 0.7mm;
+  margin-top: 0.8mm;
   margin-left: 1.2mm;
-  padding-left: 2mm;
+  padding-left: 2.2mm;
   border-left: 2px solid var(--accent);
-  font-size: 8.2pt;
-  line-height: 1.36;
+  font-size: 8.95pt;
+  line-height: 1.48;
   color: var(--ink-soft);
 }
 .k-subitem b, .k-subitem strong {
@@ -555,25 +555,25 @@ em { font-style: italic; }
 }
 .k-nass {
   display: block;
-  margin: 0.7mm 0 0.9mm 0;
-  padding: 1.2mm 2.2mm;
+  margin: 0.8mm 0 1.0mm 0;
+  padding: 1.4mm 2.6mm;
   background: var(--accent-tint);
   border-radius: 5px;
   border-left: 2.6px solid var(--accent);
 }
 .k-nass .ar, .k-nass [dir="rtl"] {
-  font-size: 9.5pt;
-  line-height: 1.4;
+  font-size: 11.5pt;
+  line-height: 1.68;
   display: block;
-  margin-bottom: 0.5mm;
+  margin-bottom: 0.6mm;
   color: var(--ink);
 }
 .k-nass .meal {
-  font-size: 7.7pt;
+  font-size: 8.6pt;
   font-style: italic;
   color: var(--ink-soft);
   display: block;
-  line-height: 1.3;
+  line-height: 1.42;
 }
 
 /* Anahtar Terim Kutularında Tanım Yüklemleri */
@@ -738,8 +738,8 @@ table.matchtable tr:nth-child(even) td { background: var(--accent-tint); }
 .tq-options { margin-left: 8.6mm; display:flex; flex-direction:column; gap: 0.85mm; }
 .tq-options li { list-style:none; display:flex; gap: 2.2mm; align-items:flex-start; font-size: 8.4pt; color: var(--ink-soft); line-height:1.3; }
 .opt-letter {
-  flex:0 0 auto; width:4.4mm; height:4.4mm; border-radius:50%; border: 1.2px solid var(--accent);
-  color: var(--accent-dark); font-size: 6.6pt; font-weight:700;
+  flex:0 0 auto; width:4.5mm; height:4.5mm; border-radius:50%; border: 1.2px solid var(--accent);
+  color: var(--accent-dark); font-size: 7.0pt; font-weight:700;
   display:flex; align-items:center; justify-content:center; margin-top: 0.2mm;
 }
 
@@ -750,30 +750,30 @@ table.matchtable tr:nth-child(even) td { background: var(--accent-tint); }
   unicode-bidi: isolate;
 }
 .tq-stem .ar, .tq-stem[dir="rtl"] {
-  font-size: 9.3pt;
-  line-height: 1.38;
+  font-size: 9.6pt;
+  line-height: 1.40;
   color: var(--ink);
 }
 .tq-options li .ar, .tq-options li[dir="rtl"] {
-  font-size: 8.9pt;
-  line-height: 1.35;
+  font-size: 9.2pt;
+  line-height: 1.36;
 }
 
 /* --- Test: Öncüllü Sorular (I, II, III) ve İbare Blokları --- */
 .tq-lead {
   font-weight: 600;
-  font-size: 8.4pt;
+  font-size: 8.7pt;
   color: var(--ink-soft);
-  line-height: 1.3;
+  line-height: 1.32;
   margin-bottom: 0.7mm;
 }
 .tq-premises {
   margin: 0.6mm 0 0.8mm 0;
   padding-left: 0;
-  font-size: 8.2pt;
+  font-size: 8.65pt;
   font-weight: 500;
   color: var(--ink);
-  line-height: 1.28;
+  line-height: 1.30;
 }
 .tq-premises li {
   list-style: none;
@@ -787,7 +787,7 @@ table.matchtable tr:nth-child(even) td { background: var(--accent-tint); }
   font-weight: 700;
   color: var(--accent-dark);
   font-family: "DejaVu Serif", serif;
-  font-size: 7.8pt;
+  font-size: 8.2pt;
 }
 
 /* ================= CEVAP ANAHTARI VE ÇÖZÜMLER ================= */
