@@ -122,6 +122,44 @@ Ders notlarında, kapaklarda veya metin içi ders künyelerinde öğretim eleman
 - Adlandırma rastgele veya tahmini yapılamaz.
 - Doğrudan haftalık ders programındaki resmî unvan ve isim (ör. "Öğr. Gör. Muhammed Salih SÜRÜCÜ", "Doç. Dr. ...") birebir esas alınır.
 
+## KRİTİK KURAL 8: Görsel Ders Notu Üretiminde 7 Temel Standart ve Kalite Protokolü (Tüm Dersler İçin Zorunlu)
+
+Herhangi bir ders veya hafta için görsel ders notu (`src/<ders>.py` -> `build.py`) üretilirken veya güncellenirken aşağıdaki **7 temel standart istisnasız uygulanmak zorundadır**:
+
+### 1. Standart: Resmî Ders Renk Teması
+- Her dersin resmî tema rengi `cekirdek/renk_uretici.py` içindeki `DERS_RENKLERI` tablosundan birebir alınır (ör. HADİS / HADİS III için `#664324` / Koyu Deri Cilt `theme="leather"`, KELAM için `#14665a` vb.).
+- Asla başka bir dersin rengi (ör. Hadis için yeşil/forest) kopyalanıp yapıştırılamaz veya varsayılan bir renk uydurulamaz.
+
+### 2. Standart: Vektörel Kapak Düzeni
+- Kapak her zaman sistemin yerel CSS/SVG vektörel kapağı ile üretilir: `cover_image=""`.
+- Harici bir kapak görseli aranmaz veya üretilmez. Usturlap motifi, altın köşe süsleri, amblem harfi, başlık, ders kodu ve şeffaf istatistik kutularını içeren native vektörel kapak esastır (Kritik Kural 5). Özel kapak sadece kullanıcı açıkça talep ederse atanır.
+
+### 3. Standart: Sayfa Verimliliği & Sıfır Sayfa İsrafı (0 mm Taşma)
+- Sayfalarda yapay boşluklar, seyreklik ve sayfa israfı kesinlikle yasaktır. Her bölüm sayfası `%90–100` doluluk bandında dengelenmelidir.
+- Her derleme sonrasında `python tools/olcum.py <slug> --sinif X --donem Y --sinav Z` çalıştırılarak sayfa dolulukları kontrol edilir; `build.py` taşma denetiminde `0 mm taşma` ("tüm sayfalar 210x297mm sınırları içinde ✓") görülmeden üretim tamamlanmış sayılamaz.
+
+### 4. Standart: Tipografik Hiyerarşi ve Görsel Vurgu Düzeni
+- Madde metinlerinde sıradan markdown (`**`, `*`) ile kuru metin dizilmez.
+- Her madde mutlaka `.k-badge` (kategoriye göre `.gold`, `.alert`, `.subtle`), `.k-title` (başlık) ve sol çizgili `.k-subitem` hiyerarşisiyle sunulur.
+- Arapça nass ve metin alıntılarında `.k-nass` kartı (içinde `.ar` ve `.meal`) kullanılır.
+- Hayati kaideler, terim tanımları ve sınavda puan getirecek anahtar ibareler `<u>` ile altı çizilerek vurgulanır.
+
+### 5. Standart: Kelime ve Font Büyüklüğü Hiyerarşisi (2026-09 Ölçeği)
+- **Arapça ve Harekeli İbareler (`bdi`, `.ar`, `[dir="rtl"]`):** Harekelerin net seçilebilmesi için `%125` daha büyük (`font-size: 1.25em`) ve çakışmayı önlemek için ferah satır aralığıyla (`line-height: 1.68`) render edilir.
+- **Türkçe Gövde ve Metin Alanları:** Gövde metinleri 9.35pt, tablo hücreleri 8.65pt, kutu metinleri 9.15pt, sözlük tanımları 8.75pt olarak hiyerarşik okunabilirlik standartlarına tam uyar.
+
+### 6. Standart: Yenilenen Test Sistemi (Pedagojik Zorluk Piramidi)
+- Testler 20 sorudan oluşur ve 3 seviyeli Pedagojik Zorluk Piramidine göre kurgulanır:
+  - **1–6. Sorular (Kolay):** Temel kavramlar, doğrudan tanım ve isim bilgisi.
+  - **7–14. Sorular (Orta):** Karşılaştırmalı usûl, sebep-sonuç ilişkileri, metodolojik ayrımlar.
+  - **15–20. Sorular (Zor):** Öncüllü sorular (Roman rakamlı `I, II, III`), olumsuz kökler, Arapça ibare analizi ve sentez.
+- **Sayfa Mimarisi:** Test tam **2 sayfaya (10 + 10 soru)** dengelenir. Çözümlü cevap anahtarı tam **1 sayfaya** sığdırılır.
+- **Çözümlü Cevap Anahtarı:** Her sorunun cevabında doğru şıkkın yanında analitik gerekçesi ve geçen Arapça ibarelerin `<span class="ans-trans">` Türkçe mealleri eksiksiz verilir.
+
+### 7. Standart: Görsel Ekleme Kutuları (AI Görsel Yer Tutucuları)
+- Her bölüme en az bir adet `add_block_gorsel(BulletBlock(...), baslik="AI görsel önerisi: <çizilebilir somut sahne>")` şablonuyla 4:3 oranında görsel çerçevesi eklenir.
+- Başlıktaki öneri soyut veya belirsiz değil; tarihî sahneyi, el yazmasını veya sened şemasını somut tarif eden çizilebilir bir yönerge olmalıdır.
+
 ---
 
 ## Sistemin amacı

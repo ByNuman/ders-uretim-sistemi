@@ -720,101 +720,114 @@ table.matchtable tr:nth-child(even) td { background: var(--accent-tint); }
    build.py'de bu CSS'e göre tools/kalibre.py ile yeniden ölçüldü. */
 .section-title--tight { font-size: 15pt; margin-top: 1.4mm; }
 .test-meta {
-  margin-top: 2.2mm; padding: 1.8mm 3.2mm; background: var(--accent-tint);
+  margin-top: 2.0mm; padding: 1.6mm 3.0mm; background: var(--accent-tint);
   border: 1px solid var(--line); border-radius: 7px;
-  font-size: 7.9pt; line-height: 1.42; color: var(--ink-soft);
+  font-size: 7.9pt; line-height: 1.40; color: var(--ink-soft);
 }
 .test-meta b { color: var(--accent-dark); }
-.chcontinue--test { margin-bottom: 2mm; }
-.tq-list { margin-top: 2.2mm; column-count: 2; column-gap: 7.5mm; column-fill: balance; }
-.tq { break-inside: avoid; -webkit-column-break-inside: avoid; margin-bottom: 2.1mm; }
-.tq-head { display:flex; align-items:flex-start; gap: 2.4mm; margin-bottom: 0.9mm; }
+.chcontinue--test { margin-bottom: 1.2mm; }
+.tq-list { margin-top: 2.0mm; column-count: 2; column-gap: 7.0mm; column-fill: balance; }
+.tq { break-inside: avoid; -webkit-column-break-inside: avoid; margin-bottom: 0.65mm; }
+.tq-head { display:flex; align-items:flex-start; gap: 2.2mm; margin-bottom: 0.2mm; }
 .tq-num {
-  flex:0 0 auto; width: 6.2mm; height:6.2mm; border-radius:5px;
-  background: var(--accent-dark); color:#fff; font-size: 8.2pt; font-weight:700;
+  flex:0 0 auto; width: 5.6mm; height:5.6mm; border-radius:5px;
+  background: var(--accent-dark); color:#fff; font-size: 7.9pt; font-weight:700;
   display:flex; align-items:center; justify-content:center; box-shadow: var(--shadow-sm); font-family:"DejaVu Serif",serif;
 }
-.tq-stem { font-size: 8.9pt; font-weight:700; color: var(--ink); line-height:1.3; padding-top:0.3mm; }
-.tq-options { margin-left: 8.6mm; display:flex; flex-direction:column; gap: 0.85mm; }
-.tq-options li { list-style:none; display:flex; gap: 2.2mm; align-items:flex-start; font-size: 8.4pt; color: var(--ink-soft); line-height:1.3; }
+.tq-stem { font-size: 8.55pt; font-weight:700; color: var(--ink); line-height:1.22; padding-top:0.2mm; }
+.tq-options { margin-left: 7.8mm; display:flex; flex-direction:column; gap: 0.25mm; }
+.tq-options li { list-style:none; display:flex; gap: 2.0mm; align-items:flex-start; font-size: 8.1pt; color: var(--ink-soft); line-height:1.16; }
 .opt-letter {
-  flex:0 0 auto; width:4.5mm; height:4.5mm; border-radius:50%; border: 1.2px solid var(--accent);
-  color: var(--accent-dark); font-size: 7.0pt; font-weight:700;
+  flex:0 0 auto; width:4.0mm; height:4.0mm; border-radius:50%; border: 1.1px solid var(--accent);
+  color: var(--accent-dark); font-size: 6.8pt; font-weight:700;
   display:flex; align-items:center; justify-content:center; margin-top: 0.2mm;
 }
 
-/* --- Test: Arapça & RTL Tipografi Desteği --- */
-.ar, [dir="rtl"] {
-  font-family: "DejaVu Sans", sans-serif;
+/* --- Genel ve Test: Arapça & RTL Tipografi Desteği (2026-09 Standardı) --- */
+bdi, .ar, [dir="rtl"] {
+  font-family: "DejaVu Sans", "Amiri", "Scheherazade New", sans-serif;
   direction: rtl;
   unicode-bidi: isolate;
+  font-size: 1.25em; /* %25 daha büyük: hareke netliği için */
+  line-height: 1.68;
 }
-.tq-stem .ar, .tq-stem[dir="rtl"] {
-  font-size: 9.6pt;
-  line-height: 1.40;
+table.ctable td bdi, table.ctable td .ar, table.ctable td [dir="rtl"],
+table.matchtable td bdi, table.matchtable td .ar, table.matchtable td [dir="rtl"] {
+  font-size: 1.22em;
+  line-height: 1.58;
+}
+.tq-stem bdi, .tq-stem .ar, .tq-stem[dir="rtl"] {
+  font-size: 1.18em;
+  line-height: 1.45;
   color: var(--ink);
 }
-.tq-options li .ar, .tq-options li[dir="rtl"] {
-  font-size: 9.2pt;
-  line-height: 1.36;
+.tq-options li bdi, .tq-options li .ar, .tq-options li[dir="rtl"] {
+  font-size: 1.15em;
+  line-height: 1.40;
 }
 
 /* --- Test: Öncüllü Sorular (I, II, III) ve İbare Blokları --- */
 .tq-lead {
   font-weight: 600;
-  font-size: 8.7pt;
+  font-size: 8.3pt;
   color: var(--ink-soft);
-  line-height: 1.32;
-  margin-bottom: 0.7mm;
+  line-height: 1.20;
+  margin-bottom: 0.5mm;
 }
 .tq-premises {
-  margin: 0.6mm 0 0.8mm 0;
+  margin: 0.3mm 0 0.4mm 0;
   padding-left: 0;
-  font-size: 8.65pt;
+  font-size: 8.15pt;
   font-weight: 500;
   color: var(--ink);
-  line-height: 1.30;
+  line-height: 1.18;
 }
 .tq-premises li {
   list-style: none;
-  margin-bottom: 0.4mm;
+  margin-bottom: 0.15mm;
   display: flex;
   align-items: flex-start;
-  gap: 1.4mm;
+  gap: 1.2mm;
 }
 .tq-roman {
   flex: 0 0 auto;
   font-weight: 700;
   color: var(--accent-dark);
   font-family: "DejaVu Serif", serif;
-  font-size: 8.2pt;
+  font-size: 7.9pt;
 }
 
-/* ================= CEVAP ANAHTARI VE ÇÖZÜMLER ================= */
-.ans-list { margin-top: 4mm; column-count: 2; column-gap: 7.5mm; column-fill: balance; }
-.ans-item { display:flex; gap: 2.6mm; break-inside: avoid; -webkit-column-break-inside: avoid; margin-bottom: 2.1mm; }
+/* ================= CEVAP ANAHTARI VE ÇÖZÜMLER (2026-09 Standardı) ================= */
+#answer-key .section-kicker { margin-top: 0; }
+#answer-key .section-title { font-size: 13.5pt; margin-bottom: 1.8mm; margin-top: 1.0mm; }
+#answer-key .section-lede { font-size: 8.2pt; margin-top: 1.2mm; margin-bottom: 1.8mm; }
+.ans-list { margin-top: 2.2mm; column-count: 2; column-gap: 5.5mm; column-fill: balance; }
+.ans-item { display:flex; gap: 2.0mm; break-inside: avoid; -webkit-column-break-inside: avoid; margin-bottom: 0.95mm; }
 .ans-num {
-  flex:0 0 auto; width: 6mm; height:6mm; border-radius:5px;
-  background: var(--accent-soft); color: var(--accent-dark); font-size: 8.1pt; font-weight:700;
+  flex:0 0 auto; width: 5.2mm; height:5.2mm; border-radius:5px;
+  background: var(--accent-soft); color: var(--accent-dark); font-size: 7.6pt; font-weight:700;
   display:flex; align-items:center; justify-content:center; font-family:"DejaVu Serif",serif; border: 1px solid var(--line);
 }
 .ans-correct {
-  display:inline-block; background:#e7f5ec; color:#1e7e42; font-weight:700; font-size:7.4pt;
-  letter-spacing:.2px; padding: 0.7mm 2.2mm; border-radius:999px; margin-bottom: 0.8mm;
+  display:inline-block; background:#e7f5ec; color:#1e7e42; font-weight:700; font-size:7.0pt;
+  letter-spacing:.2px; padding: 0.3mm 1.6mm; border-radius:999px; margin-bottom: 0.3mm;
 }
-.ans-explain { font-size: 8.2pt; color: var(--ink-soft); line-height:1.38; }
+.ans-explain { font-size: 7.9pt; color: var(--ink-soft); line-height:1.22; }
 .ans-explain b { color: var(--ink); }
 .ans-explain .ans-trans {
-  display: block;
+  display: inline;
   font-style: italic;
-  color: var(--ink-soft);
-  margin-top: 0.4mm;
-  font-size: 7.7pt;
-  line-height: 1.28;
+  color: #6c5216;
+  background: #fcf8ee;
+  padding: 0.1mm 0.8mm;
+  border-radius: 2px;
+  font-size: 7.4pt;
+  line-height: 1.16;
+  margin-top: 0;
 }
-.ans-explain .ar, .ans-explain [dir="rtl"] {
-  font-size: 8.8pt;
-  line-height: 1.34;
+.ans-explain bdi, .ans-explain .ar, .ans-explain [dir="rtl"] {
+  font-size: 1.15em;
+  line-height: 1.40;
   color: var(--ink);
 }
 
