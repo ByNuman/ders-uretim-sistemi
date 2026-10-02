@@ -802,18 +802,18 @@ table.matchtable td bdi, table.matchtable td .ar, table.matchtable td [dir="rtl"
 #answer-key .section-title { font-size: 13.5pt; margin-bottom: 1.8mm; margin-top: 1.0mm; }
 #answer-key .section-lede { font-size: 8.2pt; margin-top: 1.2mm; margin-bottom: 1.8mm; }
 .ans-list { margin-top: 2.2mm; column-count: 2; column-gap: 5.5mm; column-fill: balance; }
-.ans-item { display:flex; gap: 2.0mm; break-inside: avoid; -webkit-column-break-inside: avoid; margin-bottom: 0.95mm; }
+.ans-item { display:flex; gap: 2.2mm; break-inside: avoid; -webkit-column-break-inside: avoid; margin-bottom: 1.35mm; }
 .ans-num {
-  flex:0 0 auto; width: 5.2mm; height:5.2mm; border-radius:5px;
-  background: var(--accent-soft); color: var(--accent-dark); font-size: 7.6pt; font-weight:700;
+  flex:0 0 auto; width: 5.6mm; height:5.6mm; border-radius:5px;
+  background: var(--accent-soft); color: var(--accent-dark); font-size: 8.2pt; font-weight:700;
   display:flex; align-items:center; justify-content:center; font-family:"DejaVu Serif",serif; border: 1px solid var(--line);
 }
 .ans-correct {
-  display:inline-block; background:#e7f5ec; color:#1e7e42; font-weight:700; font-size:7.0pt;
-  letter-spacing:.2px; padding: 0.3mm 1.6mm; border-radius:999px; margin-bottom: 0.3mm;
+  display:inline-block; background:#e7f5ec; color:#1e7e42; font-weight:700; font-size:7.8pt;
+  letter-spacing:.2px; padding: 0.35mm 1.8mm; border-radius:999px; margin-bottom: 0.35mm;
 }
-.ans-explain { font-size: 7.9pt; color: var(--ink-soft); line-height:1.22; }
-.ans-explain b { color: var(--ink); }
+.ans-explain { font-size: 8.75pt; color: var(--ink); line-height:1.28; }
+.ans-explain b { color: var(--ink); font-weight: 700; }
 .ans-explain .ans-trans {
   display: inline;
   font-style: italic;
@@ -821,13 +821,13 @@ table.matchtable td bdi, table.matchtable td .ar, table.matchtable td [dir="rtl"
   background: #fcf8ee;
   padding: 0.1mm 0.8mm;
   border-radius: 2px;
-  font-size: 7.4pt;
-  line-height: 1.16;
+  font-size: 8.2pt;
+  line-height: 1.22;
   margin-top: 0;
 }
 .ans-explain bdi, .ans-explain .ar, .ans-explain [dir="rtl"] {
-  font-size: 1.15em;
-  line-height: 1.40;
+  font-size: 1.18em;
+  line-height: 1.45;
   color: var(--ink);
 }
 

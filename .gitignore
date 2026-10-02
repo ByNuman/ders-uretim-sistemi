@@ -62,3 +62,4 @@ venv/
 _kapak_onizleme.js
 .DS_Store
 Thumbs.db
+tmp/
