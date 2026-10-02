@@ -185,18 +185,26 @@ Herhangi bir ders veya hafta için görsel ders notu (`src/<ders>.py` -> `build.
 #### D) Görsel Bağlama Kuralı:
 - Kullanıcı görselleri `görseller/` klasörüne eklediğinde `baslik=""` yapılır (başlık silinir) ve `image=_foto("<dosya>.jpg")` atanır.
 
-#### E) Kullanıcı Meta-Prompt Standardı (Her Derse Uyumlu Evrensel Şablon):
-Kullanıcının harici yapay zekâ araçlarına (ChatGPT, Claude, Gemini, Midjourney vb.) görsel ürettirirken kullandığı ve sistemin kutu başlıklarıyla `%100` entegre çalışan resmî üretim yönergesidir:
+#### E) Kullanıcı Meta-Prompt Standardı (Ayrı Ayrı Üretim & Anti-Kolaj Şablonu):
+Kullanıcının harici yapay zekâ araçlarına (ChatGPT, Claude, Gemini vb.) görsel ürettirirken kullandığı, **tüm kutuların tek bir resme sıkıştırılmasını (kolaj hatasını) kesin olarak önleyen** ve her kutu için bağımsız 4:3 görsel ürettiren resmî yönergedir:
 
 ```text
-Bu PDF'teki (veya ders notundaki) görsel kutularını analiz et. Her kutunun üzerinde ne olması gerektiği şema/infografik yönergesi (prompt) yazıyor. Senden o görselleri sırayla oluşturmanı istiyorum.
+Bu PDF'teki görsel kutularını analiz et. Her kutunun üzerinde ne olması gerektiği şema/infografik promptu yazıyor.
 
-Üretim Kuralları:
-1. FORMAT & ORAN: Tüm görseller mutlaka 4:3 en-boy oranında olmalıdır.
-2. STİL & DİL: Dersin konusuna uygun modern vektörel infografik, şema ve minimalist illüstrasyon tarzında olsun; parşömen dokulu ferah bir arka plan kullan. Dersin kapak/tema rengi ve altın sarısı tonları hâkim olsun.
-3. METİN & TİPOGRAFİ DİSİPLİNİ: Sade ve anlaşılır olsun. Görsel içine asla uzun cümleler yazma; yalnızca 1-3 kelimelik net başlıklar, kavram kutuları ve akış okları kullan. Yazılar büyük, okunaklı ve hatasız olsun.
-4. HÜRMET & MAHREMİYET: İslâmî ilimler ve akademik ciddiyete uygun olsun; mahrem veya uygunsuz hiçbir tasvir yapma.
-5. İŞ AKIŞI: Sen PDF'e ekleme yapma, ben ekleyeceğim. Bana yalnızca görselleri sırayla teslim et.
+ÖNEMLİ KURAL (KOLAJ YASAĞI):
+Tüm konuları tek bir görselde veya paneller halinde ASLA BİRLEŞTİRME. Her kutu için tamamen AYRI, BAĞIMSIZ ve TEKİL bir görsel oluşturacaksın.
+
+İŞ AKIŞI & PROTOKOL:
+1. Önce PDF'teki tüm görsel kutularını analiz et ve başlıklarını bana 1, 2, 3... şeklinde listele.
+2. Hepsini aynı anda üretme! Listeyi verdikten sonra doğrudan SADECE 1. KUTU için müstakil görseli oluştur ve dur.
+3. Ben "devam" veya "sıradaki" dedikçe bir sonraki kutunun görselini tek tek üret.
+
+GÖRSEL STANDARTLARI:
+- ORAN: Her görsel mutlaka bağımsız 4:3 en-boy oranında olmalıdır.
+- STİL: Dersin konusuna uygun modern vektörel infografik, şema ve minimalist illüstrasyon tarzında; ferah parşömen arka plan. Dersin tema rengi ve altın sarısı tonları hâkim olsun.
+- METİN DİSİPLİNİ: Sade ve okunaklı olsun. Asla uzun cümle yazma; yalnızca 1-3 kelimelik net başlıklar, kavram kutucukları ve akış okları kullan.
+- HÜRMET & MAHREMİYET: İslâmî ilimler vakarına uygun olsun; mahrem veya uygunsuz tasvir yapma.
+- TESLİM: Sen PDF'e ekleme yapma; bana yalnızca görselleri sırayla, ayrı ayrı yüksek kalitede ver.
 ```
 
 ---
