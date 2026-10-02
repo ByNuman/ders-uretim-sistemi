@@ -185,6 +185,20 @@ Herhangi bir ders veya hafta için görsel ders notu (`src/<ders>.py` -> `build.
 #### D) Görsel Bağlama Kuralı:
 - Kullanıcı görselleri `görseller/` klasörüne eklediğinde `baslik=""` yapılır (başlık silinir) ve `image=_foto("<dosya>.jpg")` atanır.
 
+#### E) Kullanıcı Meta-Prompt Standardı (Her Derse Uyumlu Evrensel Şablon):
+Kullanıcının harici yapay zekâ araçlarına (ChatGPT, Claude, Gemini, Midjourney vb.) görsel ürettirirken kullandığı ve sistemin kutu başlıklarıyla `%100` entegre çalışan resmî üretim yönergesidir:
+
+```text
+Bu PDF'teki (veya ders notundaki) görsel kutularını analiz et. Her kutunun üzerinde ne olması gerektiği şema/infografik yönergesi (prompt) yazıyor. Senden o görselleri sırayla oluşturmanı istiyorum.
+
+Üretim Kuralları:
+1. FORMAT & ORAN: Tüm görseller mutlaka 4:3 en-boy oranında olmalıdır.
+2. STİL & DİL: Dersin konusuna uygun modern vektörel infografik, şema ve minimalist illüstrasyon tarzında olsun; parşömen dokulu ferah bir arka plan kullan. Dersin kapak/tema rengi ve altın sarısı tonları hâkim olsun.
+3. METİN & TİPOGRAFİ DİSİPLİNİ: Sade ve anlaşılır olsun. Görsel içine asla uzun cümleler yazma; yalnızca 1-3 kelimelik net başlıklar, kavram kutuları ve akış okları kullan. Yazılar büyük, okunaklı ve hatasız olsun.
+4. HÜRMET & MAHREMİYET: İslâmî ilimler ve akademik ciddiyete uygun olsun; mahrem veya uygunsuz hiçbir tasvir yapma.
+5. İŞ AKIŞI: Sen PDF'e ekleme yapma, ben ekleyeceğim. Bana yalnızca görselleri sırayla teslim et.
+```
+
 ---
 
 ## Sistemin amacı
