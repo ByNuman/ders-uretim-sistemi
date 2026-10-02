@@ -185,26 +185,26 @@ Herhangi bir ders veya hafta için görsel ders notu (`src/<ders>.py` -> `build.
 #### D) Görsel Bağlama Kuralı:
 - Kullanıcı görselleri `görseller/` klasörüne eklediğinde `baslik=""` yapılır (başlık silinir) ve `image=_foto("<dosya>.jpg")` atanır.
 
-#### E) Kullanıcı Meta-Prompt Standardı (Ayrı Ayrı Üretim & Anti-Kolaj Şablonu):
-Kullanıcının harici yapay zekâ araçlarına (ChatGPT, Claude, Gemini vb.) görsel ürettirirken kullandığı, **tüm kutuların tek bir resme sıkıştırılmasını (kolaj hatasını) kesin olarak önleyen** ve her kutu için bağımsız 4:3 görsel ürettiren resmî yönergedir:
+#### E) Kullanıcı Meta-Prompt Standardı (Otomatik & Kesintisiz Tekil Üretim Şablonu):
+Kullanıcının harici yapay zekâ araçlarına (ChatGPT, Claude, Gemini vb.) görsel ürettirirken kullandığı; **kolaj yapmayı kesin olarak yasaklayan**, kullanıcıdan onay beklemeden **her kutu için arka arkaya bağımsız ve müstakil 4:3 görsel üreten** resmî yönergedir:
 
 ```text
 Bu PDF'teki görsel kutularını analiz et. Her kutunun üzerinde ne olması gerektiği şema/infografik promptu yazıyor.
 
-ÖNEMLİ KURAL (KOLAJ YASAĞI):
-Tüm konuları tek bir görselde veya paneller halinde ASLA BİRLEŞTİRME. Her kutu için tamamen AYRI, BAĞIMSIZ ve TEKİL bir görsel oluşturacaksın.
+KOLAJ YASAĞI (EN ÖNEMLİ KURAL):
+Tüm konuları tek bir görselde, paneller halinde veya poster şeklinde ASLA BİRLEŞTİRME! Her kutu için tamamen AYRI, BAĞIMSIZ ve TEKİL birer görsel dosyası oluşturacaksın.
 
-İŞ AKIŞI & PROTOKOL:
-1. Önce PDF'teki tüm görsel kutularını analiz et ve başlıklarını bana 1, 2, 3... şeklinde listele.
-2. Hepsini aynı anda üretme! Listeyi verdikten sonra doğrudan SADECE 1. KUTU için müstakil görseli oluştur ve dur.
-3. Ben "devam" veya "sıradaki" dedikçe bir sonraki kutunun görselini tek tek üret.
+OTOMATİK ÜRETİM PROTOKOLÜ (KESİNTİSİZ & ONAYSIZ):
+- Benden "devam", "sıradaki" veya onay BEKLEME!
+- Sırayla duraksamadan; önce 1. kutunun bağımsız görselini üret, hemen peşinden 2. kutunun bağımsız görselini üret, ardından sıradaki diğer tüm kutuları tek tek, art arda kendin oluştur ve tamamla.
+- Her kutu kendi başına tam bağımsız bir çıktı olmalıdır.
 
 GÖRSEL STANDARTLARI:
 - ORAN: Her görsel mutlaka bağımsız 4:3 en-boy oranında olmalıdır.
 - STİL: Dersin konusuna uygun modern vektörel infografik, şema ve minimalist illüstrasyon tarzında; ferah parşömen arka plan. Dersin tema rengi ve altın sarısı tonları hâkim olsun.
 - METİN DİSİPLİNİ: Sade ve okunaklı olsun. Asla uzun cümle yazma; yalnızca 1-3 kelimelik net başlıklar, kavram kutucukları ve akış okları kullan.
 - HÜRMET & MAHREMİYET: İslâmî ilimler vakarına uygun olsun; mahrem veya uygunsuz tasvir yapma.
-- TESLİM: Sen PDF'e ekleme yapma; bana yalnızca görselleri sırayla, ayrı ayrı yüksek kalitede ver.
+- TESLİM: Sen PDF'e ekleme yapma; bana yalnızca bağımsız 4:3 görselleri peş peşe oluşturup teslim et.
 ```
 
 ---
