@@ -156,9 +156,34 @@ Herhangi bir ders veya hafta için görsel ders notu (`src/<ders>.py` -> `build.
 - **Sayfa Mimarisi:** Test tam **2 sayfaya (10 + 10 soru)** dengelenir. Çözümlü cevap anahtarı tam **1 sayfaya** sığdırılır.
 - **Çözümlü Cevap Anahtarı:** Her sorunun cevabında doğru şıkkın yanında analitik gerekçesi ve geçen Arapça ibarelerin `<span class="ans-trans">` Türkçe mealleri eksiksiz verilir.
 
-### 7. Standart: Görsel Ekleme Kutuları (AI Görsel Yer Tutucuları)
-- Her bölüme en az bir adet `add_block_gorsel(BulletBlock(...), baslik="AI görsel önerisi: <çizilebilir somut sahne>")` şablonuyla 4:3 oranında görsel çerçevesi eklenir.
-- Başlıktaki öneri soyut veya belirsiz değil; tarihî sahneyi, el yazmasını veya sened şemasını somut tarif eden çizilebilir bir yönerge olmalıdır.
+### 7. Standart: Görsel Ekleme Kutuları, Pedagojik Görsel Matrisi ve Esneklik Kuralı (4:3)
+- Her bölüme en az bir adet `add_block_gorsel(BulletBlock(...), baslik="...")` şablonuyla 4:3 oranında görsel çerçevesi (`image=None`) eklenir.
+
+#### A) Temel İlke ve Sınırsız Esneklik Kuralı:
+- Görseller kuru bir süs değil; öğrenciye doğrudan kavram, usûl veya sınav bilgisi kazandıran araçlardır.
+- **Sistem ASLA sadece belirli şablonlarla sınırlı DEĞİLDİR.** Asistan dersin ve konunun doğasına göre aşağıdaki pedagojik şablonlardan yararlanır; ancak konu somut bir el yazması sayfası, arşiv vesikası, kitabe, arkeolojik sikke, mimari rölöve/külliye planı, ordugâh krokisi, ses/mahreç anatomisi veya istatistik grafiği gerektiriyorsa tamamen konuya özel özgün görsel önerisi getirilir.
+
+#### B) Fakülte ve 3. Sınıf Ders Havuzuna Uygun Pedagojik Görsel Matrisi:
+1. **İnfografik Harita (Coğrafya & Havzalar):** Tefsir, Tasavvuf, İslâm Tarihi ve Medeniyeti. *(Örn: Mekke-Medine-Kûfe tefsir ekolleri, tasavvuf havzaları veya fetih yolları haritası)*.
+2. **Kronolojik Zaman Çizelgesi (Dönemler & Evreler):** Hadis, Kelâm, Fıkıh ve Düşünce Tarihi. *(Örn: Hadis tedvin/tasnif asırları veya Kelâm'da Mütekaddimîn → Müteahhirîn → Yeni İlm-i Kelâm evreleri)*.
+3. **İsnad & Sened Ağacı Şeması (Hadis & Tefsir):** Hadis rivayet zincirleri, âlî/nâzil kollar ve Medârü'l-Hadîs (müşterek râvi) kavşağı.
+4. **Hüküm Karar Ağacı (İslâm Hukuku & Fıkıh Usûlü):** Şartlar, rükünler ve mânilere göre dallanan hüküm akışı *(Teklîfî/Vaz'î; sahih, fâsid, bâtıl)*.
+5. **Hiyerarşik Değerler & Deliller Piramidi (Usûl & Ahlâk):** Tabanı geniş, zirvesi daralan öncelik piramitleri *(Makāsıdü'ş-Şerîa: Tahsîniyyât → Hâciyyât → Zarûriyyât-ı Hamse)*.
+6. **Çoklu Mezhep / Ekol Matrisi (Kelâm & Mezhepler Tarihi):** İtikadî bir meselede 3-4 farklı mezhebin duruşunu gösteren mukayese şeması *(Örn: Büyük günah meselesinde Hâricî, Mu'tezile, Mürcie ve Ehl-i Sünnet)*.
+7. **İki Kutuplu Karşılaştırma Şeması (Münazara & Usûl):** İki zıt görüşün mukayesesi *(Sekr vs. Sahv, Gazâlî vs. İbn Rüşd Tehâfüt münazarası, Fukahâ vs. Mütekellimîn usûlü)*.
+8. **Silsile & İlim/Eser Ağacı (Kıraat, Hadis, Tasavvuf):** 7/10 Kıraat imamı ve râvileri silsilesi, tarikat mürşid halkası veya Kütüb-i Sitte müellifleri bağı.
+9. **Kavram & Nitelik Şeması (Felsefe, Kelâm, Mantık):** Bir şahsiyetin veya doktrinin kavram matrisi *(Örn: Şems'in zâhirî ilimleri, Allah'ın sıfatları, Fârâbî'nin Faal Akıl teorisi)*.
+10. **Döngüsel / Çevrimsel Süreç Modeli (Din Psikolojisi, Sosyoloji, Ahlâk):** Birbirini besleyen dairesel gelişim döngüleri *(Nefsin 7 mertebesi çarkı, inanç ve şüphe gelişim çevrimi, iletişim döngüsü)*.
+11. **Yapısal Kesit & Eser Mimarisi (Hadis, Tefsir, Arap Dili):** Sahîh-i Buhârî bâb mimarisi, klasik el yazması metin-şerh-haşiye anatomisi veya tecvid harf mahreçleri anatomisi.
+
+#### C) AI Üretim & Prompt İlkeleri:
+- Görsel içi metinlerde harf bozulmalarını önlemek için uzun cümleler yasaktır; yalnızca 1-3 kelimelik net başlıklar, kavram etiketleri ve oklar hedeflenir.
+- Mahremiyet/hürmet filtrelerine titizlikle uyulur.
+- Görseller dersin resmî tema rengiyle (`theme_color`) uyumlu vektörel infografik ve minimalist tarihi illüstrasyon dilinde üretilir.
+- Çerçeve CSS'te `aspect-ratio: 4 / 3` olduğundan tüm görseller mutlaka **4:3** oranında üretilir.
+
+#### D) Görsel Bağlama Kuralı:
+- Kullanıcı görselleri `görseller/` klasörüne eklediğinde `baslik=""` yapılır (başlık silinir) ve `image=_foto("<dosya>.jpg")` atanır.
 
 ---
 
@@ -1067,22 +1092,23 @@ bir ilişki anlatıyorsa — klasik "harita/resim" kutusunun (aşağıda) kapsam
 girmez ama yine de görsel destekten faydalanır. Bu durumda görseli SEN ÜRETMEZSİN;
 kullanıcı kendi AI aracıyla üretecektir. İki aşamalı iş akışı:
 
-1. **Öneri aşaması:** `add_block_gorsel(block, "AI görsel önerisi: <somut, "
-   "çizilebilir tarif>")` — `baslik` alanına görselin TAM olarak ne göstermesi
-   gerektiğini yaz: kompozisyon, etiketler, renk/vurgu talimatı dahil. Bu metin
-   kullanıcının AI aracına doğrudan verebileceği bir prompt olmalı — ne kadar
-   somut/çizilebilir yazarsan üretilen görsel o kadar isabetli olur. Örnekler:
-   "Suje-Obje-Bağ üçgeni — üç köşeli basit bir diyagram; köşelerde 'Suje (Özne)',
-   'Obje (Nesne)', 'Bağ/İlişki' etiketleri, ortasında 'BİLGİ' yazısı", "Hükmün
-   dallanmasını gösteren bir karar ağacı — kökte 'HÜKÜM', iki dala ayrılır 'Dinî'
-   ve 'Aklî'; ... (4 uç yaprak)".
+1. **Öneri aşaması:** `add_block_gorsel(block, baslik="<Tür>: <Konu> (<Kavramlar>) — 4:3")` — `baslik`
+   alanına rastgele sahne yerine, konuya uygun **5 Pedagojik Görsel Çeşidinden biri** seçilerek doğrudan
+   AI'a verilebilecek hazır bir yönerge yazılır:
+   - **1. İnfografik Harita:** Havzalar, yayılış yolları, ekol merkezleri ve ilkeleri.
+   - **2. Kronolojik Zaman Çizelgesi:** Tarihî dönemler, evreler, öncü âlimler ve eserlerin akış çizgisi.
+   - **3. Kavram / Nitelik Şeması:** Bir şahsiyetin ilimleri, doktrini, zâhirî-bâtınî özellikleri matrisi.
+   - **4. İki Kutuplu Karşılaştırma Şeması:** Karşıt kavramlar, münazaralar (Sekr vs Sahv, Dar Kadeh vs Umman vb.).
+   - **5. Silsile & İlim/Eser Ağacı:** Mürşid-halife zinciri, hoca-talebe halkası ve eserlerin dallanması.
+   *Prompt İlkeleri:* Görsel modellerinde harf bozulmalarını önlemek için uzun cümleler yazdırılmaz;
+   1-3 kelimelik net başlıklar, kavram etiketleri ve akış okları istenir. Mahremiyet/hürmet filtresi
+   ve dersin `theme_color` renk dili belirtilir.
 2. **Bağlama aşaması:** kullanıcı görselleri üretip `görseller/` klasörüne koyup
    "ekle" dediğinde, HER `add_block_gorsel` çağrısındaki `baslik` metnini SİL
-   (kaldır, boş bırak) ve yerine `image=_foto("<dosya-adı>.jpg")` ekle — `_foto()`/
-   `_GORSELLER` helper'ı aşağıdaki harita/resim bölümündekiyle birebir aynı
-   (dosyanın başına ekle, bkz. `sistematik_kelam.py`). Kullanıcı dosya adlarını
-   açıklayıcı seçtiyse (`"bilgi nedir.jpg"`) hangi görselin hangi bloğa ait
-   olduğu tahmin gerektirmeden netleşir; adlar belirsizse önce kullanıcıya sor.
+   (kaldır, `baslik=""` yap) ve yerine `image=_foto("<dosya-adı>.jpg")` ekle — `_foto()`/
+   `_GORSELLER` helper'ı dosyanın başına eklenir (bkz. `turk_mutasavviflar_hafta_2.py`).
+   Kullanıcı dosya adlarını açıklayıcı seçtiyse (`"Zaman Çizelgesi Tasavvuf Tarihinin 3 Evresi.jpg"`)
+   hangi görselin hangi bloğa ait olduğu otomatik eşleşir.
 
 **Bu, yalnız soyut derslerde devreye girer** — ders zaten somut yer/yapı/eser
 içeriyorsa (tarih, coğrafya ağırlıklı) önce aşağıdaki harita/resim akışını
