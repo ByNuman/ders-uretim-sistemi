@@ -148,13 +148,19 @@ Herhangi bir ders veya hafta için görsel ders notu (`src/<ders>.py` -> `build.
 - **Arapça ve Harekeli İbareler (`bdi`, `.ar`, `[dir="rtl"]`):** Harekelerin net seçilebilmesi için `%125` daha büyük (`font-size: 1.25em`) ve çakışmayı önlemek için ferah satır aralığıyla (`line-height: 1.68`) render edilir.
 - **Türkçe Gövde ve Metin Alanları:** Gövde metinleri 9.35pt, tablo hücreleri 8.65pt, kutu metinleri 9.15pt, sözlük tanımları 8.75pt olarak hiyerarşik okunabilirlik standartlarına tam uyar.
 
-### 6. Standart: Yenilenen Test Sistemi (Pedagojik Zorluk Piramidi)
-- Testler 20 sorudan oluşur ve 3 seviyeli Pedagojik Zorluk Piramidine göre kurgulanır:
-  - **1–6. Sorular (Kolay):** Temel kavramlar, doğrudan tanım ve isim bilgisi.
-  - **7–14. Sorular (Orta):** Karşılaştırmalı usûl, sebep-sonuç ilişkileri, metodolojik ayrımlar.
-  - **15–20. Sorular (Zor):** Öncüllü sorular (Roman rakamlı `I, II, III`), olumsuz kökler, Arapça ibare analizi ve sentez.
-- **Sayfa Mimarisi:** Test tam **2 sayfaya (10 + 10 soru)** dengelenir. Çözümlü cevap anahtarı tam **1 sayfaya** sığdırılır.
-- **Çözümlü Cevap Anahtarı:** Her sorunun cevabında doğru şıkkın yanında analitik gerekçesi ve geçen Arapça ibarelerin `<span class="ans-trans">` Türkçe mealleri eksiksiz verilir.
+### 6. Standart: Yenilenen Test ve Çözümlü Cevap Anahtarı Mimarisi (Pedagojik Zorluk Piramidi & Tipografik Ferahlık)
+- **20 Soruluk Pedagojik Zorluk Piramidi:**
+  - **1–6. Sorular (Kolay):** Doğrudan kavram, terim ve isim bilgisi.
+  - **7–14. Sorular (Orta):** Karşılaştırma, usûl tahlili, sebep-sonuç ilişkileri.
+  - **15–20. Sorular (Zor):** Öncüllü sorular (Roman rakamlı `I, II, III`), olumsuz soru kökleri ve Arapça ibare çözümlemeleri.
+- **Test Sayfa Mimarisi (10 + 10 Soru & Çizgisiz Ferah Boşluk):**
+  - Test tam **2 sayfaya (10 + 10 soru)** dengelenir.
+  - Sorular arasında göz yoran kesik/düz çizgiler KULLANILMAZ. Sorular birbirinden temiz ve ferah dikey beyaz boşlukla (`margin-bottom: 3.2mm`) ayrılır; soruların ve seçeneklerin birbirine yapışması kesin olarak engellenir.
+  - Soru başlığı (`.tq-head`) ve şıklar (`.tq-options`) arasında nefes alan mikro-mesafeler korunarak iki sütuna dengeli yayılır. Soruların sadece tepeye sıkışıp sayfa altında gereksiz devasa boşluk bırakması önlenir.
+- **Çözümlü Cevap Anahtarı Mimarisi (Genişletilmiş Punto ve Sayfa Dengesi):**
+  - Tam **1 sayfaya** dengeli sığdırılır; sayfanın alt yarısının boş kalması engellenerek `%85–95` doluluk sağlanır.
+  - Çözüm metinleri minik punto yerine gövde standardına yakın (`9.2pt`), ferah satır aralığı (`line-height: 1.34`), belirgin doğru cevap hap rozetleri (`8.2pt`) ve maddeler arası nefes alan aralıklarla (`.ans-item: 2.6mm`) sunulur.
+  - Her soruda doğru şıkkın yanında analitik gerekçesi ve geçen Arapça ibarelerin `<span class="ans-trans">` Türkçe mealleri eksiksiz verilir.
 
 ### 7. Standart: Görsel Ekleme Kutuları, Pedagojik Görsel Matrisi ve Esneklik Kuralı (4:3)
 - Her bölüme en az bir adet `add_block_gorsel(BulletBlock(...), baslik="...")` şablonuyla 4:3 oranında görsel çerçevesi (`image=None`) eklenir.
@@ -1027,8 +1033,8 @@ Kullanıcının 2026-09 tarihli doğrudan talimatı gereği, görsel ders notlar
 - **Anahtar Terim Kutuları (`.term-box`):** Terim adı `9.7 pt`, tanım `8.75 pt` (line-height: `1.44`).
 - **Sözlük (`.gloss-*`):** Terim başlığı `10.4 pt`, tanım `8.75 pt` (line-height: `1.44`), bağlam `7.7 pt`.
 - **Vurgu/Uyarı Kutuları (`.callout`):** Başlık `8.8 pt`, metin `9.15 pt` (line-height: `1.50`, padding: `3.4mm 4.4mm`).
-- **Test ve Seçenekler (`.tq-*`):** Soru kökü `9.1 pt` (line-height: `1.32`), şıklar `8.65 pt` (line-height: `1.28`), şık harfi `6.8 pt`, soru alt boşluğu `1.6mm`, şık aralığı `0.65mm`.
-- **Çözümlü Cevap Anahtarı (`.ans-*`):** Açıklama `8.7 pt` (line-height: `1.38`), tercüme `.ans-trans` `8.1 pt`, doğru cevap rozeti `7.7 pt`.
+- **Test ve Seçenekler (`.tq-*`):** Soru kökü `8.65 pt` (line-height: `1.22`), şıklar `8.2 pt` (line-height: `1.18`), şık harfi `7.0 pt`, soru alt boşluğu `3.2mm` (kesik çizgisiz ferah dikey boşluk), şık aralığı `0.65mm`.
+- **Çözümlü Cevap Anahtarı (`.ans-*`):** Açıklama `9.2 pt` (line-height: `1.34`), tercüme `.ans-trans` `8.1 pt`, doğru cevap rozeti `8.2 pt`, madde aralığı `2.6mm` (%85–95 tam sayfa dengesi).
 
 ### 3. Teknik Uygulama ve Taşma Güvencesi
 - `CoursePack.custom_css` alanı üzerinden ders bazlı enjekte edilir (`master.html.j2` ve `kitap.html.j2` tarafından otomatik dahil edilir).
