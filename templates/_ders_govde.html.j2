@@ -139,9 +139,16 @@
 {% endmacro %}
 
 {% macro render_block_gorsel(block, baslik, image=None) %}
-<div class="block-gorsel">
-  <div>{{ render_block(block) }}</div>
-  <div>{{ render_gorsel_kutu(baslik, image) }}</div>
+<div class="block-gorsel block">
+  {{ render_gorsel_kutu(baslik, image) }}
+  <div class="block-head">
+    <div class="block-num">{{ block.number }}</div>
+    <div class="block-title">{{ block.title }}</div>
+  </div>
+  {% if block.subtitle %}<div class="block-subtitle">{{ block.subtitle }}</div>{% endif %}
+  <ul>
+    {% for bullet in block.bullets %}<li>{{ bullet | safe }}</li>{% endfor %}
+  </ul>
 </div>
 {% endmacro %}
 

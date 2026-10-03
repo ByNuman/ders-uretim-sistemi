@@ -470,9 +470,14 @@ em { font-style: italic; }
   background: var(--paper); box-shadow: var(--shadow-sm);
 }
 .gk-alan--foto { background-size: cover; background-position: center; background-repeat: no-repeat; }
-.block-gorsel { display: grid; grid-template-columns: 1.02fr 1fr; gap: 6mm; align-items: start; }
-.block-gorsel .block { margin-top: 5.8mm; }
-.block-gorsel .gorsel-kutu { margin-top: 5.8mm; }
+.block-gorsel::after { content: ""; display: table; clear: both; }
+.block-gorsel .gorsel-kutu {
+  float: right;
+  width: 88mm;
+  margin-left: 6.0mm;
+  margin-bottom: 3.5mm;
+  margin-top: 0.5mm;
+}
 
 /* ---------- Numaralı içerik blokları ---------- */
 .block { margin-top: 5.8mm; }
