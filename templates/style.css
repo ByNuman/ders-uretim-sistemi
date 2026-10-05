@@ -478,6 +478,10 @@ em { font-style: italic; }
   margin-bottom: 3.5mm;
   margin-top: 0.5mm;
 }
+.block-gorsel .k-nass,
+.block-gorsel .k-subitem {
+  display: flow-root;
+}
 
 /* ---------- Numaralı içerik blokları ---------- */
 .block { margin-top: 5.8mm; }
@@ -492,6 +496,10 @@ em { font-style: italic; }
 .block ul { margin-left: 9.2mm; }
 .block li { font-size: 8.9pt; color: var(--ink-soft); margin-bottom: 1.7mm; line-height:1.5; list-style: none; position:relative; }
 .block li::before { content:"–"; position:absolute; left:-4.2mm; color: var(--accent); font-weight:700; }
+.block li:has(> .k-nass:first-child)::before,
+.block li:has(> .k-subitem:first-child)::before {
+  display: none !important;
+}
 .block li b, .block li strong { color: var(--ink); font-weight:700; }
 .block li i, .block li em { color: var(--ink-soft); font-style: italic; }
 .block li u {
@@ -753,21 +761,36 @@ bdi, .ar, [dir="rtl"] {
   font-family: "DejaVu Sans", "Amiri", "Scheherazade New", sans-serif;
   direction: rtl;
   unicode-bidi: isolate;
-  font-size: 1.25em; /* %25 daha büyük: hareke netliği için */
+  font-size: 1.28em; /* Harekelerin ve harflerin net seçilebilmesi için */
   line-height: 1.68;
+}
+.term-box .term-name bdi, .term-box .term-name .ar, .term-box .term-name [dir="rtl"] {
+  font-size: 1.30em;
+  line-height: 1.60;
+}
+.term-box .term-def bdi, .term-box .term-def .ar, .term-box .term-def [dir="rtl"] {
+  font-size: 1.26em;
+  line-height: 1.60;
+}
+.gloss-term bdi, .gloss-term .ar, .gloss-term [dir="rtl"] {
+  font-size: 1.30em;
+}
+.gloss-def bdi, .gloss-def .ar, .gloss-def [dir="rtl"] {
+  font-size: 1.26em;
+  line-height: 1.55;
 }
 table.ctable td bdi, table.ctable td .ar, table.ctable td [dir="rtl"],
 table.matchtable td bdi, table.matchtable td .ar, table.matchtable td [dir="rtl"] {
-  font-size: 1.22em;
+  font-size: 1.25em;
   line-height: 1.58;
 }
 .tq-stem bdi, .tq-stem .ar, .tq-stem[dir="rtl"] {
-  font-size: 1.18em;
+  font-size: 1.20em;
   line-height: 1.45;
   color: var(--ink);
 }
 .tq-options li bdi, .tq-options li .ar, .tq-options li[dir="rtl"] {
-  font-size: 1.15em;
+  font-size: 1.16em;
   line-height: 1.40;
 }
 

@@ -32,8 +32,8 @@
 <div class="terms-grid">
   {% for t in terms %}
   <div class="term-box">
-    <div class="term-name">{{ t.term }}</div>
-    <div class="term-def">{{ t.definition }}</div>
+    <div class="term-name">{{ t.term | safe }}</div>
+    <div class="term-def">{{ t.definition | safe }}</div>
   </div>
   {% endfor %}
 </div>
@@ -398,8 +398,8 @@
   <div class="gloss-grid">
     {% for c in gpage %}
     <div class="gloss-item">
-      <div class="gloss-term">{{ c.term }}</div>
-      <div class="gloss-def">{{ c.definition }}</div>
+      <div class="gloss-term">{{ c.term | safe }}</div>
+      <div class="gloss-def">{{ c.definition | safe }}</div>
       <div class="gloss-ref">{{ c.context }} · {{ c.chapter_ref }}. Bölüm</div>
     </div>
     {% endfor %}

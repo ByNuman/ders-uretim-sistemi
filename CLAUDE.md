@@ -143,9 +143,11 @@ Herhangi bir ders veya hafta için görsel ders notu (`src/<ders>.py` -> `build.
 - Her madde mutlaka `.k-badge` (kategoriye göre `.gold`, `.alert`, `.subtle`), `.k-title` (başlık) ve sol çizgili `.k-subitem` hiyerarşisiyle sunulur.
 - Arapça nass ve metin alıntılarında `.k-nass` kartı (içinde `.ar` ve `.meal`) kullanılır.
 - Hayati kaideler, terim tanımları ve sınavda puan getirecek anahtar ibareler `<u>` ile altı çizilerek vurgulanır.
+- **Çift Liste İmi (`–`) Önleme Kuralı:** Kutu kullanılan maddelerde (`.k-nass`, `.k-subitem`), `li:has(> .k-nass:first-child)::before { display: none !important; }` defansı uygulanır ve `k-badge` ile altındaki kutular tekil bir `<li>` içinde hiyerarşik yapılandırılır; kutu kenarlıklarına çakışan çift tireler kesin olarak engellenir.
 
 ### 5. Standart: Kelime ve Font Büyüklüğü Hiyerarşisi (2026-09 Ölçeği)
-- **Arapça ve Harekeli İbareler (`bdi`, `.ar`, `[dir="rtl"]`):** Harekelerin net seçilebilmesi için `%125` daha büyük (`font-size: 1.25em`) ve çakışmayı önlemek için ferah satır aralığıyla (`line-height: 1.68`) render edilir.
+- **Arapça ve Harekeli İbareler (`bdi`, `.ar`, `[dir="rtl"]`):** Harekelerin ve harflerin net seçilebilmesi için `%128–132` daha büyük (`font-size: 1.28em–1.32em`) ve ferah satır aralığıyla (`line-height: 1.68`) render edilir. 4'lü anahtar terim kutuları (`KeyTerm`), tablolar, sözlük ve metin içi âyet şahitleri (`﴿...﴾`) kesinlikle `<bdi class="ar">` ile sarılır; çıplak Latin font boyutunda bırakılmaz. Nass kutusu nassı `font-size: 12.0pt` olarak öne çıkar.
+- **BiDi İzolasyonu & Parantez Kuralı:** LTR akış içerisinde raw Arapça karakterler nedeniyle cümlenin sağına veya başına sıçrayan liste noktaları (`•`), iki noktalar (`:`), tireler (`-`), tırnaklar ve parantezler `<bdi class="ar">` ile sarılarak izole edilir. Parantez içi açıklamalarda parantez yönünün ve noktalama işaretlerinin ters dönmesini önlemek için: daima önce Türkçe ifade yazılır, ardından parantez içinde izole Arapça terim (`(<bdi class="ar">...</bdi>)`) verilir.
 - **Türkçe Gövde ve Metin Alanları:** Gövde metinleri 9.35pt, tablo hücreleri 8.65pt, kutu metinleri 9.15pt, sözlük tanımları 8.75pt olarak hiyerarşik okunabilirlik standartlarına tam uyar.
 
 ### 6. Standart: Yenilenen Test ve Çözümlü Cevap Anahtarı Mimarisi (Pedagojik Zorluk Piramidi & Tipografik Ferahlık)
@@ -217,6 +219,28 @@ GÖRSEL STANDARTLARI:
 - Görsel kutusu (`add_block_gorsel`), rijit 2 sütunlu grid yerine `float: right` ile sağa yaslanır.
 - Metin başlığı ve ilk maddeler görselin solunda akarken, görselin bittiği hizada sonraki maddeler görselin altındaki boşluğa taşarak sayfanın tam genişliğine (`100%`) yayılır.
 - Böylece görselin altında atıl/ölü boşluk kalmaz ve sayfa alanı en yüksek verimle kullanılır.
+- **Görsel Yanı Kutularında BFC ve Taşma Önleme Standardı (`display: flow-root;`):** Sağa yaslanan görsel kutusunun yanındaki nass (`.k-nass`) veya açıklama kutularının (`.k-subitem`) görsel çerçevesinin arkasına/içine taşmasını engellemek için, CSS'te `display: flow-root;` kuralı zorunludur. Bu sayede kutu görselin sol sınırında temizce sonlanır; görsel altına inen maddeler ise otomatikman %100 genişliğe açılır.
+
+---
+
+## KRİTİK KURAL 9: Arap Dili ve Edebiyatı Görsel Ders Notu Üretim Standartları (Bütünleşik Model)
+
+Arap Dili ve Edebiyatı dersleri üretilirken veya güncellenirken aşağıdaki kurallar İSTİSNASIZ uygulanacaktır:
+
+1. **Açılış Kelime Fihristi Mimarisi (`_vocab_section` & `_vcard`):**
+   - Kitap başındaki yeni kelimeler (örn. s. 23 fihristi) kuru metin veya basit maddeler olarak bırakılamaz (`sade kalma yasağı`).
+   - Kelimeler tematik gruplara ayrılarak (`Askerî ve Ahlâkî`, `Edebî ve Gramatikal`, `Savaş`, `Ecel ve Hikmet`), 4 sütunlu estetik kelime kartları (`.vocab-grid-4`, `.v-card`) halinde tanzim edilir.
+   - Her kartta Arapça kelime iri/harekeli ve ders renginde (`#8C2F21`), sağ üstte sarf/vezin/tekil-çoğul hap rozeti (`.v-card-tag`), altta Türkçe karşılığı verilir.
+2. **Kelime Kelime Satır Altı (Interlinear) Çeviri ve Metin Düzeni:**
+   - Kitaptaki tüm metinler, şiirler, dipnotlar ve alıştırmalar `_w(ar, tr)` interlinear belirteçleriyle kelime kelime çevrilir.
+   - Ana metinler `_board` (çift sütunlu levha), alıştırmalar ve diyaloglar `_box` (satır altı kutusu) ile sunulur.
+   - Alıştırma kutularında ders rengi (`#8C2F21`) ve altın aksan (`#c49a45`) esastır. Farklı rastgele renkler kullanılmaz.
+3. **Alıştırma Boşluklarında Düz Çizgili Vurgu:**
+   - Boşluk doldurma hedeflerinde dalgalı çizgi (`underline wavy`) yerine kurumsal renkte düz alt çizgi (`text-decoration: underline solid #8C2F21 !important;`) kullanılır.
+4. **Pedagojik Görsel Matrisi ve Çeşitlilik Kuralı:**
+   - Her bölümün görseli konunun pedagojik yapısına özel üretilir. Birbiri ardına gelen bölümlerde aynı şablon (örn. iki adet yatay süreç oku) tekrar edilmez; aktör üçgeni, kavram şeması, karar ağacı, mukayese matrisi vb. pedagojik çeşitlilik korunur.
+5. **Sayfa Verimliliği & 0 mm Taşma:**
+   - Tüm sayfalar %90–100 dolulukta tutulur, `build.py` taşma denetiminde `0 mm taşma` şartı aranır.
 
 ---
 

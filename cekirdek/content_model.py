@@ -59,24 +59,28 @@ def resim_data_uri(yol) -> str:
     (harici dosyaya bağımlı olmadan) gömmektir.
     """
     yol = Path(yol)
-    mime = mimetypes.guess_type(yol.name)[0] or "image/jpeg"
+    if yol.suffix.lower() == ".jfif":
+        mime = "image/jpeg"
+    else:
+        mime = mimetypes.guess_type(yol.name)[0] or "image/jpeg"
     veri = base64.b64encode(yol.read_bytes()).decode("ascii")
     return f"data:{mime};base64,{veri}"
 
 
 def ders_kapak_uri(ders_klasoru_yolu) -> Optional[str]:
-    """Bir dersin çıktı klasöründeki kapak görselini (*kapak.{png,jpg,jpeg,webp})
+    """Bir dersin çıktı klasöründeki kapak görselini (*kapak.{png,jpg,jpeg,webp,jfif})
     bulup base64 `data:` URI döner; görsel yoksa None döner."""
     if not ders_klasoru_yolu:
         return None
     p = Path(ders_klasoru_yolu)
     if not p.exists():
         return None
+    gecerli_uzantilar = {".png", ".jpg", ".jpeg", ".webp", ".jfif"}
     for f in sorted(p.glob("*kapak.*")):
-        if f.suffix.lower() in {".png", ".jpg", ".jpeg", ".webp"}:
+        if f.suffix.lower() in gecerli_uzantilar:
             return resim_data_uri(f)
     for f in sorted(p.glob("*KAPAK.*")):
-        if f.suffix.lower() in {".png", ".jpg", ".jpeg", ".webp"}:
+        if f.suffix.lower() in gecerli_uzantilar:
             return resim_data_uri(f)
     return None
 
