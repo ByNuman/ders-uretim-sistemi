@@ -128,7 +128,19 @@ GÖRSEL STANDARTLARI:
 - Görsel kutusu (`add_block_gorsel`), rijit 2 sütunlu grid yerine `float: right` ile sağa yaslanır.
 - Metin başlığı ve ilk maddeler görselin solunda akarken, görselin bittiği hizada sonraki maddeler görselin altındaki boşluğa taşarak sayfanın tam genişliğine (`100%`) yayılır.
 - Böylece görselin altında atıl/ölü boşluk kalmaz ve sayfa alanı en yüksek verimle kullanılır.
-- **Görsel Yanı Kutularında BFC ve Taşma Önleme Standardı (`display: flow-root;`):** Sağa yaslanan görsel kutusunun yanındaki nass (`.k-nass`) veya açıklama kutularının (`.k-subitem`) görsel çerçevesinin arkasına/içine taşmasını engellemek için, CSS'te `display: flow-root;` kuralı zorunludur. Bu sayede kutu görselin sol sınırında temizce sonlanır; görsel altına inen maddeler ise otomatikman %100 genişliğe açılır.
+#### G) Otomatik Görsel Üretim Standardı (fal.ai Entegrasyonu - ZORUNLU YÖNTEM):
+- Görsel ders notu kutuları için harici görsel üretiminde resmî olarak **fal.ai** API'si kullanılır.
+- **Model Endpoint:** `openai/gpt-image-2.5/sunburst/text-to-image`
+- **Tasarruf & Format Standartları:**
+  - `quality`: `"low"` (Token ve kredi harcamasını minimumda tutmak için zorunlu)
+  - `image_size`: `"landscape_4_3"` (`1024 x 768`, 4:3 en-boy oranı)
+  - `output_format`: `"jpeg"`
+  - `num_images`: `1` (Her kutu için tekil bağımsız üretim)
+- **İşlem Akışı:**
+  1. `tools/fal_ai_uretim.py` aracılığıyla her bölümün pedagojik promptu sırayla gönderilir.
+  2. Üretilen JPEG dosyaları doğrudan hem dönemin `görseller/` havuzuna hem de ilgili dersin `gorsel_ders_notlari/<DERS>/<Hafta>/görseller/` dizinine kaydedilir.
+  3. Kaynak kodda (`src/<ders>.py`) ilgili kutunun başlığı temizlenir (`baslik=""`) ve `image=_foto("<dosya>.jpg")` atanır.
+  4. `build.py` ve `tools/olcum.py` çalıştırılarak %100 doluluk ve 0 mm taşma teyit edilir.
 
 ---
 
