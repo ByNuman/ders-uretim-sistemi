@@ -95,6 +95,10 @@ Herhangi bir ders veya hafta için görsel ders notu (`src/<ders>.py` -> `build.
 
 #### C) AI Üretim & Prompt İlkeleri:
 - Görsel içi metinlerde harf bozulmalarını önlemek için uzun cümleler yasaktır; yalnızca 1-3 kelimelik net başlıklar, kavram etiketleri ve oklar hedeflenir.
+- **Görsel İçi Dil Kuralı (Türkçe ve Arapça Zorunluluğu):**
+  - Görsel üzerindeki tüm şema başlıkları, kutucuklar ve kavram etiketleri **kesinlikle Türkçe** olacaktır (İngilizce etiket kullanımı kesinlikle yasaktır).
+  - **Arapça Dersleri İstisnası:** Arap Dili ve Edebiyatı (Sarf, Nahiv, Belâgat vb.) derslerinde veya nass/terim odaklı şemalarda görsel içi metinler doğrudan **Arapça** (veya Türkçe-Arapça çift dilli) üretilebilir.
+  - Promptlarda modele: *"All text labels and titles inside the infographic must be strictly in Turkish (or Arabic for Arabic courses); no English text labels"* talimatı zorunlu olarak verilir.
 - Mahremiyet/hürmet filtrelerine titizlikle uyulur.
 - Görseller dersin resmî tema rengiyle (`theme_color`) uyumlu vektörel infografik ve minimalist tarihi illüstrasyon dilinde üretilir.
 - Çerçeve CSS'te `aspect-ratio: 4 / 3` olduğundan tüm görseller mutlaka **4:3** oranında üretilir.
@@ -136,6 +140,7 @@ GÖRSEL STANDARTLARI:
   - `image_size`: `"landscape_4_3"` (`1024 x 768`, 4:3 en-boy oranı)
   - `output_format`: `"jpeg"`
   - `num_images`: `1` (Her kutu için tekil bağımsız üretim)
+  - `language`: Görsel içi tüm etiketler genel derslerde **Türkçe**, Arapça derslerinde **Arapça** (İngilizce etiket yasak).
 - **İşlem Akışı:**
   1. `tools/fal_ai_uretim.py` aracılığıyla her bölümün pedagojik promptu sırayla gönderilir.
   2. Üretilen JPEG dosyaları doğrudan hem dönemin `görseller/` havuzuna hem de ilgili dersin `gorsel_ders_notlari/<DERS>/<Hafta>/görseller/` dizinine kaydedilir.
