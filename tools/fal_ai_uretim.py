@@ -18,59 +18,68 @@ TASKS = [
         "filename": "1_cibril_hadisi_ihsan_sacayagi.jpg",
         "title": "Bölüm 1: Nebevî Zühd ve Cibrîl Hadisi İhsan Sacayağı",
         "prompt": (
-            "Educational clean vector infographic diagram, 4:3 aspect ratio, elegant ivory parchment background. "
-            "Three classical Islamic marble columns supporting an arch, symbolizing the three foundational pillars of religion from the Hadith of Gabriel: "
-            "Left column labeled 'İSLÂM / FIKIH' (actions and law), Middle column labeled 'İMAN / KELÂM' (creed and heart), "
-            "Right glowing golden column labeled 'İHSAN / TASAVVUF' (spiritual excellence, worshipping Allah as if seeing Him). "
-            "Arch apex with golden crest labeled 'CİBRÎL HADİSİ'. Minimalist Islamic geometric design, deep plum purple (#7B3260) and gold accents, clear scholastic visual."
+            "Extremely clean and minimalist academic vector infographic diagram, 4:3 aspect ratio, elegant light parchment ivory background. "
+            "A classical Islamic arch supported by three prominent marble pillars. "
+            "Only three large, bold Turkish text labels on the pillars: Left pillar: 'İSLÂM (FIKIH)', Middle pillar: 'İMAN (KELÂM)', Right pillar glowing in gold: 'İHSAN (TASAVVUF)'. "
+            "Arch crest labeled 'CİBRÎL HADİSİ'. Bold flow arrows connecting them. "
+            "STRICT MANDATORY RULE: All text labels must be strictly in Turkish. Bold and large legible typography. "
+            "Absolutely NO small paragraphs, NO bullet points, NO tiny explanatory text. Only 3 to 4 prominent, huge Turkish concept labels and clean boxes. "
+            "Theme colors: deep plum purple (#7B3260) and warm gold. Maximum readability at small scale."
         )
     },
     {
         "filename": "2_hadisi_veli_kurbiyet_piramidi.jpg",
         "title": "Bölüm 2: Hadis-i Velî ve Kurbiyet Piramidi",
         "prompt": (
-            "Educational 3-tier hierarchical pyramid infographic in 4:3 aspect ratio, light parchment background. "
-            "Base tier: 'ÂMM VELÂYET' (General Sainthood of all believers). "
-            "Middle wide tier: 'KURB-I FERÂİZ' (Obligatory deeds - foundation of divine proximity). "
-            "Top illuminated golden apex: 'KURB-I NEVÂFİL & HÂSS VELÂYET' (Supererogatory deeds - seeing eye, hearing ear of the beloved servant). "
-            "Decorated with a subtle vintage Sufi traveler staff and manuscript scrolls on the side. "
-            "Deep plum purple (#7B3260) and antique gold vector styling, clear typography."
+            "Minimalist 3-tier hierarchical pyramid vector diagram, 4:3 aspect ratio, clean light parchment background. "
+            "Only three bold Turkish text tiers in large legible font: "
+            "Base tier: 'ÂMM VELÂYET (TÜM MÜMİNLER)', Middle prominent tier: 'KURB-I FERÂİZ (FARZLAR)', Top glowing golden peak: 'KURB-I NEVÂFİL (HÂSS VELÂYET)'. "
+            "Upward golden direction arrow on the side labeled 'KURBİYET (YAKINLIK)'. "
+            "STRICT MANDATORY RULE: All text labels strictly in Turkish. Bold, giant legible typography. "
+            "Absolutely NO small paragraphs, NO tiny explanatory text, NO bullet points, NO tiny side notes. "
+            "High contrast, clean geometric cards, theme colors deep plum purple (#7B3260) and gold. Maximum readability at small scale."
         )
     },
     {
         "filename": "3_ihlas_ve_riya_terazisi.jpg",
         "title": "Bölüm 3: İbadette İhlâs ve Riyâ Terazisi",
         "prompt": (
-            "A conceptual comparison infographic in 4:3 aspect ratio featuring a golden mizan balance scale on parchment. "
-            "Left heavy glowing pan labeled 'İHLÂS (GÖNÜL DERVİŞLİĞİ)' with pure heart and sincere prayer rug icon, shining with warm light. "
-            "Right light tilted pan in shadow labeled 'RİYÂ (GÖSTERİŞ)' with superficial cloaks and showing-off symbols. "
-            "At the bottom, a subtle historic dawn mosque doorway with a dog silhouette referencing the story of sincerity in dawn prayer. "
-            "Minimalist Islamic scholarly vector art, deep plum purple and gold."
+            "Clean minimalist vector comparison diagram, 4:3 aspect ratio, light parchment background. "
+            "A large golden balance scale (mizan) in the center. "
+            "Left heavy pan glowing with light labeled with large bold Turkish text: 'İHLÂS (GÖNÜL DERVİŞLİĞİ)'. "
+            "Right light pan tilted upward in shadow labeled with large bold Turkish text: 'RİYÂ (GÖSTERİŞ)'. "
+            "Two contrasting large concept boxes: 'TENHADA SAMİMİYET' versus 'GÖSTERİŞLİ KİSVE'. "
+            "STRICT MANDATORY RULE: All text labels strictly in Turkish. Giant bold legible typography. "
+            "Absolutely NO small paragraphs, NO bullet points, NO tiny quotes or explanatory text. "
+            "Only 3 to 4 prominent, huge Turkish concept labels. Theme colors: deep plum purple (#7B3260) and gold."
         )
     },
     {
         "filename": "4_insanin_ontolojisi_melek_hayvan.jpg",
         "title": "Bölüm 4: İnsanın Ontolojik Konumu (Melek, Hayvan, İnsan)",
         "prompt": (
-            "Vertical ontological hierarchy infographic diagram in 4:3 aspect ratio, parchment backdrop. "
-            "Top sphere: 'MELEK' (Angels: Pure Intellect, no desires). "
-            "Bottom sphere: 'HAYVAN' (Animals: Pure Desires, no intellect). "
-            "Center prominent sphere: 'İNSAN' (Human: Endowed with both intellect and desires). "
-            "Two clear pathway arrows: Upward golden arrow pointing to 'AHSEN-İ TAKVÎM' (transcending angels through spiritual purification), "
-            "Downward arrow pointing to 'ESFEL-İ SÂFİLÎN' (falling lower than beasts). "
-            "Centered with 'Men arefe nefsehu' self-knowledge mirror motif. Scholarly vector illustration."
+            "Vertical ontological vector hierarchy diagram, 4:3 aspect ratio, clean ivory parchment backdrop. "
+            "Extremely minimalist, uncluttered layout. Three prominent circular concept nodes: "
+            "Top: 'MELEK (AKIL)', Center: 'İNSAN (AKIL + NEFİS)', Bottom: 'HAYVAN (ŞEHVET)'. "
+            "Two large bold directional arrows from center: Upward golden arrow labeled 'AHSEN-İ TAKVÎM ⬆', Downward arrow labeled 'ESFEL-İ SÂFİLÎN ⬇'. "
+            "Center mirror motif labeled: 'NEFSİNİ BİLMEK'. "
+            "STRICT MANDATORY RULE: All text labels strictly in Turkish. Giant bold legible typography. "
+            "Absolutely NO side paragraphs, NO small quotes, NO tiny bullet text, NO explanatory sentences. "
+            "Only 5 large prominent Turkish concept labels. Maximum readability at small box scale. Deep plum purple and gold."
         )
     },
     {
         "filename": "5_sufi_kelimesinin_kok_tahlili.jpg",
         "title": "Bölüm 5: Sûfî Kelimesinin 9 Kök Tahlili",
         "prompt": (
-            "Etymological linguistic elimination tree chart in 4:3 aspect ratio on clean parchment background. "
-            "Header in fine calligraphy: 'SÛFÎ VE TASAVVUF'. "
-            "Branches showing rejected root claims with clear red strike badges: 'Suffe -> Suffî (Geçersiz)', "
-            "'Safâ -> Safevî (Geçersiz)', 'Saff -> Saffî (Geçersiz)', 'Sufâne (Geçersiz)', 'Sophia (Geçersiz)'. "
-            "Branch leading to ONE prominent, golden highlighted victor branch: 'ES-SÛF (الصُّوف - KABA YÜN)' "
-            "verified by morphological rules (Tasavvefe - wearing wool). Deep plum purple and gold accents, crisp academic infographic."
+            "Minimalist etymological decision tree vector infographic, 4:3 aspect ratio, clean parchment background. "
+            "Top title in large bold Turkish lettering: 'SÛFÎ KELİMESİNİN KÖKENİ'. "
+            "Left branch with red strike marks: 'SUFFE / SAFÂ / SAFF (GEÇERSİZ)'. "
+            "Right branch glowing in bold gold box: 'ES-SÛF / YÜN (TEK GEÇERLİ KÖK)'. "
+            "Result box below: 'TASAVVEFE (YÜN GİYDİ)'. "
+            "STRICT MANDATORY RULE: All text labels strictly in Turkish. Giant bold typography. "
+            "Absolutely NO small sentences, NO tiny notes, NO paragraphs. "
+            "Only large, bold Turkish concept cards and flow arrows. High contrast, maximum legibility at small scale, deep plum purple (#7B3260) and antique gold."
         )
     }
 ]
