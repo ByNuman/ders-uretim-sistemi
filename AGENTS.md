@@ -147,7 +147,7 @@ GÖRSEL STANDARTLARI:
   - `typography`: Küçük kutuda okunabilirlik için **sıfır mikro-metin / sıfır paragraf**, yalnızca iri ve kalın 1–3 kelimelik kavram kutuları ve akış okları.
 - **İşlem Akışı:**
   1. `tools/fal_ai_uretim.py` aracılığıyla her bölümün pedagojik promptu sırayla gönderilir.
-  2. Üretilen JPEG dosyaları doğrudan hem dönemin `görseller/` havuzuna hem de ilgili dersin `gorsel_ders_notlari/<DERS>/<Hafta>/görseller/` dizinine kaydedilir.
+  2. Üretilen JPEG dosyaları doğrudan ilgili dersin `gorsel_ders_notlari/<DERS>/<Hafta>/görseller/` dizinine kaydedilir (Dönem kök dizinine fazladan genel klasör açılmaz; hiyerarşi korunur).
   3. Kaynak kodda (`src/<ders>.py`) ilgili kutunun başlığı temizlenir (`baslik=""`) ve `image=_foto("<dosya>.jpg")` atanır.
   4. `build.py` ve `tools/olcum.py` çalıştırılarak %100 doluluk ve 0 mm taşma teyit edilir.
 

@@ -8,7 +8,6 @@ FAL_KEY = os.environ.get("FAL_KEY", "fal_sk_c217e0df40a141deb539143fb2995359:317
 MODEL_ENDPOINT = "openai/gpt-image-2.5/sunburst/text-to-image"
 
 OUTPUT_DIRS = [
-    r"c:\Users\ASUS\OneDrive\OKUL\ders-uretim-sistemi\3-sinif\1-donem\vize\görseller",
     r"c:\Users\ASUS\OneDrive\OKUL\ders-uretim-sistemi\3-sinif\1-donem\vize\gorsel_ders_notlari\TASAVVUF I\3. Hafta\görseller",
     r"c:\Users\ASUS\OneDrive\OKUL\ders-uretim-sistemi\3-sinif\1-donem\vize\gorsel_ders_notlari\TASAVVUF I\görseller",
 ]
