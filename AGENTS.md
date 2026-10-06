@@ -94,7 +94,10 @@ Herhangi bir ders veya hafta için görsel ders notu (`src/<ders>.py` -> `build.
 11. **Yapısal Kesit & Eser Mimarisi (Hadis, Tefsir, Arap Dili):** Sahîh-i Buhârî bâb mimarisi, klasik el yazması metin-şerh-haşiye anatomisi veya tecvid harf mahreçleri anatomisi.
 
 #### C) AI Üretim & Prompt İlkeleri:
-- Görsel içi metinlerde harf bozulmalarını önlemek için uzun cümleler yasaktır; yalnızca 1-3 kelimelik net başlıklar, kavram etiketleri ve oklar hedeflenir.
+- **Tipografik İrilik ve Sıfır Mikro-Metin Kuralı (Küçük Kutu Okunabilirlik Standardı):**
+  - Görsel kutusu sayfa sağında kompakt bir çerçevede (`~75x56 mm`) yer aldığından, görsel içine minik paragraflar, madde işaretli küçük açıklamalar, ayet mealleri ve yan metinler koymak **KESİNLİKLE YASAKTIR** (küçüldüğünde okunaksız karınca yazısına dönüşür).
+  - Açıklamaları öğrenci zaten sol taraftaki ders metninden okur. Görselin yegâne gayesi; zihinde hiyerarşiyi, sacayağını veya karar akışını **iri, kalın, net ve ferah 1–3 kelimelik kavram kutuları ve akış oklarıyla** tek bakışta canlandırmaktır.
+  - Promptlarda modele: *"Extremely minimalist and uncluttered composition. Bold and large legible typography. Absolutely NO small paragraphs, NO bullet points, NO tiny explanatory text. Only 3 to 5 prominent, large Turkish concept labels (1-3 words each), clean boxes and flow arrows. High contrast, maximum readability at small box scale"* talimatı zorunlu olarak verilir.
 - **Görsel İçi Dil Kuralı (Türkçe ve Arapça Zorunluluğu):**
   - Görsel üzerindeki tüm şema başlıkları, kutucuklar ve kavram etiketleri **kesinlikle Türkçe** olacaktır (İngilizce etiket kullanımı kesinlikle yasaktır).
   - **Arapça Dersleri İstisnası:** Arap Dili ve Edebiyatı (Sarf, Nahiv, Belâgat vb.) derslerinde veya nass/terim odaklı şemalarda görsel içi metinler doğrudan **Arapça** (veya Türkçe-Arapça çift dilli) üretilebilir.
@@ -141,6 +144,7 @@ GÖRSEL STANDARTLARI:
   - `output_format`: `"jpeg"`
   - `num_images`: `1` (Her kutu için tekil bağımsız üretim)
   - `language`: Görsel içi tüm etiketler genel derslerde **Türkçe**, Arapça derslerinde **Arapça** (İngilizce etiket yasak).
+  - `typography`: Küçük kutuda okunabilirlik için **sıfır mikro-metin / sıfır paragraf**, yalnızca iri ve kalın 1–3 kelimelik kavram kutuları ve akış okları.
 - **İşlem Akışı:**
   1. `tools/fal_ai_uretim.py` aracılığıyla her bölümün pedagojik promptu sırayla gönderilir.
   2. Üretilen JPEG dosyaları doğrudan hem dönemin `görseller/` havuzuna hem de ilgili dersin `gorsel_ders_notlari/<DERS>/<Hafta>/görseller/` dizinine kaydedilir.
