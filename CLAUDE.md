@@ -262,20 +262,25 @@ Bu kural; nass odaklı olan **Arap Dili ve Edebiyatı**, **Hadis**, **Tefsir** d
    - Bir hadisin 2 veya 3 farklı isnad kanalı (mütâbaat, ta'lîkāt, farklı tarîkler) varsa, bunlar Arapça metnin tam başında kristal netliğinde ayrılır:
      - Arapça lafızların önünde `[الإِسْنَادُ ١]`, `[الإِسْنَادُ ٢]`, `[الإِسْنَادُ ٣]` rozet ve belirteçleri kullanılır.
      - Türkçe açıklamada her isnadın kaçıncı kanal olduğu ve ravilerin silsilesi açıkça numaralandırılarak karşılaştırılır.
+     - **Tüm Çoklu Senedlerde Râvi Hüviyet Kartı Zorunluluğu:** Yalnızca ana senedde değil, ta'lîk ve mütâbaat gibi ikincil/üçüncül tüm kanallarda da her râvi müstakil hüviyet kartıyla (`_isnad_token`) tanzim edilir. Kuru kelime listesiyle bırakılamaz.
 
-4. **İsnadın Hadisin Üstünde Yer Alması ve Metin İçi Râvi Analizi:**
+4. **İsnadın Hadisin Üstünde Yer Alması ve Bütünleşik Râvi Analizi (`.isnad-token` & `.isnad-subdesc`):**
    - İsnad zinciri daima hadis metninin (metn-i hadîs) hemen üstünde yer alır.
-   - Senetteki her bir râvinin hemen altına Türkçe yazılışı, râvi tabakası/sıfatı ve hadisin sıhhat durumu (mevkuf, mürsel, merfu, muttasıl) metin akışı bozulmadan eklenir.
+   - Senetteki her bir râvi müstakil bir kartta (`.isnad-token`): Arapça adı, Türkçe okunuşu, râvi tabakası/sıfatı, hadisin sıhhat rozeti (`Mevkūf Râvi`, `Maktû Ta'lîk`, `MERFÛ NASS`, `MEDÂRÜ'L-İSNÂD`, `Tahdîs`, `İhbâr`, `An'ane`) ve rozetin hemen altında tahmîl sîgasının Türkçe anlamı (`.isnad-subdesc`: *Doğrudan İşitme*, *Bizzat Semâ*, *Hocaya Arz/Okuma*, *«...den» Nakil*, *Kavşak Râvi*, *Sahâbî Rivayeti*, *Nebevî Nass*) ile eksiksiz gösterilir.
+   - **Bölüm Sonu İsnad Usûlü Rehberi:** Hadis isnadlarının başladığı bölümlerin sonunda veya ilgili odak kutularında sened ıstılahlarının (Mevsûl Tahdîs, İhbâr, An'ane, Medâr, Mevkûf, Merfû, Maktû) sınav ve usûl odaklı analitik izahı zorunlu olarak verilir.
 
-5. **Sistem Tasarımıyla %100 Bütünlük (Yerel Tema Değişkenleri):**
+5. **Prestijli Bâb Başlığı ve Nass Levhaları (`.bab-board`, `.bab-badge`):**
+   - Buhârî'nin fıkhî ictihadını yansıtan **Tercemetü'l-Bâb** bölümlerine özel altın sarısı degrade rozetler (`.bab-badge`) ve sıcak parşömen kart tasarımı uygulanır; **«BÂB TERCÜMESİ»** ve **«USÛL & İSTİNBAT»** kurumsal hap rozetleriyle nass ve fıkhî istinbat birbirinden net şekilde ayrılır.
+
+6. **Sistem Tasarımıyla %100 Bütünlük (Yerel Tema Değişkenleri):**
    - Kelime kelime levhalar ve kutular sistemin yerel tasarım kimliğiyle (`var(--accent)`, `var(--accent-tint)`, `var(--line)`, `var(--gold)`, `var(--paper)`) tam uyumlu olmalıdır.
    - Gözü yoran yapay, yabancı veya aşırı kontrastlı bordürler yerine sistemin `.k-badge`, `.k-nass` ve `.k-subitem` estetiği kullanılır; görsel bir bütünlük sağlanır.
 
-6. **Pedagojik Görsel ve Karar Ağaçları:**
+7. **Pedagojik Görsel ve Karar Ağaçları:**
    - Hadislerin isnad ağaçları (medârü'l-hadîs), tefsir rivayet-dirayet şemaları ve nahiv/sarf karar ağaçları konuya özel pedagojik görsel matrisine uygun olarak hazırlanır.
 
-7. **Sayfa Verimliliği & 0 mm Taşma:**
-   - Yoğun nass ve satır altı çevirilerin yer aldığı sayfalar titizlikle dengelenir; %90–100 doluluk ve `build.py` taşma denetiminde `0 mm taşma` şartı aranır.
+8. **Sayfa Verimliliği & 0 mm Taşma:**
+   - Yoğun nass, râvi kartları ve satır altı çevirilerin yer aldığı sayfalar titizlikle dengelenir; %90–100 doluluk ve `build.py` taşma denetiminde `0 mm taşma` şartı aranır.
 
 ---
 
