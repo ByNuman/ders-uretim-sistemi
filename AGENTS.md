@@ -172,6 +172,42 @@ Arap Dili ve Edebiyatı dersleri üretilirken veya güncellenirken aşağıdaki 
 5. **Sayfa Verimliliği & 0 mm Taşma:**
    - Tüm sayfalar %90–100 dolulukta tutulur, `build.py` taşma denetiminde `0 mm taşma` şartı aranır.
 
+---
+
+## KRİTİK KURAL 10: Üç Nass Dersi Bütünleşik ve İnterlinear Mimarisi (Arap Dili ve Edebiyatı, Hadis III, Tefsir III)
+
+Bu kural; nass odaklı olan **Arap Dili ve Edebiyatı**, **Hadis III** ve **Tefsir III** derslerinin tamamında **ZORUNLUDUR**. Bu derslerde kuru özet veya satır atlamalı anlatım kesinlikle yasaktır; aşağıdaki 7 temel prensip istisnasız uygulanır:
+
+1. **Kelime Kelime Satır Altı (Interlinear) Anlatım Standardı (`_w(ar, tr)`):**
+   - Ayetler, hadisler, senedler, terceme-i bâblar, şiirler ve klasik ibareler kuru metin olarak bırakılamaz.
+   - Her nass öbeği kelime kelime satır altı belirteçleriyle (`_w(ar, tr)`) tanzim edilir.
+   - Kelime kelime çevirinin hemen altına/yanına akıcı toplu Türkçe meal/anlam eklenir. Bu üslup kesinlikle korunur ve kaldırılmaz.
+
+2. **Kitap Bütünlüğü ve Kronolojik Akış (Besmeleden İtibaren Eksiksiz İbareler):**
+   - Kaynak kitapta veya derste yer alan metin sırası birebir takip edilir.
+   - İlk sayfadaki Besmele, terceme-i bâb (bölüm başlığı), nasslar ve şerhler eksiksiz Arapça lafızlarıyla yer alır. Metinden ibare atlanamaz.
+   - İlgili ayetlerin hangi sûre ve âyet numarası olduğu Arapça ibarenin hemen altına/yanına metin akışı içinde işlenir.
+
+3. **Çoklu İsnad Kanalları ve Tahlil Mimarisi (`[الإِسْنَادُ ١]`, `[الإِسْنَادُ ٢]`, `[الإِسْنَادُ ٣]`):**
+   - Bir hadisin 2 veya 3 farklı isnad kanalı (mütâbaat, ta'lîkāt, farklı tarîkler) varsa, bunlar Arapça metnin tam başında kristal netliğinde ayrılır:
+     - Arapça lafızların önünde `[الإِسْنَادُ ١]`, `[الإِسْنَادُ ٢]`, `[الإِسْنَادُ ٣]` rozet ve belirteçleri kullanılır.
+     - Türkçe açıklamada her isnadın kaçıncı kanal olduğu ve ravilerin silsilesi açıkça numaralandırılarak karşılaştırılır.
+
+4. **İsnadın Hadisin Üstünde Yer Alması ve Metin İçi Râvi Analizi:**
+   - İsnad zinciri daima hadis metninin (metn-i hadîs) hemen üstünde yer alır.
+   - Senetteki her bir râvinin hemen altına Türkçe yazılışı, râvi tabakası/sıfatı ve hadisin sıhhat durumu (mevkuf, mürsel, merfu, muttasıl) metin akışı bozulmadan eklenir.
+
+5. **Sistem Tasarımıyla %100 Bütünlük (Yerel Tema Değişkenleri):**
+   - Kelime kelime levhalar ve kutular sistemin yerel tasarım kimliğiyle (`var(--accent)`, `var(--accent-tint)`, `var(--line)`, `var(--gold)`, `var(--paper)`) tam uyumlu olmalıdır.
+   - Gözü yoran yapay, yabancı veya aşırı kontrastlı bordürler yerine sistemin `.k-badge`, `.k-nass` ve `.k-subitem` estetiği kullanılır; görsel bir bütünlük sağlanır.
+
+6. **Pedagojik Görsel ve Karar Ağaçları:**
+   - Hadislerin isnad ağaçları (medârü'l-hadîs), tefsir rivayet-dirayet şemaları ve nahiv/sarf karar ağaçları konuya özel pedagojik görsel matrisine uygun olarak hazırlanır.
+
+7. **Sayfa Verimliliği & 0 mm Taşma:**
+   - Yoğun nass ve satır altı çevirilerin yer aldığı sayfalar titizlikle dengelenir; %90–100 doluluk ve `build.py` taşma denetiminde `0 mm taşma` şartı aranır.
+
+
 
 
 
