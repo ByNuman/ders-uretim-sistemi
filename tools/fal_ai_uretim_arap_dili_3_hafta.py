@@ -12,7 +12,7 @@ import sys
 
 sys.stdout.reconfigure(encoding='utf-8')
 
-FAL_KEY = os.environ.get("FAL_KEY", "fal_sk_c217e0df40a141deb539143fb2995359:3177c261a8b0173cd99440fd011a9720")
+FAL_KEY = os.environ.get("FAL_KEY", "")
 MODEL_ENDPOINT = "openai/gpt-image-2.5/sunburst/text-to-image"
 
 ROOT = os.path.abspath(".")
