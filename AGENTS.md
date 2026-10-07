@@ -174,9 +174,9 @@ Arap Dili ve Edebiyatı dersleri üretilirken veya güncellenirken aşağıdaki 
 
 ---
 
-## KRİTİK KURAL 10: Üç Nass Dersi Bütünleşik ve İnterlinear Mimarisi (Arap Dili ve Edebiyatı, Hadis III, Tefsir III)
+## KRİTİK KURAL 10: Arapça Nass ve İbare Geçen Tüm Derslerde Bütünleşik ve İnterlinear Mimari Standardı
 
-Bu kural; nass odaklı olan **Arap Dili ve Edebiyatı**, **Hadis III** ve **Tefsir III** derslerinin tamamında **ZORUNLUDUR**. Bu derslerde kuru özet veya satır atlamalı anlatım kesinlikle yasaktır; aşağıdaki 7 temel prensip istisnasız uygulanır:
+Bu kural; nass odaklı olan **Arap Dili ve Edebiyatı**, **Hadis**, **Tefsir** dersleri başta olmak üzere, **içerisinde âyet, hadis, fıkhî kaide, kelâmî delil veya klasik metin gibi Arapça ibare geçen TÜM DERSLERDE (Fıkıh, Kelâm, İslâm Felsefesi, Tasavvuf vb.) İSTİSNASIZ ZORUNLUDUR**. Bu derslerde kuru özet veya satır atlamalı anlatım kesinlikle yasaktır; aşağıdaki 7 temel prensip eksiksiz uygulanır:
 
 1. **Kelime Kelime Satır Altı (Interlinear) Anlatım Standardı (`_w(ar, tr)`):**
    - Ayetler, hadisler, senedler, terceme-i bâblar, şiirler ve klasik ibareler kuru metin olarak bırakılamaz.
