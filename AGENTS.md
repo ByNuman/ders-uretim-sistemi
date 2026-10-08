@@ -138,10 +138,9 @@ GÖRSEL STANDARTLARI:
 - Metin başlığı ve ilk maddeler görselin solunda akarken, görselin bittiği hizada sonraki maddeler görselin altındaki boşluğa taşarak sayfanın tam genişliğine (`100%`) yayılır.
 - Böylece görselin altında atıl/ölü boşluk kalmaz ve sayfa alanı en yüksek verimle kullanılır.
 #### G) Görselleri Yapay Zekâ Asistanının Üretmemesi Kuralı (Kullanıcı Üretim Standardı):
-- **Asistan Görsel Üretmez:** Asistan görsel üretiminde doğrudan harici API (fal.ai vb.) çalıştırmaz veya görsel üretimi yapmaz.
-- **Boş Çerçeve Bırakma (`image=None`):** Her bölüme yalnızca 4:3 oranında temiz, boş görsel çerçevesi (`add_block_gorsel(BulletBlock(...), baslik="...", image=None)`) yerleştirir.
-- **Pedagojik Prompt/Başlık:** Çerçevenin `baslik` parametresine yukarıdaki pedagojik standartlara tam uygun 4:3 şema/infografik prompt yönergesi yazılır. Kullanıcı görseli dilediğinde kendisi üretir.
-- **Görsel Bağlama:** Kullanıcı görselleri ilgili dersin `görseller/` klasörüne ekleyip açıkça bağlanmasını istediğinde `image=_foto("<dosya>.jpg")` ve `baslik=""` yapılarak bağlanır. Asistan kendiliğinden görsel bağlamaz.
+- **Asistan Görsel Üretmez & Harici Anahtar Bulundurmaz:** Asistan görsel üretiminde kesinlikle hiçbir harici API (fal.ai vb.) çalıştırmaz veya görsel üretimi yapmaz. Sistemde veya ortamda harici görsel üretim anahtarları (fal.ai vb.) tutulmaz ve kullanılmaz.
+- **Boş Çerçeve ve Prompt Hazırlama (`image=None`):** Asistan yalnızca görsel ekleme kutularını (`add_block_gorsel(BulletBlock(...), baslik="...", image=None)`) 4:3 oranında yerleştirir ve kutunun `baslik` parametresine konuya tam uygun pedagojik infografik/şema prompt yönergesini yazar. Görsellerin üretimini kullanıcı bağımsız olarak kendisi üstlenir.
+- **Görsel Bağlama:** Kullanıcı görselleri ilgili dersin `görseller/` klasörüne ekleyip açıkça bağlanmasını istediğinde `image=_foto("<dosya>.jpg")` ve `baslik=""` yapılarak bağlanır. Asistan kendiliğinden görsel üretip bağlamaz.
 
 
 ---

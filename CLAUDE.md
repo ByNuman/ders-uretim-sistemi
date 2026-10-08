@@ -223,9 +223,8 @@ GÖRSEL STANDARTLARI:
 - **Görsel Yanı Kutularında BFC ve Taşma Önleme Standardı (`display: flow-root;`):** Sağa yaslanan görsel kutusunun yanındaki nass (`.k-nass`) veya açıklama kutularının (`.k-subitem`) görsel çerçevesinin arkasına/içine taşmasını engellemek için, CSS'te `display: flow-root;` kuralı zorunludur. Bu sayede kutu görselin sol sınırında temizce sonlanır; görsel altına inen maddeler ise otomatikman %100 genişliğe açılır.
 
 #### G) Görselleri Yapay Zekâ Asistanının Üretmemesi Kuralı (Kullanıcı Üretim Standardı):
-- **Asistan Görsel Üretmez:** Asistan görsel üretiminde doğrudan harici API (fal.ai vb.) çalıştırmaz veya görsel üretimi yapmaz.
-- **Boş Çerçeve Bırakma (`image=None`):** Her bölüme yalnızca 4:3 oranında temiz, boş görsel çerçevesi (`add_block_gorsel(BulletBlock(...), baslik="...", image=None)`) yerleştirir.
-- **Pedagojik Prompt/Başlık:** Çerçevenin `baslik` parametresine yukarıdaki pedagojik standartlara tam uygun 4:3 şema/infografik prompt yönergesi yazılır. Kullanıcı görseli dilediğinde kendisi üretir.
+- **Asistan Görsel Üretmez & Harici Anahtar Bulundurmaz:** Asistan görsel üretiminde kesinlikle hiçbir harici API (fal.ai vb.) çalıştırmaz veya görsel üretimi yapmaz. Sistemde veya ortamda harici görsel üretim anahtarları (fal.ai vb.) tutulmaz ve kullanılmaz.
+- **Boş Çerçeve ve Prompt Hazırlama (`image=None`):** Asistan yalnızca görsel ekleme kutularını (`add_block_gorsel(BulletBlock(...), baslik="...", image=None)`) 4:3 oranında yerleştirir ve kutunun `baslik` parametresine konuya tam uygun pedagojik infografik/şema prompt yönergesini yazar. Görsellerin üretimini kullanıcı bağımsız olarak kendisi üstlenir.
 - **Görsel Bağlama:** Kullanıcı görselleri ilgili dersin `görseller/` klasörüne ekleyip açıkça bağlanmasını istediğinde `image=_foto("<dosya>.jpg")` ve `baslik=""` yapılarak bağlanır. Asistan kendiliğinden görsel bağlamaz.
 
 
