@@ -27,6 +27,8 @@ Detaylı sistem kılavuzu için ayrıca `CLAUDE.md` dosyasına bakınız.
 ## KRİTİK KURAL 5: Kapak Tasarımı — Standart Vektörel Kapaktır (`cover_image=""`)
 - Kapak her zaman sistemin yerel CSS/SVG vektörel kapağı ile üretilir (`cover_image=""`).
 - Harici görsel aranmaz, difüzyon görseli üretilmez. Özel görsel sadece kullanıcı açıkça isterse atanır.
+- **Kapak Açıklaması (`description`):** Kapak sayfasında başlığın altındaki açıklama/tanıtım metni daima **kısa ve öz 1–2 cümle** olmalıdır; asla uzun paragraflar yazılmaz.
+
 
 ---
 
@@ -135,21 +137,12 @@ GÖRSEL STANDARTLARI:
 - Görsel kutusu (`add_block_gorsel`), rijit 2 sütunlu grid yerine `float: right` ile sağa yaslanır.
 - Metin başlığı ve ilk maddeler görselin solunda akarken, görselin bittiği hizada sonraki maddeler görselin altındaki boşluğa taşarak sayfanın tam genişliğine (`100%`) yayılır.
 - Böylece görselin altında atıl/ölü boşluk kalmaz ve sayfa alanı en yüksek verimle kullanılır.
-#### G) Otomatik Görsel Üretim Standardı (fal.ai Entegrasyonu - ZORUNLU YÖNTEM):
-- Görsel ders notu kutuları için harici görsel üretiminde resmî olarak **fal.ai** API'si kullanılır.
-- **Model Endpoint:** `openai/gpt-image-2.5/sunburst/text-to-image`
-- **Tasarruf & Format Standartları:**
-  - `quality`: `"low"` (Token ve kredi harcamasını minimumda tutmak için zorunlu)
-  - `image_size`: `"landscape_4_3"` (`1024 x 768`, 4:3 en-boy oranı)
-  - `output_format`: `"jpeg"`
-  - `num_images`: `1` (Her kutu için tekil bağımsız üretim)
-  - `language`: Görsel içi tüm etiketler genel derslerde **Türkçe**, Arapça derslerinde **Arapça** (İngilizce etiket yasak).
-  - `typography`: Küçük kutuda okunabilirlik için **sıfır mikro-metin / sıfır paragraf**, yalnızca iri ve kalın 1–3 kelimelik kavram kutuları ve akış okları.
-- **İşlem Akışı:**
-  1. `tools/fal_ai_uretim.py` aracılığıyla her bölümün pedagojik promptu sırayla gönderilir.
-  2. Üretilen JPEG dosyaları doğrudan ilgili dersin `gorsel_ders_notlari/<DERS>/<Hafta>/görseller/` dizinine kaydedilir (Dönem kök dizinine fazladan genel klasör açılmaz; hiyerarşi korunur).
-  3. Kaynak kodda (`src/<ders>.py`) ilgili kutunun başlığı temizlenir (`baslik=""`) ve `image=_foto("<dosya>.jpg")` atanır.
-  4. `build.py` ve `tools/olcum.py` çalıştırılarak %100 doluluk ve 0 mm taşma teyit edilir.
+#### G) Görselleri Yapay Zekâ Asistanının Üretmemesi Kuralı (Kullanıcı Üretim Standardı):
+- **Asistan Görsel Üretmez:** Asistan görsel üretiminde doğrudan harici API (fal.ai vb.) çalıştırmaz veya görsel üretimi yapmaz.
+- **Boş Çerçeve Bırakma (`image=None`):** Her bölüme yalnızca 4:3 oranında temiz, boş görsel çerçevesi (`add_block_gorsel(BulletBlock(...), baslik="...", image=None)`) yerleştirir.
+- **Pedagojik Prompt/Başlık:** Çerçevenin `baslik` parametresine yukarıdaki pedagojik standartlara tam uygun 4:3 şema/infografik prompt yönergesi yazılır. Kullanıcı görseli dilediğinde kendisi üretir.
+- **Görsel Bağlama:** Kullanıcı görselleri ilgili dersin `görseller/` klasörüne ekleyip açıkça bağlanmasını istediğinde `image=_foto("<dosya>.jpg")` ve `baslik=""` yapılarak bağlanır. Asistan kendiliğinden görsel bağlamaz.
+
 
 ---
 

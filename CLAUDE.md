@@ -107,6 +107,7 @@ Görsel ders notu üretilirken kapak için **her zaman sistemin yerel CSS/HTML v
 - Harici bir kapak görseli (`cover_image`) otomatik olarak aranmaz, resim/difüzyon yapay zekasıyla üretilmez veya görsel manipülasyonla yamalanmaz.
 - Klasik vektörel kapak; dersin renk temasında degrade zemin, usturlap amblemi, altın köşe süsleri, amblem harfi, başlık/alt başlık, cam efektli istatistik kutuları ve kurumsal alt bilgiyi kusursuz, jilet gibi net vektörel formatta otomatik çizer.
 - Özel kapak görseli **SADECE ve SADECE** kullanıcı açıkça *"şu kapağı kullan"*, *"kapağı şu görsel ile değiştir"* dediğinde ilgili derse atanır.
+- **Kapak Açıklaması (`description`):** Kapak sayfasında başlığın altındaki açıklama/tanıtım metni daima **kısa ve öz 1–2 cümle** olmalıdır; asla uzun paragraflar yazılmaz.
 
 ## KRİTİK KURAL 6: Müfredat Bilgi Paketleri Eski ve Bağlayıcı Değildir — Tek Bağlayıcı Kaynak Ders Kitapları ve Öğretmenin Verdiği Ek Kaynaklardır (Tüm Dersler İçin Geçerli)
 
@@ -220,6 +221,13 @@ GÖRSEL STANDARTLARI:
 - Metin başlığı ve ilk maddeler görselin solunda akarken, görselin bittiği hizada sonraki maddeler görselin altındaki boşluğa taşarak sayfanın tam genişliğine (`100%`) yayılır.
 - Böylece görselin altında atıl/ölü boşluk kalmaz ve sayfa alanı en yüksek verimle kullanılır.
 - **Görsel Yanı Kutularında BFC ve Taşma Önleme Standardı (`display: flow-root;`):** Sağa yaslanan görsel kutusunun yanındaki nass (`.k-nass`) veya açıklama kutularının (`.k-subitem`) görsel çerçevesinin arkasına/içine taşmasını engellemek için, CSS'te `display: flow-root;` kuralı zorunludur. Bu sayede kutu görselin sol sınırında temizce sonlanır; görsel altına inen maddeler ise otomatikman %100 genişliğe açılır.
+
+#### G) Görselleri Yapay Zekâ Asistanının Üretmemesi Kuralı (Kullanıcı Üretim Standardı):
+- **Asistan Görsel Üretmez:** Asistan görsel üretiminde doğrudan harici API (fal.ai vb.) çalıştırmaz veya görsel üretimi yapmaz.
+- **Boş Çerçeve Bırakma (`image=None`):** Her bölüme yalnızca 4:3 oranında temiz, boş görsel çerçevesi (`add_block_gorsel(BulletBlock(...), baslik="...", image=None)`) yerleştirir.
+- **Pedagojik Prompt/Başlık:** Çerçevenin `baslik` parametresine yukarıdaki pedagojik standartlara tam uygun 4:3 şema/infografik prompt yönergesi yazılır. Kullanıcı görseli dilediğinde kendisi üretir.
+- **Görsel Bağlama:** Kullanıcı görselleri ilgili dersin `görseller/` klasörüne ekleyip açıkça bağlanmasını istediğinde `image=_foto("<dosya>.jpg")` ve `baslik=""` yapılarak bağlanır. Asistan kendiliğinden görsel bağlamaz.
+
 
 ---
 

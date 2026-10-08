@@ -63,3 +63,5 @@ _kapak_onizleme.js
 .DS_Store
 Thumbs.db
 tmp/
+scratch/
+
