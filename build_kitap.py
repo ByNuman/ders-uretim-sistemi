@@ -66,13 +66,10 @@ from cekirdek.theme_engine import resolve_theme_css, generate_theme_vars_from_he
 # "Ders Haritası" sayfası da kaldırıldı: dersin sayfa aralığı/sayısı zaten Ana
 # İçindekiler satırında yazıyor.
 FRONT_FIXED_PAGES = 4      # ana kapak + künye + önsöz + sayfa rehberi (1 sayfa)
-TOC_PER_PAGE = 11          # ana içindekilerde sayfa başına ders satırı. 11 ders
-                           #  210x297mm sayfayı DOLU ama taşmadan dolduruyor
-                           #  (ölçüldü). 12+ derste liste otomatik dengeli iki
-                           #  sayfaya bölünür (toc_chunks: 12 -> 6+6). Satır
-                           #  yüksekliği sabit değil (3 satıra saran ders adı
-                           #  ~26mm, tek satırlık ~18mm); artırmadan önce mutlaka
-                           #  build_kitap.py taşma çıktısını okuyun.
+TOC_PER_PAGE = 10          # ana içindekilerde sayfa başına ders satırı. 10 ders
+                           #  210x297mm sayfayı tam doldurur; 11+ derste liste
+                           #  otomatik dengeli iki sayfaya bölünür (11 -> 6+5).
+
 
 
 def toc_chunks(courses: list) -> list[list]:
@@ -108,6 +105,39 @@ def theme_accents_from_css(css: str) -> dict:
     return out
 
 
+def scope_custom_css(css_text: str, scope_cls: str) -> str:
+    """Her dersin pack.custom_css kurallarını o dersin sayfalarına (.ders-N)
+    izole eder. Böylece bir dersteki .block, .k-badge, .tq kuralları diğer
+    derslerin sayfalarını ezmez veya bozmaz."""
+    import tinycss2
+    rules = tinycss2.parse_stylesheet(css_text, skip_comments=False, skip_whitespace=False)
+    output = []
+    for rule in rules:
+        if rule.type == 'qualified-rule':
+            selector = tinycss2.serialize(rule.prelude).strip()
+            parts = [p.strip() for p in selector.split(',') if p.strip()]
+            new_parts = []
+            for p in parts:
+                if p.startswith(scope_cls):
+                    new_parts.append(p)
+                elif p.startswith(':root') or p.startswith('body'):
+                    new_parts.append(p.replace(':root', scope_cls).replace('body', scope_cls))
+                elif p.startswith('[data-ch') or p.startswith('[data-cp') or p.startswith('.page'):
+                    new_parts.append(f"{scope_cls}{p}")
+                else:
+                    new_parts.append(f"{scope_cls} {p}")
+            new_selector = ', '.join(new_parts)
+            content = tinycss2.serialize(rule.content)
+            output.append(f"{new_selector} {{ {content} }}")
+        elif rule.type == 'comment':
+            output.append(f"/*{rule.value}*/")
+        elif rule.type == 'whitespace':
+            output.append(rule.value)
+        else:
+            output.append(tinycss2.serialize([rule]))
+    return '\n'.join(output)
+
+
 def collect_courses(book, offset: int = 0, css: str = "") -> list[dict]:
     """Her dersi sırayla yükler, offset zincirini kurar ve tema kapsamını
     ayırır. Dönen her kayıt: pack, ctx, theme_css, prefix, sayfa aralığı,
@@ -130,6 +160,8 @@ def collect_courses(book, offset: int = 0, css: str = "") -> list[dict]:
             theme_css = ""
             accent, accent_dark = fixed.get(pack.theme, ("#3d5568", "#24333f"))
 
+        scoped_css = scope_custom_css(pack.custom_css, f".ders-{i}") if pack.custom_css else ""
+
         ctx = B.course_context(pack, offset=offset, prefix=f"d{i}-", pagecls=pagecls)
         courses.append({
             "index": i,
@@ -137,6 +169,7 @@ def collect_courses(book, offset: int = 0, css: str = "") -> list[dict]:
             "pack": pack,
             "ctx": ctx,
             "theme_css": theme_css,
+            "custom_css": scoped_css,
             "accent": accent,
             "accent_dark": accent_dark,
             "plain_title": B.strip_tags(pack.title),

@@ -222,10 +222,22 @@ GÖRSEL STANDARTLARI:
 - Böylece görselin altında atıl/ölü boşluk kalmaz ve sayfa alanı en yüksek verimle kullanılır.
 - **Görsel Yanı Kutularında BFC ve Taşma Önleme Standardı (`display: flow-root;`):** Sağa yaslanan görsel kutusunun yanındaki nass (`.k-nass`) veya açıklama kutularının (`.k-subitem`) görsel çerçevesinin arkasına/içine taşmasını engellemek için, CSS'te `display: flow-root;` kuralı zorunludur. Bu sayede kutu görselin sol sınırında temizce sonlanır; görsel altına inen maddeler ise otomatikman %100 genişliğe açılır.
 
-#### G) Görselleri Yapay Zekâ Asistanının Üretmemesi Kuralı (Kullanıcı Üretim Standardı):
+#### G) Görselleri Yapay Zekâ Asistanının Üretmemesi & Şema Promptu Açıklık Standardı:
 - **Asistan Görsel Üretmez & Harici Anahtar Bulundurmaz:** Asistan görsel üretiminde kesinlikle hiçbir harici API (fal.ai vb.) çalıştırmaz veya görsel üretimi yapmaz. Sistemde veya ortamda harici görsel üretim anahtarları (fal.ai vb.) tutulmaz ve kullanılmaz.
-- **Boş Çerçeve ve Prompt Hazırlama (`image=None`):** Asistan yalnızca görsel ekleme kutularını (`add_block_gorsel(BulletBlock(...), baslik="...", image=None)`) 4:3 oranında yerleştirir ve kutunun `baslik` parametresine konuya tam uygun pedagojik infografik/şema prompt yönergesini yazar. Görsellerin üretimini kullanıcı bağımsız olarak kendisi üstlenir.
-- **Görsel Bağlama:** Kullanıcı görselleri ilgili dersin `görseller/` klasörüne ekleyip açıkça bağlanmasını istediğinde `image=_foto("<dosya>.jpg")` ve `baslik=""` yapılarak bağlanır. Asistan kendiliğinden görsel bağlamaz.
+- **Boş Çerçeve ve Şema Promptu Hazırlama (`image=None`):** Asistan yalnızca görsel ekleme kutularını (`add_block_gorsel(BulletBlock(...), baslik="...", image=None)`) 4:3 oranında yerleştirir ve kutunun `baslik` parametresine konuya tam uygun pedagojik infografik/şema prompt yönergesini yazar. Görsellerin üretimini kullanıcı bağımsız olarak kendisi üstlenir.
+- **Tüm Görsel Türlerinde Yüksek Açıklık ve Ayrıntı Standardı (Pedagojik Matris Entegrasyonu):**
+  Kullanıcının paylaştığı örnekler görsel türünü iki şablonla sınırlamaz; **Pedagojik Görsel Matrisindeki tüm çeşitlerin (11 temel şablon + özgün türler)** promptlarının yapay zekâya aktarılırken taşıması gereken **kristal netlikteki ayrıntı derinliğini** belirler:
+  1. **Şema/Görsel Türünün Açıkça Belirtilmesi:** Rastgele bir başlık yerine matristeki somut tür adıyla başlar (örn. `İnfografik Harita`, `Kronolojik Zaman Çizelgesi`, `Hüküm Karar Ağacı`, `İsnad Ağacı`, `İki Kutuplu Karşılaştırma Şeması`, `Silsile & İlim Ağacı`, `Kavram Şeması`, `Döngüsel Süreç Modeli`, `Hiyerarşik Değerler Piramidi` vb.).
+  2. **Yapısal ve Semantik Bileşenlerin Somut Dökümü:** Kompozisyondaki sol/sağ sütunlar, basamaklar, dallar, zıtlık okları, aktörler veya noktalı virgülle (` ; `) ayrılmış kilit kavram kümeleri açıkça yazılır; yapay zekânın kompozisyonda neyi nereye koyacağı tartışmaya yer bırakmayacak netlikte tanımlanır.
+  3. **Biçimsel ve Renk Parametreleri:** Prompt içerisinde `4:3 en-boy oranı` açıkça zikredilir; gerekli durumlarda dersin kurumsal tema rengi ve altın sarısı vurgu tonu eklenir.
+  *(Örnek 1 - Karşılaştırma Matrisi: `ŞEMA PROMPTU (4:3): İLİM VE MARİFET / İRFAN DİKOTOMİ MATRİSİ — Sol sütun İlim (Tafsilatlı, Ezelî/Hâdis, Zıddı Cehl, Esmâ: Âlim). Sağ sütun Marifet (Tanımak, Yalnızca Kesbî, Zıddı İnkâr, Esmâ: Ârif Denilmez). Ortada zıtlık ve bağ okları. Vurgu rengi erguvan moru (#592F79) ve altın sarısı.`)*
+  *(Örnek 2 - Coğrafi / Tarihî İnfografik: `İnfografik Şema: Kadim Nehir Havzaları ve Kur'anî Atlas (Mezopotamya / Cezîre Dicle-Fırat ve Mısır Nil havzaları; Hz. İbrahim, Hz. Nûh, Hz. Yûnus ve Hz. Mûsâ; 4:3 en-boy oranı)`)*
+  *(Örnek 3 - Karar Ağacı: `Hüküm Karar Ağacı: Şartlar, Rükünler ve Butlan Dalları (Girdi: Akit İradesi; Dallanma: Sıhhat Şartları Tam → Sahih / Rükün Eksik → Bâtıl / Vasıf Bozuk → Fâsid; 4:3 en-boy oranı)`)*
+  *(Örnek 4 - İsnad Zinciri: `İsnad Ağacı Şeması (4:3): Medârü'l-Hadîs Kavşağı ve Tarîkler — Zührî kavşağı; yukarıda 3 talebe (Mâlik, Süfyân, Ma'mer); aşağıda sahâbî Enes b. Mâlik; âlî ve nâzil isnad kolları. Vurgu rengi deri cilt (#664324) ve altın sarısı.`)*
+- **Tipografik ve Görsel Kutu Mizanpajı:**
+  - Prompt başlığı (`.gk-baslik`): `"DejaVu Serif", serif` fontlu, kalın (`font-weight: 700`), ortalanmış, dersin koyu aksan renginde (`var(--accent-dark)`), dış çerçevesiz ve arka plan şeritsiz olarak kutunun hemen üzerinde yer alır.
+  - Görsel alanı (`.gk-alan`): `aspect-ratio: 4 / 3;`, `border: 1px solid var(--line);`, `border-radius: 8px;`, `background: var(--paper);`, `box-shadow: var(--shadow-sm);` özelliklerinde şık, parşömen zeminli boş çerçevedir.
+- **Görsel Bağlama:** Kullanıcı görselleri ilgili dersin `görseller/` klasörüne ekleyip açıkça bağlanmasını istediğinde `image=_foto("<dosya>.jpg")` ve `baslik=""` yapılarak bağlanır. Asistan kendiliğinden görsel üretip bağlamaz.
 
 
 ---
