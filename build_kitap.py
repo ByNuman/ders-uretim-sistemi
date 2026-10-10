@@ -365,6 +365,12 @@ def build_book(module_name: str = "kitap", d: "donem_mod.Donem | None" = None):
     print(f"[kitap] Yer imi ağacı: {n} girdi ({len(courses)} ders düğümü + alt başlıklar)")
     print(f"[kitap] PDF üretildi: {pdf_path} ({size_mb:.1f} MB)")
     B.report_page_count(pdf_path)
+    if not B.KEEP_HTML_DEFAULT:
+        try:
+            html_path.unlink(missing_ok=True)
+            print(f"[kitap] Ara HTML temizlendi (disk tasarrufu): {html_path.name}")
+        except Exception:
+            pass
     return pdf_path
 
 

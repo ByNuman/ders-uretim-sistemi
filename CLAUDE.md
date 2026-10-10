@@ -318,6 +318,13 @@ Bu kural; nass odaklı olan **Arap Dili ve Edebiyatı**, **Hadis**, **Tefsir** d
 
 ---
 
+## KRİTİK KURAL 11: Disk Alanı Tasarrufu — Ara HTML ve Ham Görsellerin Temizlenmesi
+
+1. **Otomatik Ara HTML Temizliği:** `build.py` ve `build_kitap.py` PDF üretimini başarıyla tamamladıktan sonra ara `.html` dosyasını otomatik olarak siler (yüzlerce MB disk tasarrufu sağlar). İnceleme/hata ayıklama gerekirse `--keep-html` bayrağı kullanılır.
+2. **Ham Görsellerin Temizliği:** Görsel kutuları için görseller `image=_foto(...)` ile bağlanıp PDF üretildikten sonra; görseller doğrudan PDF ikili dosyasına gömüldüğünden, projede ve bulutta gereksiz yer kaplamaması adına `görseller/` klasöründeki ham görsel dosyaları temizlenir/silinir.
+
+---
+
 ## Sistemin amacı
 
 Üniversite derslerinin ham metin özetlerini (5-25 sayfalık PDF'ler) alıp tasarım

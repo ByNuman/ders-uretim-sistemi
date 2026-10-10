@@ -567,16 +567,23 @@ def build(module_name: str, d: "donem_mod.Donem | None" = None):
     finalize_for_print(pdf_path, strip_tags(pack.title))
     print(f"[build] PDF üretildi: {pdf_path}")
     report_page_count(pdf_path)
+    if not KEEP_HTML_DEFAULT:
+        try:
+            html_path.unlink(missing_ok=True)
+            print(f"[build] Ara HTML temizlendi (disk tasarrufu): {html_path.name}")
+        except Exception:
+            pass
     return pdf_path
 
 
-# --- ÇIKTI RENK UZAYI --------------------------------------------------------
+# --- ÇIKTI RENK UZAYI & ARA DOSYA YÖNETİMİ -----------------------------------
 # VARSAYILAN: RGB (fotokopi kipi). PDF/X-4 CMYK dönüşümü yalnızca MATBAAYA
 # gönderilecek işler içindir; fotokopi makinesi ve ofis yazıcısı zaten kendi
 # renk dönüşümünü yapar, önceden CMYK'ya çevirmek renkleri donuklaştırır,
 # dosyayı büyütür ve her derlemeye Ghostscript'in dakikalarını ekler.
 # Matbaaya iş gönderecekseniz: python build.py <slug> ... --cmyk
 CMYK_DEFAULT = False
+KEEP_HTML_DEFAULT = False
 
 
 def finalize_for_print(pdf_path: Path, title: str,
@@ -596,23 +603,27 @@ def finalize_for_print(pdf_path: Path, title: str,
 
 
 def add_cikti_args(ap) -> None:
-    """--cmyk / --rgb bayraklarını ekler. build.py ve build_kitap.py ORTAK
-    kullanır ki iki çıktının renk kipi tek yerden yönetilsin."""
+    """--cmyk / --rgb / --keep-html bayraklarını ekler. build.py ve build_kitap.py ORTAK
+    kullanır ki iki çıktının renk kipi ve ara dosya davranışı tek yerden yönetilsin."""
     g = ap.add_mutually_exclusive_group()
     g.add_argument("--cmyk", action="store_true",
                    help="Çıktıyı Ghostscript ile PDF/X-4 CMYK'ya çevir "
                         "(MATBAA için; fotokopide gereksiz, varsayılan kapalı)")
     g.add_argument("--rgb", action="store_true",
                    help="Çıktıyı RGB bırak (varsayılan davranış)")
+    ap.add_argument("--keep-html", action="store_true",
+                    help="Ara HTML dosyasını silme (hata ayıklama / inceleme için sakla)")
 
 
 def apply_cikti_args(args) -> None:
     """add_cikti_args() ile alınan bayrakları modül durumuna işler."""
-    global CMYK_DEFAULT
+    global CMYK_DEFAULT, KEEP_HTML_DEFAULT
     if getattr(args, "cmyk", False):
         CMYK_DEFAULT = True
     elif getattr(args, "rgb", False):
         CMYK_DEFAULT = False
+    if getattr(args, "keep_html", False):
+        KEEP_HTML_DEFAULT = True
 
 
 def report_page_count(pdf_path: Path):
@@ -859,6 +870,10 @@ const {{ chromium }} = require('playwright');
     # UTF-8 hata çıktısını çözemeyip build'i asıl hatayı göstermeden düşürüyor.
     result = subprocess.run(["node", str(tmp_js)], capture_output=True, text=True,
                             encoding="utf-8", errors="replace")
+    try:
+        tmp_js.unlink(missing_ok=True)
+    except Exception:
+        pass
     if result.returncode != 0:
         print("[HATA] PDF render başarısız:")
         print(result.stdout)
