@@ -106,8 +106,15 @@ değerlendir. `.toc-compact` değerlerini elle küçültme — ölçümle bağl�
 Görsel ders notu üretilirken kapak için **her zaman sistemin yerel CSS/HTML vektörel kapağı kullanılır (`cover_image=""`)**:
 - Harici bir kapak görseli (`cover_image`) otomatik olarak aranmaz, resim/difüzyon yapay zekasıyla üretilmez veya görsel manipülasyonla yamalanmaz.
 - Klasik vektörel kapak; dersin renk temasında degrade zemin, usturlap amblemi, altın köşe süsleri, amblem harfi, başlık/alt başlık, cam efektli istatistik kutuları ve kurumsal alt bilgiyi kusursuz, jilet gibi net vektörel formatta otomatik çizer.
-- Özel kapak görseli **SADECE ve SADECE** kullanıcı açıkça *"şu kapağı kullan"*, *"kapağı şu görsel ile değiştir"* dediğinde ilgili derse atanır.
 - **Kapak Açıklaması (`description`):** Kapak sayfasında başlığın altındaki açıklama/tanıtım metni daima **kısa ve öz 1–2 cümle** olmalıdır; asla uzun paragraflar yazılmaz.
+
+## KRİTİK KURAL 5.1: Sayfa Düzeni ve Ön Kısım Mimarisi (Senaryo A — Kapak Arkası Boş Sayfa)
+
+- **Genel Bakış Sayfası Kaldırılmıştır:** Tekil görsel ders notlarında "Genel Bakış" sayfası okunmadan atlandığı ve sayfa israfı oluşturduğu için tamamen kaldırılmıştır (`OVERVIEW_PAGES = 0`).
+- **Kapak Arkası Boş Sayfa (Çift Taraflı Baskı / Forma Uyumu):** Hem tekil derslerde hem birleşik kitapta kapağın arkasına boş sayfa (`<section class="page blank-page ...">`) yerleştirilir. Böylece çift taraflı baskıda içindekiler sağ sayfada açılır.
+- **Tekil Ders Notu Sayfa Akışı:** `s.1 Kapak` → `s.2 Boş Sayfa` → `s.3 İçindekiler` → `s.4 Bölüm 1` (Bölümler daima 4. sayfadan başlar).
+- **Birleşik Kitap Ön Kısım Sadeleştirmesi:** Birleşik kitapta atlanan ve sayfa israfı oluşturan "Künye", "Bu Kitap Nasıl Kullanılır" ve "Sayfa Rehberi" sayfaları kaldırılmıştır (`FRONT_FIXED_PAGES = 2`).
+- **Birleşik Kitap Sayfa Akışı:** `s.1 Ana Kapak` → `s.2 Boş Sayfa` → `s.3-4 Ana İçindekiler` → `s.5 1. Ders Başlangıcı` (1. ders kapağı s.5 → s.6 Boş Sayfa → s.7 İçindekiler → s.8 Bölüm 1...).
 
 ## KRİTİK KURAL 6: Müfredat Bilgi Paketleri Eski ve Bağlayıcı Değildir — Tek Bağlayıcı Kaynak Ders Kitapları ve Öğretmenin Verdiği Ek Kaynaklardır (Tüm Dersler İçin Geçerli)
 
@@ -117,11 +124,10 @@ Görsel ders notu üretilirken kapak için **her zaman sistemin yerel CSS/HTML v
 - Öğretmen ek bir kaynak veya farklı bir metin bildirirse, kullanıcı bunu belirtecektir. Aksi takdirde ders kitabının ünite ve konu akışı doğrudan esas alınır.
 - Bu kural sistemdeki **TÜM DERSLER** için istisnasız geçerlidir.
 
-## KRİTİK KURAL 7: Öğretmen İsimleri Ders Programındaki Resmî İsimlerle Birebir Yazılır
+## KRİTİK KURAL 7: Öğretmen İsimleri Ders Programındaki Resmî İsimlerle Birebir Yazılır & Görsel Notlarda İsim Yasağı
 
-Ders notlarında, kapaklarda veya metin içi ders künyelerinde öğretim elemanı adı geçecekse:
-- Adlandırma rastgele veya tahmini yapılamaz.
-- Doğrudan haftalık ders programındaki resmî unvan ve isim (ör. "Öğr. Gör. Muhammed Salih SÜRÜCÜ", "Doç. Dr. ...") birebir esas alınır.
+- **Yazılı Anlatımlarda Resmî İsim Zorunluluğu:** Yazılı ders anlatımı künyelerinde (`ders_anlatimlari/`) veya dönem planlama analizlerinde öğretim elemanı adı geçecekse; rastgele veya tahmini adlandırma yapılamaz. Doğrudan haftalık ders programındaki resmî unvan ve isim (ör. "Doç. Dr. Nevzat AYDIN", "Dr. Öğr. Üyesi Adem GÜNEŞ", "Öğr. Gör. Muhammed Salih SÜRÜCÜ") birebir esas alınır.
+- **Görsel Ders Notlarında Hoca İsmi Kullanılmaz (KESİN YASAK):** Hocaların izni olmadan isimlerini görsel ders notlarında (`src/*.py` -> PDF / HTML) geçirmek kesinlikle yasaktır. Kapaklarda, açıklamalarda (`description`), soru köklerinde, çözümlü test cevap anahtarlarında (`AnswerItem`) veya arka kapaklarda hoca isimleri zikredilmez; yalnızca "ders anlatımında", "ders içi sınav yönergesinde" gibi pedagojik ifadeler kullanılır.
 
 ## KRİTİK KURAL 8: Görsel Ders Notu Üretiminde 7 Temel Standart ve Kalite Protokolü (Tüm Dersler İçin Zorunlu)
 
@@ -1041,7 +1047,7 @@ TEST_PER_PAGE_FIRST = 10   # 2026-09: sınav 3 -> 2 sayfaya indirildi (20 soru =
 TEST_PER_PAGE = 10         # test devam sayfaları
 ANSWER_PER_PAGE = 23       # cevap anahtarı (20 soru -> tek sayfa)
 TOC_COMPACT_THRESHOLD = 7  # bu kadar satırı aşınca İçindekiler sıkışık kipe geçer
-OVERVIEW_PAGES = 1         # Genel Bakış TEK sayfa
+OVERVIEW_PAGES = 0         # Senaryo A: Genel Bakış kalktı, kapaktan sonra boş sayfa
 QA_PER_PAGE = 12 · DISTINCTIONS_PER_PAGE = 8 · MATCHTABLE_PER_PAGE = 11   # LEGACY
 ```
 

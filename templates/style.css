@@ -142,6 +142,9 @@ em { font-style: italic; }
   flex-direction: column;
 }
 .page:last-child { page-break-after: auto; }
+.blank-page {
+  background: var(--paper, #ffffff) !important;
+}
 
 /* Zemin dokusu KALDIRILDI: iç sayfalarda arka plan artık düz `--paper` tonudur.
    (Eski hâli `.body-page::before` üzerinde tekrarlayan bir radial-gradient nokta

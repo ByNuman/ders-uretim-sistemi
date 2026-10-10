@@ -315,7 +315,7 @@ def paginate_capped(items: list, first_cap: int, rest_cap: int | None = None,
 
 def compute_page_numbers(pack, offset: int = 0) -> dict:
     """Her bölümün gerçek başlangıç sayfa numarasını hesaplar. Tek ders
-    build'inde offset=0 -> kapak=1, içindekiler=2, genel bakış=3, sonra
+    build'inde offset=0 -> kapak=1, boş sayfa=2, içindekiler=3, sonra
     bölümler sırayla kendi page_count() kadar yer kaplar.
 
     KİTAP build'inde offset, o dersten ÖNCE gelen tüm sayfaların toplamıdır --
@@ -323,17 +323,17 @@ def compute_page_numbers(pack, offset: int = 0) -> dict:
     ana içindekiler kitap boyunca kesintisiz akan AYNI numarayı gösterir.
 
     Dönen sözlükteki ek anahtarlar:
-      cover/toc/overview/chapters -> dersin ön sayfalarının numaraları
-      end                          -> dersin son fiziksel sayfa numarası
-      total                        -> dersin toplam sayfa sayısı (offset zinciri için)
+      cover/blank/toc/chapters -> dersin ön sayfalarının numaraları
+      end                      -> dersin son fiziksel sayfa numarası
+      total                    -> dersin toplam sayfa sayısı (offset zinciri için)
     """
     n = offset + 1
     starts = {"cover": n}
     n += 1
+    starts["blank"] = n
+    n += 1
     starts["toc"] = n
     n += toc_page_count(pack)
-    starts["overview"] = n
-    n += OVERVIEW_PAGES
     starts["chapters"] = n
     for ch in pack.chapters:
         starts[ch.number] = n
@@ -474,11 +474,8 @@ TOC_COMPACT_THRESHOLD = 7
 # "Bir ders 12 bölümü aşarsa ... dersi bölmeyi değerlendirin").
 TOC_MAX_ROWS = 14
 
-# Genel Bakış TEK sayfadır. Yapıya göre (ölçüye göre değil) sabitlenmiştir:
-# sayfa numaraları render'dan ÖNCE hesaplanabilir olmalı (bkz.
-# compute_page_numbers). A4'te dört blok (hero + 6 kart + akış + sınav notu)
-# rahat sığıyor; buraya blok eklerseniz taşma denetimini mutlaka okuyun.
-OVERVIEW_PAGES = 1
+# Genel Bakış sayfası Senaryo A uyarınca kaldırılmıştır; kapaktan sonra boş sayfa gelir.
+OVERVIEW_PAGES = 0
 
 
 def exam_page_count(pack) -> int:

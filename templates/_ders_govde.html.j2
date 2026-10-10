@@ -278,7 +278,14 @@
 {% endif %}
 
 {# ============================================================
-   2. İÇİNDEKİLER — dar sayfada satırlar tek sayfaya sığmayabildiği için
+   2. BOŞ SAYFA (KAPAK ARKASI — SENARYO A)
+   Çift taraflı baskıda kapağın arkası boş kalır; İçindekiler
+   sağ sayfada açılır.
+   ============================================================ #}
+<section class="page blank-page{{ ctx.pagecls }}" id="{{ ctx.prefix }}blank"></section>
+
+{# ============================================================
+   3. İÇİNDEKİLER — dar sayfada satırlar tek sayfaya sığmayabildiği için
    ctx.toc_pages üzerinden sayfalanır (build.py: TOC_ROWS_FIRST/REST).
    ============================================================ #}
 {% set toc_pageno = namespace(n=ctx.page_starts["toc"]) %}
@@ -307,49 +314,6 @@
 </section>
 {% set toc_pageno.n = toc_pageno.n + 1 %}
 {% endfor %}
-
-{# ============================================================
-   3. GENEL BAKIŞ — TEK sabit sayfa (build.py: OVERVIEW_PAGES = 1).
-   hero + 6 kart + çalışma akışı + sınav notu tek sayfada.
-   (Küçültülmüş punto + genişletilmiş metin alanında dördü birden sığıyor;
-   taşma denetimi hakemdir — sığmazsa OVERVIEW_PAGES'i 2'ye çevirip bu
-   bölümü tekrar ikiye ayırın.)
-   ============================================================ #}
-<section class="page body-page{{ ctx.pagecls }}">
-  <div class="pageband"><div>{{ pack.title }}</div><div class="pageband-course">{{ pack.course_code }}</div></div>
-  <div class="toc-kicker">Dersin Büyük Resmi</div>
-  <div class="toc-title">Genel Bakış</div>
-
-  <div class="ov-hero">{{ pack.overview_lead | safe }}</div>
-
-  <div class="ov-grid">
-    {% for card in pack.overview_cards %}
-    <div class="ov-card">
-      <div class="ov-card-title">{{ card.title }}</div>
-      <div class="ov-card-text">{{ card.text }}</div>
-    </div>
-    {% endfor %}
-  </div>
-
-  {% if pack.overview_flow %}
-  <div class="section-kicker" style="margin-top:3.5mm;">Çalışma Akışı</div>
-  <div class="ov-flow">
-    {% for step in pack.overview_flow %}
-    {% if not loop.first %}<div class="ov-flow-arrow">{{ arrow_svg() }}</div>{% endif %}
-    <div class="ov-flow-step"><b>{{ step[0] }}</b><span>{{ step[1] }}</span></div>
-    {% endfor %}
-  </div>
-  {% endif %}
-
-  {% if pack.overview_note %}
-  <div class="callout caution" style="margin-top:3.5mm;">
-    <div class="callout-icon">{{ icon_svg("caution") }}</div>
-    <div><div class="callout-title">Sınavda Ana Ayrım</div><div class="callout-text">{{ pack.overview_note | safe }}</div></div>
-  </div>
-  {% endif %}
-
-  {{ footer(pack, ctx.page_starts["overview"]) }}
-</section>
 
 {# ============================================================
    4. BÖLÜM SAYFALARI

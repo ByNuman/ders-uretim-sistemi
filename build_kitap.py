@@ -61,11 +61,9 @@ from cekirdek.theme_engine import resolve_theme_css, generate_theme_vars_from_he
 
 
 # --- Ön kısım sayfa düzeni ---------------------------------------------------
-# 210x297mm sayfada (metin alanı 186x270mm) "Sayfa Rehberi" 8 örneğiyle TEK
-# sayfaya sığar; eski 175x250mm'de sığmayıp 4+4 bölünüyordu (2026-09 birleşti).
-# "Ders Haritası" sayfası da kaldırıldı: dersin sayfa aralığı/sayısı zaten Ana
-# İçindekiler satırında yazıyor.
-FRONT_FIXED_PAGES = 4      # ana kapak + künye + önsöz + sayfa rehberi (1 sayfa)
+# Senaryo A: Kapaktan sonra boş sayfa (s.1 Kapak, s.2 Boş Sayfa, s.3+ Ana İçindekiler).
+# Künye, önsöz ve sayfa rehberi kaldırıldı (boş sayfa israfını önleme).
+FRONT_FIXED_PAGES = 2      # ana kapak (1) + boş sayfa (1)
 TOC_PER_PAGE = 10          # ana içindekilerde sayfa başına ders satırı. 10 ders
                            #  210x297mm sayfayı tam doldurur; 11+ derste liste
                            #  otomatik dengeli iki sayfaya bölünür (11 -> 6+5).
@@ -188,8 +186,8 @@ def build_front_matter(book, courses: list[dict], fm_pages: int) -> dict:
     sayfa numarası bile elle yazılmaz; hepsi buradan gelir."""
     chunks = toc_chunks(courses)
     fm = {
-        "cover": 1, "imprint": 2, "preface": 3, "guide": 4,
-        # rehber tek sayfa (s.4); ana içindekiler s.5'ten başlar
+        "cover": 1, "blank": 2,
+        # ana içindekiler s.3'ten başlar
         "toc": FRONT_FIXED_PAGES + 1,
         "toc_chunks": chunks,
         "total": fm_pages,
@@ -216,10 +214,8 @@ def add_book_bookmarks(pdf_path: Path, courses: list[dict], fm: dict):
     writer = PdfWriter()
     writer.append(reader)
     total = 0
-    for label, key in [("Künye", "imprint"), ("Bu Kitap Nasıl Kullanılır", "preface"),
-                       ("Sayfa Rehberi", "guide"), ("Ana İçindekiler", "toc")]:
-        writer.add_outline_item(label, fm[key] - 1)
-        total += 1
+    writer.add_outline_item("Ana İçindekiler", fm["toc"] - 1)
+    total += 1
     for c in courses:
         pack, ps = c["pack"], c["ctx"]["page_starts"]
         parent = writer.add_outline_item(
@@ -320,8 +316,7 @@ def build_book(module_name: str = "kitap", d: "donem_mod.Donem | None" = None):
     courses = collect_courses(book, offset=fm_pages, css=css)
     fm = build_front_matter(book, courses, fm_pages)
 
-    print(f"[kitap] Ön kısım {fm_pages} sayfa (kapak s.1, künye s.{fm['imprint']}, "
-          f"önsöz s.{fm['preface']}, rehber s.{fm['guide']}, "
+    print(f"[kitap] Ön kısım {fm_pages} sayfa (kapak s.1, boş sayfa s.{fm['blank']}, "
           f"içindekiler s.{fm['toc']})")
     print(f"[kitap] {len(courses)} ders birleştiriliyor:")
     for c in courses:
