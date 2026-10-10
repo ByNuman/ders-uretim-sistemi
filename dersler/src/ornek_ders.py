@@ -124,16 +124,20 @@ def get_pack() -> CoursePack:
     ch2.pages.append(
         ChapterPage()
         .add_terms(ch2.key_terms)
-        .add_block(BulletBlock(1, "Bölümleri planlama", [
-            "Ham metnin <b>kendi başlık yapısını</b> takip edin; yapay bölümleme uydurmayın.",
-            "Bölüm başına ortalama <b>2 sayfa</b> hedefleyin (1-3 sayfa kabul edilebilir).",
-            "Her bölüm tam <b>4 anahtar terim</b> içermelidir — tasarım 2x2 ızgara varsayar.",
-            "Yoğun bölümleri en baştan birkaç <b>ChapterPage</b>'e bölün.",
-        ]))
-        .add_block(BulletBlock(2, "Sınav bölümünü yazma", [
-            "<b>test_questions</b> ve <b>answer_key_items</b> listeleri aynı uzunlukta ve aynı sırada olmalıdır.",
-            "Her <b>AnswerItem.correct</b> değeri, o sorunun seçenek anahtarlarından biri olmalıdır.",
-            "Numaralandırma 1'den başlar ve boşluksuz artar; <b>validate()</b> bunu denetler.",
+        .add_block_gorsel(
+            BulletBlock(1, "Bölümleri planlama ve şema kuralları", [
+                '<span class="k-badge gold">Mizanpaj</span> Ham metnin başlık yapısını izleyin; yapay bölümleme uydurmayın.',
+                '<span class="k-badge alert">4:3 Oranı</span> Her bölüme pedagojik şema ve görsel çerçevesi (4:3) eklenir.',
+                '<span class="k-badge subtle">Float Düzen</span> Görsel kutusu sağa yaslanır; metin çevresini sararak sıfır sayfa kaybı sağlar.',
+                '<span class="k-badge gold">Terimler</span> Her bölümün başında tam 4 anahtar terim kartı yer alır.',
+            ]),
+            baslik="ŞEMA PROMPTU (4:3): VERİ AKIŞI VE DERS İÇERİK MİMARİSİ",
+            image=None
+        )
+        .add_block(BulletBlock(2, "Sınav ve çözüm bölümü standartları", [
+            "<b>test_questions</b> ve <b>answer_key_items</b> listeleri aynı uzunlukta ve eşleşen sırada olmalıdır.",
+            "Pedagojik zorluk piramidi, homojen seçenek uzunluğu ve tüyo yasağı zorunludur.",
+            "Her sorunun analitik gerekçesi çözümlü cevap anahtarında eksiksiz verilir.",
         ]))
     )
     ch2.pages.append(
@@ -285,46 +289,47 @@ def get_pack() -> CoursePack:
             "A": "Sayfa numaraları için", "B": "Cilt payı bırakmak için",
             "C": "Kesimde beyaz çizgi oluşmasını önlemek için",
             "D": "Dosya boyutunu küçültmek için", "E": "Gerekli değildir"}),
+        TestQuestion(9, "add_block_gorsel() çerçevesinin standart en-boy oranı nedir?", {
+            "A": "16:9 yatay ekran oranı", "B": "1:1 kare çerçeve oranı",
+            "C": "4:3 pedagojik şema oranı", "D": "3:2 fotoğraf en-boy oranı",
+            "E": "2:1 geniş panorama oranı"}),
+        TestQuestion(10, "Senaryo A mizanpajında kapağın arkasına neden boş sayfa yerleştirilir?", {
+            "A": "Çift taraflı baskıda İçindekiler sağ sayfada açılsın diye",
+            "B": "Sayfa sayısını kasıtlı artırmak amacıyla",
+            "C": "Matbaa yazılımı zorunlu kıldığı için",
+            "D": "Kapak resminin taşmasını önlemek amacıyla",
+            "E": "Tasarım hatasını gizlemek amacıyla"}),
     ]
 
     answer_key_items = [
-        AnswerItem(1, "B", "<b>get_pack()</b> — modül yalnızca bu fonksiyonu dışa verir "
-                           "ve parametre almadan bir CoursePack döndürür."),
-        AnswerItem(2, "C", "<b>gorsel_ders_notlari/</b> tek gerçek çıktı klasörüdür. "
-                           "kaynaklar/ altındakiler girdi ya da ara üründür."),
-        AnswerItem(3, "C", "<b>4</b> — tasarım 2x2 bir ızgara varsayar, bu yüzden sayı sabittir."),
-        AnswerItem(4, "C", "<b>tools/dengele.py</b> blokları ölçüp sayfa bölünmelerini "
-                           "yeniden dağıtır. Punto veya boşluk küçültmek yasaktır: "
-                           "tasarım sistemi sabit kalmalıdır."),
-        AnswerItem(5, "A", "<b>A4 (210 × 297 mm).</b> Çıktı fotokopiyle çoğaltıldığı "
-                           "için kesim payı (bleed) yoktur; render ölçüsü de A4'tür."),
-        AnswerItem(6, "B", "<b>theme_color</b> alanına yazılan tek bir hex renkten "
-                           "theme_engine.py bütün tonları türetir."),
-        AnswerItem(7, "B", "<b>Girdisidir.</b> Ham kaynaktan çıkarılan yazılı özet burada "
-                           "durur; build.py onu okuyup görsel kitabı üretir."),
-        AnswerItem(8, "C", "Zemin rengi sayfa kenarına kadar bassın diye içerik "
-                           "kesim çizgisinin <b>dışına taşırılır</b>; böylece küçük kesim "
-                           "kaymalarında beyaz çizgi oluşmaz."),
+        AnswerItem(1, "B", "<b>get_pack()</b> — modül yalnızca bu fonksiyonu dışa verir ve CoursePack nesnesi döndürür."),
+        AnswerItem(2, "C", "<b>gorsel_ders_notlari/</b> tek gerçek çıktı klasörüdür. kaynaklar/ altındakiler girdi veya ara üründür."),
+        AnswerItem(3, "C", "<b>4</b> — tasarım sistemi 2x2 dengeli bir ızgara varsayar; her bölüm tam 4 anahtar terim taşır."),
+        AnswerItem(4, "C", "<b>tools/dengele.py</b> blok yüksekliklerini ölçüp sayfaları otomatik yeniden dağıtır."),
+        AnswerItem(5, "A", "<b>A4 (210 × 297 mm).</b> Çıktı dar kenarlı A4 fotokopi kipi için optimize edilmiştir."),
+        AnswerItem(6, "B", "<b>theme_color</b> alanına yazılan tek bir hex renkten theme_engine.py bütün gradyan ve aksan tonlarını türetir."),
+        AnswerItem(7, "B", "<b>Girdisidir.</b> Ham kaynaktan çıkarılan yazılı özet burada durur; build.py onu okur."),
+        AnswerItem(8, "C", "Zemin rengi kesim hattının dışına taşırılarak (bleed) giyotin kesiminde beyaz çizgi oluşması engellenir."),
+        AnswerItem(9, "C", "<b>4:3 oranı.</b> Görsel kutuları float mizanpajıyla sayfa sağına 4:3 oranında yerleştirilir."),
+        AnswerItem(10, "A", "<b>Çift taraflı baskı uyumu.</b> Kapağın arkasına boş sayfa konularak İçindekiler'in daima sağ sayfada açılması sağlanır."),
     ]
 
     return CoursePack(
         ders_klasoru="ÖRNEK DERS",
-        course_code="ÖRNEK DERS",
+        course_code="SİSTEM REHBERİ",
         title='Görsel Ders Notu <span class="accent-word">Sistemi</span>',
-        subtitle="Kendi dersinizi yazmak için başlangıç şablonu",
-        description="Bu örnek ders, sistemin kendisini anlatır: bir ders modülünün "
-                    "nasıl yazıldığını, hangi blokların kullanılabileceğini ve "
-                    "derleme denetimlerinin ne işe yaradığını gösterir.",
+        subtitle="A4 Baskıya Hazır Kitap ve Görsel Ders Notu Üretim Motoru",
+        description="Bu rehber, sistemin mimarisini ve kurallarını kendi üzerinden anlatır: Python veri modelinin anatomisi, bloklar, 0 mm taşma denetimi ve derleme döngüsü.",
         theme="forest",
-        theme_color="#2F5D50",
-        icon_text="O",
+        theme_color="#185a4a",
+        icon_text="S",
         chapters=chapters,
         glossary=glossary,
-        test_title="Genel Değerlendirme Testi",
-        test_subtitle="Sistemi doğru anladığınızı kontrol edin",
+        test_title="Sistem Kuralları Değerlendirme Testi",
+        test_subtitle="Üretim standartlarını ve dizgi motorunu doğru anladığınızı denetleyin",
         test_instructions="Aşağıdaki sorularda beş seçenekten yalnızca birini işaretleyiniz.",
         test_questions=test_questions,
-        answer_key_intro="Her sorunun doğru cevabı ve kısa gerekçesi aşağıda yer almaktadır.",
+        answer_key_intro="Her sorunun doğru cevabı ve analitik sistem gerekçesi aşağıda yer almaktadır.",
         answer_key_items=answer_key_items,
         overview_lead="Bu sistem, ders içeriği ile sayfa tasarımını birbirinden ayırır. "
                       "Siz yalnızca içeriği Python veri yapılarıyla yazarsınız; sayfa "
