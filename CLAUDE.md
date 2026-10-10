@@ -156,14 +156,23 @@ Herhangi bir ders veya hafta için görsel ders notu (`src/<ders>.py` -> `build.
   - **1–6. Sorular (Kolay):** Doğrudan kavram, terim ve isim bilgisi.
   - **7–14. Sorular (Orta):** Karşılaştırma, usûl tahlili, sebep-sonuç ilişkileri.
   - **15–20. Sorular (Zor):** Öncüllü sorular (Roman rakamlı `I, II, III`), olumsuz soru kökleri ve Arapça ibare çözümlemeleri.
+- **%70 Düşündürücü & Akademik Derinlik Standardı:**
+  - Soruların en az %70'i kuru ezber yerine; usûl tahlili, mezhep/ekol mukayesesi, neden-sonuç bağıntıları ve öncüllü derinlik taşımalıdır.
+  - Çeldiriciler uydurma veya basit olamaz; konunun püf noktasını bilmeyi gerektiren kardeş ıstılahlar, zıt mezhep görüşleri veya benzer kaidelerden kurulur.
+- **Şık Boyutu Eşitliği & Homojenliği (Uzun Şık İpucu Yasağı):**
+  - "En uzun şık doğru cevaptır" yanılsaması KESİNLİKLE YASAKTIR.
+  - 5 seçeneğin (`A, B, C, D, E`) tamamı paralel cümle yapısında, birbirine denk kelime sayısında ve eşit satır/hacim dengesinde yazılır.
+- **Parantez İçi Tüyo Yasağı:**
+  - Soru kökünde veya şıklarda terimin Türkçe anlamını parantez içinde vermek (ör. `«الأَثَرَةُ» (bencillik)`, `cevâbü't-taleb (emrin cevabı)`) KESİNLİKLE YASAKTIR.
+  - Sadece BiDi standardı gereği izole edilen Arapça ibareler (`<bdi class="ar">...</bdi>`) yer alabilir; anlam ve izahlar çözümlü cevap anahtarında öğretici olarak verilir.
 - **Test Sayfa Mimarisi (10 + 10 Soru & Çizgisiz Ferah Boşluk):**
   - Test tam **2 sayfaya (10 + 10 soru)** dengelenir.
-  - Sorular arasında göz yoran kesik/düz çizgiler KULLANILMAZ. Sorular birbirinden temiz ve ferah dikey beyaz boşlukla (`margin-bottom: 3.2mm`) ayrılır; soruların ve seçeneklerin birbirine yapışması kesin olarak engellenir.
+  - Sorular arasında göz yoran kesik/düz çizgiler KULLANILMAZ. Sorular birbirinden temiz ve ferah dikey beyaz boşlukla (`margin-bottom: 1.0–2.0mm`) ayrılır; soruların ve seçeneklerin birbirine yapışması kesin olarak engellenir.
   - Soru başlığı (`.tq-head`) ve şıklar (`.tq-options`) arasında nefes alan mikro-mesafeler korunarak iki sütuna dengeli yayılır. Soruların sadece tepeye sıkışıp sayfa altında gereksiz devasa boşluk bırakması önlenir.
 - **Çözümlü Cevap Anahtarı Mimarisi (Genişletilmiş Punto ve Sayfa Dengesi):**
   - Tam **1 sayfaya** dengeli sığdırılır; sayfanın alt yarısının boş kalması engellenerek `%85–95` doluluk sağlanır.
   - Çözüm metinleri minik punto yerine gövde standardına yakın (`9.2pt`), ferah satır aralığı (`line-height: 1.34`), belirgin doğru cevap hap rozetleri (`8.2pt`) ve maddeler arası nefes alan aralıklarla (`.ans-item: 2.6mm`) sunulur.
-  - Her soruda doğru şıkkın yanında analitik gerekçesi ve geçen Arapça ibarelerin `<span class="ans-trans">` Türkçe mealleri eksiksiz verilir.
+  - Her soruda doğru şıkkın yanında analitik gerekçesi ve geçen Arapça ibarelerin `<span class="ans-trans">` Türkçe mealleri eksiksiz verilir. Öğrenci soruyu yanlış yapsa dahi cevap anahtarını okuduğunda konuyu tam olarak öğrenir.
 
 ### 7. Standart: Görsel Ekleme Kutuları, Pedagojik Görsel Matrisi ve Esneklik Kuralı (4:3)
 - Her bölüme en az bir adet `add_block_gorsel(BulletBlock(...), baslik="...")` şablonuyla 4:3 oranında görsel çerçevesi (`image=None`) eklenir.
