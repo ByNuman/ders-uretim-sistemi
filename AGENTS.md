@@ -28,6 +28,7 @@ Detaylı sistem kılavuzu için ayrıca `CLAUDE.md` dosyasına bakınız.
 - Kapak her zaman sistemin yerel CSS/SVG vektörel kapağı ile üretilir (`cover_image=""`).
 - Harici görsel aranmaz, difüzyon görseli üretilmez. Özel görsel sadece kullanıcı açıkça isterse atanır.
 - **Kapak Açıklaması (`description`):** Kapak sayfasında başlığın altındaki açıklama/tanıtım metni daima **kısa ve öz 1–2 cümle** olmalıdır; asla uzun paragraflar yazılmaz.
+- **`KAPAK/` Klasörü ve Ana Kapak Görsellerinin Dokunulmazlığı (KESİN SİLME YASAĞI):** `gorsel_ders_notlari/KAPAK/` klasörü her dersin ana kapak görsellerini barındırır. Bu klasördeki ana kapak görselleri KESİNLİKLE SİLİNMEZ, silme scriptlerine/temizlik komutlarına dâhil edilmez, taşınmaz veya ezilemez. Yalnızca ilgili dersin hangi haftası işleniyorsa o haftaya ait materyaller değiştirilirken haftalık dosyalar silinebilir; `KAPAK/` klasöründeki dosyalara asla dokunulmaz.
 
 ## KRİTİK KURAL 6: Sayfa Düzeni ve Ön Kısım Mimarisi (Senaryo A — Kapak Arkası Boş Sayfa)
 - **Genel Bakış Sayfası Kaldırılmıştır:** Tekil görsel ders notlarında "Genel Bakış" sayfası okunmadan atlandığı ve sayfa israfı oluşturduğu için tamamen kaldırılmıştır.
@@ -174,6 +175,10 @@ GÖRSEL STANDARTLARI:
   - Prompt başlığı (`.gk-baslik`): `"DejaVu Serif", serif` fontlu, kalın (`font-weight: 700`), ortalanmış, dersin koyu aksan renginde (`var(--accent-dark)`), dış çerçevesiz ve arka plan şeritsiz olarak kutunun hemen üzerinde yer alır.
   - Görsel alanı (`.gk-alan`): `aspect-ratio: 4 / 3;`, `border: 1px solid var(--line);`, `border-radius: 8px;`, `background: var(--paper);`, `box-shadow: var(--shadow-sm);` özelliklerinde şık, parşömen zeminli boş çerçevedir.
 - **Görsel Bağlama:** Kullanıcı görselleri ilgili dersin `görseller/` klasörüne ekleyip açıkça bağlanmasını istediğinde `image=_foto("<dosya>.jpg")` ve `baslik=""` yapılarak bağlanır. Asistan kendiliğinden görsel üretip bağlamaz.
+
+#### H) HADİS III Dersi Özel İstisnası (Görsel Ekleme Kutusu Yasağı):
+- Kullanıcı talimatı gereğince, **HADİS III** dersinin görsel notlarında **görsel ekleme kutusu (`add_block_gorsel`) KESİNLİKLE KULLANILMAZ**.
+- Bunun yerine zengin hadis levhaları (`_hadis_board`), terceme-i bâb levhaları (`_nass_board`), isnad zincirleri (`_isnad_section`) ve bâb fıkhı analizleri doğrudan tam sayfa genişliğinde (`add_block`) tanzim edilir.
 
 
 ---

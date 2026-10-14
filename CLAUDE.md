@@ -107,6 +107,7 @@ Görsel ders notu üretilirken kapak için **her zaman sistemin yerel CSS/HTML v
 - Harici bir kapak görseli (`cover_image`) otomatik olarak aranmaz, resim/difüzyon yapay zekasıyla üretilmez veya görsel manipülasyonla yamalanmaz.
 - Klasik vektörel kapak; dersin renk temasında degrade zemin, usturlap amblemi, altın köşe süsleri, amblem harfi, başlık/alt başlık, cam efektli istatistik kutuları ve kurumsal alt bilgiyi kusursuz, jilet gibi net vektörel formatta otomatik çizer.
 - **Kapak Açıklaması (`description`):** Kapak sayfasında başlığın altındaki açıklama/tanıtım metni daima **kısa ve öz 1–2 cümle** olmalıdır; asla uzun paragraflar yazılmaz.
+- **`KAPAK/` Klasörü ve Ana Kapak Görsellerinin Dokunulmazlığı (KESİN SİLME YASAĞI):** `gorsel_ders_notlari/KAPAK/` klasöründe yer alan görseller her dersin ana kapak görselleridir. Bu klasördeki dosyalar KESİNLİKLE SİLİNMEZ, taşınamaz veya silme/temizleme rutinlerine dahil edilmez. Yalnızca ilgili dersin haftalık içeriği güncellenirken o haftaya ait haftalık dosyalar değiştirilebilir; `KAPAK/` klasörüne asla dokunulmaz.
 
 ## KRİTİK KURAL 5.1: Sayfa Düzeni ve Ön Kısım Mimarisi (Senaryo A — Kapak Arkası Boş Sayfa)
 
