@@ -327,6 +327,29 @@ Bu kural; nass odaklı olan **Arap Dili ve Edebiyatı**, **Hadis**, **Tefsir** d
 
 ---
 
+## KRİTİK KURAL 12: Şahsiyet / Düşünür Kartları (`Person`) Kullanım Protokolü ve Otomatik Ekleme Yasağı
+
+Şahsiyet kartları (`Person`, `add_person`, `add_person_row`), sayfa mizanpajında 35 mm dikey yer kaplayan ve öğrencinin görsel dikkatini doğrudan üzerine çeken son derece stratejik ve ağırlıklı bileşenlerdir. Bu bileşenin kullanımı aşağıdaki katı kurallara bağlanmıştır:
+
+1. **Otomatik / Hafızadan / Şablondan Rastgele Şahsiyet Kartı Ekleme Yasağı (KESİN YASAK):**
+   - Geçmiş ders şablonlarından, yapay zekânın genel kelâm/fıkıh/tarih hafızasından veya "sayfada boşluk kaldı / kelâm dersidir bir âlim bulunsun" denilerek rastgele veya otomatik olarak şahsiyet kartı KESİNLİKLE EKLENEMEZ.
+   - Her dersin kodu sıfırdan, o haftanın doğrudan ders içeriği ve verileri esas alınarak kurulur.
+
+2. **Kaynakta Doğrudan Geçme ve Dersin Odak Konusu Olma Şartı:**
+   - Bir şahıs kartı **YALNIZCA VE YALNIZCA** o haftanın öğretmen ders notunda veya temel kaynak metninde o şahsiyet doğrudan, tarihsel, ekol kurucu veya biyografik bir odak olarak işleniyorsa / geçiyorsa eklenebilir.
+   - Eğer derste veya notta şahsın biyografisi, ekoldeki kurucu rolü veya müstakil bir bahsi geçmiyorsa (konu salt kavram, epistemoloji, semantik veya hüküm teorisiyse); `add_person` **KESİNLİKLE KULLANILMAZ**. Bu alan doğrudan dersin analitik maddelerine, nasslarına veya karşılaştırma tablolarına tahsis edilir.
+
+3. **Doyurucu, Genel Bilgi Verici & Akademik Derinlik Standardı (Kısa / Yüzeysel Metin Yasağı):**
+   - Şahıs kartı meşru olarak kullanıldığında; içindeki metin (`tagline`, `bio`, `key_work`) asla kuru, 1 cümlelik veya yüzeysel bir unvan geçiştirmesi olamaz.
+   - `tagline`: Şahsın ilim tarihindeki ve mezhep/ekol içerisindeki kurucu unvanını ve dönemini net yansıtır (ör. *"Ehl-i Sünnet Kelâmının Kurucusu ve Mütekaddimîn Dönemi İmamı"*).
+   - `bio`: Yalnızca doğum-ölüm tarihi değil; şahsın ilgili ilim dalındaki devrimsel metodolojisini, savunduğu ana tezi, akıl-nakil dengesindeki duruşunu ve o dersteki temel ağırlığını anlatan **dolu, genel bilgi verici ve öğretici tam bir paragraf** olarak yazılır.
+   - `key_work`: Şahsın o ilim dalındaki en temel şaheseri ve literatürdeki yeriyle birlikte zikredilir (ör. *"Kitâbü't-Tevhîd & Te'vîlâtü'l-Kur'ân"*).
+
+4. **Şahsiyet Kartı Olmadığında Sayfa Dengeleme:**
+   - Şahıs kartı kullanılmadığında sayfalarda boşluk kalmaması için, sayfanın asıl ders içeriği genişletilir; nass kutuları (`.k-nass`), karar ağaçları, karşılaştırma tabloları, `BulletBlock` içi analitik maddeler veya odak uyarı kutuları (`Callout`) ile sayfa %90–100 doluluk ve 0 mm taşma sınırında tutulur.
+
+---
+
 ## Sistemin amacı
 
 Üniversite derslerinin ham metin özetlerini (5-25 sayfalık PDF'ler) alıp tasarım
@@ -876,10 +899,14 @@ from cekirdek.content_model import (
 ```
 
 - **`Person(id, name, years, tagline, bio, key_work=None, initials=None)`**
-  Bir düşünür/kişi kartı. `bio` bir liste ama sadece `bio[0]` render edilir — tek,
-  dolu bir paragraf yaz. **Tek kaynak ilkesi**: bir kişinin tarihleri/eserleri sadece
-  burada tanımlanır; sözlükte veya eşleştirme tablosunda aynı bilgiyi elle tekrar
-  yazma, bu nesneden türet.
+  Bir düşünür/kişi kartı (35 mm dikey odak bloğu). **KRİTİK KURAL 12'ye tabidir**:
+  Otomatik/şablondan rastgele eklenmesi KESİNLİKLE YASAKTIR. Yalnızca öğretmenin notunda veya
+  kaynak metinde o şahsiyet doğrudan ve odak olarak işleniyorsa kullanılır. Kullanıldığında ise
+  `bio` asla kısa/yüzeysel bir cümle olamaz; şahsın o ilim dalındaki devrimsel metodolojisini,
+  savunduğu ana tezi ve dersteki ağırlığını anlatan **dolu, genel bilgi verici ve öğretici tam bir
+  paragraf** (`bio[0]`) olarak yazılır. `tagline` kurucu unvanını, `key_work` ise ana şaheserini içerir.
+  **Tek kaynak ilkesi**: bir kişinin tarihleri/eserleri sadece burada tanımlanır; sözlükte veya
+  eşleştirme tablosunda aynı bilgiyi elle tekrar yazma, bu nesneden türet.
 
 - **`KeyTerm(term, definition)`** — bölüm başındaki 4'lü terim kutusu. Her
   `Chapter.key_terms` **tam 4 eleman** içermeli (tasarım 2x2 grid varsayar).
