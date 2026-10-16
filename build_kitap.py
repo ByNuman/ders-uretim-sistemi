@@ -64,9 +64,9 @@ from cekirdek.theme_engine import resolve_theme_css, generate_theme_vars_from_he
 # Senaryo A: Kapaktan sonra boş sayfa (s.1 Kapak, s.2 Boş Sayfa, s.3+ Ana İçindekiler).
 # Künye, önsöz ve sayfa rehberi kaldırıldı (boş sayfa israfını önleme).
 FRONT_FIXED_PAGES = 2      # ana kapak (1) + boş sayfa (1)
-TOC_PER_PAGE = 10          # ana içindekilerde sayfa başına ders satırı. 10 ders
-                           #  210x297mm sayfayı tam doldurur; 11+ derste liste
-                           #  otomatik dengeli iki sayfaya bölünür (11 -> 6+5).
+TOC_PER_PAGE = 8           # ana içindekilerde sayfa başına ders satırı. 8 ders
+                           #  210x297mm sayfayı taşmadan dengeli doldurur; 10 ders
+                           #  otomatik dengeli iki sayfaya bölünür (5+5).
 
 
 
