@@ -350,6 +350,32 @@ Bu kural; nass odaklı olan **Arap Dili ve Edebiyatı**, **Hadis**, **Tefsir** d
 
 ---
 
+## KRİTİK KURAL 13: Vize Konu Anlatımı Görsel Ders Notu Üretim Standartları (Bütünleşik Model & Birleşik Kitap Hazırlığı)
+
+Vize dönemine ait görsel ders notları, dönem sonunda tek bir ciltte birleştirilip öğrencilere ve çalışma gruplarına dağıtılacağından, her dersin aynı kurumsal prestijde ve sıfır hata toleransıyla üretilmesi zorunludur:
+
+1. **İki Aşamalı Üretim Standardı (Yazılı Temel Zorunluluğu):**
+   - Görsel ders notu üretilmeden önce, ilgili dersin tüm haftalık anlatımları ve resmî kaynakları analiz edilerek `ders_anlatimlari/<DERS ADI>/` altında **Kapsamlı Vize Konu Anlatımı Dokümanı** (.md ve .pdf) hazırlanır. Yüzeysel özetleme kesinlikle yasaktır; nasslar, fıkhî tahliller ve akademik tartışmalar eksiksiz işlenir.
+   - Görsel ders notu (`src/<ders>.py` -> `build.py`), bu sağlam yazılı dokümana dayanarak inşa edilir.
+2. **Esnek Sayfa Mimarisi ve Sayfa Sınırı Yoktur:**
+   - Vize notları katı bir 20 sayfa kalıbına sıkıştırılamaz. Dersin 7 haftalık müfredatı ve nass yoğunluğu gerektiriyorsa sayfa sayısı 20, 24, 28, 30 veya daha fazla sayfa olabilir.
+   - Temel hedef: Konuların hiçbir detayı atlanmadan tam kavranması, çift taraflı kitap baskısına (forma uyumu) uygun olarak sayfa sayısının ÇİFT olması ve her sayfada **0.0 mm taşma ile %90–100 doluluk** sağlanmasıdır.
+3. **Mevcut Vize Notlarının Korunması ve Genişletilmesi:**
+   - Üretilen vize modülleri silinmez; sınav dönemine kadar yeni haftalar (5, 6, 7. haftalar) işlendikçe mevcut dosya üzerine yeni bölümler eklenerek genişletilir.
+4. **Tipografik Hiyerarşi, BiDi İzolasyonu ve Okunabilir Punto:**
+   - Gövde metinleri 9.15–9.35pt, tablo hücreleri 8.65pt, kutu metinleri 9.15pt, sözlük tanımları 8.15–9.1pt, test soruları 7.85–8.1pt, cevap anahtarı 8.0pt standardında tutulur.
+   - Arapça harekeli metinler %128–130 ölçek ve `line-height: 1.68` ile büyütülür; daima `<bdi class="ar">` ile çift yönlü BiDi izolasyonuna alınır.
+   - Parantez yönü kuralı: Daima önce Türkçe terim, ardından parantez içinde izole Arapça metin (`(<bdi class="ar">...</bdi>)`) verilir.
+5. **Dört Bileşenli Zenginleştirilmiş Sözlük:**
+   - Kuru kelime tanımları yerine; konunun **Kavramları, Kurucu Şahsiyetleri, Klasik Kütüb-i Usûl Eserleri ve Tarihî Yapı/Mekânları** dengeli ve doyurucu bir şekilde tanzim edilir.
+6. **Sınav Kalitesinde 20 Soruluk Test & Çözümlü Cevap Anahtarı:**
+   - Boşluk doldurma / cümle tamamlama, olumsuz kökler (değildir / söylenemez / bağdaşmaz), kavram/ekol eşleştirmeleri ve `I, II, III` öncüllü akademik sorular dengelenir.
+   - Şıklar eşit hacimde tutulur, parantez içi Türkçe tüyo verilmez ve tam sayfa çözümlü cevap anahtarında Arapça terimlerin Türkçe mealleri (`.ans-trans`) verilir.
+7. **Hoca İsmi Dokunulmazlığı:**
+   - Görsel ders notlarında hocaların izni olmadan isimleri ve akademik unvanları asla zikredilmez.
+
+---
+
 ## Sistemin amacı
 
 Üniversite derslerinin ham metin özetlerini (5-25 sayfalık PDF'ler) alıp tasarım
