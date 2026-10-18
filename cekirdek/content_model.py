@@ -363,6 +363,8 @@ class CoursePack:
     # Boş bırakılırsa build.py başlıktan türetilen slug'a düşer (geriye dönük uyumluluk).
     ders_klasoru: str = ""
     custom_css: str = ""   # Derse özel ek CSS kuralları (opsiyonel)
+    toc_footer_html: str = ""       # İçindekiler sayfası altına eklenecek opsiyonel rehber/html bloğu
+    glossary_footer_html: str = ""  # Sözlük son sayfası altına eklenecek opsiyonel karşılaştırma/html bloğu
 
     # --- Kapaktaki sınav etiketi ---
     # Kapak kickerinde ("Ders Notu Kitabı · <X> Özeti"), kapak istatistik

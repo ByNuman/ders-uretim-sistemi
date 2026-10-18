@@ -376,6 +376,41 @@ Vize dönemine ait görsel ders notları, dönem sonunda tek bir ciltte birleşt
 
 ---
 
+## KRİTİK KURAL 14: Modern Levha, Sened/Şema, Anlam Gruplu Kelime Çevirisi ve Ferah Mizanpaj Standardı (Tüm Dersler İçin Kalıcı Mimari)
+
+Arapça nass/metin içeren dersler (Hadis, Arap Dili ve Edebiyatı, Tefsir, Fıkıh, Kelâm vb.) ile şema/kavram odaklı tüm normal derslerde okuyucuyu yormayan, görsel hiyerarşisi net ve pedagojik olarak kolaylaştırıcı aşağıdaki **7 Mimari Standart** kalıcı olarak uygulanır (Referans uygulama: `3-sinif/1-donem/vize/src/hadis_3.py`):
+
+1. **Standart Râvi / Aktör / Kavram Kutuları ve Ok Üstü Bağlantı Lafızları (`_svg_rich_card` & `_svg_lafiz_badge`):**
+   - Sened ve akış şemalarındaki her kutuda aynı sabit hiyerarşi uygulanır: **1) Arapça İsim / Kavram → 2) Türkçe İsim → 3) Nesil ve Tabaka / Kategori Bilgisi → 4) Varsa Ortak Râvi (`ORTAK RÂVİ · MEDÂR`) veya Konum Etiketi (`Sahâbî Râvi`, `Merfû Nass`, `Musannif`)**.
+   - Tekrarlayan uzun biyografiler veya genel sîga açıklamaları küçük kutuların içine sıkıştırılmaz; ayrı tanıtım kutusunda (`Person`) veya Sayfa 3'teki ortak okuma rehberinde tutulur. Böylece kutu içi yazılar büyük, net ve okunaklı kalır.
+   - **Tariklerin Renk Tutarlılığı ve Ortak Râvi Vurgusu:** Çok tarikli/kollu şemalarda her yol birleşme noktasına kadar kendi rengiyle (`#6d4626` kahverengi, `#1d615c` çini yeşili, `#694f73` mürdüm) ilerler; yolların birleştiği kavşak noktası kalın kehribar çerçeve (`#b87b14`) ve **`ORTAK RÂVİ · MEDÂR`** rozetiyle vurgulanır. Aktarım lafızları (<bdi class="ar">حَدَّثَنَا</bdi>, <bdi class="ar">أَخْبَرَنَا</bdi>, <bdi class="ar">عَنْ</bdi>, <bdi class="ar">سَمِعْتُ</bdi>, <bdi class="ar">وَقَالَ</bdi>) doğrudan okların üzerinde gösterilir.
+
+2. **Anlam Gruplu ve Ton Farklı Kelime Kelime Çeviri (`_w(ar, tr, g)` & `.w-token.tone-1/2/3`):**
+   - Kelime kelime çeviri levhalarında (`❷ METİN` / `_hadis_board`, `_nass_board`) Arapça kelime/ibare ile Türkçe karşılığı aynı küçük kart biriminde (`.w-token`) tutulur.
+   - Cümleyi oluşturan kelime birimleri tek tek kopuk bırakılmaz; anlam grupları (cümlecikler/terkipler) hâlinde `g=1, 2, 3` parametresiyle sağdan sola **hafif arka plan ton farklarıyla** (`.tone-1` ferah krem, `.tone-2` sıcak parşömen, `.tone-3` hafif çini tonu) gruplandırılır.
+   - Kelime kartlarının hemen altında **`BÜTÜNCÜL MEAL`** şeridi ayrı ve belirgin olarak yer alır.
+
+3. **Bâb ve Bölüm Başlıklarında Üçlü Kademe ve «Bâb–Hadis Bağlantısı» (`.bab-board`):**
+   - Bâb ve ana nass başlıklarında: 1) Üst sağda iri puntoyla tam Arapça başlık (`.bab-full-ar`), 2) Ortada anlam gruplu kelime karşılıkları, 3) Altta kalın ve belirgin **`BÂB TERCÜMESİ`** ile onun altında özlü **`BÂB–HADİS BAĞLANTISI`** açıklaması yer alır. Başlık, tercüme ve açıklama birbirine karışmaz.
+
+4. **Standart «USÛL», «ANLAM» ve «DİKKAT» Açıklama Kutuları (`_mukayese_box`):**
+   - Ders ve nass açıklamaları tekdüze paragraflar yerine; **`USÛL`** (sened/metodoloji, `#6d4626`), **`ANLAM`** (fıkıh/kelâm/mesaj, `#1d615c`) ve **`DİKKAT`** (sınav uyarısı/kavram farkı, `#8c2f21`) rozetleriyle sınıflandırılır.
+   - Maddeler arasında ince kesik ayırıcı çizgi (`border-bottom: 0.5px dashed`) ve ferah dikey boşluk bırakılır; aynı bilgiyi tekrar eden kutular birleştirilir.
+
+5. **Sayfa 3 «Bu Levhalar Nasıl Okunur?» Rehberi (`CoursePack.toc_footer_html`) ve Sözlük Altı Karşılaştırma Tablosu (`CoursePack.glossary_footer_html`):**
+   - İçindekiler sayfasının (s. 3) altındaki boş alan, **`toc_footer_html`** ile *"Bu Kitaptaki Sened ve Metin Levhaları Nasıl Okunur?"* (veya dersin şema okuma anahtarı) rehberi olarak değerlendirilir. Renkler, ok yönü, kesik çizgi, ortak râvi etiketi, tabaka numaraları ve anlam grupları burada topluca açıklandığından her sayfada tekrar edilmez.
+   - Sözlük bölümünün son sayfasının altında **`glossary_footer_html`** ile birbirine karıştırılan kilit usûl kavramlarını (örn. *Medâr – Mütâbaat – Tahvîl – Ta‘lîk*) kitaptaki sayfa ve örnek numaralarıyla karşılaştıran özet tablo sunulur.
+
+6. **Test ve Çözümlü Cevap Anahtarında «Tekrar için: s. …» Yönlendirmesi (`.ans-page-ref`):**
+   - Testte soru kökü ile seçenekler arasında rahat okuma boşluğu bırakılır.
+   - Çözümlü cevap anahtarındaki her açıklamanın sonuna **`Tekrar için: s. …`** rozeti (`.ans-page-ref`) eklenerek öğrencinin yanlış yaptığı sorudan doğrudan ilgili konu sayfasına dönmesi sağlanır.
+
+7. **Ferah Mizanpaj ve Kutu İçi Nefes Payı Disiplini (Sıkışıklık Yasağı):**
+   - Kutuların, kartların ve tabloların üzerinde dış tepe çizgisi (`border-top` şeridi) kullanılmaz; sade, modern ve tam çerçeveli (`1px solid`) tasarım korunur.
+   - Kutu içi dolgular (`padding`), satır aralıkları (`line-height: 1.28–1.38`) ve kartlar arası mesafeler (`gap`, `margin`) asla yazıları birbirine yapıştıracak kadar daraltılmaz; tüm sayfalarda **0 mm taşma** korunarak ferah ve göz yormayan bir okuma deneyimi sağlanır.
+
+---
+
 ## Sistemin amacı
 
 Üniversite derslerinin ham metin özetlerini (5-25 sayfalık PDF'ler) alıp tasarım

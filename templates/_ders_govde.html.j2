@@ -310,6 +310,7 @@
     </a>
     {% endfor %}
   </div>
+  {% if pack.toc_footer_html and loop.last %}{{ pack.toc_footer_html | safe }}{% endif %}
   {{ footer(pack, toc_pageno.n) }}
 </section>
 {% set toc_pageno.n = toc_pageno.n + 1 %}
@@ -368,6 +369,7 @@
     </div>
     {% endfor %}
   </div>
+  {% if pack.glossary_footer_html and loop.last %}{{ pack.glossary_footer_html | safe }}{% endif %}
   {{ footer(pack, gloss_pageno.n) }}
 </section>
 {% set gloss_pageno.n = gloss_pageno.n + 1 %}

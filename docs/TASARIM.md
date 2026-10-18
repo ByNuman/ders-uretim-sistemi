@@ -149,4 +149,6 @@ oluyorsa o dersin hue'sunu birkaç derece kaydırmayı deneyin.
   tek bir "Sınav Hazırlık" (`#exam` anchor) sayfa grubudur — hangisinin
   render edileceğine `pack.test_questions` doluluğu karar verir.
 - **Tipografik Hiyerarşi & Görsel Vurgu Standartları (2026 Eylül):** Düz metin yığınlarını engellemek için `.k-badge` (kategori rozetleri: varsayılan tema tonu, `.gold`, `.alert`, `.subtle`), `.k-title` (serif madde başlığı), `.k-subitem` (solu dikey renk çizgili girintili açıklama bloğu), `.k-nass` (Arapça metin + meal için hafif zeminli nass/kural kartı) ve renkli alt çizgi (`<u>`) standartlaştırılmıştır. Tüm derslerde paylaşılır.
-
+- **Modern Levha, Sened/Şema, Anlam Gruplu Kelime Çevirisi ve Ferah Mizanpaj Mimarisi (`cekirdek/levha_bilesenleri.py` — 2026 Ekim):**
+  - Kutu üstü dekoratif kalın renk şeritleri (`border-top`) kaldırılmış; tüm kartlarda homojen ince çerçeve (`1px solid`) benimsenmiştir.
+  - Ortak bileşenler `cekirdek/levha_bilesenleri.py` modülünde toplanmıştır: `_w(ar, tr, g)` (anlam grubu tonlamalı `tone-1/2/3` kelime kartı), `_isnad_token` & `_isnad_section` (standart 4 katmanlı râvi/kavram kutusu + ok üstü aktarım lafızları + `ORTAK RÂVİ · MEDÂR` vurgusu), `_hadis_board` (`❷ METİN` levhası), `_nass_board` (`BÂB–HADİS BAĞLANTISI` kademeli başlık levhası), `_mukayese_box` (`USÛL` / `ANLAM` / `DİKKAT` etiketli açıklama kutusu), `TOC_OKUMA_REHBERI_HTML` (`CoursePack.toc_footer_html`) ve `GLOSSARY_SENED_TABLOSU_HTML` (`CoursePack.glossary_footer_html`).
