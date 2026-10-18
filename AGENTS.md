@@ -303,7 +303,7 @@ Vize dönemine ait görsel ders notları, dönem sonunda tek bir ciltte birleşt
 
 ## KRİTİK KURAL 14: Modern Levha, Sened/Şema, Anlam Gruplu Kelime Çevirisi ve Ferah Mizanpaj Standardı (Tüm Dersler İçin Kalıcı Mimari)
 
-Arapça nass/metin içeren dersler (Hadis, Arap Dili ve Edebiyatı, Tefsir, Fıkıh, Kelâm vb.) ile şema/kavram odaklı tüm normal derslerde okuyucuyu yormayan, görsel hiyerarşisi net ve pedagojik olarak kolaylaştırıcı aşağıdaki **7 Mimari Standart** kalıcı olarak uygulanır (Referans uygulama: `3-sinif/1-donem/vize/src/hadis_3.py`):
+Arapça nass/metin içeren dersler (Hadis, Arap Dili ve Edebiyatı, Tefsir, Fıkıh, Kelâm vb.) ile şema/kavram odaklı tüm normal derslerde okuyucuyu yormayan, görsel hiyerarşisi net ve pedagojik olarak kolaylaştırıcı aşağıdaki **8 Mimari Standart** kalıcı olarak uygulanır (Referans uygulama: `3-sinif/1-donem/vize/src/hadis_3.py`):
 
 1. **Standart Râvi / Aktör / Kavram Kutuları ve Ok Üstü Bağlantı Lafızları (`_svg_rich_card` & `_svg_lafiz_badge`):**
    - Sened ve akış şemalarındaki her kutuda aynı sabit hiyerarşi uygulanır: **1) Arapça İsim / Kavram → 2) Türkçe İsim → 3) Nesil ve Tabaka / Kategori Bilgisi → 4) Varsa Ortak Râvi (`ORTAK RÂVİ · MEDÂR`) veya Konum Etiketi (`Sahâbî Râvi`, `Merfû Nass`, `Musannif`)**.
@@ -333,3 +333,9 @@ Arapça nass/metin içeren dersler (Hadis, Arap Dili ve Edebiyatı, Tefsir, Fık
 7. **Ferah Mizanpaj ve Kutu İçi Nefes Payı Disiplini (Sıkışıklık Yasağı):**
    - Kutuların, kartların ve tabloların üzerinde dış tepe çizgisi (`border-top` şeridi) kullanılmaz; sade, modern ve tam çerçeveli (`1px solid`) tasarım korunur.
    - Kutu içi dolgular (`padding`), satır aralıkları (`line-height: 1.28–1.38`) ve kartlar arası mesafeler (`gap`, `margin`) asla yazıları birbirine yapıştıracak kadar daraltılmaz; tüm sayfalarda **0 mm taşma** korunarak ferah ve göz yormayan bir okuma deneyimi sağlanır.
+
+8. **Hadis Levhaları ve Materyallerin Boyut Dokunulmazlığı & Sayfa Genişletme Protokolü (5. ve Sonraki Haftalar Standardı):**
+   - Hadis levhaları (`.mod-isnad-container`, `.mod-tree-svg`, `.hadis-board`, `.w-token`, `.w-ar`, `.w-tr`, `.mukayese-box` vb.) sayfaya sığdırmak amacıyla asla küçültülemez (`max-height: 52mm`, `0.94em`, `7.5pt` vb. yapay micro-font ve sıkıştırma kuralları KESİNLİKLE YASAKTIR).
+   - Bir hadisin sened ağacı, Arapça metin satırları, kelime kartları ve tahlili tek sayfaya sığmıyorsa; levhaları küçültmek yerine içerik mantıksal olarak bölünür: **Usûl & Anlam tahlil kutusu bir sonraki sayfaya taşınır, yetmezse metin kısmı da sonraki sayfaya taşınır**.
+   - Sayfa sayısı, çift taraflı baskı forma uyumu (`sayfa_sayisi % 4 == 0`) gözetilerek genişletilir (örn. 20 → 24 → 28 sayfa).
+   - 5. hafta veya sonraki haftalarda yeni hadisler ve bâblar eklenirken de bu ferah mimari zorunludur; materyallerin boyutları daima tam standart ölçekte tutulur.

@@ -409,6 +409,12 @@ Arapça nass/metin içeren dersler (Hadis, Arap Dili ve Edebiyatı, Tefsir, Fık
    - Kutuların, kartların ve tabloların üzerinde dış tepe çizgisi (`border-top` şeridi) kullanılmaz; sade, modern ve tam çerçeveli (`1px solid`) tasarım korunur.
    - Kutu içi dolgular (`padding`), satır aralıkları (`line-height: 1.28–1.38`) ve kartlar arası mesafeler (`gap`, `margin`) asla yazıları birbirine yapıştıracak kadar daraltılmaz; tüm sayfalarda **0 mm taşma** korunarak ferah ve göz yormayan bir okuma deneyimi sağlanır.
 
+8. **Hadis Levhaları ve Materyallerin Boyut Dokunulmazlığı & Sayfa Genişletme Protokolü (5. ve Sonraki Haftalar Standardı):**
+   - Hadis levhaları (`.mod-isnad-container`, `.mod-tree-svg`, `.hadis-board`, `.w-token`, `.w-ar`, `.w-tr`, `.mukayese-box` vb.) sayfaya sığdırmak amacıyla asla küçültülemez (`max-height: 52mm`, `0.94em`, `7.5pt` vb. yapay micro-font ve sıkıştırma kuralları KESİNLİKLE YASAKTIR).
+   - Bir hadisin sened ağacı, Arapça metin satırları, kelime kartları ve tahlili tek sayfaya sığmıyorsa; levhaları küçültmek yerine içerik mantıksal olarak bölünür: **Usûl & Anlam tahlil kutusu bir sonraki sayfaya taşınır, yetmezse metin kısmı da sonraki sayfaya taşınır**.
+   - Sayfa sayısı, çift taraflı baskı forma uyumu (`sayfa_sayisi % 4 == 0`) gözetilerek genişletilir (örn. 20 → 24 → 28 sayfa).
+   - 5. hafta veya sonraki haftalarda yeni hadisler ve bâblar eklenirken de bu ferah mimari zorunludur; materyallerin boyutları daima tam standart ölçekte tutulur.
+
 ---
 
 ## Sistemin amacı
