@@ -453,7 +453,7 @@ GLOSSARY_SENED_TABLOSU_HTML = """
         <td><b>Medârü’l-İsnâd (Ortak Râvi)</b></td>
         <td>Farklı tarîklerin ve sened kollarının kendisinde birleştiği müşterek kavşak râvi.</td>
         <td>Kalın kehribar çerçeve + <b>«ORTAK RÂVİ · MEDÂR»</b> rozeti</td>
-        <td><b>Hadis 10:</b> eş-Şa‘bî (s. 10) · <b>Hadis 13:</b> Katâde (s. 13) · <b>Hadis 18:</b> ez-Zührî (s. 17)</td>
+        <td><b>Hadis 10:</b> eş-Şa‘bî (s. 10) · <b>Hadis 13:</b> Katâde (s. 13)</td>
       </tr>
       <tr>
         <td><b>Mütâbaat (Takviye Kolu)</b></td>
