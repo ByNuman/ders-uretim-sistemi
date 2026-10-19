@@ -5,6 +5,11 @@ Detaylı sistem kılavuzu için ayrıca `CLAUDE.md` dosyasına bakınız.
 
 ---
 
+## KRİTİK KURAL 0: Tüm Üretimlerde Otomatik ve Kesintisiz Kural Uyumu (Hatırlatma Bekleme Yasağı)
+- **Bağlayıcılık İlkesi:** Asistan, kullanıcıdan herhangi bir uyarı veya hatırlatma beklemeksizin; bundan sonra üretilecek veya güncellenecek istisnasız **HER görsel ders notunda (`src/<ders>.py` -> `build.py`)** bu belgede (`AGENTS.md`) ve `CLAUDE.md`'de yer alan **14 Kritik Kuralın ve Standartların tamamını** doğrudan, eksiksiz ve otomatik olarak uygulamakla yükümlüdür.
+- **Tavizsiz Kalite Standartları:** Vektörel kapak (`cover_image=""`), 0 mm taşma (%90–100 doluluk), BiDi izolasyonu, şık eşitliği ve tüyo yasağı, s.3 `toc_footer_html` görsel/metin okuma rehberi, s.14 `glossary_footer_html` kavram mukayese tablosu ve çözümlü cevap anahtarında her soruda `.ans-page-ref` («Tekrar için: s. …») yönlendirmesi her derste zorunlu bileşendir; "sonradan eklenir" denilerek atlanamaz.
+- **Otomatik Doğrulama Şartı:** Kod yazımı bittiğinde `python tools/olcum.py <slug> --sinif X --donem Y --sinav Z` ve `python build.py <slug> --sinif X --donem Y --sinav Z` komutları çalıştırılarak 0 mm taşma ve sayfa verimliliği doğrulanmadan iş tamamlanmış sayılamaz.
+
 ## KRİTİK KURAL 1: Birleşik Kitaba Otomatik Ekleme Yasağı
 - Tekil ders üretildiğinde veya güncellendiğinde birleşik kitaba otomatik EKLEME. Birleştirme scriptini çalıştırma.
 - Çıktı sadece o dersin kendi PDF'i olarak üretilir (`<dönem>/gorsel_ders_notlari/<DERS ADI>/<slug>.pdf`).
