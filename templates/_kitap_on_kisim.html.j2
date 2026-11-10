@@ -32,6 +32,18 @@
 
 {% macro front_matter(book, courses, fm) %}
 
+{% if book.toc_show_chapters %}
+<style>
+.kitap .btoc-course { break-inside: avoid; margin-bottom: 5mm; }
+.kitap .btoc-course .btoc-row { margin-bottom: 1.5mm; }
+.kitap .btoc-chapters { padding-left: 16mm; }
+.kitap .btoc-chapter { display: flex; gap: 3mm; justify-content: space-between;
+  padding: 1.1mm 0; border-bottom: 0.5px solid var(--line); color: var(--ink);
+  text-decoration: none; font-size: 9pt; line-height: 1.25; }
+.kitap .btoc-chapter b { flex-shrink: 0; color: var(--accent-dark); }
+</style>
+{% endif %}
+
 {# ---------------- 1. ANA KAPAK ---------------- #}
 {% if book.cover_image %}
 {# Tam sayfa görsel kapak: CSS ile çizilen amblem/başlık/istatistik düzeninin
@@ -97,6 +109,7 @@
   {% endif %}
   <div class="btoc-list">
     {% for c in chunk %}
+    <div class="btoc-course">
     <a class="btoc-row" href="#d{{ c.index }}-cover">
       <div class="btoc-chip" style="background: linear-gradient(150deg, {{ c.accent_dark }}, {{ c.accent }});">{{ c.index }}</div>
       <div class="btoc-body">
@@ -109,6 +122,21 @@
       </div>
       <div class="btoc-range" style="background: {{ c.accent }};">s.{{ c.first_page }}–{{ c.last_page }}</div>
     </a>
+    {% if book.toc_show_chapters %}
+    <div class="btoc-chapters">
+      {% for rows in c.ctx.toc_pages %}{% for row in rows %}
+      <a class="btoc-chapter" href="#{{ c.ctx.prefix }}{{ row.anchor }}">
+        <span>{{ row.title }}</span><b>{{ row.page }}</b>
+      </a>
+      {% endfor %}{% endfor %}
+      {% if c.pack.test_questions %}
+      <a class="btoc-chapter" href="#{{ c.ctx.prefix }}answer-key">
+        <span>Cevap Anahtarı ve Çözümler</span><b>{{ c.ctx.page_starts.answer_key }}</b>
+      </a>
+      {% endif %}
+    </div>
+    {% endif %}
+    </div>
     {% endfor %}
   </div>
   {{ bfooter(book, tocno.n) }}

@@ -81,7 +81,7 @@
   </div>
   {% if b.subtitle %}<div class="block-subtitle">{{ b.subtitle }}</div>{% endif %}
   <ul>
-    {% for bullet in b.bullets %}<li>{{ bullet | safe }}</li>{% endfor %}
+    {% for bullet in b.bullets %}{% if bullet is string %}<li>{{ bullet | safe }}</li>{% elif bullet is sequence %}<li>{{ bullet | join(" ") | safe }}</li>{% else %}<li>{{ bullet | safe }}</li>{% endif %}{% endfor %}
   </ul>
 </div>
 {% endmacro %}
@@ -147,7 +147,7 @@
   </div>
   {% if block.subtitle %}<div class="block-subtitle">{{ block.subtitle }}</div>{% endif %}
   <ul>
-    {% for bullet in block.bullets %}<li>{{ bullet | safe }}</li>{% endfor %}
+    {% for bullet in block.bullets %}{% if bullet is string %}<li>{{ bullet | safe }}</li>{% elif bullet is sequence %}<li>{{ bullet | join(" ") | safe }}</li>{% else %}<li>{{ bullet | safe }}</li>{% endif %}{% endfor %}
   </ul>
 </div>
 {% endmacro %}
@@ -231,6 +231,7 @@
 {% endmacro %}
 
 {% macro course(pack, ctx, tab=None) %}
+{% if not pack.no_front_matter %}
 {# ============================================================
    1. KAPAK
    ============================================================ #}
@@ -319,6 +320,7 @@
 {# ============================================================
    4. BÖLÜM SAYFALARI
    ============================================================ #}
+{% endif %}
 {% set pageno = namespace(n=ctx.page_starts["chapters"]) %}
 {% for ch in pack.chapters %}
   {% for page in ch.pages %}
@@ -526,5 +528,22 @@
 
 {% endif %}
 
+
+{% if pack.classical_pages | default([]) %}
+{% for classical_html in pack.classical_pages %}
+<section class="page body-page classical-page{{ ctx.pagecls }}"{% if loop.first %} id="{{ ctx.prefix }}classical"{% endif %}>
+  <div class="pageband"><div>{{ pack.title }}</div><div class="pageband-course">Klasik Sınav</div></div>
+  {% if loop.first %}<div class="classical-banner"><div class="section-kicker">Klasik Sınav</div><div class="section-title">{{ pack.classical_title }}</div><div class="section-lede">{{ pack.classical_subtitle }}</div></div>{% endif %}
+  {{ classical_html | safe }}
+  {{ footer(pack, ctx.page_starts["classical"] + loop.index0) }}
+</section>
+{% endfor %}
+{% endif %}
+
+{% for closing_html in pack.closing_pages | default([]) %}
+<section class="page {% if closing_html %}course-back-cover{% else %}blank-page{% endif %}{{ ctx.pagecls }}">
+  {{ closing_html | safe }}
+</section>
+{% endfor %}
 
 {% endmacro %}

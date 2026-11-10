@@ -6,8 +6,8 @@ Detaylı sistem kılavuzu için ayrıca `CLAUDE.md` dosyasına bakınız.
 ---
 
 ## KRİTİK KURAL 0: Tüm Üretimlerde Otomatik ve Kesintisiz Kural Uyumu (Hatırlatma Bekleme Yasağı)
-- **Bağlayıcılık İlkesi:** Asistan, kullanıcıdan herhangi bir uyarı veya hatırlatma beklemeksizin; bundan sonra üretilecek veya güncellenecek istisnasız **HER görsel ders notunda (`src/<ders>.py` -> `build.py`)** bu belgede (`AGENTS.md`) ve `CLAUDE.md`'de yer alan **14 Kritik Kuralın ve Standartların tamamını** doğrudan, eksiksiz ve otomatik olarak uygulamakla yükümlüdür.
-- **Tavizsiz Kalite Standartları:** Vektörel kapak (`cover_image=""`), 0 mm taşma (%90–100 doluluk), BiDi izolasyonu, şık eşitliği ve tüyo yasağı, s.3 `toc_footer_html` görsel/metin okuma rehberi, s.14 `glossary_footer_html` kavram mukayese tablosu ve çözümlü cevap anahtarında her soruda `.ans-page-ref` («Tekrar için: s. …») yönlendirmesi her derste zorunlu bileşendir; "sonradan eklenir" denilerek atlanamaz.
+- **Bağlayıcılık İlkesi:** Asistan, kullanıcıdan herhangi bir uyarı veya hatırlatma beklemeksizin; bundan sonra üretilecek veya güncellenecek istisnasız **HER görsel ders notunda (`src/<ders>.py` -> `build.py`) ve Okuma PDF dokümanında (`tools/okuma_pdf.py`)** bu belgede (`AGENTS.md`) ve `CLAUDE.md`'de yer alan **15 Kritik Kuralın ve Standartların tamamını** doğrudan, eksiksiz ve otomatik olarak uygulamakla yükümlüdür.
+- **Tavizsiz Kalite Standartları:** Vektörel kapak (`cover_image=""`), 0 mm taşma (%90–100 doluluk), BiDi izolasyonu, şık eşitliği ve tüyo yasağı, İçindekiler ve Sözlük altına tablo ekleme yasağı (`toc_footer_html` ve `glossary_footer_html` KULLANILMAZ), tam sayfa kapsamlı Anahtar Kavramlar Sözlüğü (18–22 zengin kavram) ve çözümlü cevap anahtarında her soruda `.ans-page-ref` («Tekrar için: s. …») yönlendirmesi her derste zorunlu bileşendir; "sonradan eklenir" denilerek atlanamaz.
 - **Otomatik Doğrulama Şartı:** Kod yazımı bittiğinde `python tools/olcum.py <slug> --sinif X --donem Y --sinav Z` ve `python build.py <slug> --sinif X --donem Y --sinav Z` komutları çalıştırılarak 0 mm taşma ve sayfa verimliliği doğrulanmadan iş tamamlanmış sayılamaz.
 
 ## KRİTİK KURAL 1: Birleşik Kitaba Otomatik Ekleme Yasağı
@@ -77,7 +77,25 @@ Herhangi bir ders veya hafta için görsel ders notu (`src/<ders>.py` -> `build.
 ### 5. Standart: Kelime ve Font Büyüklüğü Hiyerarşisi (2026-09 Ölçeği)
 - **Arapça ve Harekeli İbareler (`bdi`, `.ar`, `[dir="rtl"]`):** Harekelerin ve harflerin net seçilebilmesi için `%128–132` daha büyük (`font-size: 1.28em–1.32em`) ve ferah satır aralığıyla (`line-height: 1.68`) render edilir. 4'lü anahtar terim kutuları (`KeyTerm`), tablolar, sözlük ve metin içi âyet şahitleri (`﴿...﴾`) kesinlikle `<bdi class="ar">` ile sarılır; çıplak Latin font boyutunda bırakılmaz. Nass kutusu nassı `font-size: 12.0pt` olarak öne çıkar.
 - **BiDi İzolasyonu & Parantez Kuralı:** LTR akış içerisinde raw Arapça karakterler nedeniyle cümlenin sağına veya başına sıçrayan liste noktaları (`•`), iki noktalar (`:`), tireler (`-`), tırnaklar ve parantezler `<bdi class="ar">` ile sarılarak izole edilir. Parantez içi açıklamalarda parantez yönünün ve noktalama işaretlerinin ters dönmesini önlemek için: daima önce Türkçe ifade yazılır, ardından parantez içinde izole Arapça terim (`(<bdi class="ar">...</bdi>)`) verilir.
-- **Türkçe Gövde:** Gövde metinleri 9.35pt, tablo hücreleri 8.65pt, kutu metinleri 9.15pt, sözlük tanımları 8.75pt.
+- **Türkçe Gövde:** Gövde metinleri 9.35pt, tablo hücreleri 8.65pt, kutu metinleri 9.15pt.
+- **SÖZLÜK, TEST VE CEVAP ANAHTARINDA KÜÇÜK PUNTO YASAĞI (İSTİSNASIZ İRİ PUNTO STANDARDI):**
+  - Asistan kullanıcıdan *"harfler küçük kalmış büyüt"* uyarısı beklemeden; istisnasız **HER DERS VE SINAV KİTAPÇIĞINDA** aşağıdaki asgari punto değerlerini doğrudan inşa etmekle yükümlüdür:
+    1. **Anahtar Kavramlar Sözlüğü:**
+       - Terim (`.gloss-term`): **`9.60pt – 10.0pt`** (kalın, kurumsal renk)
+       - Tanım (`.gloss-def`): **`8.70pt – 9.00pt`** (ferah satır aralığı: `line-height: 1.32–1.36`)
+       - Referans (`.gloss-ref`): **`7.50pt – 7.80pt`** (italik, zarif)
+    2. **Genel Değerlendirme Testi:**
+       - Soru Kökü (`.tq-stem`): **`8.40pt – 8.65pt`** (line-height: `1.22`, yarı kalın okunur metin)
+       - Şık Metinleri (`.tq-options li`): **`7.90pt – 8.15pt`** (line-height: `1.20`)
+       - Şık Harf Rozetleri (`.opt-letter`): **`7.2pt`** (3.8mm x 3.8mm daire, belirgin)
+       - Soru Numarası (`.tq-num`): **`7.6pt`** (5.0mm x 5.0mm daire)
+    3. **Çözümlü Cevap Anahtarı:**
+       - Çözüm Metni (`.ans-explain`): **`8.25pt – 8.50pt`** (line-height: `1.22–1.24`)
+       - Arapça Meal Kutucuğu (`.ans-trans`): **`7.75pt – 8.00pt`**
+       - Sayfa Yönlendirmesi (`.ans-page-ref`): **`7.30pt – 7.50pt`** (kalın, belirgin rozet)
+       - Doğru Şık Rozeti (`.ans-correct`): **`7.30pt – 7.50pt`**
+       - Numara Rozeti (`.ans-num`): **`7.4pt – 7.6pt`** (4.8mm x 4.8mm daire)
+  - `7.0pt – 7.6pt` gibi göz yoran ve okunması zor cılız/mikro puntolar KESİNLİKLE KULLANILAMAZ.
 
 ### 6. Standart: Yenilenen Test ve Çözümlü Cevap Anahtarı Mimarisi (Pedagojik Zorluk Piramidi & Tipografik Ferahlık)
 - **20 Soruluk Pedagojik Zorluk Piramidi:**
@@ -102,14 +120,26 @@ Herhangi bir ders veya hafta için görsel ders notu (`src/<ders>.py` -> `build.
   - Çözüm metinleri minik punto yerine gövde standardına yakın (`9.2pt`), ferah satır aralığı (`line-height: 1.34`), belirgin doğru cevap hap rozetleri (`8.2pt`) ve maddeler arası nefes alan aralıklarla (`.ans-item: 2.6mm`) sunulur.
   - Her soruda doğru şıkkın yanında analitik gerekçesi ve geçen Arapça ibarelerin `<span class="ans-trans">` Türkçe mealleri eksiksiz verilir. Öğrenci soruyu yanlış yapsa dahi cevap anahtarını okuduğunda konuyu tam olarak öğrenir.
 
-### 7. Standart: Görsel Ekleme Kutuları, Pedagojik Görsel Matrisi ve Esneklik Kuralı (4:3)
-- Her bölüme en az bir adet `add_block_gorsel(BulletBlock(...), baslik="...")` şablonuyla 4:3 oranında görsel çerçevesi (`image=None`) eklenir.
+### 7. Standart: Görsel Ekleme Kutuları, Harici Prompt Teslimi ve KUTU N İsimlendirme Standardı (4:3)
+- Her bölüme en az bir adet `add_block_gorsel(BulletBlock(...), baslik="KUTU N: ...", image=None)` şablonuyla 4:3 oranında görsel çerçevesi eklenir.
 
-#### A) Temel İlke ve Sınırsız Esneklik Kuralı:
-- Görseller kuru bir süs değil; öğrenciye doğrudan kavram, usûl veya sınav bilgisi kazandıran araçlardır.
-- **Sistem ASLA sadece belirli şablonlarla sınırlı DEĞİLDİR.** Asistan dersin ve konunun doğasına göre aşağıdaki pedagojik şablonlardan yararlanır; ancak konu somut bir el yazması sayfası, arşiv vesikası, kitabe, arkeolojik sikke, mimari rölöve/külliye planı, ordugâh krokisi, ses/mahreç anatomisi veya istatistik grafiği gerektiriyorsa tamamen konuya özel özgün görsel önerisi getirilir.
+#### A) Kutu Üzeri Sade Başlık Kuralı (Uzun Prompt Yazma Yasağı):
+- PDF içerisindeki görsel kutusunun üzerine (`baslik` parametresi) kesinlikle uzun paragraf promptları YAZILMAZ.
+- Kutu üzerine yalnızca kutu numarası ve kısa şema adı yazılır (örn. `baslik="KUTU 1: Din ve Felsefe Telif Mimarisi"`, `baslik="KUTU 2: İslam Medeniyet Havzası"`).
+- Böylece PDF sayfasında kutu üstü ferah, derli toplu kalır; uzun metinlerin sağa yaslı (float) çerçeveyi aşağı itmesi ve sayfa taşması oluşturması kesin olarak engellenir.
 
-#### B) Fakülte ve 3. Sınıf Ders Havuzuna Uygun Pedagojik Görsel Matrisi:
+#### B) Ders Bitimi Otomatik Harici Prompt Teslim Protokolü:
+- Görsel ders notu derlemesi tamamlandığında, asistan tüm kutuların kristal netlikteki ayrıntılı yapay zekâ promptlarını:
+  1. Hem sohbet çıktısında doğrudan kopyalanabilir bir metin bloğu olarak sunar,
+  2. Hem de `gorsel_ders_notlari/<DERS ADI>/gorsel_promptlari.md` dosyasına kaydeder.
+- Bu prompt metni; kolaj yasağı, 4:3 oranı, minimalist parşömen infografik dili ve sıfır mikro-metin ilkelerini içeren **Resmî Kullanıcı Meta-Promptu** ile başlar. Kullanıcı bu tek metni kopyalayıp harici yapay zekâya (ChatGPT, Claude, Gemini vb.) yapıştırdığında tüm görseller tek seferde kesintisiz üretilir.
+
+#### C) Standart Dosya İsimlendirme ve Otomatik Bağlama (`kutu_1.jpg`, `kutu_2.jpg`):
+- Kullanıcı harici yapay zekâda ürettiği görselleri ilgili dersin `görseller/` klasörüne sırasıyla **`kutu_1.jpg`**, **`kutu_2.jpg`**, **`kutu_3.jpg`** (veya `KUTU 1.jpg`, `KUTU 2.jpg`) adıyla kaydeder.
+- Asistan kullanıcı "görselleri ekledim" dediğinde hiçbir karmaşa yaşamadan; 1. kutuya `image=_foto("kutu_1.jpg")`, 2. kutuya `image=_foto("kutu_2.jpg")` atamasını yapar ve kutu üzerindeki `baslik=""` yaparak resmi tam hizasında PDF'e bağlar.
+
+#### D) Pedagojik Görsel Matrisi ve Zengin Şema Çeşitliliği (11 Temel Tür):
+Görseller kuru bir süs değil; öğrenciye doğrudan kavram, usûl veya sınav bilgisi kazandıran araçlardır. Asistan dersin ve konunun doğasına göre aşağıdaki pedagojik şablonlardan yararlanır:
 1. **İnfografik Harita (Coğrafya & Havzalar):** Tefsir, Tasavvuf, İslâm Tarihi ve Medeniyeti. *(Örn: Mekke-Medine-Kûfe tefsir ekolleri, tasavvuf havzaları veya fetih yolları haritası)*.
 2. **Kronolojik Zaman Çizelgesi (Dönemler & Evreler):** Hadis, Kelâm, Fıkıh ve Düşünce Tarihi. *(Örn: Hadis tedvin/tasnif asırları veya Kelâm'da Mütekaddimîn → Müteahhirîn → Yeni İlm-i Kelâm evreleri)*.
 3. **İsnad & Sened Ağacı Şeması (Hadis & Tefsir):** Hadis rivayet zincirleri, âlî/nâzil kollar ve Medârü'l-Hadîs (müşterek râvi) kavşağı.
@@ -122,25 +152,13 @@ Herhangi bir ders veya hafta için görsel ders notu (`src/<ders>.py` -> `build.
 10. **Döngüsel / Çevrimsel Süreç Modeli (Din Psikolojisi, Sosyoloji, Ahlâk):** Birbirini besleyen dairesel gelişim döngüleri *(Nefsin 7 mertebesi çarkı, inanç ve şüphe gelişim çevrimi, iletişim döngüsü)*.
 11. **Yapısal Kesit & Eser Mimarisi (Hadis, Tefsir, Arap Dili):** Sahîh-i Buhârî bâb mimarisi, klasik el yazması metin-şerh-haşiye anatomisi veya tecvid harf mahreçleri anatomisi.
 
-#### C) AI Üretim & Prompt İlkeleri:
-- **Tipografik İrilik ve Sıfır Mikro-Metin Kuralı (Küçük Kutu Okunabilirlik Standardı):**
-  - Görsel kutusu sayfa sağında kompakt bir çerçevede (`~75x56 mm`) yer aldığından, görsel içine minik paragraflar, madde işaretli küçük açıklamalar, ayet mealleri ve yan metinler koymak **KESİNLİKLE YASAKTIR** (küçüldüğünde okunaksız karınca yazısına dönüşür).
-  - Açıklamaları öğrenci zaten sol taraftaki ders metninden okur. Görselin yegâne gayesi; zihinde hiyerarşiyi, sacayağını veya karar akışını **iri, kalın, net ve ferah 1–3 kelimelik kavram kutuları ve akış oklarıyla** tek bakışta canlandırmaktır.
-  - Promptlarda modele: *"Extremely minimalist and uncluttered composition. Bold and large legible typography. Absolutely NO small paragraphs, NO bullet points, NO tiny explanatory text. Only 3 to 5 prominent, large Turkish concept labels (1-3 words each), clean boxes and flow arrows. High contrast, maximum readability at small box scale"* talimatı zorunlu olarak verilir.
-- **Görsel İçi Dil Kuralı (Türkçe ve Arapça Zorunluluğu):**
-  - Görsel üzerindeki tüm şema başlıkları, kutucuklar ve kavram etiketleri **kesinlikle Türkçe** olacaktır (İngilizce etiket kullanımı kesinlikle yasaktır).
-  - **Arapça Dersleri İstisnası:** Arap Dili ve Edebiyatı (Sarf, Nahiv, Belâgat vb.) derslerinde veya nass/terim odaklı şemalarda görsel içi metinler doğrudan **Arapça** (veya Türkçe-Arapça çift dilli) üretilebilir.
-  - Promptlarda modele: *"All text labels and titles inside the infographic must be strictly in Turkish (or Arabic for Arabic courses); no English text labels"* talimatı zorunlu olarak verilir.
-- Mahremiyet/hürmet filtrelerine titizlikle uyulur.
-- Görseller dersin resmî tema rengiyle (`theme_color`) uyumlu vektörel infografik ve minimalist tarihi illüstrasyon dilinde üretilir.
-- Çerçeve CSS'te `aspect-ratio: 4 / 3` olduğundan tüm görseller mutlaka **4:3** oranında üretilir.
+#### E) AI Üretim & Prompt İlkeleri:
+- **Tipografik İrilik ve Sıfır Mikro-Metin Kuralı:** Görsel kutusu kompakt bir çerçevede (`~75x56 mm`) yer aldığından, görsel içine minik paragraflar, madde işaretli küçük açıklamalar ve yan metinler koymak **KESİNLİKLE YASAKTIR**. Yalnızca **iri, kalın, net 1–3 kelimelik kavram kutuları ve akış okları** kullanılır.
+- **Dil Zorunluluğu:** Tüm şema başlıkları, kutucuklar ve kavram etiketleri **kesinlikle Türkçe** (Arapça derslerinde Arapça) olacaktır; İngilizce etiket kesinlikle yasaktır.
+- **Stil & En-Boy Oranı:** Modern vektörel infografik, minimalist parşömen arka plan, dersin tema rengi + altın sarısı tonları ve mutlaka **4:3 en-boy oranı**.
+- **Hürmet & Mahremiyet:** İslâmî ilimler vakarına uygun; mahrem veya uygunsuz tasvir yapılmaz.
 
-#### D) Görsel Bağlama Kuralı:
-- Kullanıcı görselleri `görseller/` klasörüne eklediğinde `baslik=""` yapılır (başlık silinir) ve `image=_foto("<dosya>.jpg")` atanır.
-
-#### E) Kullanıcı Meta-Prompt Standardı (Otomatik & Kesintisiz Tekil Üretim Şablonu):
-Kullanıcının harici yapay zekâ araçlarına (ChatGPT, Claude, Gemini vb.) görsel ürettirirken kullandığı; **kolaj yapmayı kesin olarak yasaklayan**, kullanıcıdan onay beklemeden **her kutu için arka arkaya bağımsız ve müstakil 4:3 görsel üreten** resmî yönergedir:
-
+#### F) Kullanıcı Meta-Prompt Standardı (Otomatik & Kesintisiz Tekil Üretim):
 ```text
 Bu PDF'teki görsel kutularını analiz et. Her kutunun üzerinde ne olması gerektiği şema/infografik promptu yazıyor.
 
@@ -160,33 +178,16 @@ GÖRSEL STANDARTLARI:
 - TESLİM: Sen PDF'e ekleme yapma; bana yalnızca bağımsız 4:3 görselleri peş peşe oluşturup teslim et.
 ```
 
-#### F) Sayfa Yerleşimi ve Metin Akışı (Float Metin Sarmalama Düzeni):
-- Görsel kutusu (`add_block_gorsel`), rijit 2 sütunlu grid yerine `float: right` ile sağa yaslanır.
-- Metin başlığı ve ilk maddeler görselin solunda akarken, görselin bittiği hizada sonraki maddeler görselin altındaki boşluğa taşarak sayfanın tam genişliğine (`100%`) yayılır.
-- Böylece görselin altında atıl/ölü boşluk kalmaz ve sayfa alanı en yüksek verimle kullanılır.
-#### G) Görselleri Yapay Zekâ Asistanının Üretmemesi & Şema Promptu Açıklık Standardı:
-- **Asistan Görsel Üretmez & Harici Anahtar Bulundurmaz:** Asistan görsel üretiminde kesinlikle hiçbir harici API (fal.ai vb.) çalıştırmaz veya görsel üretimi yapmaz. Sistemde veya ortamda harici görsel üretim anahtarları (fal.ai vb.) tutulmaz ve kullanılmaz.
-- **Boş Çerçeve ve Şema Promptu Hazırlama (`image=None`):** Asistan yalnızca görsel ekleme kutularını (`add_block_gorsel(BulletBlock(...), baslik="...", image=None)`) 4:3 oranında yerleştirir ve kutunun `baslik` parametresine konuya tam uygun pedagojik infografik/şema prompt yönergesini yazar. Görsellerin üretimini kullanıcı bağımsız olarak kendisi üstlenir.
-- **Tüm Görsel Türlerinde Yüksek Açıklık ve Ayrıntı Standardı (Pedagojik Matris Entegrasyonu):**
-  Kullanıcının paylaştığı örnekler görsel türünü iki şablonla sınırlamaz; **Pedagojik Görsel Matrisindeki tüm çeşitlerin (11 temel şablon + özgün türler)** promptlarının yapay zekâya aktarılırken taşıması gereken **kristal netlikteki ayrıntı derinliğini** belirler:
-  1. **Şema/Görsel Türünün Açıkça Belirtilmesi:** Rastgele bir başlık yerine matristeki somut tür adıyla başlar (örn. `İnfografik Harita`, `Kronolojik Zaman Çizelgesi`, `Hüküm Karar Ağacı`, `İsnad Ağacı`, `İki Kutuplu Karşılaştırma Şeması`, `Silsile & İlim Ağacı`, `Kavram Şeması`, `Döngüsel Süreç Modeli`, `Hiyerarşik Değerler Piramidi` vb.).
-  2. **Yapısal ve Semantik Bileşenlerin Somut Dökümü:** Kompozisyondaki sol/sağ sütunlar, basamaklar, dallar, zıtlık okları, aktörler veya noktalı virgülle (` ; `) ayrılmış kilit kavram kümeleri açıkça yazılır; yapay zekânın kompozisyonda neyi nereye koyacağı tartışmaya yer bırakmayacak netlikte tanımlanır.
-  3. **Biçimsel ve Renk Parametreleri:** Prompt içerisinde `4:3 en-boy oranı` açıkça zikredilir; gerekli durumlarda dersin kurumsal tema rengi ve altın sarısı vurgu tonu eklenir.
-  *(Örnek 1 - Karşılaştırma Matrisi: `ŞEMA PROMPTU (4:3): İLİM VE MARİFET / İRFAN DİKOTOMİ MATRİSİ — Sol sütun İlim (Tafsilatlı, Ezelî/Hâdis, Zıddı Cehl, Esmâ: Âlim). Sağ sütun Marifet (Tanımak, Yalnızca Kesbî, Zıddı İnkâr, Esmâ: Ârif Denilmez). Ortada zıtlık ve bağ okları. Vurgu rengi erguvan moru (#592F79) ve altın sarısı.`)*
-  *(Örnek 2 - Coğrafi / Tarihî İnfografik: `İnfografik Şema: Kadim Nehir Havzaları ve Kur'anî Atlas (Mezopotamya / Cezîre Dicle-Fırat ve Mısır Nil havzaları; Hz. İbrahim, Hz. Nûh, Hz. Yûnus ve Hz. Mûsâ; 4:3 en-boy oranı)`)*
-  *(Örnek 3 - Karar Ağacı: `Hüküm Karar Ağacı: Şartlar, Rükünler ve Butlan Dalları (Girdi: Akit İradesi; Dallanma: Sıhhat Şartları Tam → Sahih / Rükün Eksik → Bâtıl / Vasıf Bozuk → Fâsid; 4:3 en-boy oranı)`)*
-  *(Örnek 4 - İsnad Zinciri: `İsnad Ağacı Şeması (4:3): Medârü'l-Hadîs Kavşağı ve Tarîkler — Zührî kavşağı; yukarıda 3 talebe (Mâlik, Süfyân, Ma'mer); aşağıda sahâbî Enes b. Mâlik; âlî ve nâzil isnad kolları. Vurgu rengi deri cilt (#664324) ve altın sarısı.`)*
-- **Tipografik ve Görsel Kutu Mizanpajı:**
-  - Prompt başlığı (`.gk-baslik`): `"DejaVu Serif", serif` fontlu, kalın (`font-weight: 700`), ortalanmış, dersin koyu aksan renginde (`var(--accent-dark)`), dış çerçevesiz ve arka plan şeritsiz olarak kutunun hemen üzerinde yer alır.
-  - Görsel alanı (`.gk-alan`): `aspect-ratio: 4 / 3;`, `border: 1px solid var(--line);`, `border-radius: 8px;`, `background: var(--paper);`, `box-shadow: var(--shadow-sm);` özelliklerinde şık, parşömen zeminli boş çerçevedir.
-- **Görsel Bağlama:** Kullanıcı görselleri ilgili dersin `görseller/` klasörüne ekleyip açıkça bağlanmasını istediğinde `image=_foto("<dosya>.jpg")` ve `baslik=""` yapılarak bağlanır. Asistan kendiliğinden görsel üretip bağlamaz.
+#### G) Sayfa Yerleşimi ve Float Metin Akışı:
+- Görsel kutusu (`add_block_gorsel`), `float: right` ile sağa yaslanır. Metin başlığı ve ilk maddeler görselin solunda akarken, görselin bittiği hizada sonraki maddeler görselin altındaki boşluğa taşarak sayfanın tam genişliğine (`100%`) yayılır.
+- **BFC ve Taşma Önleme Standardı (`display: flow-root;`):** Sağa yaslanan görsel kutusunun yanındaki kutuların (`.k-nass`, `.k-subitem`) görsel çerçevesi arkasına taşmaması için CSS'te `display: flow-root;` kuralı zorunludur.
 
 #### H) HADİS III Dersi Özel İstisnası (Görsel Ekleme Kutusu Yasağı):
 - Kullanıcı talimatı gereğince, **HADİS III** dersinin görsel notlarında **görsel ekleme kutusu (`add_block_gorsel`) KESİNLİKLE KULLANILMAZ**.
 - Bunun yerine zengin hadis levhaları (`_hadis_board`), terceme-i bâb levhaları (`_nass_board`), isnad zincirleri (`_isnad_section`) ve bâb fıkhı analizleri doğrudan tam sayfa genişliğinde (`add_block`) tanzim edilir.
 
-
 ---
+
 
 ## KRİTİK KURAL 9: Arap Dili ve Edebiyatı Görsel Ders Notu Üretim Standartları (Bütünleşik Model)
 
@@ -280,29 +281,34 @@ Bu kural; nass odaklı olan **Arap Dili ve Edebiyatı**, **Hadis**, **Tefsir** d
 
 ---
 
-## KRİTİK KURAL 13: Vize Konu Anlatımı Görsel Ders Notu Üretim Standartları (Bütünleşik Model & Birleşik Kitap Hazırlığı)
+## KRİTİK KURAL 13: Sınav Hazırlık Protokolü ve Dengeli Sınav Kitapçığı Mimarisi (Yazılı Temel + Görsel Sınav Kitapçığı)
 
-Vize dönemine ait görsel ders notları, dönem sonunda tek bir ciltte birleştirilip öğrencilere ve çalışma gruplarına dağıtılacağından, her dersin aynı kurumsal prestijde ve sıfır hata toleransıyla üretilmesi zorunludur:
+Kullanıcı herhangi bir ders için vize veya final sınavı odaklı ders anlatımı / çalışma notu talep ettiğinde; asistan kullanıcıdan hatırlatma veya ek uyarı beklemeksizin istisnasız **HER DERS İÇİN** aşağıdaki pedagojik protokolü ve dengeli sınav kitapçığı mantığını uygular:
 
-1. **İki Aşamalı Üretim Standardı (Yazılı Temel Zorunluluğu):**
-   - Görsel ders notu üretilmeden önce, ilgili dersin tüm haftalık anlatımları ve resmî kaynakları analiz edilerek `ders_anlatimlari/<DERS ADI>/` altında **Kapsamlı Vize Konu Anlatımı Dokümanı** (.md ve .pdf) hazırlanır. Yüzeysel özetleme kesinlikle yasaktır; nasslar, fıkhî tahliller ve akademik tartışmalar eksiksiz işlenir.
-   - Görsel ders notu (`src/<ders>.py` -> `build.py`), bu sağlam yazılı dokümana dayanarak inşa edilir.
-2. **Esnek Sayfa Mimarisi ve Sayfa Sınırı Yoktur:**
-   - Vize notları katı bir 20 sayfa kalıbına sıkıştırılamaz. Dersin 7 haftalık müfredatı ve nass yoğunluğu gerektiriyorsa sayfa sayısı 20, 24, 28, 30 veya daha fazla sayfa olabilir.
-   - Temel hedef: Konuların hiçbir detayı atlanmadan tam kavranması, çift taraflı kitap baskısına (forma uyumu) uygun olarak sayfa sayısının ÇİFT olması ve her sayfada **0.0 mm taşma ile %90–100 doluluk** sağlanmasıdır.
-3. **Mevcut Vize Notlarının Korunması ve Genişletilmesi:**
-   - Üretilen vize modülleri silinmez; sınav dönemine kadar yeni haftalar (5, 6, 7. haftalar) işlendikçe mevcut dosya üzerine yeni bölümler eklenerek genişletilir.
-4. **Tipografik Hiyerarşi, BiDi İzolasyonu ve Okunabilir Punto:**
-   - Gövde metinleri 9.15–9.35pt, tablo hücreleri 8.65pt, kutu metinleri 9.15pt, sözlük tanımları 8.15–9.1pt, test soruları 7.85–8.1pt, cevap anahtarı 8.0pt standardında tutulur.
-   - Arapça harekeli metinler %128–130 ölçek ve `line-height: 1.68` ile büyütülür; daima `<bdi class="ar">` ile çift yönlü BiDi izolasyonuna alınır.
-   - Parantez yönü kuralı: Daima önce Türkçe terim, ardından parantez içinde izole Arapça metin (`(<bdi class="ar">...</bdi>)`) verilir.
-5. **Dört Bileşenli Zenginleştirilmiş Sözlük:**
-   - Kuru kelime tanımları yerine; konunun **Kavramları, Kurucu Şahsiyetleri, Klasik Kütüb-i Usûl Eserleri ve Tarihî Yapı/Mekânları** dengeli ve doyurucu bir şekilde tanzim edilir.
-6. **Sınav Kalitesinde 20 Soruluk Test & Çözümlü Cevap Anahtarı:**
-   - Boşluk doldurma / cümle tamamlama, olumsuz kökler (değildir / söylenemez / bağdaşmaz), kavram/ekol eşleştirmeleri ve `I, II, III` öncüllü akademik sorular dengelenir.
-   - Şıklar eşit hacimde tutulur, parantez içi Türkçe tüyo verilmez ve tam sayfa çözümlü cevap anahtarında Arapça terimlerin Türkçe mealleri (`.ans-trans`) verilir.
-7. **Hoca İsmi Dokunulmazlığı:**
-   - Görsel ders notlarında hocaların izni olmadan isimleri ve akademik unvanları asla zikredilmez.
+1. **İki Aşamalı Üretim Sıralaması (Zorunlu İş Akışı):**
+   - **1. Aşama (Yazılı Temel Dokümanı):** Görsel ders notuna geçilmeden önce, ilgili dersin işlenen tüm haftalık anlatımları ve resmî kaynakları taranır. Konu anlatımı başlık sırasına sadık kalınarak; kelimesi kelimesine kuru aktarma yapmadan fakat hiçbir sınav detayını, nassı, fıkhî/kelâmî ayrımı, filozof doktrinini ve mukayeseyi atlamadan `ders_anlatimlari/<DERS ADI>/<Ders Adı> - Vize Konu Anlatımı Kitapçığı.md` ve `kaynaklar/özetlenmiş_dersler/<DERS ADI>/<slug>-vize-ozeti.md` hazırlanır. Yüzeysel özetleme kesinlikle yasaktır; her bilgi bir sınav sorusu hassasiyetiyle işlenir.
+   - **2. Aşama (Görsel Sınav Kitapçığı):** Yazılı anlatım tamamlandıktan sonra, bu sağlam yazılı dokümana dayanarak görsel ders notu (`src/<ders>_vize.py` -> `build.py`) üretilir.
+
+2. **Dengeli Sınav Kitapçığı Mantığı (Esnek Forma Uyumu: 24, 28, 32 veya 36 Sayfa):**
+   - **Rijit Sayfa Dogması Yoktur:** Sistem kendini katı bir tekil sayfa sayısına zorlamaz; kitapçık hacmi dersin işlenen hafta sayısına (4 hafta, 6 hafta, 8 hafta vb.) ve nass/bilgi yoğunluğuna göre doğal olarak şekillenir.
+   - **Temel Mantık ve İki Uçtan Kaçınma:**
+     - *Aşırı Sıkıştırma Yasağı:* Konular yapay olarak 20 sayfaya sıkıştırılıp öğrenciye soru kaçırtacak özetlemelere gidilemez.
+     - *Aşırı Hacim Yasağı:* Haftalık notların ham birleşimi olan 45+ sayfalık hacim tekil sınav tekrarı için ağır olduğundan, sınav notu olarak değil 'arşiv külliyatı' olarak saklanır.
+     - *Altın Denge:* Konular haftalık ortalama **4–6 sayfa doymuş anlatımla** işlenir; çift taraflı baskı ve matbaa forma kuralına (`sayfa_sayisi % 4 == 0`) uygun olarak genellikle **24, 28, 32 veya 36 sayfa** aralığında dengelenir.
+   - **Standart Bileşenler:**
+     - **Ön Kısım (3 sf):** Vektörel Kapak (`cover_image=""`, kısa 1-2 cümlelik `description`), Kapak Arkası Boş Sayfa, Tek Sayfa İçindekiler (`TOC_MAX_ROWS = 14`).
+     - **Doymuş Konu Anlatımı:** Hafta sayısına göre 16–26 sayfa doymuş metin (ilişkili başlıklar lehimlenmiş, sıfır konu kaybı, `%100.0 doluluk`, `0.0 mm taşma`).
+     - **Zengin Vize Sözlüğü:** 1 veya 2 sayfa (20–30 kilit kavram, sayfa başına dengeli dağıtım).
+     - **Pedagojik Vize Testi:** Tam 2 sayfa (20 soru; 1-6 Kolay, 7-14 Orta, 15-20 Zor; şık boyutu eşitliği, parantez içi tüyo yasağı, dengeli 4'er A, B, C, D, E dağılımı).
+     - **Çözümlü Cevap Anahtarı:** Tam 1 sayfa (20 analitik çözüm, `<span class="ans-trans">` terim mealleri ve kitapçıktaki yerini gösteren `.ans-page-ref` sayfa yönlendirmesi).
+     - **Kapanış:** Tamamlayıcı Boş Sayfa + Vektörel Arka Kapak.
+
+3. **Kapsamlı Külliyat ile Sınav Kitapçığı Ayrımı ve İsimlendirme:**
+   - Haftalık tüm derslerin ham birleşimi olan geniş külliyat ana modülde (`src/<ders>.py` -> `<slug>.pdf`) korunur, ezilmez veya silinmez.
+   - Sınav odaklı optimize edilmiş kitapçık ise `src/<ders>_vize.py` -> `<slug>-vize.pdf` olarak üretilir. Böylece öğrencinin elinde hem tam arşiv külliyatı hem de sınav masasında tek oturuşta bitirebileceği dengeli sınav kitapçığı bulunur.
+
+4. **Otomatik Ölçüm ve Taşma Doğrulaması:**
+   - Üretim tamamlandığında `python tools/olcum.py <ders>_vize --sinif X --donem Y --sinav Z` ve `python build.py <ders>_vize --sinif X --donem Y --sinav Z` çalıştırılarak tüm bölüm sayfalarında **0.0 mm taşma** ve **%100.0 doluluk** teyit edilmeden iş teslim edilmiş sayılamaz.
 
 ---
 
@@ -327,9 +333,9 @@ Arapça nass/metin içeren dersler (Hadis, Arap Dili ve Edebiyatı, Tefsir, Fık
    - Ders ve nass açıklamaları tekdüze paragraflar yerine; **`USÛL`** (sened/metodoloji, `#6d4626`), **`ANLAM`** (fıkıh/kelâm/mesaj, `#1d615c`) ve **`DİKKAT`** (sınav uyarısı/kavram farkı, `#8c2f21`) rozetleriyle sınıflandırılır.
    - Maddeler arasında ince kesik ayırıcı çizgi (`border-bottom: 0.5px dashed`) ve ferah dikey boşluk bırakılır; aynı bilgiyi tekrar eden kutular birleştirilir.
 
-5. **Sayfa 3 «Bu Levhalar Nasıl Okunur?» Rehberi (`CoursePack.toc_footer_html`) ve Sözlük Altı Karşılaştırma Tablosu (`CoursePack.glossary_footer_html`):**
-   - İçindekiler sayfasının (s. 3) altındaki boş alan, **`toc_footer_html`** ile *"Bu Kitaptaki Sened ve Metin Levhaları Nasıl Okunur?"* (veya dersin şema okuma anahtarı) rehberi olarak değerlendirilir. Renkler, ok yönü, kesik çizgi, ortak râvi etiketi, tabaka numaraları ve anlam grupları burada topluca açıklandığından her sayfada tekrar edilmez.
-   - Sözlük bölümünün son sayfasının altında **`glossary_footer_html`** ile birbirine karıştırılan kilit usûl kavramlarını (örn. *Medâr – Mütâbaat – Tahvîl – Ta‘lîk*) kitaptaki sayfa ve örnek numaralarıyla karşılaştıran özet tablo sunulur.
+5. **İçindekiler ve Kavramlar Sözlüğü Altına Tablo Ekleme Yasağı & Kapsamlı Tam Sayfa Sözlük Kuralı:**
+   - **Footer Tablo/Kutu Yasağı:** İçindekiler sayfasının (s. 3) ve Kavramlar Sözlüğünün (s. 14) altına kesinlikle tablo, levha rehberi veya mukayese kutusu (`toc_footer_html`, `glossary_footer_html`) YERLEŞTİRİLMEZ; bu sayfalar sade ve ferah bırakılır.
+   - **Kapsamlı Tam Sayfa Sözlük Standardı:** Sözlük sayfası (s. 14), alt kutular olmaksızın tam sayfayı dolduracak şekilde; dersin tüm ünitelerini kapsayan **en az 18–22 kilit kavramla**, zengin tanımlar, BiDi izoleli Arapça asılları (`<bdi class="ar">«...»</bdi>`), bağlam etiketleri ve ilgili bölüm referanslarıyla (`N. Bölüm`) eksiksiz olarak hazırlanır.
 
 6. **Test ve Çözümlü Cevap Anahtarında «Tekrar için: s. …» Yönlendirmesi (`.ans-page-ref`):**
    - Testte soru kökü ile seçenekler arasında rahat okuma boşluğu bırakılır.
@@ -344,3 +350,35 @@ Arapça nass/metin içeren dersler (Hadis, Arap Dili ve Edebiyatı, Tefsir, Fık
    - Bir hadisin sened ağacı, Arapça metin satırları, kelime kartları ve tahlili tek sayfaya sığmıyorsa; levhaları küçültmek yerine içerik mantıksal olarak bölünür: **Usûl & Anlam tahlil kutusu bir sonraki sayfaya taşınır, yetmezse metin kısmı da sonraki sayfaya taşınır**.
    - Sayfa sayısı, çift taraflı baskı forma uyumu (`sayfa_sayisi % 4 == 0`) gözetilerek genişletilir (örn. 20 → 24 → 28 sayfa).
    - 5. hafta veya sonraki haftalarda yeni hadisler ve bâblar eklenirken de bu ferah mimari zorunludur; materyallerin boyutları daima tam standart ölçekte tutulur.
+
+
+---
+
+## KRİTİK KURAL 15: Okuma PDF Standardı (Yazılı Konu Anlatımı / Özet Mizanpajı)
+
+Kullanıcı herhangi bir ders veya konu özeti için *"okuma pdf üret"*, *"[Ders Adı] okuma pdf'ini çıkar"* veya benzeri bir talepte bulunduğunda; asistan `tools/okuma_pdf.py` motorunu veya eşdeğer Playwright mimarisini kullanarak istisnasız aşağıdaki standartlara tam uyumla çıktı üretir (Referans model: `Arap Dili ve Edebiyatı V - Vize Sınavı Konu Özeti (Sarf-Nahiv ve Alıştırmasız).pdf`):
+
+1. **Ön/Arka Sayfaların Sadeleştirilmesi (Salt İçerik Mimarisi):**
+   - Ekranda ve mobilde kesintisiz okuma deneyimi sağlamak adına; kapak, boş sayfa, içindekiler ve 7. Bölüm gibi hızlı kontrol/sınav tabloları çıkarılır.
+   - Doğrudan **1. Ünite** ile başlar ve son üniteye kadar kesintisiz metin akışı korunur.
+   - İlk ünitede boş sayfa oluşmasını önlemek için `first-unit` sınıfı ve `break-before: avoid;` uygulanır; sonraki üniteler ise sayfa başından (`break-before: page;`) başlar.
+
+2. **Dersin Tema Rengine Göre Ünite Levhaları (Unit Banners):**
+   - Her ünite başında `cekirdek/renk_uretici.py` içindeki ders rengiyle uyumlu, degrade arka planlı, altın kenarlıklı ve ünite emojisi taşıyan lüks kart başlıkları (`.unit-banner-container`) yer alır.
+
+3. **Tipografik Hiyerarşi & Rozet Standartları:**
+   - **Gövde Metni:** 9.8pt net font boyutu, 1.58 ferah satır aralığı.
+   - **H2 Alt Başlıklar:** Ders renkli zarif hap rozet (`.h2-badge`, örn. `1.1`, `1.2`) ve alt çizgi ile yapılandırılır.
+   - **H3 Başlıklar:** Altın elmas (`◆`, `.h3-diamond`) imi ile ayrıştırılır.
+   - **Özel Liste İmleri:** Standart madde noktası yerine kurumsal renkte kare imler (`▪`) kullanılır.
+
+4. **Arapça ve Nass Tipografisi (%128 İrilik & BiDi İzolasyonu):**
+   - Arapça ibareler, şiirler ve nasslar ferah satır aralığı (`line-height: 1.70`), büyük punto (`font-size: 1.28em`, `Traditional Arabic / Amiri`) ve kesinlikle `<bdi class="ar">` BiDi izolasyonu ile sunulur.
+   - Nasslar ders renkli sol şeride sahip fildişi zeminli panellerde (`.callout-nass`); sınav dipnotları ise kehribar/altın vurgulu ve `📌 KİTAP DİPNOTU & SINAV UYARISI` etiketli kutularda (`.callout-pinned`) verilir.
+
+5. **Tablo Tasarımı & Sayfa Altlıkları:**
+   - Tablolar ders renkli degrade başlıklı, altın ayırıcı çizgili ve zebra desenli okunaklı hücrelerle tanzim edilir.
+   - Her sayfanın üstünde ders adı ve kapsam bilgisi; altında ise şık sayfa numarası kapsülü (`Sayfa X / Toplam`) yer alır.
+
+6. **Çift Konum Senkronizasyonu:**
+   - Üretilen PDF doğrudan hem `ders_anlatimlari/<DERS ADI>/` altına hem de `kaynaklar/özetlenmiş_dersler/<DERS ADI>/` altına otomatik olarak kopyalanır.

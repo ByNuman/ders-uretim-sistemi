@@ -40,7 +40,7 @@ import re
 import sys
 import argparse
 import subprocess
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path
 from jinja2 import Environment, FileSystemLoader
 
@@ -328,12 +328,14 @@ def compute_page_numbers(pack, offset: int = 0) -> dict:
       total                    -> dersin toplam sayfa sayısı (offset zinciri için)
     """
     n = offset + 1
-    starts = {"cover": n}
-    n += 1
-    starts["blank"] = n
-    n += 1
-    starts["toc"] = n
-    n += toc_page_count(pack)
+    starts = {}
+    if not getattr(pack, "no_front_matter", False):
+        starts["cover"] = n
+        n += 1
+        starts["blank"] = n
+        n += 1
+        starts["toc"] = n
+        n += toc_page_count(pack)
     starts["chapters"] = n
     for ch in pack.chapters:
         starts[ch.number] = n
@@ -343,6 +345,9 @@ def compute_page_numbers(pack, offset: int = 0) -> dict:
         g_first = getattr(pack, "glossary_per_page_first", None) or getattr(pack, "glossary_per_page", None) or GLOSSARY_PER_PAGE
         g_rest = getattr(pack, "glossary_per_page", None) or GLOSSARY_PER_PAGE
         n += len(paginate_capped(pack.glossary, g_first, g_rest))
+    if getattr(pack, "classical_pages", None):
+        starts["classical"] = n
+        n += len(pack.classical_pages)
     if pack.test_questions:
         starts["test"] = n
         n += len(paginate_capped(pack.test_questions, TEST_PER_PAGE_FIRST, TEST_PER_PAGE))
@@ -351,6 +356,9 @@ def compute_page_numbers(pack, offset: int = 0) -> dict:
     elif pack.distinctions or pack.match_table or pack.qa_items:
         starts["exam"] = n
         n += exam_page_count(pack)
+    if getattr(pack, "closing_pages", None):
+        starts["closing"] = n
+        n += len(pack.closing_pages)
     starts["end"] = n - 1
     starts["total"] = n - offset - 1
     return starts
@@ -367,6 +375,11 @@ def toc_rows(pack, page_starts: dict) -> list[dict]:
                      "title": "Anahtar Kavramlar Sözlüğü",
                      "sub": f"Tanımlı ve bağlamlandırılmış {pack.concept_count()} kavram",
                      "page": page_starts["glossary"]})
+    if getattr(pack, "classical_pages", None) and "classical" in page_starts:
+        rows.append({"num": "B", "alt": True, "anchor": "classical",
+                     "title": pack.classical_title,
+                     "sub": pack.classical_subtitle,
+                     "page": page_starts["classical"]})
     if pack.test_questions and "test" in page_starts:
         rows.append({"num": "B", "alt": True, "anchor": "exam", "title": pack.test_title,
                      "sub": f"{len(pack.test_questions)} soruluk çoktan seçmeli test "
@@ -383,10 +396,24 @@ def toc_page_count(pack) -> int:
     """İçindekiler standart derslerde (12 bölüme kadar) TEK SAYFADIR.
     12+ bölümlü kapsamlı konu anlatım kitaplarında ise taşmayı önlemek
     için dengeli 2 sayfaya bölünür."""
-    n_rows = len(pack.chapters) + (1 if pack.glossary else 0) + (1 if getattr(pack, "test_questions", None) or getattr(pack, "qa_items", None) else 0)
+    n_rows = len(pack.chapters) + (1 if pack.glossary else 0) + (1 if getattr(pack, "test_questions", None) or getattr(pack, "qa_items", None) else 0) + (1 if getattr(pack, "classical_pages", None) else 0)
     if n_rows > TOC_MAX_ROWS:
         return 2
     return 1
+
+
+def answer_items_with_offset(items: list, offset: int) -> list:
+    """Kitapta cevapların sayfa rozetlerini kaydır; tekil ders verisini değiştirme."""
+    if not offset:
+        return items
+    ref_span = re.compile(
+        r'''(<span\b[^>]*\bclass=["'][^"']*\bans-page-ref\b[^"']*["'][^>]*>)(.*?)(</span>)''',
+        re.S,
+    )
+    def shift(match):
+        body = re.sub(r"\d+", lambda n: str(int(n.group()) + offset), match.group(2))
+        return match.group(1) + body + match.group(3)
+    return [replace(item, explanation=ref_span.sub(shift, item.explanation)) for item in items]
 
 
 def course_context(pack, offset: int = 0, prefix: str = "", pagecls: str = "") -> dict:
@@ -421,7 +448,7 @@ def course_context(pack, offset: int = 0, prefix: str = "", pagecls: str = "") -
         "distinctions_pages": paginate_capped(pack.distinctions, DISTINCTIONS_PER_PAGE),
         "matchtable_pages": paginate_capped(pack.match_table, MATCHTABLE_PER_PAGE),
         "test_pages": paginate_capped(pack.test_questions, TEST_PER_PAGE_FIRST, TEST_PER_PAGE),
-        "answer_pages": paginate_capped(pack.answer_key_items, ANSWER_PER_PAGE),
+        "answer_pages": paginate_capped(answer_items_with_offset(pack.answer_key_items, offset), ANSWER_PER_PAGE),
         "has_legacy_exam": bool(pack.distinctions or pack.match_table or pack.qa_items),
         "prefix": prefix,
         "pagecls": pagecls,
@@ -654,11 +681,16 @@ def add_bookmarks(pdf_path: Path, pack, page_starts: dict):
         writer.add_outline_item(f"{ch.number}. {ch.title}", page_starts[ch.number] - 1)
     if pack.glossary and "glossary" in page_starts:
         writer.add_outline_item("Anahtar Kavramlar Sözlüğü", page_starts["glossary"] - 1)
+    if getattr(pack, "classical_pages", None) and "classical" in page_starts:
+        writer.add_outline_item(pack.classical_title, page_starts["classical"] - 1)
     if pack.test_questions and "test" in page_starts:
         writer.add_outline_item(pack.test_title, page_starts["test"] - 1)
         writer.add_outline_item("Cevap Anahtarı ve Çözümler", page_starts["answer_key"] - 1)
     elif "exam" in page_starts:
         writer.add_outline_item("Sınav Hazırlık", page_starts["exam"] - 1)
+    written_source = getattr(pack, "written_source", None)
+    if written_source is not None:
+        writer.add_attachment(written_source.name, written_source.read_bytes())
     with open(pdf_path, "wb") as f:
         writer.write(f)
 
@@ -759,7 +791,7 @@ def validate(pack) -> list[str]:
     chapter_numbers = [c.number for c in pack.chapters]
     if chapter_numbers != list(range(1, len(chapter_numbers) + 1)):
         warnings.append(f"Bölüm numaraları sıralı/ardışık değil: {chapter_numbers}")
-    toc_rows = len(pack.chapters) + (1 if pack.glossary else 0) + (1 if getattr(pack, "test_questions", None) or getattr(pack, "qa_items", None) else 0)
+    toc_rows = len(pack.chapters) + (1 if pack.glossary else 0) + (1 if getattr(pack, "test_questions", None) or getattr(pack, "qa_items", None) else 0) + (1 if getattr(pack, "classical_pages", None) else 0)
     if toc_rows > TOC_MAX_ROWS and toc_page_count(pack) == 1:
         warnings.append(
             f"İçindekiler {toc_rows} satır; sıkışık kipin ölçülmüş kapasitesi "

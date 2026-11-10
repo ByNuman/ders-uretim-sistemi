@@ -70,20 +70,25 @@ TOC_PER_PAGE = 8           # ana içindekilerde sayfa başına ders satırı. 8 
 
 
 
-def toc_chunks(courses: list) -> list[list]:
+def toc_chunks(courses: list, min_pages: int = 1) -> list[list]:
     """Ders listesini ana içindekiler sayfalarına DENGELİ böler: 10 ders ->
     5+5, 14 ders -> 7+7. Düz paginate() 8+2 gibi yamuk bir son sayfa
     bırakırdı; ön kısım kitabın vitrini olduğu için burada denge önemli."""
     n = len(courses)
-    pages = max(1, -(-n // TOC_PER_PAGE))
-    size = -(-n // pages)
-    return [courses[i:i + size] for i in range(0, n, size)]
+    pages = max(1, min_pages, -(-n // TOC_PER_PAGE))
+    size, extra = divmod(n, pages)
+    chunks, start = [], 0
+    for i in range(pages):
+        end = start + size + (i < extra)
+        chunks.append(courses[start:end])
+        start = end
+    return chunks
 
 
-def front_matter_page_count(n_courses: int) -> int:
+def front_matter_page_count(n_courses: int, min_toc_pages: int = 1) -> int:
     """Derslerin offset'i buna bağlı olduğu için ders sayısından ÖNCE
     hesaplanabilir olmalı: sabit sayfalar + ana içindekiler sayfaları."""
-    pages = max(1, -(-n_courses // TOC_PER_PAGE))
+    pages = max(1, min_toc_pages, -(-n_courses // TOC_PER_PAGE))
     return FRONT_FIXED_PAGES + pages
 
 
@@ -184,7 +189,7 @@ def collect_courses(book, offset: int = 0, css: str = "") -> list[dict]:
 def build_front_matter(book, courses: list[dict], fm_pages: int) -> dict:
     """Ön kısım sayfa numaraları + kitap geneli sayımlar. Şablonda tek bir
     sayfa numarası bile elle yazılmaz; hepsi buradan gelir."""
-    chunks = toc_chunks(courses)
+    chunks = toc_chunks(courses, getattr(book, "toc_min_pages", 1))
     fm = {
         "cover": 1, "blank": 2,
         # ana içindekiler s.3'ten başlar
@@ -312,7 +317,7 @@ def build_book(module_name: str = "kitap", d: "donem_mod.Donem | None" = None):
     # build'inin config'inden (B.SINGLE_GEOMETRY) bağımsızdır.
     css = B.load_css(B.BOOK_GEOMETRY)
 
-    fm_pages = front_matter_page_count(len(book.course_modules))
+    fm_pages = front_matter_page_count(len(book.course_modules), getattr(book, "toc_min_pages", 1))
     courses = collect_courses(book, offset=fm_pages, css=css)
     fm = build_front_matter(book, courses, fm_pages)
 

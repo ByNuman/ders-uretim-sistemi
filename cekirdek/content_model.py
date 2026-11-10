@@ -316,6 +316,8 @@ class BookPack:
     guide_lede: str = ""
     guide_note: str = ""
     toc_lede: str = ""
+    toc_min_pages: int = 1             # Çift taraflı baskıda ilk dersin sağda açılması için artırılabilir.
+    toc_show_chapters: bool = False    # Ana içindekilerde derslerin bölüm ve sınav sayfalarını da göster.
     # NOT: map_lede / map_note (Ders Haritası sayfası) 2026-09'da kaldırıldı —
     # dersin sayfa aralığı zaten Ana İçindekiler satırında yazıyor.
 
@@ -372,6 +374,18 @@ class CoursePack:
     # kitapları için "Vize" yazılır. LEGACY "Sınav Hazırlık" bölümünün pageband
     # etiketi de ("<X> Tekrarı") bu değerden türetilir.
     sinav_etiketi: str = "Final"
+    # İsteğe bağlı baskı kapanışı: her öğe bir fiziksel sayfanın iç HTML'idir.
+    # Boş metin boş sayfa üretir; varsayılan mevcut dersleri etkilemez.
+    closing_pages: list[str] = field(default_factory=list)
+    # Klasik sınav çalışma sayfaları: her öğe bir sayfanın iç HTML'idir.
+    # Boş varsayılan, mevcut çoktan seçmeli derslerin akışını değiştirmez.
+    classical_pages: list[str] = field(default_factory=list)
+    classical_title: str = "Klasik Sınav Çalışması"
+    classical_subtitle: str = "Sorular, cevap iskeletleri ve örnek cevaplar"
+    # İstendiğinde yazılı kaynağın özgün dosyasını tekil PDF'ye ekle.
+    written_source: Optional[Path] = None
+    # Kapak + Boş Sayfa + İçindekiler ön kısmını atla (saf çalışma kağıdı/alıştırma föyü için)
+    no_front_matter: bool = False
 
     # --- Otomatik hesaplanan istatistikler (elle yazılmaz) ---
     def chapter_count(self) -> int:

@@ -2,13 +2,18 @@
 """
 4. HAFTA BİRLEŞİK DERS NOTLARI KİTABI ÜRETİCİSİ
 ================================================
-Kullanıcı Kuralları:
+Kullanıcı Kuralları & Standartlar:
   1. Ana Kapak daima önce CSS/SVG vektörel olarak yapılır (cover_image="").
      Yalnızca kullanıcı açıkça "değiştir" dediğinde veya özel kapak görseli
      eklediğinde (haftalik-ders-4-hafta-kapak.png) görsel kapak atanır.
   2. 10 dersin mevcut PDF'leri (kapakları, görsel kutularındaki tüm görselleri
      ve zengin içerikleri %100 korunarak) haftalık ders programı sırasıyla birleştirilir.
-  3. Sayfa numaraları kesintisiz (s. 1 – 190) ve vektörel temizlikle damgalanır.
+  3. Sayfa numaraları kesintisiz ve vektörel temizlikle damgalanır.
+  4. TIKLANABİLİR LİNKLER:
+     - Ana İçindekiler (s. 3–4): 10 dersin her birinin satırına tıklandığında doğrudan
+       o dersin başlangıç sayfasına (kapağına) gider.
+     - Her dersin kendi İçindekiler bölümü: Bölümlere, sözlüğe ve teste tıklandığında
+       birleşik kitaptaki doğru hedefine gider.
 """
 
 import sys
@@ -34,7 +39,6 @@ OUT_PDF.parent.mkdir(parents=True, exist_ok=True)
 
 CUSTOM_COVER_PNG = BASE_DIR / "HAFTALIK DERSLER" / "4. HAFTA" / "haftalik-ders-4-hafta-kapak.png"
 
-# 10 Dersin Ders Programı Sırasıyla Listesi: (Başlık, PDF Yolu, Varsayılan Tema Rengi RGB)
 COURSES = [
     (
         "1. Arap Dili ve Edebiyatı V · 3. Ünite",
@@ -88,9 +92,21 @@ COURSES = [
     ),
 ]
 
+MAIN_TOC_TITLES = [
+    ("Arap Dili ve Edebiyatı V", 1),
+    ("Tasavvuf I", 2),
+    ("Hadis III", 3),
+    ("Tefsir III", 4),
+    ("Sınıf Yönetimi", 5),
+    ("İslam Felsefesi Tarihi I", 6),
+    ("Sistematik Kelâm I", 7),
+    ("İslam Medeniyeti Tarihi", 8),
+    ("Din Eğitimi", 9),
+    ("İslâm Hukuku I", 10),
+]
+
 
 def render_front_matter_pdf() -> Path:
-    """Kullanıcı özel kapak eklediyse onu kullanır, yoksa Kural 5 gereği CSS kapak üretir."""
     d = donem_mod.Donem(sinif=3, donem=1, sinav="vize")
     B.set_donem(d)
 
@@ -170,43 +186,38 @@ def build_merged_book():
     FRONT_MATTER_PAGES = 4
     current_offset = FRONT_MATTER_PAGES
     toc_tree = [[1, "Ana İçindekiler", 3]]
+    course_start_pages = {}
 
     print("\n[3/5] Derslerin sayfaları, kapakları ve görselleri korunarak kesintisiz numaralandırılıyor...")
-    for title, doc, default_color, num_pages in course_data:
+    for course_idx, (title, doc, default_color, num_pages) in enumerate(course_data, 1):
         start_page = current_offset + 1
         end_page = current_offset + num_pages
+        course_start_pages[course_idx] = current_offset
         print(f"  İşleniyor: {title:40s} -> s.{start_page}–{end_page} ({num_pages} sf)")
 
-        # Ders üst yer imi
         toc_tree.append([1, title, start_page])
 
-        # Alt yer imleri (bölümler, sözlük, test)
         orig_toc = doc.get_toc()
         for item in orig_toc:
             lvl, item_title, orig_pno = item[0], item[1], item[2]
             new_pno = orig_pno + current_offset
             toc_tree.append([lvl + 1, item_title, new_pno])
 
-        # Sayfaları işle ve ekle
         for page_idx in range(num_pages):
             src_page = doc[page_idx]
             global_pno = current_offset + page_idx + 1
 
-            # s.1 Kapak ve s.2 Boş sayfa hariç: s.3 ve sonrasındaki sayfalara numara güncellemesi yap
             if page_idx >= 2:
-                # 1. Sayfadaki mevcut rozet rengini tespit et
                 fill_color = default_color
                 for d in src_page.get_drawings():
                     if d["rect"].y0 > 800 and d["rect"].x0 > 500 and d.get("fill"):
                         fill_color = d["fill"]
                         break
 
-                # 2. Eski sayfa numarasını vektörel olarak temizle
                 redact_rect = pymupdf.Rect(525, 800, 568, 822)
                 src_page.add_redact_annot(redact_rect, fill=(1, 1, 1))
                 src_page.apply_redactions()
 
-                # 3. Yeni sayfa numarasını ders renginde rozet ile damgala
                 num_str = str(global_pno)
                 num_digits = len(num_str)
                 w = 14.25 if num_digits == 1 else (18.75 if num_digits == 2 else 23.25)
@@ -214,7 +225,6 @@ def build_merged_book():
                 badge_rect = pymupdf.Rect(x0, 803.25, 561.0, 816.75)
                 src_page.draw_rect(badge_rect, color=None, fill=fill_color, radius=0.25)
 
-                # 4. Beyaz metin
                 text_len = pymupdf.get_text_length(num_str, fontname="helv", fontsize=7.6)
                 tx = x0 + (w - text_len) / 2.0
                 src_page.insert_text(
@@ -225,15 +235,54 @@ def build_merged_book():
                     color=(1, 1, 1),
                 )
 
-        # İşlenen ders sayfalarını birleşik dökümana ekle
         out_doc.insert_pdf(doc)
+
+        course_link_count = 0
+        for page_idx in range(num_pages):
+            orig_links = doc[page_idx].get_links()
+            if orig_links:
+                out_page = out_doc[current_offset + page_idx]
+                for l in orig_links:
+                    target_p = l.get("page")
+                    if target_p is not None and target_p >= 0:
+                        new_target = current_offset + target_p
+                        out_page.insert_link({
+                            "kind": pymupdf.LINK_GOTO,
+                            "from": l["from"],
+                            "page": new_target,
+                            "to": l.get("to", pymupdf.Point(0, 0)),
+                        })
+                        course_link_count += 1
+        if course_link_count:
+            print(f"    ✓ {course_link_count} adet içindekiler/navigasyon linki birleşik kitaba aktarıldı.")
+
         current_offset += num_pages
 
-    print("\n[4/5] PDF yer imleri (outline) kaydediliyor...")
+    print("\n[4/5] Ana İçindekiler (s.3–4) tıklanabilir bağlantıları kuruluyor...")
+    main_toc_link_count = 0
+    for pno in [2, 3]:
+        page = out_doc[pno]
+        for search_term, c_idx in MAIN_TOC_TITLES:
+            rects = page.search_for(search_term)
+            if rects:
+                r = rects[0]
+                row_rect = pymupdf.Rect(34.0, r.y0 - 10.0, 561.0, r.y1 + 22.0)
+                target_page_idx = course_start_pages[c_idx]
+                page.insert_link({
+                    "kind": pymupdf.LINK_GOTO,
+                    "from": row_rect,
+                    "page": target_page_idx,
+                    "to": pymupdf.Point(0, 0),
+                })
+                main_toc_link_count += 1
+                print(f"  ✓ Ana İçindekiler -> {search_term} (s.{target_page_idx + 1}'e tıkla-git linki bağlandı)")
+
+    print(f"  ✓ Toplam {main_toc_link_count} ana içindekiler linki başarıyla kuruldu.")
+
+    print("\n[5/5] PDF yer imleri (outline) kaydediliyor ve optimize ediliyor...")
     out_doc.set_toc(toc_tree)
     print(f"  ✓ Toplam {len(toc_tree)} yer imi düğümü ağaca eklendi.")
 
-    print("\n[5/5] Birleşik PDF optimize edilip kaydediliyor...")
     out_doc.save(str(OUT_PDF), deflate=True, garbage=4)
     file_size_mb = OUT_PDF.stat().st_size / (1024 * 1024)
     total_pages = len(out_doc)
