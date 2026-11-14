@@ -366,19 +366,48 @@ Kullanıcı herhangi bir ders veya konu özeti için *"okuma pdf üret"*, *"[Der
 2. **Dersin Tema Rengine Göre Ünite Levhaları (Unit Banners):**
    - Her ünite başında `cekirdek/renk_uretici.py` içindeki ders rengiyle uyumlu, degrade arka planlı, altın kenarlıklı ve ünite emojisi taşıyan lüks kart başlıkları (`.unit-banner-container`) yer alır.
 
-3. **Tipografik Hiyerarşi & Rozet Standartları:**
+3. **Tipografik Hiyerarşi & Rozet Standartları (İstisnasız İri ve Renkli Rozetleme):**
    - **Gövde Metni:** 9.8pt net font boyutu, 1.58 ferah satır aralığı.
-   - **H2 Alt Başlıklar:** Ders renkli zarif hap rozet (`.h2-badge`, örn. `1.1`, `1.2`) ve alt çizgi ile yapılandırılır.
-   - **H3 Başlıklar:** Altın elmas (`◆`, `.h3-diamond`) imi ile ayrıştırılır.
+   - **Evrensel Alt Başlık Rozetleri (H2/H3 Zorunluluğu):** Yazar ister `## 1.1.` ister `### 1.1.` ister `## A)` yazsın; motor bunu otomatik olarak yakalar ve dersin kurumsal renginde degrade rozetli (`.h2-badge`, örn. `1.1`, `1.2`), alt çizgili lüks başlığa dönüştürür. Çıplak ve rozetsiz alt başlık üretimi KESİNLİKLE YASAKTIR. Alt başlıklara bağlı ikincil başlıklar da kehribar şeritli ve soft zeminli lüks kutu başlık (`.h3-styled`) olarak tanzim edilir.
+   - **Kavram ve Istılah Hap Kutuları (`.badge-tr` & `==kavram==`):** Önemli terimler, şahıslar, eserler, kurumlar, ekoller ve sınav anahtar kelimeleri kuru düz metin bırakılamaz. Yazar ister doğrudan `==kavram==` sözdizimini ister `<span class="badge-tr">` etiketini kullansın; terimler dersin resmi tema renginden türeyen 3px sol şeritli, pastel zeminli lüks hap kutucuk (`.badge-tr`) içine alınmak zorundadır (Din Eğitimi standardı).
    - **Özel Liste İmleri:** Standart madde noktası yerine kurumsal renkte kare imler (`▪`) kullanılır.
 
-4. **Arapça ve Nass Tipografisi (%128 İrilik & BiDi İzolasyonu):**
-   - Arapça ibareler, şiirler ve nasslar ferah satır aralığı (`line-height: 1.70`), büyük punto (`font-size: 1.28em`, `Traditional Arabic / Amiri`) ve kesinlikle `<bdi class="ar">` BiDi izolasyonu ile sunulur.
-   - Nasslar ders renkli sol şeride sahip fildişi zeminli panellerde (`.callout-nass`); sınav dipnotları ise kehribar/altın vurgulu ve `📌 KİTAP DİPNOTU & SINAV UYARISI` etiketli kutularda (`.callout-pinned`) verilir.
+4. **Arapça ve Nass Tipografisi (%128 İrilik, Renkli Rozetler & BiDi İzolasyonu):**
+   - **Renkli Arapça Rozetler (`<code class="ar">` & `«...»`):** Metin, liste ve tablolarda geçen tekil veya kısa Arapça kavramlar/ıstılahlar (`«...»`, `` `...` ``, `<bdi>`), ders rengi zeminli (`c_pill_bg`), sağdan 3px ders renkli şeritli (`theme_hex`), zarif bordürlü, hafif gölgeli ve `Amiri` fontlu **renkli Arapça hap rozet** (`<code class="ar" dir="rtl"><bdi>...</bdi></code>`) olarak otomatik render edilir. Çıplak veya şeffaf bırakılamaz.
+   - **Bütünleşik Nass Levhaları (`.nass-board` Zorunluluğu):** Âyetler, hadisler ve klasik metin tahlilleri satır içi metinlere veya çıplak listelere sıkıştırılamaz. Tefsir III ve Sistematik Kelâm modellerinde olduğu gibi; ders renkli başlık rozeti, iri ve harekeli Arapça nass (`1.28em`, `Traditional Arabic / Amiri`), BiDi izolasyonu ve altında Türkçe meal/şerh kutucuğu (`.nass-trans-box` / `.nass-meal-box`) içeren lüks `.nass-board` mimarisiyle sunulur. Sınav dipnotları ise kehribar/altın vurgulu ve `📌 KİTAP DİPNOTU & SINAV UYARISI` etiketli kutularda (`.callout-pinned`) verilir.
 
-5. **Tablo Tasarımı & Sayfa Altlıkları:**
+5. **Sıkı Tipografi, Doğal Metin Akışı ve Sayfa Tasarrufu:**
+   - **Beyaz Nehirleri Önleme (`text-align: left`):** Satır aralarında ve kelimeler arasında yapay boşluklar/yırtılmalar oluşturan `text-align: justify` kesinlikle kullanılmaz; doğal ve dengeli sol hizalama uygulanır.
+   - **Sıkı Aralıklar (Sıfır Sayfa İsrafı):** Bilgi veya cümle silinmeden; paragraflar `margin-bottom: 7.5px`, listeler `3.5px`, satır yüksekliği `1.50–1.56` tutularak yapay sayfa uzamaları engellenir ve kompakt/dolgun sayfa düzeni sağlanır.
+
+6. **Tablo Tasarımı & Sayfa Altlıkları:**
    - Tablolar ders renkli degrade başlıklı, altın ayırıcı çizgili ve zebra desenli okunaklı hücrelerle tanzim edilir.
    - Her sayfanın üstünde ders adı ve kapsam bilgisi; altında ise şık sayfa numarası kapsülü (`Sayfa X / Toplam`) yer alır.
 
-6. **Çift Konum Senkronizasyonu:**
-   - Üretilen PDF doğrudan hem `ders_anlatimlari/<DERS ADI>/` altına hem de `kaynaklar/özetlenmiş_dersler/<DERS ADI>/` altına otomatik olarak kopyalanır.
+7. **Çift Konum Senkronizasyonu & Tek Seferde Üretim:**
+   - Asistan, kullanıcıdan yeni bir komut veya hatırlatma beklemeden doğrudan `python tools/okuma_pdf.py <slug> --sinif X --donem Y --sinav Z` motorunu çalıştırır.
+   - Üretilen PDF doğrudan hem `ders_anlatimlari/<DERS ADI>/` altına hem de `kaynaklar/özetlenmiş_dersler/<DERS ADI>/` altına otomatik olarak senkronize edilir.
+
+8. **Seçici ve Bağlamsal Pedagojik Materyal İlkesi (Şablon Dayatma Yasağı & Zengin Vektörel Anlatım):**
+   - Okuma PDF dokümanlarında terminal tarzı ham ASCII şemalar (`+-----+`, `|`, `->`) bırakılamaz; bunların yerine dersin resmi kurumsal rengini otomatik alan modern HTML/CSS lüks kart ve şema modelleri kullanılır.
+   - **Zorunluluk Yasağı:** Hiçbir derse sırf şekil olsun diye yapay şema dayatılamaz. Materyaller yalnızca anlatımı berraklaştıran, karşılaştırma veya hiyerarşi gerektiren kritik konularda seçici olarak kullanılır.
+   - **Evrensel 12 Materyal Kütüphanesi (`tools/okuma_pdf.py`):**
+     1. *Barem Skalası* (`.spectrum-bar`, `.certainty-scale-bar` - Kanaat, Hüküm veya Sıhhat dereceleri)
+     2. *Hiyerarşik Değerler Piramidi* (`.concept-pyramid` - İbn Rüşd insan tipleri, Makāsıd, Müdahale basamakları)
+     3. *Kavram Anatomisi Matrisi* (`.entity-matrix-wrap`, `.entity-grid-2/3/4` - 2'li, 3'lü, 4'lü kavram kartları)
+     4. *Doktrin ve Ekol Karşılaştırma Levhası* (`.doctrine-compare-wrap` - Mezhep ve fikir münazaraları)
+     5. *Ontoloji ve Sınıflandırma Ağacı* (`.ontology-card-wrap` - Varlık sahası, İlimler ağacı)
+     6. *Döngüsel / Çevrimsel Süreç Modeli* (`.cycle-flow-wrap` - İbn Haldun 5 tavır döngüsü, İletişim döngüsü)
+     7. *Süreç ve Oluşum Akış Zinciri* (`.formation-flow` - Hudûs akışı, Hüküm oluşumu)
+     8. *İsnad Akış Şeridi* (`.isnad-flow-strip` - Râvi tabakaları, mütâbaat ve şâhid zincirleri)
+     9. *Formül ve Küllî Kaide Kartı* (`.formula-card` - Varlık eşitlikleri, Fıkhî küllî kaideler, Ben Dili formülü)
+     10. *Tarihsel Dönemler Zaman Çizelgesi* (`.timeline-bar` - Kurumsal evrim, Islahat kronolojisi)
+     11. *2x2 Eksen Matrisi* (`.axis-matrix-2x2` - Liderlik ve yönetim stilleri)
+     12. *Tefsir III Modeli Kurumsal Renkli Nass Levhaları* (`.nass-board` - Degrade zeminli, iri hatlı ve bütünleşik tercümeli nass paneli)
+     13. *Hiyerarşik Ağaç Şeması* (`.tree-diagram-wrap` - Sosyal yapı, hanedan şeceresi, idarî ve hukukî sınıflandırma ağacı).
+
+9. **Materyal Tasarımında Sıfır Bilgi Kaybı & Çift Katmanlı Mimari Standardı (Materyal + Tam ve Eksiksiz Konu Anlatımı):**
+   - Görsel materyaller (şemalar, zaman çizelgeleri, akış kartları, hiyerarşik ağaçlar vb.) tasarlanırken kavramlar özetlenip kompakt kartlara dönüştürülebilir; **ANCAK hiçbir sınav bilgisi, fıkhî ayrım, ıstılah, âyet/hadis metni, isim, eser veya tarihsel detay atlanamaz veya eksiltilemez.**
+   - **Çift Katmanlı Kural (Zorunlu):** Ya tüm detaylar doğrudan materyalin içine tam ve eksiksiz olarak yazılır YA DA (ferahlık ve estetik için tercih edilen yöntem) materyalin hemen altında `### ... Tam ve Eksiksiz Konu Anlatımı:` başlığı açılarak konunun tüm detayları, maddeleri ve tahlilleri eksiksizce yazıya dökülür.
+   - Görsel materyaller tek başına kuru bir özet olarak bırakılamaz; altındaki konu anlatımı asla budanamaz veya atlanamaz. Öğrenci hem görsel şemadan konunun haritasını görmeli, hem de altındaki metinden sınavda çıkacak tüm ayrıntıları eksiksizce okuyabilmelidir.
+
