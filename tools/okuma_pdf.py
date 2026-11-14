@@ -78,7 +78,7 @@ def theme_hsl_tint(hex_code, lightness=0.965, min_saturation=0.50, sat_factor=0.
     tr, tg, tb = colorsys.hls_to_rgb(h, lightness, target_s)
     return f"#{int(tr*255+0.5):02x}{int(tg*255+0.5):02x}{int(tb*255+0.5):02x}"
 
-def generate_okuma_pdf(md_path: Path, output_pdf_path: Path = None, course_name: str = "", theme_hex: str = "#8C2F21"):
+def generate_okuma_pdf(md_path: Path, output_pdf_path: Path = None, course_name: str = "", theme_hex: str = "#8C2F21", son_unite: int = None, haric_unite: int = None):
     """Tek bir Markdown özet dosyasından yüksek estetikli Okuma PDF üretir."""
     if not md_path.exists():
         raise FileNotFoundError(f"Markdown dosyası bulunamadı: {md_path}")
@@ -92,6 +92,25 @@ def generate_okuma_pdf(md_path: Path, output_pdf_path: Path = None, course_name:
     # Sınav kontrol tablosu veya ekstra kısımlar varsa bitiş noktasını tespit et
     end_match = re.search(r'^#\s+(?:\d+\.\s*)?SINAV\s+KONTROL', raw_text, flags=re.MULTILINE | re.IGNORECASE)
     end_idx = end_match.start() if end_match else len(raw_text)
+
+    # Hariç tutulacak veya son ünite sınırı varsa bitiş noktasını ayarla
+    if haric_unite is not None:
+        u_exclude_match = re.search(
+            rf'^#\s+(?:{haric_unite}\.\s*(?:ÜNİTE|BÖLÜM|HAFTA)|(?:ÜNİTE|BÖLÜM|HAFTA)\s*{haric_unite}\b)',
+            raw_text,
+            flags=re.MULTILINE | re.IGNORECASE
+        )
+        if u_exclude_match and u_exclude_match.start() < end_idx:
+            end_idx = u_exclude_match.start()
+    elif son_unite is not None:
+        next_unit = son_unite + 1
+        u_next_match = re.search(
+            rf'^#\s+(?:{next_unit}\.\s*(?:ÜNİTE|BÖLÜM|HAFTA)|(?:ÜNİTE|BÖLÜM|HAFTA)\s*{next_unit}\b)',
+            raw_text,
+            flags=re.MULTILINE | re.IGNORECASE
+        )
+        if u_next_match and u_next_match.start() < end_idx:
+            end_idx = u_next_match.start()
 
     pure_md = raw_text[start_idx:end_idx].strip()
     pure_md = re.sub(r'---+\s*$', '', pure_md).strip()
@@ -617,6 +636,22 @@ def generate_okuma_pdf(md_path: Path, output_pdf_path: Path = None, course_name:
             font-size: 8pt;
             display: inline-block;
             vertical-align: middle;
+        }}
+
+        h4 {{
+            font-size: 10.0pt;
+            font-weight: 700;
+            color: {theme_hex};
+            margin-top: 12px;
+            margin-bottom: 4px;
+            padding-left: 6px;
+            border-left: 3px solid {theme_hex};
+            break-after: avoid !important;
+            page-break-after: avoid !important;
+        }}
+
+        h4 strong {{
+            color: {theme_hex};
         }}
 
         p {{
@@ -2344,6 +2379,8 @@ def main():
     parser.add_argument("--donem", default="1", help="Dönem (1, 2)")
     parser.add_argument("--sinav", default="vize", help="Sınav (vize, final)")
     parser.add_argument("--renk", default=None, help="Özel tema rengi hex (örn: #8C2F21)")
+    parser.add_argument("--son-unite", type=int, default=None, help="Dahil edilecek son ünite numarası")
+    parser.add_argument("--haric-unite", type=int, default=None, help="Hariç tutulacak ilk ünite numarası")
     args = parser.parse_args()
 
     hedef_path = Path(args.hedef)
@@ -2383,7 +2420,13 @@ def main():
     print(f"Girdi: {hedef_path}")
     print(f"Tema Rengi: {theme_hex}")
 
-    generate_okuma_pdf(hedef_path, course_name=course_folder, theme_hex=theme_hex)
+    generate_okuma_pdf(
+        hedef_path,
+        course_name=course_folder,
+        theme_hex=theme_hex,
+        son_unite=args.son_unite,
+        haric_unite=args.haric_unite
+    )
 
 if __name__ == "__main__":
     main()
