@@ -149,6 +149,8 @@ def resolve_course_meta(name_or_stem: str, sinif: str, donem: str, sinav: str) -
     family = _aile_anahtari_stem(name_or_stem)
     if family in DOSYA_DERS_ADI_HARITASI:
         title, topic = DOSYA_DERS_ADI_HARITASI[family]
+        if family == "ARAPDILIVEEDEBIYATI" and _tr_lower(sinav_label) == "final":
+            topic = "Sadru'l-İslâm ve Emevî Edebiyatı"
         subtitle = f"{sinav_label} Özeti · {topic}"
     else:
         raw_title = re.split(r"\s+-\s+|\(", name_or_stem, maxsplit=1)[0].strip()
@@ -237,6 +239,8 @@ def _clean_unit_title(raw: str) -> str:
     txt = re.sub(r"\(\s*[—\-–:,]*\s*", "(", txt)
     txt = re.sub(r"\s*[—\-–:,]*\s*\)", ")", txt)
     txt = re.sub(r"\(\s*\)", "", txt)
+    txt = re.sub(r":\s*[—–-]+\s*", ": ", txt)
+    txt = re.sub(r"\b(Hz|b)\.(?=[A-ZÇĞİÖŞÜÂÎÛ])", r"\1. ", txt)
     txt = re.sub(r"([A-ZÇĞİÖŞÜÂÎÛ])['’]N([IİUÜ])N([A-ZÇĞİÖŞÜÂÎÛ])", r"\1'N\2N \3", txt)
     txt = _format_unit_title(" ".join(txt.split()))
     if len(txt) > 125:
@@ -406,7 +410,7 @@ def _extract_units(doc: pymupdf.Document, start_page_idx: int = 0) -> list[tuple
         i = 0
         while i < len(blocks):
             block = blocks[i]
-            txt = "".join(span["text"] for line in block["lines"] for span in line["spans"]).strip()
+            txt = " ".join("".join(span["text"] for span in line["spans"]).strip() for line in block["lines"]).strip()
             txt_norm = " ".join(txt.split())
             if not txt_norm:
                 i += 1
@@ -421,7 +425,7 @@ def _extract_units(doc: pymupdf.Document, start_page_idx: int = 0) -> list[tuple
             last_y1 = block["bbox"][3]
             if has_emoji and len(txt_norm) <= 3 and i + 1 < len(blocks):
                 nxt = blocks[i + 1]
-                nxt_txt = " ".join("".join(s["text"] for l in nxt["lines"] for s in l["spans"]).split())
+                nxt_txt = " ".join(" ".join("".join(s["text"] for s in l["spans"]).strip() for l in nxt["lines"]).split())
                 if nxt_txt and nxt["bbox"][1] - block["bbox"][1] < 24:
                     combined = f"{txt_norm} {nxt_txt}"
                     last_y1 = max(last_y1, nxt["bbox"][3])
@@ -429,8 +433,12 @@ def _extract_units(doc: pymupdf.Document, start_page_idx: int = 0) -> list[tuple
 
             while i + 1 < len(blocks):
                 nxt = blocks[i + 1]
-                nxt_txt = " ".join("".join(s["text"] for l in nxt["lines"] for s in l["spans"]).split())
+                nxt_txt = " ".join(" ".join("".join(s["text"] for s in l["spans"]).strip() for l in nxt["lines"]).split())
                 nxt_sz = max((s["size"] for l in nxt["lines"] for s in l["spans"]), default=0.0)
+                if nxt_sz < 10.5 and nxt["bbox"][0] > 420 and (nxt["bbox"][1] - last_y1) < 16.0:
+                    # Banner sağındaki küçük sayfa aralığı kapsülünü (s. 80 · 96) atlayıp alt satıra devam et
+                    i += 1
+                    continue
                 if (
                     nxt_txt
                     and not any(nxt_txt.startswith(ic) for ic in UNIT_EMOJIS)
