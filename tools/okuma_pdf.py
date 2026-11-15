@@ -88,6 +88,9 @@ _SVG_ICONS = {
     "cross": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m9.5 9.5 5 5m0-5-5 5"/></svg>',
     "diamond": '<svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1 10.2 5.8 15 8 10.2 10.2 8 15 5.8 10.2 1 8 5.8 5.8Z"/></svg>',
     "warn": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.8 2.2 18a2 2 0 0 0 1.7 3h16.2a2 2 0 0 0 1.7-3L13.7 3.8a2 2 0 0 0-3.4 0Z"/><path d="M12 9v4M12 17h.01"/></svg>',
+    "compass": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polygon points="16.2 7.8 14.1 14.1 7.8 16.2 9.9 9.9 16.2 7.8" stroke="#e6c36e"/></svg>',
+    "user": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4.5 20a7.5 7.5 0 0 1 15 0" stroke="#e6c36e"/></svg>',
+    "mail": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6" stroke="#e6c36e"/></svg>',
 }
 
 _EMOJI_TO_SVG_KEY = {
@@ -106,6 +109,7 @@ _EMOJI_TO_SVG_KEY = {
     "🔍": "search",
     "✨": "sparkle",
     "🌿": "tree",
+    "🌳": "tree",
     "🌍": "globe",
     "📌": "pin",
     "⭐": "star",
@@ -116,6 +120,12 @@ _EMOJI_TO_SVG_KEY = {
     "🛡": "shield",
     "⚠️": "warn",
     "⚠": "warn",
+    "🧭": "compass",
+    "🕒": "compass",
+    "👤": "user",
+    "👥": "user",
+    "✉️": "mail",
+    "✉": "mail",
 }
 
 
@@ -420,7 +430,7 @@ def generate_okuma_pdf(
         elif '«' in content or ARABIC_RE.search(content):
             def wrap_nass_quote(m):
                 q = m.group(1).strip()
-                return f'<div class="nass-ar" dir="rtl"><bdi>« {q} »</bdi></div>'
+                return f'<div class="nass-ar" dir="rtl"><bdi>{q}</bdi></div>'
             clean_content = re.sub(r'<p>\s*(?:<strong>\s*)?«\s*([^»]+?)\s*»(?:\s*</strong>)?\s*</p>', wrap_nass_quote, content)
             return f'''<blockquote class="callout callout-nass">
                 {clean_content}
@@ -790,12 +800,13 @@ def generate_okuma_pdf(
     def _enhance_nass_board(block: str) -> str:
         out = block
         # Arapça metni zarif iç parşömen çerçeveye al
-        out = re.sub(
-            r'(<div class="nass-arabic-text"[^>]*>[\s\S]*?</div>)',
-            r'<div class="nass-arabic-frame">\1</div>',
-            out,
-            count=1,
-        )
+        if 'class="nass-arabic-frame"' not in out:
+            out = re.sub(
+                r'(<div class="nass-arabic-text"[^>]*>[\s\S]*?</div>)',
+                r'<div class="nass-arabic-frame">\1</div>',
+                out,
+                count=1,
+            )
         # Çoklu âyet meali (125. Âyet: ... <br> 126. Âyet: ...) varsa ayırıcı satırlar üret
         def _split_ayah_trans(tm):
             inner = tm.group(1).strip()
@@ -898,7 +909,7 @@ def generate_okuma_pdf(
     html_body = html_body.replace('ﷺ', '<span class="sallallahu">ﷺ</span>')
 
     # Görsel şema veya tablodan hemen önceki tanıtım paragrafını + başlığı birbirine bağla (sayfa altında öksüz kalmasını önler)
-    _visual_target_re = r'(?:<div class="(?:nass-board|tree-diagram-wrap|doctrine-compare-wrap|entity-matrix-wrap|axis-matrix-2x2|pyramid-panel|timeline-bar|formula-card|lugat-grid-2)\b|<table>)'
+    _visual_target_re = r'(?:<div class="(?:nass-board|kasida-board|epistle-blueprint|bento-7-grid|era-timeline-svg|tree-diagram-wrap|doctrine-compare-wrap|entity-matrix-wrap|axis-matrix-2x2|pyramid-panel|timeline-bar|formula-card|lugat-grid-2)\b|<table>)'
     html_body = re.sub(
         rf'<p>((?:(?!<p\b|</p>)[\s\S]){{1,340}}?)</p>(\s*{_visual_target_re})',
         r'<p class="diagram-intro">\1</p>\2',
@@ -1030,7 +1041,7 @@ def generate_okuma_pdf(
         }}
         h2 [dir="rtl"], h3 [dir="rtl"] {{
             font-size: 1.18em;
-            line-height: 1.22;
+            line-height: 1.38;
         }}
 
         /* ROZETLER: Köşe bükülmesi yapmayan, yan çizgisiz ve taban çizgisini (baseline) koruyan yumuşak hap vurgular */
@@ -1239,7 +1250,7 @@ def generate_okuma_pdf(
             break-before: page;
             page-break-before: always;
             margin-top: 0;
-            margin-bottom: 14px;
+            margin-bottom: 10px;
         }}
 
         .unit-banner-container.first-unit {{
@@ -1353,6 +1364,7 @@ def generate_okuma_pdf(
             color: {c_dark};
             margin-top: 14px;
             margin-bottom: 6px;
+            padding-top: 3px;
             padding-bottom: 4.5px;
             border-bottom: 1.5px solid {c_border};
             break-inside: avoid !important;
@@ -1588,12 +1600,12 @@ def generate_okuma_pdf(
         blockquote.callout-nass {{
             position: relative;
             overflow: hidden;
-            background: {c_bg_tint};
+            background: linear-gradient(180deg, #fffdf9 0%, {c_bg_tint} 100%);
             border: 1px solid {c_border};
-            border-radius: 7px;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
-            padding: 9px 15px 9px 17px;
-            margin: 8px 0;
+            border-radius: 7.5px;
+            box-shadow: inset 0 0 0 1px rgba(196, 154, 69, 0.20), 0 2px 7px rgba(15, 23, 42, 0.035);
+            padding: 7px 14px 7px 16px;
+            margin: 6px 0;
             break-inside: avoid;
             page-break-inside: avoid;
             direction: ltr;
@@ -1606,7 +1618,7 @@ def generate_okuma_pdf(
             top: 0;
             bottom: 0;
             width: 4.5px;
-            background: {theme_hex};
+            background: linear-gradient(180deg, {theme_hex} 0%, {c_gold} 100%);
         }}
 
         blockquote.callout-nass p {{
@@ -1752,21 +1764,22 @@ def generate_okuma_pdf(
         }}
 
         .nass-arabic-frame {{
-            margin: 8px 13px 7px 16px;
-            padding: 8px 14px;
-            background: #ffffff;
+            margin: 6px 13px 5.5px 16px;
+            padding: 6.5px 13px;
+            background: #fffdf9;
             border: 1px solid {c_border};
             border-radius: 6px;
-            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.02);
+            box-shadow: inset 0 0 0 1px rgba(196, 154, 69, 0.22), inset 0 1px 4px rgba(0, 0, 0, 0.02);
         }}
         .nass-board.gold-accent .nass-arabic-frame {{
             border-color: {c_gold_border};
+            box-shadow: inset 0 0 0 1px rgba(196, 154, 69, 0.30), inset 0 1px 4px rgba(0, 0, 0, 0.02);
         }}
 
         .nass-arabic-text {{
             font-family: 'Amiri', 'Traditional Arabic', serif;
-            font-size: 1.44em;
-            line-height: 1.90;
+            font-size: 1.38em;
+            line-height: 1.72;
             color: {c_dark};
             margin: 0;
             unicode-bidi: isolate;
@@ -1783,27 +1796,27 @@ def generate_okuma_pdf(
             background: #ffffff;
             border: 1px solid #e2e8f0;
             border-radius: 6px;
-            padding: 7px 11px;
-            margin: 0 13px 9px 16px;
+            padding: 6px 10px;
+            margin: 0 13px 7px 16px;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
         }}
 
         .nass-trans-badge {{
-            font-size: 7.1pt;
+            font-size: 7.0pt;
             font-weight: 800;
             letter-spacing: 0.5px;
             color: #92400e;
             background: #fef3c7;
             border: 1px solid #fcd34d;
-            padding: 1.5px 7px;
+            padding: 1px 7px;
             border-radius: 3.5px;
             display: inline-block;
-            margin-bottom: 5px;
+            margin-bottom: 4px;
         }}
 
         .nass-trans-text {{
-            font-size: 9.2pt;
-            line-height: 1.50;
+            font-size: 9.05pt;
+            line-height: 1.44;
             color: #334155;
             margin: 0;
         }}
@@ -1811,16 +1824,16 @@ def generate_okuma_pdf(
         .ayah-trans-list {{
             display: flex;
             flex-direction: column;
-            gap: 4px;
+            gap: 2.5px;
         }}
         .ayah-trans-row {{
             display: flex;
             align-items: baseline;
             gap: 7px;
-            padding-bottom: 3.5px;
+            padding-bottom: 2.5px;
             border-bottom: 0.5px dashed #e2e8f0;
-            font-size: 9.05pt;
-            line-height: 1.46;
+            font-size: 8.95pt;
+            line-height: 1.38;
             color: #334155;
         }}
         .ayah-trans-row:last-child {{
@@ -2404,26 +2417,36 @@ def generate_okuma_pdf(
         }}
 
         .dok-pill {{
-            font-size: 7.4pt;
+            font-size: 7.3pt;
             font-weight: 800;
-            padding: 2px 7.5px;
+            padding: 2px 8px;
             border-radius: 4.5px;
             display: inline-flex;
             align-items: center;
             gap: 4px;
             margin-bottom: 3px;
+            background: {c_pill_bg};
+            color: {c_dark};
+            border: 1px solid {c_pill_border};
+            letter-spacing: 0.2px;
         }}
 
         .dok-pill.green {{
-            background: #dcfce7;
-            color: #166534;
-            border: 1px solid #86efac;
+            background: #eef6f1;
+            color: #1b4d3e;
+            border: 1px solid #b5d5c3;
+        }}
+
+        .dok-pill.gold {{
+            background: {c_gold_bg};
+            color: {c_gold_dark};
+            border: 1px solid {c_gold_border};
         }}
 
         .dok-pill.red {{
-            background: #fee2e2;
+            background: #fef2f2;
             color: #991b1b;
-            border: 1px solid #fca5a5;
+            border: 1px solid #fecaca;
         }}
 
         .dok-sub {{
@@ -2549,16 +2572,16 @@ def generate_okuma_pdf(
         }}
 
         .formula-flow {{
-            margin: 7px 0;
-            padding: 7px 10px;
-            background: #ffffff;
+            margin: 6px 0;
+            padding: 5.5px 9px;
+            background: #fffdf9;
             border: 1px solid {c_border};
-            border-radius: 7px;
+            border-radius: 8px;
             display: flex;
             align-items: stretch;
             justify-content: center;
             gap: 8px;
-            box-shadow: 0 1px 4px rgba(15, 23, 42, 0.03);
+            box-shadow: 0 2px 6px rgba(15, 23, 42, 0.03);
             break-inside: avoid;
             page-break-inside: avoid;
             flex-wrap: nowrap;
@@ -2567,11 +2590,11 @@ def generate_okuma_pdf(
         .flow-node {{
             flex: 1 1 0;
             min-width: 0;
-            padding: 6px 10px;
+            padding: 5px 8px;
             border-radius: 6px;
-            font-size: 8.4pt;
+            font-size: 8.3pt;
             font-weight: 700;
-            line-height: 1.44;
+            line-height: 1.36;
             background: #f8fafc;
             border: 1px solid #cbd5e1;
             color: #334155;
@@ -2583,19 +2606,22 @@ def generate_okuma_pdf(
         .flow-node.origin {{
             background: linear-gradient(180deg, #ffffff 0%, {c_bg_tint} 100%);
             border-color: {c_border};
+            border-top: 2.5px solid {theme_hex};
             color: {c_dark};
         }}
 
         .flow-node.stage {{
-            background: linear-gradient(180deg, #fffdf5 0%, #fef3c7 100%);
-            border-color: #f5d076;
-            color: #92400e;
+            background: linear-gradient(180deg, #fffdf9 0%, #fcf4df 100%);
+            border-color: {c_gold_border};
+            border-top: 2.5px solid {c_gold};
+            color: {c_gold_dark};
         }}
 
         .flow-node.target {{
-            background: linear-gradient(180deg, #f8fffb 0%, #dcfce7 100%);
-            border-color: #86efac;
-            color: #166534;
+            background: linear-gradient(180deg, #f9fafb 0%, #eef2f6 100%);
+            border-color: #cbd5e1;
+            border-top: 2.5px solid #334155;
+            color: #1e293b;
         }}
 
         .flow-arrow {{
@@ -3231,7 +3257,7 @@ def generate_okuma_pdf(
 
         /* 6. Evrensel Kavram Matrisi (2'li, 3'lü, 4'lü) ve Doktrin Uyumluluğu */
         .entity-matrix-wrap {{
-            margin: 12px 0;
+            margin: 8px 0;
             border-radius: 9px;
             overflow: hidden;
             border: 1px solid {c_border};
@@ -3255,6 +3281,276 @@ def generate_okuma_pdf(
         .entity-grid-2 {{ display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: {c_border}; }}
         .entity-grid-3 {{ display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1px; background: {c_border}; }}
         .entity-grid-4 {{ display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 1px; background: {c_border}; }}
+        .entity-grid-5 {{ display: grid; grid-template-columns: repeat(6, 1fr); gap: 1px; background: {c_border}; }}
+        .entity-grid-5 > .entity-card:nth-child(-n+3) {{ grid-column: span 2; }}
+        .entity-grid-5 > .entity-card:nth-child(n+4) {{ grid-column: span 3; }}
+
+        /* 6B. Klasik Dîvân Kasîde Levhası (İki Şatır Simetrik Beyit Izgarası: Sadr ✦ Acüz) */
+        .kasida-grid {{
+            display: flex;
+            flex-direction: column;
+            gap: 1.5px;
+            direction: rtl;
+            width: 100%;
+        }}
+        .bayt-row {{
+            display: grid;
+            grid-template-columns: 20px minmax(0, 1fr) 18px minmax(0, 1fr);
+            align-items: center;
+            gap: 6px;
+            padding: 2px 6px;
+            border-radius: 4.5px;
+            background: rgba(255, 253, 249, 0.72);
+        }}
+        .bayt-row:nth-child(even) {{
+            background: {c_bg_tint};
+        }}
+        .bayt-num {{
+            width: 17px;
+            height: 17px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, {theme_hex} 0%, {c_dark} 100%);
+            color: #ffffff;
+            border: 1px solid {c_gold};
+            font-family: 'Amiri', 'Traditional Arabic', serif;
+            font-size: 8.4pt;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            box-shadow: 0 1px 2px rgba(15, 23, 42, 0.12);
+        }}
+        .bayt-sadr, .bayt-acuz {{
+            font-family: 'Amiri', 'Traditional Arabic', serif;
+            font-size: 1.24em;
+            font-weight: 700;
+            line-height: 1.42;
+            color: {c_dark};
+            text-align: center;
+            unicode-bidi: isolate;
+        }}
+        .bayt-sep {{
+            text-align: center;
+            color: {c_gold_dark};
+            font-size: 8.2pt;
+            line-height: 1;
+            user-select: none;
+        }}
+
+        /* 6C. Dile / Konuya Çoklu Tesir Bento Matrisi */
+        .bento-7-grid {{
+            margin: 5px 0 7px 0;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4.5px;
+            break-inside: avoid;
+            page-break-inside: avoid;
+        }}
+        .bento-card {{
+            position: relative;
+            background: #fffdf9;
+            border: 1px solid {c_border};
+            border-left: 3px solid {theme_hex};
+            border-radius: 6.5px;
+            padding: 4.5px 8px;
+            box-shadow: 0 1px 3px rgba(15, 23, 42, 0.025);
+        }}
+        .bento-card.bento-gold {{
+            background: linear-gradient(180deg, #fffdf9 0%, {c_gold_bg} 100%);
+            border-color: {c_gold_border};
+            border-left-color: {c_gold_dark};
+        }}
+        .bento-card.bento-wide {{
+            grid-column: 1 / -1;
+        }}
+        .bento-head {{
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 1.5px;
+        }}
+        .bento-num {{
+            width: 17px;
+            height: 17px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, {theme_hex} 0%, {c_dark} 100%);
+            color: #ffffff;
+            font-size: 7.2pt;
+            font-weight: 800;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }}
+        .bento-card.bento-gold .bento-num {{
+            background: linear-gradient(135deg, {c_gold} 0%, {c_gold_dark} 100%);
+        }}
+        .bento-title {{
+            font-size: 8.75pt;
+            font-weight: 800;
+            color: {c_dark};
+            line-height: 1.25;
+        }}
+        .bento-ar {{
+            margin-left: auto;
+            font-family: 'Amiri', 'Traditional Arabic', serif;
+            font-size: 1.15em;
+            font-weight: 700;
+            color: {theme_hex};
+            direction: rtl;
+            unicode-bidi: isolate;
+            white-space: nowrap;
+        }}
+        .bento-body {{
+            font-size: 8.2pt;
+            line-height: 1.32;
+            color: #334155;
+            margin: 0;
+        }}
+
+        /* 6D. Nebevî Mektup / Yapısal Anatomi Mimari Kartı (.epistle-blueprint) */
+        .epistle-blueprint {{
+            margin: 9px 0;
+            border-radius: 9px;
+            overflow: hidden;
+            border: 1px solid {c_border};
+            box-shadow: 0 3px 10px rgba(15, 23, 42, 0.045);
+            background: #ffffff;
+            break-inside: avoid;
+            page-break-inside: avoid;
+        }}
+        .epistle-stages {{
+            padding: 9px 11px;
+            background: linear-gradient(180deg, #fffdf9 0%, {c_bg_end} 100%);
+            display: grid;
+            grid-template-columns: 1.15fr auto 0.9fr auto 1.25fr auto 0.9fr;
+            align-items: stretch;
+            gap: 5px;
+        }}
+        .ep-stage {{
+            background: #ffffff;
+            border: 1px solid {c_border};
+            border-top: 2.5px solid {theme_hex};
+            border-radius: 6px;
+            padding: 6.5px 7px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 2px;
+        }}
+        .ep-stage.ep-bridge {{
+            background: linear-gradient(180deg, #fffdf7 0%, #fcf4df 100%);
+            border-color: {c_gold_border};
+            border-top: 2.5px solid {c_gold_dark};
+        }}
+        .ep-stage.ep-seal {{
+            background: linear-gradient(180deg, #f8fafc 0%, #eef2f6 100%);
+            border-color: #cbd5e1;
+            border-top: 2.5px solid #334155;
+        }}
+        .ep-kicker {{
+            font-size: 6.7pt;
+            font-weight: 800;
+            letter-spacing: 0.4px;
+            color: {theme_hex};
+            text-transform: uppercase;
+        }}
+        .ep-stage.ep-bridge .ep-kicker {{ color: {c_gold_dark}; }}
+        .ep-stage.ep-seal .ep-kicker {{ color: #334155; }}
+        .ep-ar {{
+            font-family: 'Amiri', 'Traditional Arabic', serif;
+            font-size: 1.24em;
+            font-weight: 700;
+            color: {c_dark};
+            direction: rtl;
+            unicode-bidi: isolate;
+            line-height: 1.4;
+        }}
+        .ep-detail {{
+            font-size: 7.45pt;
+            color: #475569;
+            line-height: 1.32;
+        }}
+        .ep-arrow {{
+            align-self: center;
+            color: {c_gold_dark};
+            font-weight: 900;
+            font-size: 9.5pt;
+        }}
+
+        /* 6E. Tarihsel Devir & Ünite Konum Haritası (.era-timeline-svg) */
+        .era-timeline-svg {{
+            margin: 5px 0 6px 0;
+            border-radius: 7.5px;
+            overflow: hidden;
+            border: 1px solid {c_border};
+            background: linear-gradient(180deg, #fffdf9 0%, {c_bg_end} 100%);
+            box-shadow: 0 2px 6px rgba(15, 23, 42, 0.03);
+            break-inside: avoid;
+            page-break-inside: avoid;
+        }}
+        .era-grid {{
+            display: grid;
+            grid-template-columns: 0.85fr 1.65fr 1.15fr;
+            gap: 1px;
+            background: {c_border};
+        }}
+        .era-col {{
+            background: #ffffff;
+            padding: 4.5px 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 1px;
+        }}
+        .era-col.era-active {{
+            background: linear-gradient(180deg, #fffdf8 0%, {c_bg_tint} 100%);
+            border-top: 2.5px solid {theme_hex};
+        }}
+        .era-col.era-emev {{
+            background: linear-gradient(180deg, #fffdf7 0%, #fcf4df 100%);
+            border-top: 2.5px solid {c_gold_dark};
+        }}
+        .era-col.era-muted {{
+            background: #f8fafc;
+            border-top: 2.5px solid #94a3b8;
+        }}
+        .era-dates {{
+            font-size: 6.7pt;
+            font-weight: 800;
+            color: {theme_hex};
+            letter-spacing: 0.25px;
+        }}
+        .era-col.era-emev .era-dates {{ color: {c_gold_dark}; }}
+        .era-col.era-muted .era-dates {{ color: #64748b; }}
+        .era-name {{
+            font-size: 8.4pt;
+            font-weight: 800;
+            color: {c_dark};
+            line-height: 1.22;
+        }}
+        .era-units {{
+            font-size: 7.25pt;
+            line-height: 1.26;
+            color: #334155;
+        }}
+
+        /* 6F. Mini Alt-Bölüm Etiketi ve Bütün Tutma Yardımcıları */
+        .sub-lead {{
+            margin: 8px 0 4px 0;
+            padding: 2px 0 2px 9px;
+            border-left: 3px solid {c_gold};
+            font-size: 9.35pt;
+            font-weight: 800;
+            color: {c_dark};
+            break-after: avoid;
+            page-break-after: avoid;
+        }}
+        .keep-together {{
+            break-inside: avoid;
+            page-break-inside: avoid;
+        }}
 
         /* 7. Genel Barem / Yelpaze Skalası (Teklîfî Hükümler, Sıhhat, Kanaat) */
         .spectrum-bar {{

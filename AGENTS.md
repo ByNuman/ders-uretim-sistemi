@@ -404,12 +404,23 @@ Kullanıcı herhangi bir ders veya konu özeti için *"okuma pdf üret"*, *"[Der
      10. *Tarihsel Dönemler Zaman Çizelgesi* (`.timeline-bar` - Kurumsal evrim, Islahat kronolojisi)
      11. *2x2 Eksen Matrisi* (`.axis-matrix-2x2` - Liderlik ve yönetim stilleri)
      12. *Tefsir III Modeli Kurumsal Renkli Nass Levhaları* (`.nass-board` - Degrade zeminli, iri hatlı ve bütünleşik tercümeli nass paneli)
-     13. *Hiyerarşik Ağaç Şeması* (`.tree-diagram-wrap` - Sosyal yapı, hanedan şeceresi, idarî ve hukukî sınıflandırma ağacı).
+     13. *Hiyerarşik Ağaç Şeması* (`.tree-diagram-wrap` - Sosyal yapı, hanedan şeceresi, idarî ve hukukî sınıflandırma ağacı)
+     14. *Çoklu Tesir Bento Matrisi* (`.bento-7-grid` - Madde veya tesir kümeleri için ilk kartı tam genişlikte, kalanları 2 sütunlu numaralı madalyon bento ızgarası)
+     15. *Yapısal Mektup / Risâle Anatomisi* (`.epistle-blueprint` - Hitap, besmele, şart-ceza ve mühür aşamalarını şematize eden yapısal şablon)
+     16. *Klasik Dîvân Kasîde Levhası* (`.kasida-grid`, `.bayt-row` - `١–٧` madalyon numaralı simetrik `Sadr ✦ Acüz` beyit ızgarası)
+     17. *Birleşik 5'li Şahsiyet / Kavram Matrisi* (`.entity-grid-5` - 6 sütunlu bento ile `3 + 2` simetrik kart düzeni)
+     18. *Kronolojik Dönem Şeridi* (`.era-timeline-svg`, `.era-grid` - Çağlar veya edebî dönemler arası kapanış sentezi).
 
 9. **Materyal Tasarımında Sıfır Bilgi Kaybı & Çift Katmanlı Mimari Standardı (Materyal + Tam ve Eksiksiz Konu Anlatımı):**
    - Görsel materyaller (şemalar, zaman çizelgeleri, akış kartları, hiyerarşik ağaçlar vb.) tasarlanırken kavramlar özetlenip kompakt kartlara dönüştürülebilir; **ANCAK hiçbir sınav bilgisi, fıkhî ayrım, ıstılah, âyet/hadis metni, isim, eser veya tarihsel detay atlanamaz veya eksiltilemez.**
    - **Çift Katmanlı Kural (Zorunlu):** Ya tüm detaylar doğrudan materyalin içine tam ve eksiksiz olarak yazılır YA DA (ferahlık ve estetik için tercih edilen yöntem) materyalin hemen altında `### ... Tam ve Eksiksiz Konu Anlatımı:` başlığı açılarak konunun tüm detayları, maddeleri ve tahlilleri eksiksizce yazıya dökülür.
    - Görsel materyaller tek başına kuru bir özet olarak bırakılamaz; altındaki konu anlatımı asla budanamaz veya atlanamaz. Öğrenci hem görsel şemadan konunun haritasını görmeli, hem de altındaki metinden sınavda çıkacak tüm ayrıntıları eksiksizce okuyabilmelidir.
+
+10. **Yüksek Yayın Kalitesi Tipografi ve Bileşen Standardı (Varsayılan Üretim İlkesi):**
+    - **Ham Emoji Yerine Vektörel SVG İkonlar:** Panel ve başlık şeritlerinde ham sistem emojileri (`🧭`, `👤`, `✉️`, `🌳` vb.) kullanılmaz; `_SVG_ICONS` / `_EMOJI_TO_SVG_KEY` üzerinden temaya uyumlu SVG ikonlar basılır.
+    - **Seçici Hap Rozet & Yan Çizgisiz Vurgu:** Yalnızca kilit kavram/terim ikilileri veya müstakil Arapça/Türkçe vurgular hap rozet içine alınır; kutu ve rozet kenarlarında dikey kalın şerit bulunmaz (`::before` şeritleri kaldırılmıştır).
+    - **Arapça Nass Çerçevesi ve BiDi Koruma:** Çok satırlı ortalama `.nass-ar` ve takdim kutularında yönü dönen `« »` tırnakları basılmaz (`tag_blockquotes`); `callout-nass` ve `.nass-arabic-frame` parşömen degrade + ince altın iç çerçeveyle sunulur. `h2 [dir="rtl"], h3 [dir="rtl"]` için `line-height: 1.38` ve `h2` `padding-top: 3px` korunarak sayfa başındaki harekelerin bir önceki sayfanın altına taşması engellenir.
+    - **Uyumlu Renk & Alt Başlık Hiyerarşisi:** `.dok-pill` ve `.formula-flow` (`.origin`, `.stage`, `.target`) kutularında sert neon renkler yerine dersin tema rengi, antik altın ve yumuşak kurşunî/yeşil tonları esas alınır. Alt liste tanıtıcı başlıklarında çift madde imi yerine `.sub-lead` kullanılır.
 
 ---
 
