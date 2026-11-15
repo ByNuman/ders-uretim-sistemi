@@ -24,6 +24,7 @@ import os
 import re
 import sys
 import shutil
+import tempfile
 import argparse
 import colorsys
 from pathlib import Path
@@ -36,6 +37,16 @@ sys.path.insert(0, str(ROOT))
 
 from cekirdek import donem as donem_mod
 from cekirdek.renk_uretici import ders_rengi
+from tools.okuma_birlestir import (
+    _darken as _cover_darken,
+    _hsl_tint as _cover_hsl_tint,
+    _extract_units as _extract_pdf_units,
+    _render_footers_overlay_html,
+    _redact_old_footer,
+    attach_course_cover_links,
+    render_single_course_cover_html,
+    resolve_course_meta,
+)
 
 sys.stdout.reconfigure(encoding='utf-8')
 
@@ -78,8 +89,37 @@ def theme_hsl_tint(hex_code, lightness=0.965, min_saturation=0.50, sat_factor=0.
     tr, tg, tb = colorsys.hls_to_rgb(h, lightness, target_s)
     return f"#{int(tr*255+0.5):02x}{int(tg*255+0.5):02x}{int(tb*255+0.5):02x}"
 
-def generate_okuma_pdf(md_path: Path, output_pdf_path: Path = None, course_name: str = "", theme_hex: str = "#8C2F21", son_unite: int = None, haric_unite: int = None):
-    """Tek bir Markdown özet dosyasından yüksek estetikli Okuma PDF üretir."""
+def _infer_donem_from_path(md_path: Path, sinif: str | None, donem: str | None, sinav: str | None) -> tuple[str, str, str]:
+    """Dosya yolundan (sinif, donem, sinav) bilgisini çıkarır."""
+    s_val, d_val, sv_val = sinif, donem, sinav
+    for part in md_path.parts:
+        low = part.lower()
+        if not s_val:
+            m = re.match(r'^(\d+)-sinif$', low)
+            if m:
+                s_val = m.group(1)
+        if not d_val:
+            m = re.match(r'^(\d+)-donem$', low)
+            if m:
+                d_val = m.group(1)
+        if not sv_val and low in {'vize', 'final'}:
+            sv_val = low
+    return s_val or "3", d_val or "1", sv_val or "vize"
+
+
+def generate_okuma_pdf(
+    md_path: Path,
+    output_pdf_path: Path = None,
+    course_name: str = "",
+    theme_hex: str = "#8C2F21",
+    son_unite: int = None,
+    haric_unite: int = None,
+    sinif: str = None,
+    donem: str = None,
+    sinav: str = None,
+    with_cover: bool = True,
+):
+    """Tek bir Markdown özet dosyasından yüksek estetikli (Baskı Dostu Lüks kapaklı) Okuma PDF üretir."""
     if not md_path.exists():
         raise FileNotFoundError(f"Markdown dosyası bulunamadı: {md_path}")
 
@@ -205,7 +245,7 @@ def generate_okuma_pdf(md_path: Path, output_pdf_path: Path = None, course_name:
     # H3 başlıklarına altın elmas imi ekle
     def replace_h3(match):
         content = match.group(1).strip()
-        return f'<h3 class="h3-styled"><span class="h3-diamond">◆</span> {content}</h3>'
+        return f'<h3 class="h3-styled"><span class="h3-diamond">◆</span> <span class="h3-content">{content}</span></h3>'
 
     html_body = re.sub(r'<h3>([\s\S]*?)</h3>', replace_h3, html_body)
 
@@ -242,9 +282,7 @@ def generate_okuma_pdf(md_path: Path, output_pdf_path: Path = None, course_name:
             def wrap_nass_quote(m):
                 q = m.group(1).strip()
                 return f'<div class="nass-ar" dir="rtl"><bdi>« {q} »</bdi></div>'
-            clean_content = re.sub(r'<p>\s*<strong>\s*«\s*([^»]+?)\s*»\s*</strong>\s*</p>', wrap_nass_quote, content)
-            if clean_content == content:
-                clean_content = re.sub(r'«\s*([^»]+?)\s*»', wrap_nass_quote, clean_content)
+            clean_content = re.sub(r'<p>\s*(?:<strong>\s*)?«\s*([^»]+?)\s*»(?:\s*</strong>)?\s*</p>', wrap_nass_quote, content)
             return f'''<blockquote class="callout callout-nass">
                 {clean_content}
             </blockquote>'''
@@ -325,7 +363,7 @@ def generate_okuma_pdf(md_path: Path, output_pdf_path: Path = None, course_name:
 
     # Hadis bölümlerini (H3 + UL) bölünmez bütün bloklar haline getir
     html_body = re.sub(
-        r'(<h3 class="h3-styled"><span class="h3-diamond">◆</span>\s*Hadis\s*\d+:[\s\S]*?</h3>\s*<ul>[\s\S]*?</ul>)',
+        r'(<h3 class="h3-styled"><span class="h3-diamond">◆</span>\s*(?:<span class="h3-content">\s*)?Hadis\s*\d+:[\s\S]*?</h3>\s*<ul>[\s\S]*?</ul>)',
         r'<div class="hadis-card">\1</div>',
         html_body
     )
@@ -351,6 +389,7 @@ def generate_okuma_pdf(md_path: Path, output_pdf_path: Path = None, course_name:
         q_num = m.group(1)
         q_stem = m.group(2).strip()
         raw_options = m.group(3).strip()
+        ans_body = m.group(4).strip() if (m.lastindex and m.lastindex >= 4 and m.group(4)) else ""
 
         opt_lines = [opt.strip() for opt in re.split(r'<br\s*/?>', raw_options) if opt.strip()]
         context_lines = []
@@ -369,7 +408,7 @@ def generate_okuma_pdf(md_path: Path, output_pdf_path: Path = None, course_name:
             context_html = f'<div class="q-context">{"<br />".join(context_lines)}</div>'
 
         opts_html = []
-        is_long = any(len(opt) > 55 for opt in option_lines)
+        is_long = any(len(re.sub(r'<[^>]+>', '', opt)) > 48 for opt in option_lines)
         for line in option_lines:
             opt_match = re.match(r'^([A-E]\))\s*(.+)$', line)
             if opt_match:
@@ -385,14 +424,16 @@ def generate_okuma_pdf(md_path: Path, output_pdf_path: Path = None, course_name:
 
         grid_cls = "q-options q-options-single" if is_long else "q-options"
         options_block = ''.join(opts_html)
+        ans_html = f'<div class="q-ans">{ans_body}</div>' if ans_body else ""
         return f'''<div class="q-card q-card-mc">
             <div class="q-header"><span class="q-badge">{q_num}</span><span class="q-stem">{q_stem}</span></div>
             {context_html}
             <div class="{grid_cls}">{options_block}</div>
+            {ans_html}
         </div>'''
 
     html_body = re.sub(
-        r'<p><strong>(S\d+)\.\s*(.+?)</strong><br />([\s\S]*?)</p>',
+        r'<p><strong>(S\d+)\.\s*(.+?)</strong><br />([\s\S]*?)</p>(?:\s*<blockquote[^>]*>([\s\S]*?)</blockquote>)?',
         repl_mc,
         html_body
     )
@@ -456,7 +497,7 @@ def generate_okuma_pdf(md_path: Path, output_pdf_path: Path = None, course_name:
             direction: rtl;
             unicode-bidi: isolate;
             color: {c_dark};
-            background: linear-gradient(135deg, {c_pill_bg} 0%, #ffffff 100%) !important;
+            background: {c_pill_bg} !important;
             border: 1px solid {c_pill_border} !important;
             border-right: 3px solid {theme_hex} !important;
             border-radius: 4px !important;
@@ -483,7 +524,7 @@ def generate_okuma_pdf(md_path: Path, output_pdf_path: Path = None, course_name:
             font-size: 8.6pt;
             font-weight: 700;
             color: {c_dark};
-            background: linear-gradient(135deg, {c_pill_bg} 0%, #ffffff 100%);
+            background: {c_pill_bg};
             border: 1px solid {c_pill_border};
             border-left: 3px solid {theme_hex};
             padding: 1px 6px;
@@ -527,12 +568,25 @@ def generate_okuma_pdf(md_path: Path, output_pdf_path: Path = None, course_name:
             unicode-bidi: isolate;
             display: inline-block;
             padding: 1.5px 8px;
-            background: linear-gradient(135deg, {c_bg_tint} 0%, #ffffff 100%);
+            background: {c_bg_tint};
             border-radius: 5px;
             border: 1px solid {c_border};
             border-right: 3px solid {theme_hex};
             margin: 2px 0;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+        }}
+
+        .nass-arabic-text .ar-quote, .nass-ar .ar-quote,
+        .nass-arabic-text code.ar, .nass-ar code.ar {{
+            background: transparent !important;
+            border: none !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            box-shadow: none !important;
+            display: inline !important;
+            font-size: inherit !important;
+            line-height: inherit !important;
+            color: inherit !important;
         }}
 
         .ar-quote bdi.ar {{
@@ -542,6 +596,13 @@ def generate_okuma_pdf(md_path: Path, output_pdf_path: Path = None, course_name:
             line-height: 1.60;
             margin: 0 3px;
             color: {c_dark};
+        }}
+
+        .nass-arabic-text .ar-quote bdi.ar, .nass-ar .ar-quote bdi.ar {{
+            font-size: inherit !important;
+            line-height: inherit !important;
+            margin: 0 !important;
+            color: inherit !important;
         }}
 
         /* ÜNİTE BANNER'LARI (KURAL 15: İlk ünite 1. sayfada; sonrakiler yeni sayfada açılır) */
@@ -560,7 +621,7 @@ def generate_okuma_pdf(md_path: Path, output_pdf_path: Path = None, course_name:
         }}
 
         .unit-banner-inner {{
-            background: linear-gradient(135deg, {theme_hex} 0%, {c_dark} 100%);
+            background: {theme_hex};
             color: #ffffff;
             padding: 9.5px 16px;
             border-radius: 8px;
@@ -601,7 +662,7 @@ def generate_okuma_pdf(md_path: Path, output_pdf_path: Path = None, course_name:
         }}
 
         .h2-badge {{
-            background: linear-gradient(135deg, {theme_hex} 0%, {c_badge_grad} 100%);
+            background: {theme_hex};
             color: #ffffff;
             font-size: 8.5pt;
             font-weight: 800;
@@ -621,11 +682,11 @@ def generate_okuma_pdf(md_path: Path, output_pdf_path: Path = None, course_name:
             margin-top: 13px;
             margin-bottom: 6px;
             padding: 3.5px 10px;
-            background: linear-gradient(90deg, {c_bg_tint} 0%, transparent 100%);
+            background: {c_bg_tint};
             border-left: 3.5px solid #d97706;
             border-radius: 0 4px 4px 0;
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             gap: 6px;
             break-after: avoid !important;
             page-break-after: avoid !important;
@@ -635,7 +696,13 @@ def generate_okuma_pdf(md_path: Path, output_pdf_path: Path = None, course_name:
             color: #d97706;
             font-size: 8pt;
             display: inline-block;
-            vertical-align: middle;
+            margin-top: 2.5px;
+            flex-shrink: 0;
+        }}
+
+        .h3-content {{
+            flex: 1;
+            display: inline;
         }}
 
         h4 {{
@@ -699,7 +766,7 @@ def generate_okuma_pdf(md_path: Path, output_pdf_path: Path = None, course_name:
         }}
 
         th {{
-            background: linear-gradient(135deg, {theme_hex} 0%, {c_dark} 100%);
+            background: {theme_hex};
             color: #ffffff;
             font-weight: 700;
             text-align: left;
@@ -751,7 +818,7 @@ def generate_okuma_pdf(md_path: Path, output_pdf_path: Path = None, course_name:
         }}
 
         blockquote.callout-nass {{
-            background: linear-gradient(180deg, {c_bg_tint} 0%, {c_bg_end} 100%);
+            background: {c_bg_tint};
             border-left: 4.5px solid {theme_hex};
             border-top: 1px solid {c_border};
             border-right: 1px solid {c_border};
@@ -827,7 +894,7 @@ def generate_okuma_pdf(md_path: Path, output_pdf_path: Path = None, course_name:
 
         /* NASS LEVHALARI VE DİYAGRAM KUTULARI (TEFSİR III REFERANSLI) */
         .nass-board {{
-            background: linear-gradient(135deg, {c_bg_tint} 0%, {c_bg_end} 100%);
+            background: {c_bg_tint};
             border: 1px solid {c_border};
             border-left: 5px solid {theme_hex};
             border-radius: 7px;
@@ -840,7 +907,7 @@ def generate_okuma_pdf(md_path: Path, output_pdf_path: Path = None, course_name:
 
         .nass-board.gold-accent {{
             border-left-color: #d97706;
-            background: linear-gradient(135deg, #fffdf8 0%, #fef8eb 100%);
+            background: #fffdf5;
             border-color: #fde68a;
         }}
 
@@ -894,7 +961,7 @@ def generate_okuma_pdf(md_path: Path, output_pdf_path: Path = None, course_name:
 
         .nass-divider {{
             height: 1px;
-            background: linear-gradient(90deg, transparent 0%, {c_border} 20%, {c_border} 80%, transparent 100%);
+            background: {c_border};
             margin: 5px 0;
         }}
 
@@ -938,7 +1005,7 @@ def generate_okuma_pdf(md_path: Path, output_pdf_path: Path = None, course_name:
 
         /* Kök Fiil Kartı */
         .root-verb-card {{
-            background: linear-gradient(135deg, {c_bg_tint} 0%, #ffffff 100%);
+            background: {c_bg_tint};
             border: 1px solid {c_border};
             border-left: 4.5px solid {theme_hex};
             border-radius: 8px;
@@ -982,13 +1049,13 @@ def generate_okuma_pdf(md_path: Path, output_pdf_path: Path = None, course_name:
             padding: 9px 14px;
             border: 1px solid {c_border};
             border-left: 5px solid {theme_hex};
-            background: linear-gradient(135deg, #ffffff 0%, {c_bg_tint} 100%);
+            background: {c_bg_tint};
             box-shadow: 0 1px 4px rgba(0,0,0,0.02);
         }}
 
         .usul-step.usul-mesail {{
             border-left-color: #d97706;
-            background: linear-gradient(135deg, #ffffff 0%, #fffdf5 100%);
+            background: #fffdf5;
             border-color: #fde68a;
         }}
 
@@ -1075,7 +1142,7 @@ def generate_okuma_pdf(md_path: Path, output_pdf_path: Path = None, course_name:
         }}
 
         .ontology-main-banner {{
-            background: linear-gradient(135deg, {theme_hex} 0%, {c_dark} 100%);
+            background: {theme_hex};
             color: #ffffff;
             padding: 8px 14px;
             display: flex;
@@ -1190,7 +1257,7 @@ def generate_okuma_pdf(md_path: Path, output_pdf_path: Path = None, course_name:
         }}
 
         .entities-banner {{
-            background: linear-gradient(135deg, {theme_hex} 0%, {c_dark} 100%);
+            background: {theme_hex};
             color: #ffffff;
             padding: 7.5px 14px;
             display: flex;
@@ -1293,7 +1360,7 @@ def generate_okuma_pdf(md_path: Path, output_pdf_path: Path = None, course_name:
         }}
 
         .doktrin-banner {{
-            background: linear-gradient(135deg, {theme_hex} 0%, {c_dark} 100%);
+            background: {theme_hex};
             color: #ffffff;
             padding: 7.5px 14px;
             display: flex;
@@ -1431,7 +1498,7 @@ def generate_okuma_pdf(md_path: Path, output_pdf_path: Path = None, course_name:
         .formula-card {{
             margin: 9px 0;
             padding: 9px 14px;
-            background: linear-gradient(135deg, #ffffff 0%, {c_bg_tint} 100%);
+            background: {c_bg_tint};
             border: 1px solid {c_border};
             border-left: 4.5px solid {theme_hex};
             border-radius: 6px;
@@ -1530,14 +1597,14 @@ def generate_okuma_pdf(md_path: Path, output_pdf_path: Path = None, course_name:
 
         .pyramid-tier.top {{
             width: 52%;
-            background: linear-gradient(135deg, {theme_hex} 0%, {c_dark} 100%);
+            background: {theme_hex};
             color: #ffffff;
             border-color: {c_dark};
         }}
 
         .pyramid-tier.middle {{
             width: 74%;
-            background: linear-gradient(135deg, #ffffff 0%, {c_bg_tint} 100%);
+            background: {c_bg_tint};
             color: {c_dark};
             border-color: {c_border};
             border-left: 4.5px solid #d97706;
@@ -1586,7 +1653,7 @@ def generate_okuma_pdf(md_path: Path, output_pdf_path: Path = None, course_name:
         }}
 
         .cycle-banner {{
-            background: linear-gradient(135deg, {theme_hex} 0%, {c_dark} 100%);
+            background: {theme_hex};
             color: #ffffff;
             padding: 7.5px 14px;
             display: flex;
@@ -1612,7 +1679,7 @@ def generate_okuma_pdf(md_path: Path, output_pdf_path: Path = None, course_name:
             flex: 1;
             min-width: 105px;
             padding: 8px 9px;
-            background: linear-gradient(135deg, #ffffff 0%, {c_bg_tint} 100%);
+            background: {c_bg_tint};
             border: 1px solid {c_border};
             border-radius: 6px;
             display: flex;
@@ -1667,7 +1734,7 @@ def generate_okuma_pdf(md_path: Path, output_pdf_path: Path = None, course_name:
         }}
 
         .axis-banner {{
-            background: linear-gradient(135deg, {theme_hex} 0%, {c_dark} 100%);
+            background: {theme_hex};
             color: #ffffff;
             padding: 7.5px 14px;
             display: flex;
@@ -1692,7 +1759,7 @@ def generate_okuma_pdf(md_path: Path, output_pdf_path: Path = None, course_name:
         }}
 
         .axis-cell.highlight {{
-            background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
+            background: #f0fdf4;
             border-left: 3.5px solid #16a34a;
         }}
 
@@ -1727,7 +1794,7 @@ def generate_okuma_pdf(md_path: Path, output_pdf_path: Path = None, course_name:
         .isnad-flow-strip {{
             margin: 8px 0;
             padding: 8px 12px;
-            background: linear-gradient(135deg, #ffffff 0%, {c_bg_tint} 100%);
+            background: {c_bg_tint};
             border: 1px solid {c_border};
             border-left: 4.5px solid {theme_hex};
             border-radius: 6px;
@@ -1797,7 +1864,7 @@ def generate_okuma_pdf(md_path: Path, output_pdf_path: Path = None, course_name:
         .timeline-node {{
             flex: 1;
             min-width: 100px;
-            background: linear-gradient(135deg, #ffffff 0%, {c_bg_tint} 100%);
+            background: {c_bg_tint};
             border: 1px solid {c_border};
             border-top: 3.5px solid {theme_hex};
             border-radius: 5px;
@@ -1886,7 +1953,7 @@ def generate_okuma_pdf(md_path: Path, output_pdf_path: Path = None, course_name:
         }}
 
         .tree-diagram-banner {{
-            background: linear-gradient(135deg, {theme_hex} 0%, {c_dark} 100%);
+            background: {theme_hex};
             color: #ffffff;
             padding: 7px 14px;
             font-size: 9.6pt;
@@ -1906,7 +1973,7 @@ def generate_okuma_pdf(md_path: Path, output_pdf_path: Path = None, course_name:
         }}
 
         .tree-root-node {{
-            background: linear-gradient(135deg, {c_bg_tint} 0%, #ffffff 100%);
+            background: {c_bg_tint};
             border: 2px solid {theme_hex};
             border-radius: 6px;
             padding: 5px 16px;
@@ -2089,7 +2156,7 @@ def generate_okuma_pdf(md_path: Path, output_pdf_path: Path = None, course_name:
         hr {{
             border: 0;
             height: 1px;
-            background: linear-gradient(90deg, #f1f5f9 0%, {c_border} 50%, #f1f5f9 100%);
+            background: {c_border};
             margin: 14px 0;
         }}
 
@@ -2204,7 +2271,7 @@ def generate_okuma_pdf(md_path: Path, output_pdf_path: Path = None, course_name:
         }}
 
         .q-badge {{
-            background: linear-gradient(135deg, {theme_hex} 0%, {c_dark} 100%);
+            background: {theme_hex};
             color: #ffffff;
             font-size: 7.8pt;
             font-weight: 800;
@@ -2310,37 +2377,117 @@ def generate_okuma_pdf(md_path: Path, output_pdf_path: Path = None, course_name:
     output_pdf_path.parent.mkdir(parents=True, exist_ok=True)
 
     print(f"Playwright Chromium ile Okuma PDF üretiliyor: {output_pdf_path.name}")
-    with sync_playwright() as p:
-        browser = p.chromium.launch()
-        page = browser.new_page()
-        page.goto(f"file:///{str(html_out.resolve()).replace('\\\\', '/')}", wait_until="load")
-        page.evaluate("() => document.fonts.ready")
-        
-        page.pdf(
-            path=str(output_pdf_path),
-            format="A4",
-            print_background=True,
-            margin={
-                "top": "24mm",
-                "bottom": "22mm",
-                "left": "14mm",
-                "right": "14mm"
-            },
-            display_header_footer=True,
-            header_template=f"""
-                <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 8.0pt; color: #64748b; width: 100%; border-bottom: 1px solid {c_light}; padding-top: 5mm; padding-bottom: 4px; margin: 0 14mm; display: flex; justify-content: space-between; align-items: center;">
-                    <span style="font-weight: 700; color: {theme_hex};">{title_display} — Okuma PDF</span>
-                    <span style="font-weight: 500; color: #475569;">Ders Anlatımı &amp; İbare Şerhleri</span>
-                </div>
-            """,
-            footer_template=f"""
-                <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 8.0pt; color: #64748b; width: 100%; border-top: 1px solid #e2e8f0; padding-top: 4px; padding-bottom: 4mm; margin: 0 14mm; display: flex; justify-content: space-between; align-items: center;">
-                    <span style="color: #64748b;">{title_display} — Akademik Çalışma Notu</span>
-                    <span style="background-color: {c_bg_tint}; border: 1px solid {c_border}; color: {theme_hex}; padding: 1.5px 8px; border-radius: 12px; font-weight: 700;">Sayfa <span class="pageNumber"></span> / <span class="totalPages"></span></span>
-                </div>
-            """
-        )
-        browser.close()
+    sinif_val, donem_val, sinav_val = _infer_donem_from_path(md_path, sinif, donem, sinav)
+
+    with tempfile.TemporaryDirectory() as tmp_dir_str:
+        tmp_dir = Path(tmp_dir_str)
+        content_target = (tmp_dir / "content.pdf") if with_cover else output_pdf_path
+
+        with sync_playwright() as p:
+            browser = p.chromium.launch()
+            page = browser.new_page()
+            page.goto(f"file:///{str(html_out.resolve()).replace('\\\\', '/')}", wait_until="load")
+            page.evaluate("() => document.fonts.ready")
+
+            page.pdf(
+                path=str(content_target),
+                format="A4",
+                print_background=True,
+                margin={
+                    "top": "24mm",
+                    "bottom": "22mm",
+                    "left": "14mm",
+                    "right": "14mm"
+                },
+                display_header_footer=True,
+                header_template=f"""
+                    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 8.0pt; color: #64748b; width: 100%; border-bottom: 1px solid {c_light}; padding-top: 5mm; padding-bottom: 4px; margin: 0 14mm; display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-weight: 700; color: {theme_hex};">{title_display} — Okuma PDF</span>
+                        <span style="font-weight: 500; color: #475569;">Ders Anlatımı &amp; İbare Şerhleri</span>
+                    </div>
+                """,
+                footer_template=f"""
+                    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 8.0pt; color: #64748b; width: 100%; border-top: 1px solid #e2e8f0; padding-top: 4px; padding-bottom: 4mm; margin: 0 14mm; display: flex; justify-content: space-between; align-items: center;">
+                        <span style="color: #64748b;">{title_display} — Akademik Çalışma Notu</span>
+                        <span style="background-color: {c_bg_tint}; border: 1px solid {c_border}; color: {theme_hex}; padding: 1.5px 8px; border-radius: 12px; font-weight: 700;">Sayfa <span class="pageNumber"></span> / <span class="totalPages"></span></span>
+                    </div>
+                """
+            )
+
+            if with_cover:
+                content_doc = pymupdf.open(content_target)
+                content_pages = len(content_doc)
+                units = _extract_pdf_units(content_doc, start_page_idx=0)
+                content_doc.close()
+
+                _fam, resolved_title, _sub, resolved_hex = resolve_course_meta(
+                    course_name or md_path.stem, sinif_val, donem_val, sinav_val
+                )
+                use_hex = theme_hex or resolved_hex
+                cover_html = render_single_course_cover_html(
+                    course_name=course_name or md_path.stem,
+                    theme_hex=use_hex,
+                    content_pages=content_pages,
+                    units=units,
+                    sinif=sinif_val,
+                    donem=donem_val,
+                    sinav=sinav_val,
+                )
+                cover_html_path = tmp_dir / "cover.html"
+                cover_pdf_path = tmp_dir / "cover.pdf"
+                cover_html_path.write_text(cover_html, encoding="utf-8")
+
+                cover_tab = browser.new_page()
+                cover_tab.goto(f"file:///{str(cover_html_path.resolve()).replace(chr(92), '/')}", wait_until="load")
+                cover_tab.evaluate("() => document.fonts.ready")
+                cover_tab.pdf(
+                    path=str(cover_pdf_path),
+                    format="A4",
+                    print_background=True,
+                    margin={"top": "0", "bottom": "0", "left": "0", "right": "0"},
+                )
+
+                total_pages = 1 + content_pages
+                tint_c = _cover_hsl_tint(use_hex, 0.96, 0.72)
+                border_c = _cover_hsl_tint(use_hex, 0.78, 0.62)
+                footer_specs = [
+                    (1 + idx, resolved_title, use_hex, tint_c, border_c, idx, content_pages, total_pages)
+                    for idx in range(1, content_pages + 1)
+                ]
+                footers_html_path = tmp_dir / "footers.html"
+                footers_pdf_path = tmp_dir / "footers.pdf"
+                footers_html_path.write_text(_render_footers_overlay_html(footer_specs), encoding="utf-8")
+                footer_tab = browser.new_page()
+                footer_tab.goto(f"file:///{str(footers_html_path.resolve()).replace(chr(92), '/')}", wait_until="load")
+                footer_tab.evaluate("() => document.fonts.ready")
+                footer_tab.pdf(
+                    path=str(footers_pdf_path),
+                    format="A4",
+                    print_background=True,
+                    margin={"top": "0", "bottom": "0", "left": "0", "right": "0"},
+                )
+            browser.close()
+
+        if with_cover:
+            cover_doc = pymupdf.open(cover_pdf_path)
+            content_doc = pymupdf.open(content_target)
+            footers_doc = pymupdf.open(footers_pdf_path)
+            out_doc = pymupdf.open()
+            out_doc.insert_pdf(cover_doc)
+            out_doc.insert_pdf(content_doc)
+            for idx in range(len(content_doc)):
+                pg = out_doc[1 + idx]
+                _redact_old_footer(pg)
+                pg.show_pdf_page(pg.rect, footers_doc, idx, overlay=True)
+            attach_course_cover_links(out_doc[0], units, first_content_page=2)
+            toc = [[1, resolved_title, 1]] + [[2, utitle, 1 + local_pg] for local_pg, utitle in units]
+            if toc:
+                out_doc.set_toc(toc)
+            out_doc.save(output_pdf_path, garbage=4, deflate=True)
+            cover_doc.close()
+            content_doc.close()
+            footers_doc.close()
+            out_doc.close()
 
     # Sayfa sayısını ve boyutunu doğrula
     doc = pymupdf.open(output_pdf_path)
@@ -2381,6 +2528,7 @@ def main():
     parser.add_argument("--renk", default=None, help="Özel tema rengi hex (örn: #8C2F21)")
     parser.add_argument("--son-unite", type=int, default=None, help="Dahil edilecek son ünite numarası")
     parser.add_argument("--haric-unite", type=int, default=None, help="Hariç tutulacak ilk ünite numarası")
+    parser.add_argument("--kapaksiz", action="store_true", help="Ders kapağı eklemeden yalnızca içerik PDF üretir")
     args = parser.parse_args()
 
     hedef_path = Path(args.hedef)
@@ -2425,7 +2573,11 @@ def main():
         course_name=course_folder,
         theme_hex=theme_hex,
         son_unite=args.son_unite,
-        haric_unite=args.haric_unite
+        haric_unite=args.haric_unite,
+        sinif=args.sinif,
+        donem=args.donem,
+        sinav=args.sinav,
+        with_cover=not args.kapaksiz,
     )
 
 if __name__ == "__main__":

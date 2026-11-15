@@ -44,9 +44,9 @@ Detaylı sistem kılavuzu için ayrıca `CLAUDE.md` dosyasına bakınız.
 
 ---
 
-## KRİTİK KURAL 7: Öğretmen İsimleri Ders Programındaki Resmî İsimlerle Birebir Yazılır & Görsel Notlarda İsim Yasağı
-- **Yazılı Anlatımlarda Resmî İsim Zorunluluğu:** Yazılı ders anlatımı künyelerinde (`ders_anlatimlari/`) veya dönem planlama analizlerinde öğretim elemanı adı geçecekse; rastgele veya tahmini adlandırma yapılamaz. Doğrudan haftalık ders programındaki resmî unvan ve isim (ör. "Doç. Dr. Nevzat AYDIN", "Dr. Öğr. Üyesi Adem GÜNEŞ", "Öğr. Gör. Muhammed Salih SÜRÜCÜ") birebir esas alınır.
-- **Görsel Ders Notlarında Hoca İsmi Kullanılmaz (KESİN YASAK):** Hocaların izni olmadan isimlerini görsel ders notlarında (`src/*.py` -> PDF / HTML) geçirmek kesinlikle yasaktır. Kapaklarda, açıklamalarda (`description`), soru köklerinde, çözümlü test cevap anahtarlarında (`AnswerItem`) veya arka kapaklarda hoca isimleri zikredilmez; yalnızca "ders anlatımında", "ders içi sınav yönergesinde" gibi pedagojik ifadeler kullanılır.
+## KRİTİK KURAL 7: Öğretmen / Hoca İsimlerinin Kullanım Yasağı (Tüm Not ve Okuma PDF Dokümanlarında Kesin Yasak)
+- **Hoca / Öğretmen İsmi Kullanılmaz (KESİN YASAK):** Hocaların izni olmadan isimlerini veya unvanlarını görsel ders notlarında (`src/*.py` -> PDF / HTML), Okuma PDF dokümanlarında (`tools/okuma_pdf.py` -> `.md` / `.pdf`), özetlerde, konu anlatımlarında veya soru metinlerinde geçirmek KESİNLİKLE YASAKTIR.
+- **Pedagojik İfade Zorunluluğu:** Kapaklarda, künyelerde, ünite başlıklarında, soru köklerinde, çözümlü test cevap anahtarlarında (`AnswerItem`) veya açıklamalarda hoca isimleri ve unvanları zikredilmez; yalnızca "ders anlatımında", "ders içi sınav yönergesinde", "müfredat standartlarında", "ders içi tahta notlarında" gibi nesnel ve pedagojik ifadeler kullanılır.
 
 ---
 
@@ -358,9 +358,9 @@ Arapça nass/metin içeren dersler (Hadis, Arap Dili ve Edebiyatı, Tefsir, Fık
 
 Kullanıcı herhangi bir ders veya konu özeti için *"okuma pdf üret"*, *"[Ders Adı] okuma pdf'ini çıkar"* veya benzeri bir talepte bulunduğunda; asistan `tools/okuma_pdf.py` motorunu veya eşdeğer Playwright mimarisini kullanarak istisnasız aşağıdaki standartlara tam uyumla çıktı üretir (Referans model: `Arap Dili ve Edebiyatı V - Vize Sınavı Konu Özeti (Sarf-Nahiv ve Alıştırmasız).pdf`):
 
-1. **Ön/Arka Sayfaların Sadeleştirilmesi (Salt İçerik Mimarisi):**
-   - Ekranda ve mobilde kesintisiz okuma deneyimi sağlamak adına; kapak, boş sayfa, içindekiler ve 7. Bölüm gibi hızlı kontrol/sınav tabloları çıkarılır.
-   - Doğrudan **1. Ünite** ile başlar ve son üniteye kadar kesintisiz metin akışı korunur.
+1. **Ön/Arka Sayfaların Sadeleştirilmesi ve Ders Kapağı Mimarisi:**
+   - Ekranda ve mobilde kesintisiz okuma deneyimi sağlamak adına; boş sayfa, ayrı içindekiler sayfası ve 7. Bölüm gibi hızlı kontrol/sınav tabloları çıkarılır.
+   - Her tekil Okuma PDF doğrudan 1 sayfalık **Seçenek 1 — Baskı Dostu Lüks** ders kapağı (`s. 1`, tıklanabilir ünite planı + yer imleri) ile açılır ve hemen ardından **1. Ünite** (`s. 2`) kesintisiz olarak başlar (`--kapaksiz` verilmediği sürece varsayılan standart budur).
    - İlk ünitede boş sayfa oluşmasını önlemek için `first-unit` sınıfı ve `break-before: avoid;` uygulanır; sonraki üniteler ise sayfa başından (`break-before: page;`) başlar.
 
 2. **Dersin Tema Rengine Göre Ünite Levhaları (Unit Banners):**
@@ -410,4 +410,23 @@ Kullanıcı herhangi bir ders veya konu özeti için *"okuma pdf üret"*, *"[Der
    - Görsel materyaller (şemalar, zaman çizelgeleri, akış kartları, hiyerarşik ağaçlar vb.) tasarlanırken kavramlar özetlenip kompakt kartlara dönüştürülebilir; **ANCAK hiçbir sınav bilgisi, fıkhî ayrım, ıstılah, âyet/hadis metni, isim, eser veya tarihsel detay atlanamaz veya eksiltilemez.**
    - **Çift Katmanlı Kural (Zorunlu):** Ya tüm detaylar doğrudan materyalin içine tam ve eksiksiz olarak yazılır YA DA (ferahlık ve estetik için tercih edilen yöntem) materyalin hemen altında `### ... Tam ve Eksiksiz Konu Anlatımı:` başlığı açılarak konunun tüm detayları, maddeleri ve tahlilleri eksiksizce yazıya dökülür.
    - Görsel materyaller tek başına kuru bir özet olarak bırakılamaz; altındaki konu anlatımı asla budanamaz veya atlanamaz. Öğrenci hem görsel şemadan konunun haritasını görmeli, hem de altındaki metinden sınavda çıkacak tüm ayrıntıları eksiksizce okuyabilmelidir.
+
+---
+
+## KRİTİK KURAL 16: Okuma PDF Ders Kapağı ve Birleşik Okuma Kitapçığı Ana Kapak Standardı
+
+Bundan sonra üretilecek Final ve diğer tüm dönem **tekil Okuma PDF'leri** (`tools/okuma_pdf.py`) ile **Birleşik Okuma Kitapçıkları** (`tools/okuma_birlestir.py`) istisnasız aşağıdaki standart kapak mimarisi ile üretilir:
+
+1. **Tekil Okuma PDF Ders Kapağı (`Seçenek 1 — Baskı Dostu Lüks`):**
+   - `tools/okuma_pdf.py` varsayılan olarak her ders PDF'inin başına `tools/okuma_birlestir.py` içindeki paylaşımlı şablonla (`render_single_course_cover_html` + `attach_course_cover_links`) 1 sayfalık Baskı Dostu Lüks kapak ekler.
+   - Kapak tasarımı: Beyaz baskı dostu zemin üzerinde çift çizgili zarif dış/iç çerçeve, altın-tema köşe süsleri, sağ üstte renkli sekme (`01`), üstte dersin `cekirdek/renk_uretici.py` tema renginden degrade banner, sağda dersin ruhuna özgü altın halkalı vektörel SVG simge (`_course_svg_icon`), 3'lü metrik şeridi (`Ünite / Konu`, `İçerik Sayfası`, `Sayfa Aralığı`), **tıklanabilir `LINK_GOTO` ünite/konu planı**, sayfa numaralı altlık ve PDF yer imi (outline/TOC) içerir.
+   - Kapak üzerindeki sınav etiketi döneme göre dinamik üretilir (`VİZE SINAV HAZIRLIĞI` / `FİNAL SINAV HAZIRLIĞI`, `Vize Özeti · ...` / `Final Özeti · ...`).
+
+2. **Birleşik Okuma Kitapçığı Ana Kapağı (`Seçenek 1 — Tam Vektörel Prestij`):**
+   - Bir dönemdeki okuma PDF'leri `python tools/okuma_birlestir.py --sinif X --donem Y --sinav Z` ile tek ciltte birleştirildiğinde ana kapak (`s. 1`) daima **Tam Vektörel Prestij** şablonuyla üretilir (koyu lacivert degrade zemin, ince İslâmî kemer-daire kafes dokusu, altın köşe bezemeleri).
+   - **İslâmî Ana Amblem Zorunluluğu (`_main_cover_emblem_svg`):** Ana kapak sağ üst amblemi **hilâl ve çift minareli kubbeli cami** İslâmî motifidir. Usturlap (Felsefe dersi ikonuyla çakışan) veya altı köşeli üst üste kare yıldız figürü KESİNLİKLE KULLANILMAZ.
+   - **Dinamik Başlık:** `{SINAV} SINAVI HAZIRLIK KİTABI` (`VİZE` veya `FİNAL`), dönem kapsülü (`X. SINIF · Y. DÖNEM · {SINAV} · İLAHİYAT OKUMA KİTABI`) otomatik uyumlanır.
+   - **Ayrı İçindekiler Sayfası Yoktur:** Ana kapakta tüm derslerin sayfa aralığı ve tıklanabilir `LINK_GOTO` kartları bulunduğu için ayrıca bir İçindekiler sayfası konmaz.
+   - **Çift Taraflı Baskı (Duplex) ve Çift Kapak Önleme:** `s. 1` Ana Kapak, `s. 2` Boş Sayfa (yalnızca boş kalır, yazı/kutu eklenmez), her ders kapağı tek (sağ) sayfada başlar (`c.cover_page % 2 == 1`). Tekil okuma PDF'lerinde hâlihazırda Baskı Dostu Lüks kapak varsa `_pdf_has_baski_lux_cover` ilk sayfayı otomatik atlar ve çift kapak basılmasını engeller; tüm içerik altlıkları global sayfa numarasına (`Sayfa X / Toplam`) yenilenir.
+
 
