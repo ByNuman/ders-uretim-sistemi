@@ -819,7 +819,9 @@ def render_course_cover_section_html(
     svg_icon = _course_svg_icon(family)
     corner = _corner_ornament_svg(theme_hex)
     idx_display = course_index if course_index is not None else 1
-    tab_top_mm = 26 + (idx_display - 1) * 26
+    tab_step_mm = 22.5 if (total_courses and total_courses > 9) else 26.0
+    tab_start_mm = 22.0 if (total_courses and total_courses > 9) else 26.0
+    tab_top_mm = tab_start_mm + (idx_display - 1) * tab_step_mm
 
     if course_index is not None and total_courses is not None:
         top_caption = f"{donem_etiket} · BÖLÜM {course_index:02d} / {total_courses:02d}"
@@ -1196,8 +1198,8 @@ def _render_front_and_covers_html(courses: list[CourseEntry], total_pages: int, 
   }}
   .mc-grid {{
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 3mm;
+    grid-template-columns: repeat({2 if (total_courses > 9 and total_courses % 2 == 0) else 3}, 1fr);
+    gap: {'2.2mm 3.2mm' if (total_courses > 9 and total_courses % 2 == 0) else '3mm'};
   }}
   .mc-pill {{
     display: flex;
@@ -1365,13 +1367,17 @@ def _render_front_and_covers_html(courses: list[CourseEntry], total_pages: int, 
 """
 
 
-def _render_footers_overlay_html(footer_specs: list[tuple[int, str, str, str, str, int, int, int]]) -> str:
+def _render_footers_overlay_html(
+    footer_specs: list[tuple[int, str, str, str, str, int, int, int]],
+    show_local: bool = True,
+) -> str:
     pages_html = []
     for global_pg, title, hex_c, tint_c, border_c, local_pg, local_total, book_total in footer_specs:
         is_odd = (global_pg % 2 == 1)
+        local_html = f'<span class="f-local"> · Ders İçi {local_pg}/{local_total}</span>' if show_local else ""
         left_part = (
             f'<span class="f-course" style="color:{hex_c};">{html.escape(title)}</span>'
-            f'<span class="f-local"> · Ders İçi {local_pg}/{local_total}</span>'
+            f'{local_html}'
         )
         right_part = (
             f'<span class="f-pill" style="background:{tint_c}; border-color:{border_c}; color:{hex_c};">'
@@ -1492,7 +1498,7 @@ def merge_okuma_pdfs(d: donem_mod.Donem, output_path: Path | None = None) -> Pat
                     c.theme_border, local_i, c.content_pages, total_pages
                 ))
 
-        footers_html = _render_footers_overlay_html(footer_specs)
+        footers_html = _render_footers_overlay_html(footer_specs, show_local=False)
         _html_to_pdf(footers_html, footers_pdf_path, tmp_dir, "footers")
 
         front_doc = pymupdf.open(front_pdf_path)
@@ -1530,15 +1536,21 @@ def merge_okuma_pdfs(d: donem_mod.Donem, output_path: Path | None = None) -> Pat
 
         assert len(out_doc) == total_pages, f"Sayfa sayısı uyuşmuyor: {len(out_doc)} != {total_pages}"
 
-        # Ana kapaktaki 9 ders kartını tıklanabilir yap
+        # Ana kapaktaki tüm ders kartlarını tıklanabilir yap (2 veya 3 sütun dinamik)
         main_cover_page = out_doc[0]
+        is_two_col = (len(courses) > 9 and len(courses) % 2 == 0)
         for c in courses:
             rects = main_cover_page.search_for(c.title)
             if rects:
                 r = rects[0]
-                col = (c.index - 1) % 3
-                col_x0 = [64, 224, 384][col]
-                col_x1 = col_x0 + 148
+                if is_two_col:
+                    col = (c.index - 1) % 2
+                    col_x0 = [56, 301][col]
+                    col_x1 = col_x0 + 236
+                else:
+                    col = (c.index - 1) % 3
+                    col_x0 = [64, 224, 384][col]
+                    col_x1 = col_x0 + 148
                 main_cover_page.insert_link({
                     "kind": pymupdf.LINK_GOTO,
                     "from": pymupdf.Rect(col_x0, r.y0 - 6, col_x1, r.y1 + 16),

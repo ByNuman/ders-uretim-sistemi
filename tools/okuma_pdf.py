@@ -239,6 +239,7 @@ def generate_okuma_pdf(
         raise FileNotFoundError(f"Markdown dosyası bulunamadı: {md_path}")
 
     raw_text = md_path.read_text(encoding="utf-8")
+    flow_units_flag = bool(re.search(r'<!--\s*flow-units\s*-->', raw_text, flags=re.IGNORECASE))
 
     # Ünite başlangıç noktasını tespit et (Kural 15: Ön kapak, künye, içindekiler atlanır; doğrudan 1. Ünite başlar)
     u1_match = re.search(r'^#\s+(?:1\.\s*(?:ÜNİTE|BÖLÜM|HAFTA)|(?:ÜNİTE|BÖLÜM|HAFTA)\s*1\b)', raw_text, flags=re.MULTILINE | re.IGNORECASE)
@@ -401,7 +402,8 @@ def generate_okuma_pdf(
     # Ünite öncesi <hr> temizliği
     html_body = re.sub(r'<hr\s*/?>\s*(<div class="unit-banner-container)', r'\1', html_body)
 
-    # Manuel sayfa sonu imi desteği (<!-- pagebreak -->)
+    # Manuel sayfa sonu ve esnek ünite akışı imi desteği
+    html_body = re.sub(r'<!--\s*flow-units\s*-->', '', html_body, flags=re.IGNORECASE)
     html_body = re.sub(r'<!--\s*pagebreak\s*-->', '<div style="break-before: page; page-break-before: always;"></div>', html_body, flags=re.IGNORECASE)
 
     # Callout / Alıntı kutuları (Sınav & Dipnot vs Arapça Nass)
@@ -835,6 +837,29 @@ def generate_okuma_pdf(
 
     html_body = _transform_div_blocks(html_body, "nass-board", _enhance_nass_board)
 
+    # 8b. Tek Tarîkli İsnad Şeritleri (.isnad-flow-strip): Ok + Sonraki Düğüm Çiftini Kilitle (Sarkan Ok Önlemi)
+    def _enhance_isnad_strip_safe(block: str) -> str:
+        if 'isnad-multi' in block or 'isnad-step' in block:
+            return block
+        return re.sub(
+            r'(<span class="isnad-arrow">[\s\S]*?</span>)\s*(<span class="isnad-node[^"]*">(?:<span class="isnad-role">[\s\S]*?</span>)?[\s\S]*?</span>)',
+            r'<span class="isnad-step">\1\2</span>',
+            block,
+        )
+
+    html_body = _transform_div_blocks(html_body, "isnad-flow-strip", _enhance_isnad_strip_safe)
+
+    # 8c. Küçük Tabloları Bütün Tut (<= 6 satırlı tabloların 1 satır artıp bölünmesini engeller)
+    def _tag_short_tables(m):
+        tbl = m.group(0)
+        tbody_m = re.search(r'<tbody>([\s\S]*?)</tbody>', tbl)
+        rows = len(re.findall(r'<tr\b', tbody_m.group(1))) if tbody_m else len(re.findall(r'<tr\b', tbl))
+        if rows <= 7:
+            return tbl.replace('<table', '<table class="table-keep"', 1)
+        return tbl
+
+    html_body = re.sub(r'<table\b[^>]*>[\s\S]*?</table>', _tag_short_tables, html_body)
+
     # 9. Lügat Şerhi Listeleri (<ul> içinde >= 4 maddesi de `<code class="ar">...</code> :` olan listeleri 2 sütunlu sözlük kartına dönüştür)
     def _upgrade_lugat_ul(m):
         ul_inner = m.group(1)
@@ -909,7 +934,7 @@ def generate_okuma_pdf(
     html_body = html_body.replace('ﷺ', '<span class="sallallahu">ﷺ</span>')
 
     # Görsel şema veya tablodan hemen önceki tanıtım paragrafını + başlığı birbirine bağla (sayfa altında öksüz kalmasını önler)
-    _visual_target_re = r'(?:<div class="(?:nass-board|kasida-board|epistle-blueprint|bento-7-grid|era-timeline-svg|tree-diagram-wrap|doctrine-compare-wrap|entity-matrix-wrap|axis-matrix-2x2|pyramid-panel|timeline-bar|formula-card|lugat-grid-2)\b|<table>)'
+    _visual_target_re = r'(?:<div class="(?:nass-board|kasida-board|epistle-blueprint|bento-7-grid|era-timeline-svg|tree-diagram-wrap|doctrine-compare-wrap|entity-matrix-wrap|axis-matrix-2x2|pyramid-panel|timeline-bar|formula-card|lugat-grid-2|ayah-evidence-grid|asar-grid|isnad-flow-strip)\b|<table)'
     html_body = re.sub(
         rf'<p>((?:(?!<p\b|</p>)[\s\S]){{1,340}}?)</p>(\s*{_visual_target_re})',
         r'<p class="diagram-intro">\1</p>\2',
@@ -952,6 +977,7 @@ def generate_okuma_pdf(
     c_gold_bg = "#fdf8ec"
     c_gold_border = "#ead296"
 
+    body_cls_attr = ' class="flow-units-doc"' if flow_units_flag else ''
     sinif_val, donem_val, sinav_val = _infer_donem_from_path(md_path, sinif, donem, sinav)
     sinav_label = "Final" if sinav_val.lower() == "final" else "Vize"
     title_display = course_name or re.sub(r'\s*-\s*(?:Vize|Final)\s+Sınavı\s+Konu\s+Özeti.*$', '', md_path.stem, flags=re.IGNORECASE).strip()
@@ -1113,6 +1139,8 @@ def generate_okuma_pdf(
             display: inline-flex;
             align-items: baseline;
             vertical-align: baseline;
+            direction: ltr;
+            unicode-bidi: isolate;
             border: 1px solid {c_pill_border};
             border-radius: 5px;
             background: #ffffff;
@@ -1258,6 +1286,53 @@ def generate_okuma_pdf(
             page-break-before: avoid;
             margin-top: 0;
             margin-bottom: 11px;
+        }}
+
+        /* Esnek Ünite Akışı (<!-- flow-units -->): Yarım kalan sayfaları %85-95 doluluğa taşır */
+        body.flow-units-doc .unit-banner-container {{
+            break-before: auto !important;
+            page-break-before: auto !important;
+            margin-top: 14px;
+            margin-bottom: 9px;
+            break-inside: avoid !important;
+            page-break-inside: avoid !important;
+            break-after: avoid !important;
+            page-break-after: avoid !important;
+        }}
+        body.flow-units-doc .unit-banner-container.first-unit {{
+            margin-top: 0;
+        }}
+        body.flow-units-doc h2 {{
+            margin-top: 10px;
+            margin-bottom: 5px;
+        }}
+        body.flow-units-doc table {{
+            font-size: 8.55pt;
+            margin: 6px 0 9px 0;
+        }}
+        body.flow-units-doc th {{
+            padding: 5.5px 8px;
+            font-size: 8.55pt;
+        }}
+        body.flow-units-doc td {{
+            padding: 4.4px 8px;
+        }}
+        body.flow-units-doc .isnad-flow-strip:not(.isnad-multi) {{
+            padding: 5px 9px 5px 12px;
+            gap: 2.5px 3px;
+        }}
+        body.flow-units-doc .isnad-flow-strip:not(.isnad-multi) .isnad-step {{
+            gap: 2.5px;
+        }}
+        body.flow-units-doc .isnad-flow-strip:not(.isnad-multi) .isnad-node {{
+            padding: 2px 5.2px;
+            font-size: 7.35pt;
+        }}
+        body.flow-units-doc .isnad-flow-strip:not(.isnad-multi) .isnad-role {{
+            font-size: 5.65pt;
+        }}
+        body.flow-units-doc .isnad-flow-strip:not(.isnad-multi) .isnad-arrow {{
+            font-size: 7.5pt;
         }}
 
         .unit-banner-inner {{
@@ -1491,6 +1566,11 @@ def generate_okuma_pdf(
             page-break-inside: auto;
             word-break: normal;
             overflow-wrap: break-word;
+        }}
+
+        table.table-keep {{
+            break-inside: avoid !important;
+            page-break-inside: avoid !important;
         }}
 
         thead {{
@@ -1862,6 +1942,133 @@ def generate_okuma_pdf(
         .nass-trans-text em {{
             color: #64748b;
             font-size: 8.7pt;
+        }}
+
+        /* Kompakt Nass Levhası (Hadislerin tamamını tek görsel standartta birleştirir) */
+        .nass-board.compact {{
+            margin: 6px 0;
+            border-radius: 8px;
+        }}
+        .nass-board.compact .nass-header {{
+            padding: 4.5px 11px 4.5px 14px;
+        }}
+        .nass-board.compact .nass-arabic-frame {{
+            margin: 4.5px 11px 4px 14px;
+            padding: 5px 11px;
+        }}
+        .nass-board.compact .nass-arabic-text {{
+            font-size: 1.30em;
+            line-height: 1.62;
+        }}
+        .nass-board.compact .nass-trans-box {{
+            padding: 4.5px 9px;
+            margin: 0 11px 5.5px 14px;
+        }}
+        .nass-board.compact .nass-trans-text {{
+            font-size: 8.8pt;
+            line-height: 1.40;
+        }}
+
+        /* 2 Sütunlu Kur'ânî Delil Gridi (.ayah-evidence-grid) & Âsâr Gridi (.asar-grid) */
+        .ayah-evidence-grid, .asar-grid {{
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 5.5px 8px;
+            margin: 6px 0 8px 0;
+        }}
+        .ayah-card, .asar-card {{
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(180deg, #fffdf9 0%, #ffffff 100%);
+            border: 1px solid {c_border};
+            border-radius: 7px;
+            padding: 5px 9px 5.5px 12px;
+            box-shadow: 0 1.5px 5px rgba(15, 23, 42, 0.035);
+            break-inside: avoid;
+            page-break-inside: avoid;
+        }}
+        .ayah-card::before, .asar-card::before {{
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3.5px;
+            background: linear-gradient(180deg, {theme_hex} 0%, {c_gold} 100%);
+        }}
+        .ayah-card.span-2, .asar-card.span-2 {{
+            grid-column: 1 / -1;
+            background: linear-gradient(180deg, {c_gold_bg} 0%, #ffffff 100%);
+            border-color: {c_gold_border};
+        }}
+        .ayah-card-top, .asar-card-top {{
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 6px;
+            margin-bottom: 3px;
+            padding-bottom: 2.5px;
+            border-bottom: 0.5px dashed {c_border};
+        }}
+        .ayah-ref, .asar-ref {{
+            font-size: 7.1pt;
+            font-weight: 800;
+            padding: 1px 6px;
+            border-radius: 3.5px;
+            background: {theme_hex};
+            color: #ffffff;
+            letter-spacing: 0.25px;
+        }}
+        .asar-ref.mevkuf {{
+            background: #92400e;
+        }}
+        .asar-ref.maktu {{
+            background: #475569;
+        }}
+        .ayah-ctx, .asar-ctx {{
+            font-size: 7.0pt;
+            font-weight: 600;
+            color: #64748b;
+            font-style: italic;
+        }}
+        .ayah-ar, .asar-ar {{
+            font-family: 'Amiri', 'Traditional Arabic', serif;
+            font-size: 1.24em;
+            line-height: 1.54;
+            font-weight: 700;
+            color: {c_dark};
+            direction: rtl;
+            unicode-bidi: isolate;
+            text-align: center;
+            background: {c_bg_tint};
+            border: 1px solid {c_border};
+            border-radius: 4.5px;
+            padding: 3px 7px;
+            margin-bottom: 3.5px;
+        }}
+        .ayah-tr, .asar-tr {{
+            font-size: 8.3pt;
+            line-height: 1.36;
+            color: #334155;
+        }}
+
+        /* Hadis Altı Ana Konu & Kelime Notu Kartı (.hadis-meta-note) */
+        .hadis-meta-note {{
+            position: relative;
+            margin: 4px 0 8px 0;
+            padding: 4.5px 10px 4.5px 12px;
+            background: #fffdf8;
+            border: 1px solid {c_border};
+            border-left: 3px solid {c_gold};
+            border-radius: 0 6px 6px 0;
+            font-size: 8.6pt;
+            line-height: 1.44;
+            color: #334155;
+            break-inside: avoid;
+            page-break-inside: avoid;
+        }}
+        .hadis-meta-note strong {{
+            color: {c_dark};
         }}
 
         /* LÜGAT ŞERHİ 2 SÜTUNLU KART IZGARA */
@@ -3061,16 +3268,16 @@ def generate_okuma_pdf(
         .isnad-flow-strip {{
             position: relative;
             overflow: hidden;
-            margin: 8px 0;
-            padding: 8px 12px 8px 14px;
+            margin: 5px 0 6px 0;
+            padding: 6px 10px 6px 13px;
             background: linear-gradient(135deg, {c_bg_tint} 0%, #ffffff 100%);
             border: 1px solid {c_border};
-            border-radius: 7px;
+            border-radius: 7.5px;
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 3px 4px;
             flex-wrap: wrap;
-            box-shadow: 0 1px 4px rgba(15, 23, 42, 0.03);
+            box-shadow: 0 2px 6px rgba(15, 23, 42, 0.035);
             break-inside: avoid;
             page-break-inside: avoid;
         }}
@@ -3081,21 +3288,30 @@ def generate_okuma_pdf(
             top: 0;
             bottom: 0;
             width: 4.5px;
-            background: {theme_hex};
+            background: linear-gradient(180deg, {theme_hex} 0%, {c_gold} 100%);
+        }}
+
+        .isnad-step {{
+            display: inline-flex;
+            align-items: center;
+            gap: 3.5px;
+            white-space: nowrap;
         }}
 
         .isnad-node {{
-            padding: 3.5px 8px;
+            padding: 2.5px 6.5px;
             border-radius: 4.5px;
-            font-size: 8.3pt;
+            font-size: 7.65pt;
             font-weight: 700;
+            line-height: 1.18;
             background: #ffffff;
             border: 1px solid #cbd5e1;
             color: #334155;
-            display: flex;
+            display: inline-flex;
             flex-direction: column;
             align-items: center;
-            gap: 1px;
+            gap: 0.5px;
+            box-shadow: 0 1px 2px rgba(15, 23, 42, 0.02);
         }}
 
         .isnad-node.sahabi {{
@@ -3111,16 +3327,294 @@ def generate_okuma_pdf(
         }}
 
         .isnad-role {{
-            font-size: 6.8pt;
+            font-size: 5.95pt;
             font-weight: 800;
             color: #64748b;
             text-transform: uppercase;
+            letter-spacing: 0.2px;
         }}
 
         .isnad-arrow {{
             color: {theme_hex};
-            font-size: 10pt;
+            font-size: 8.1pt;
             font-weight: 800;
+            white-space: nowrap;
+        }}
+        .isnad-arrow .ar, .isnad-arrow code.ar {{
+            font-size: 1.12em !important;
+            padding: 0.5px 4.5px !important;
+            margin: 0 1px !important;
+        }}
+
+        /* 4b. Çok Tarîkli Birleşik İsnad Şeridi (.isnad-multi — Ayrılma & Birleşme) */
+        .isnad-flow-strip.isnad-multi {{
+            flex-direction: column;
+            align-items: stretch;
+            gap: 5px;
+            padding: 7px 10px 8px 13px;
+            overflow: visible;
+        }}
+
+        .isnad-multi-head {{
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 6px;
+            padding-bottom: 4px;
+            border-bottom: 1px dashed {c_border};
+        }}
+
+        .isnad-multi-badge {{
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 1.5px 7px;
+            border-radius: 4px;
+            background: {theme_hex};
+            color: #ffffff;
+            font-size: 7.0pt;
+            font-weight: 800;
+            letter-spacing: 0.35px;
+        }}
+
+        .isnad-multi-sub {{
+            font-size: 7.4pt;
+            color: #475569;
+            font-weight: 600;
+        }}
+
+        .isnad-multi-sub strong {{
+            color: {c_dark};
+        }}
+
+        .isnad-multi-body {{
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 4px 2px;
+            width: 100%;
+        }}
+
+        .isnad-shared-pre {{
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            flex-shrink: 0;
+        }}
+
+        .isnad-shared-post {{
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            flex-wrap: nowrap;
+            flex-shrink: 0;
+        }}
+
+        .isnad-tail-row {{
+            flex-basis: 100%;
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            flex-wrap: wrap;
+            margin-top: 2px;
+            padding-top: 4px;
+            border-top: 1px dashed {c_border};
+        }}
+
+        .isnad-tail-lead {{
+            display: inline-flex;
+            align-items: center;
+            padding: 1.5px 5px;
+            border-radius: 3.5px;
+            background: {c_bg_tint};
+            border: 1px solid {c_border};
+            color: {c_dark};
+            font-size: 6.2pt;
+            font-weight: 800;
+            letter-spacing: 0.15px;
+            white-space: nowrap;
+        }}
+
+        .isnad-lanes-group {{
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            padding: 0 8px;
+            flex-shrink: 0;
+        }}
+
+        .isnad-lanes-group::before {{
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 50%;
+            width: 4px;
+            height: 2px;
+            background: {theme_hex};
+            transform: translateY(-1px);
+        }}
+
+        .isnad-lanes-group::after {{
+            content: "";
+            position: absolute;
+            right: 0;
+            top: 50%;
+            width: 4px;
+            height: 2px;
+            background: {theme_hex};
+            transform: translateY(-1px);
+        }}
+
+        .isnad-lane {{
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            flex-wrap: nowrap;
+            padding: 2px 4px;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.90);
+            border: 1px solid #e2e8f0;
+        }}
+
+        .isnad-lane.lane-mutabi {{
+            background: #fffbeb;
+            border-color: #fde68a;
+        }}
+
+        .isnad-lane::before {{
+            content: "";
+            position: absolute;
+            left: -7px;
+            top: -3.5px;
+            bottom: -3.5px;
+            width: 7px;
+            border-left: 2px solid {theme_hex};
+            background: linear-gradient({theme_hex}, {theme_hex}) left center / 7px 2px no-repeat;
+        }}
+
+        .isnad-lane:first-child::before {{
+            top: 50%;
+            bottom: -3.5px;
+            border-top: 2px solid {theme_hex};
+            border-top-left-radius: 4px;
+            background: none;
+        }}
+
+        .isnad-lane:last-child::before {{
+            top: -3.5px;
+            bottom: 50%;
+            border-bottom: 2px solid {theme_hex};
+            border-bottom-left-radius: 4px;
+            background: none;
+        }}
+
+        .isnad-lane::after {{
+            content: "";
+            position: absolute;
+            right: -7px;
+            top: -3.5px;
+            bottom: -3.5px;
+            width: 7px;
+            border-right: 2px solid {theme_hex};
+            background: linear-gradient({theme_hex}, {theme_hex}) right center / 7px 2px no-repeat;
+        }}
+
+        .isnad-lane:first-child::after {{
+            top: 50%;
+            bottom: -3.5px;
+            border-top: 2px solid {theme_hex};
+            border-top-right-radius: 4px;
+            background: none;
+        }}
+
+        .isnad-lane:last-child::after {{
+            top: -3.5px;
+            bottom: 50%;
+            border-bottom: 2px solid {theme_hex};
+            border-bottom-right-radius: 4px;
+            background: none;
+        }}
+
+        .isnad-lane-tag {{
+            padding: 1.5px 4px;
+            border-radius: 3px;
+            font-size: 5.9pt;
+            font-weight: 800;
+            letter-spacing: 0.15px;
+            white-space: nowrap;
+            background: {theme_hex};
+            color: #ffffff;
+        }}
+
+        .isnad-lane-tag.tag-mutabi {{
+            background: #b45309;
+            color: #ffffff;
+        }}
+
+        .isnad-tahvil-pill {{
+            padding: 1px 4px;
+            border-radius: 3px;
+            font-size: 6.1pt;
+            font-weight: 800;
+            background: #fef2f2;
+            border: 1px solid #fca5a5;
+            color: #991b1b;
+            white-space: nowrap;
+        }}
+
+        .isnad-multi .isnad-node {{
+            padding: 2px 3.8px;
+            font-size: 6.95pt;
+            line-height: 1.12;
+            white-space: nowrap;
+        }}
+
+        .isnad-multi .isnad-role {{
+            font-size: 5.5pt;
+            line-height: 1.02;
+        }}
+
+        .isnad-multi .isnad-arrow {{
+            font-size: 6.9pt;
+            white-space: nowrap;
+            letter-spacing: -0.2px;
+        }}
+
+        .isnad-multi .isnad-arrow .ar {{
+            font-size: 8.1pt;
+        }}
+
+        .isnad-node.bukhari {{
+            background: {theme_hex};
+            border-color: {c_dark};
+            color: #ffffff;
+        }}
+
+        .isnad-node.bukhari .isnad-role {{
+            color: #fde68a;
+        }}
+
+        .isnad-node.split {{
+            background: #fff7ed;
+            border: 1.5px solid #d97706;
+            color: #9a3412;
+        }}
+
+        .isnad-node.split .isnad-role {{
+            color: #c2410c;
+        }}
+
+        .isnad-node.medar {{
+            background: {c_bg_tint};
+            border: 1.5px solid {theme_hex};
+            color: {c_dark};
+        }}
+
+        .isnad-node.medar .isnad-role {{
+            color: {theme_hex};
         }}
 
         /* 5. Tarihsel Dönemler Zaman Çizelgesi (Kronoloji Rayı + Odak Dönem Vurgusu) */
@@ -4139,7 +4633,7 @@ def generate_okuma_pdf(
         }}
     </style>
 </head>
-<body>
+<body{body_cls_attr}>
 
 {html_body}
 
@@ -4157,6 +4651,7 @@ def generate_okuma_pdf(
     output_pdf_path.parent.mkdir(parents=True, exist_ok=True)
 
     print(f"Playwright Chromium ile Okuma PDF üretiliyor: {output_pdf_path.name}")
+    body_cls_attr = ' class="flow-units-doc"' if flow_units_flag else ''
     sinif_val, donem_val, sinav_val = _infer_donem_from_path(md_path, sinif, donem, sinav)
 
     with tempfile.TemporaryDirectory() as tmp_dir_str:
@@ -4239,7 +4734,10 @@ def generate_okuma_pdf(
                 ]
                 footers_html_path = tmp_dir / "footers.html"
                 footers_pdf_path = tmp_dir / "footers.pdf"
-                footers_html_path.write_text(_render_footers_overlay_html(footer_specs), encoding="utf-8")
+                footers_html_path.write_text(
+                    _render_footers_overlay_html(footer_specs, show_local=False),
+                    encoding="utf-8",
+                )
                 footer_tab = browser.new_page()
                 footer_tab.goto(f"file:///{str(footers_html_path.resolve()).replace(chr(92), '/')}", wait_until="load")
                 footer_tab.evaluate("() => document.fonts.ready")
