@@ -442,20 +442,27 @@ Bundan sonra üretilecek Final ve diğer tüm dönem **tekil Okuma PDF'leri** (`
 
 ---
 
-## KRİTİK KURAL 17: Haftalık Eklemeli (Aşamalı) Sınav Özeti Üretim Protokolü
+## KRİTİK KURAL 17: Haftalık Tam Kararında Konu Anlatımı ve Dönem Sonu Sınav Özeti Protokolü
 
-Dönem içi yoğunluğu azaltmak ve sınav haftasına her dersin özeti hazır girmek amacıyla, haftalık öğretmen notları ve sorumlu üniteler **tek bir canlı sınav özeti dosyasında bölüm bölüm biriktirilerek** işlenir:
+Dönem içinde diğer haftaların hacmi henüz bilinmediği için yapay sayfa sınırları ve erken özetleme karmaşasını önlemek amacıyla, haftalık ders notları ve slaytlar aşağıdaki **haftalık kararında anlatım → dönem sonu bütüncül sınav özeti** disipliniyle işlenir:
 
-1. **Canlı Tek Dosya & Otomatik Bölüm Numaralandırma:**
-   - Her ders için `<D>/ders_anlatimlari/<DERS ADI>/<Ders Adı> - <Vize/Final> Öğretmen Notları.md` (veya dersin belirlenen sınav özeti `.md` dosyası) canlı ana kaynak olarak tutulur.
-   - Kullanıcı sınıf/dönem/sınav, ders adı ve haftayı bildirdiğinde asistan ilgili dersin `.md` dosyasını kontrol eder: dosya henüz yoksa ilk haftayı `# 1. BÖLÜM: <Konu Başlığı> (<H>. HAFTA)` şeklinde başlatır; dosya mevcutsa önceki bölümlere dokunmadan son bölümün arkasına `# N. BÖLÜM: <Konu Başlığı> (<H>. HAFTA)` olarak sıradaki bölümü ekler (`tools/okuma_pdf.py` sondaki `(<H>. HAFTA)` parantezini otomatik olarak ünite levhası sağ etiketine dönüştürür).
-   - Ders kitabından sorumlu ek üniteler (ör. 14. ve 15. üniteler) veya çeviri metinleri de istendiğinde aynı dosyaya sıradaki `# N. BÖLÜM:` olarak eklenir.
-2. **Kaynak Doğrulama, Sıfır Bilgi Kaybı ve Kural Uyumu:**
-   - Ham kaynak (`<D>/kaynaklar/ogretmen_notlari/<DERS ADI>/` veya `ders_kaynaklari/<DERS ADI>/`) eksiksiz okunur; âyet/sure numaraları, harekeli Arapça metinler ve hadisler kontrol edilerek tamamlanır (ham notta sehven farklı numara kaydedilmişse doğru Mushaf numarası esas alınır ve kısa not düşülür).
-   - Eklenen her bölümde Kural 7 (hoca/öğretmen ismi yasağı) ve Kural 15 (Okuma PDF bileşenleri, `.nass-board`, BiDi izolasyonu, çift katmanlı sıfır bilgi kaybı) eksiksiz uygulanır.
-3. **Okuma PDF Güncelleme & Dönem Sonu Görsel Kitapçık Ayrımı:**
-   - Yeni bölüm `.md` dosyasına eklendikten (ve kullanıcı isterse onayladıktan) sonra `python tools/okuma_pdf.py "<md_yolu>" --sinif X --donem Y --sinav Z` çalıştırılır; kapak, tıklanabilir ünite planı, sayfa numaraları ve `kaynaklar/özetlenmiş_dersler/<DERS ADI>/` yedeği otomatik güncellenir, üretilen sayfalar görsel olarak kontrol edilir.
-   - Görsel Ders Notu Kitapçığı (`build.py` — 20 soruluk piramit test, tam sayfa sözlük, 4'lü forma dengesi) her hafta yeniden üretilmez; tüm haftalar ve sorumlu üniteler tamamlandığında bu hazır `.md` dosyası üzerinden tek seferde üretilir.
+1. **Dönem İçi Varsayılan Akış — Haftalık Tekil Konu Anlatımı (`.md`):**
+   - Dönem ortasında her hafta için şimdiden canlı final/vize özetini yapay sayfa kotasına (ör. "her bölüm 2 sayfa") zorlamak yerine, ilgili dersin o haftası için müstakil ve tam kararında bir haftalık konu anlatımı dosyası üretilir:
+     `<D>/ders_anlatimlari/<DERS ADI>/<H>. Hafta - <Ders Adı> Konu Anlatımı.md`
+   - Kullanıcı doğrudan üretim istemedikçe önce ham kaynaklar (`.docx`, slayt fotoğrafları, PDF'ler, müfredat bilgi paketi) eksiksiz analiz edilir, yarım/eksik kayıtlar tespit edilip plan sunulur; onay sonrasında `.md` dosyası oluşturulur ve kullanıcı beğenirse `tools/okuma_pdf.py` ile Okuma PDF'i üretilip görsel olarak kontrol edilir.
+
+2. **Altın Anlatım Standardı ("Ne Çok Uzun Ne Çok Kısa — Sıfır Bilgi Kaybı"):**
+   - **Sıfır Bilgi Kaybı:** Sınav sorusu olma ihtimali olan hiçbir bilgi atlanamaz; konular, terimler, tanımlar, kavramlar, başlıklar, örnekler, açıklamalar, Arapça ibareler, metot, usûl, mezhep/ekol görüşleri, şahsiyetler, eserler, istatistikler ve kritik yaş/tarih eşikleri eksiksiz işlenir.
+   - **Arapça İbare Sıralaması (Önce Arapça, Sonra Türkçe):** Arapça ibare, ıstılah, âyet veya hadis geçen her yerde **önce harekeli Arapçası** (`<bdi class="ar">...</bdi>` veya `.nass-board` ile BiDi izoleli), **ardından Türkçe okunuşu ve açıklaması/meali** verilir.
+   - **Kararında Yoğunluk ve Doğal Hacim:** Sınava hazırlık odaklı konu anlatımı akıcılığında ve öğretici olur; gereksiz dolgu paragrafları, aynı bilginin hem şemada hem metinde hem tekrar tablosunda çift/üçlü tekrarı ve görsel kutu enflasyonu yapılmaz. Buna karşılık kuru madde başlıklarına da indirgenmez; her haftanın uzunluğu yapay sayfa kotasına göre değil, konunun doğal yoğunluğuna göre belirlenir.
+
+3. **Kaynak Doğrulama, Eksik Tamamlama ve Kural Uyumu:**
+   - Ham kaynak (`<D>/kaynaklar/ogretmen_notlari/<DERS ADI>/` ve `ders_kaynaklari/<DERS ADI>/`, varsa slayt fotoğrafları dâhil) eksiksiz okunur; âyet/sure numaraları Mushaf'a göre doğrulanır (ham notta sehven farklı numara kaydedilmişse doğru Mushaf numarası esas alınır ve kısa not düşülür). Ham nottaki `(tamamla)` / `(açıkla)` boşlukları ilgili disiplin literatüründen kontrollü ve şeffaf biçimde tamamlanır.
+   - Her haftalık anlatımda **Kural 7** (hoca/öğretmen ismi yasağı) ve **Kural 15** (Okuma PDF bileşenleri, `.nass-board`, `==kavram==` hap rozetleri, vektörel SVG ikonlar, BiDi izolasyonu) eksiksiz uygulanır.
+
+4. **Dönem Sonu Bütüncül Sınav Özeti ve Görsel Kitapçık Üretimi:**
+   - İlgili sınav döneminin tüm haftaları (ve varsa sorumlu ek kitap üniteleri / çeviri metinleri) tamamlandığında, eldeki tüm `<H>. Hafta - <Ders Adı> Konu Anlatımı.md` dosyalarının ağırlıkları görülerek **tek seferde en dengeli Sınav Özeti** (`.md` + `tools/okuma_pdf.py`) ve ardından **Görsel Ders Notu Kitapçığı** (`build.py` — 20 soruluk piramit test, tam sayfa sözlük, 4'lü forma dengesi) üretilir.
+   - *(İstisna: Kullanıcı belirli bir ders için açıkça canlı sınav özetine bölüm eklenmesini isterse, `<Ders Adı> - <Vize/Final> Öğretmen Notları.md` dosyasına `# N. BÖLÜM: <Konu Başlığı> (<H>. HAFTA)` şeklinde ekleme desteği korunur.)*
 
 
 
