@@ -934,7 +934,7 @@ def generate_okuma_pdf(
     html_body = html_body.replace('ﷺ', '<span class="sallallahu">ﷺ</span>')
 
     # Görsel şema veya tablodan hemen önceki tanıtım paragrafını + başlığı birbirine bağla (sayfa altında öksüz kalmasını önler)
-    _visual_target_re = r'(?:<div class="(?:nass-board|kasida-board|epistle-blueprint|bento-7-grid|era-timeline-svg|tree-diagram-wrap|doctrine-compare-wrap|entity-matrix-wrap|axis-matrix-2x2|pyramid-panel|timeline-bar|formula-card|lugat-grid-2|ayah-evidence-grid|asar-grid|isnad-flow-strip)\b|<table)'
+    _visual_target_re = r'(?:<div class="(?:nass-board|kasida-board|epistle-blueprint|bento-7-grid|era-timeline-svg|tree-diagram-wrap|doctrine-compare-wrap|entity-matrix-wrap|axis-matrix-2x2|pyramid-panel|timeline-bar|formula-card|lugat-grid-2|ayah-evidence-grid|asar-grid|isnad-flow-strip|tedrib-head|wb-box|fill-list|fill-grid-2|syn-list|pair-grid-2|qa-grid-2|q-card)\b|<table)'
     html_body = re.sub(
         rf'<p>((?:(?!<p\b|</p>)[\s\S]){{1,340}}?)</p>(\s*{_visual_target_re})',
         r'<p class="diagram-intro">\1</p>\2',
@@ -1068,6 +1068,13 @@ def generate_okuma_pdf(
         h2 [dir="rtl"], h3 [dir="rtl"] {{
             font-size: 1.18em;
             line-height: 1.38;
+        }}
+        th .ar, th [dir="rtl"], th bdi, th bdi.ar,
+        .unit-title [dir="rtl"], .unit-title bdi {{
+            color: #ffffff !important;
+        }}
+        th code.ar {{
+            color: {c_dark} !important;
         }}
 
         /* ROZETLER: Köşe bükülmesi yapmayan, yan çizgisiz ve taban çizgisini (baseline) koruyan yumuşak hap vurgular */
@@ -4630,6 +4637,411 @@ def generate_okuma_pdf(
             color: #16a34a;
             font-weight: 900;
             margin-left: 3px;
+        }}
+
+        /* TEDRÎBÂT & SINAV ALIŞTIRMA BİLEŞENLERİ (ARAP DİLİ VE EDEBİYATI) */
+        .tedrib-head {{
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            margin: 11px 0 5px 0;
+            padding: 4.5px 9px 4.5px 7px;
+            background: linear-gradient(90deg, {c_pill_bg} 0%, #ffffff 100%);
+            border: 1px solid {c_border};
+            border-left: 4px solid {theme_hex};
+            border-radius: 6px;
+            break-inside: avoid !important;
+            page-break-inside: avoid !important;
+            break-after: avoid !important;
+            page-break-after: avoid !important;
+        }}
+        .tedrib-head-left {{
+            display: flex;
+            align-items: center;
+            gap: 6.5px;
+        }}
+        .tedrib-letter {{
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 19px;
+            height: 19px;
+            padding: 0 5px;
+            border-radius: 4.5px;
+            background: linear-gradient(135deg, {theme_hex} 0%, {c_dark} 100%);
+            color: #ffffff;
+            font-size: 8.2pt;
+            font-weight: 800;
+            line-height: 1;
+        }}
+        .tedrib-title {{
+            font-size: 9.4pt;
+            font-weight: 700;
+            color: {c_dark};
+            line-height: 1.25;
+        }}
+        .tedrib-ref-pill {{
+            font-size: 8.0pt;
+            font-weight: 700;
+            color: {c_dark};
+            background: #ffffff;
+            border: 1px solid {c_pill_border};
+            border-radius: 99px;
+            padding: 1.5px 8px;
+            white-space: nowrap;
+        }}
+        .tedrib-ref-pill bdi {{
+            font-family: 'Amiri', 'Traditional Arabic', serif;
+            font-size: 1.22em;
+            line-height: 1.2;
+            color: {c_dark};
+        }}
+
+        /* Kelime Havuzu Kutusu (.wb-box) */
+        .wb-box {{
+            background: linear-gradient(135deg, {c_bg_tint} 0%, #fffdf9 100%);
+            border: 1px solid {c_pill_border};
+            border-left: 4px solid {c_gold};
+            border-radius: 6.5px;
+            padding: 5.5px 9px 6.5px 9px;
+            margin: 4px 0 7px 0;
+            break-inside: avoid;
+            page-break-inside: avoid;
+            break-after: avoid;
+            page-break-after: avoid;
+        }}
+        .wb-label {{
+            font-size: 7.3pt;
+            font-weight: 800;
+            letter-spacing: 0.45px;
+            text-transform: uppercase;
+            color: {c_gold_dark};
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }}
+        .wb-chips {{
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: flex-start;
+            gap: 4px 5px;
+            direction: rtl;
+        }}
+        .wb-chip {{
+            font-family: 'Amiri', 'Traditional Arabic', serif;
+            font-size: 11.1pt;
+            font-weight: 700;
+            line-height: 1.32;
+            color: {c_dark};
+            background: #ffffff;
+            border: 1px solid {c_pill_border};
+            border-radius: 4.5px;
+            padding: 1px 7.5px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+        }}
+
+        /* Boşluk Doldurma Satır Kartları (.fill-list / .fill-grid-2) */
+        .fill-list {{
+            display: flex;
+            flex-direction: column;
+            gap: 4.5px;
+            margin: 4px 0 8px 0;
+        }}
+        .fill-grid-2 {{
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4.5px 7px;
+            margin: 4px 0 7px 0;
+        }}
+        .fill-grid-2 .fill-row:last-child:nth-child(odd) {{
+            grid-column: 1 / -1;
+        }}
+        .fill-row {{
+            display: flex;
+            align-items: flex-start;
+            gap: 7.5px;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 5px 9px;
+            box-shadow: 0 1px 2px rgba(15, 23, 42, 0.025);
+            break-inside: avoid;
+            page-break-inside: avoid;
+        }}
+        .fill-row:nth-child(even) {{
+            background: {c_bg_end};
+        }}
+        .fill-num {{
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 17px;
+            height: 17px;
+            border-radius: 4px;
+            background: {c_pill_bg};
+            border: 1px solid {c_pill_border};
+            color: {c_dark};
+            font-size: 7.6pt;
+            font-weight: 800;
+            flex-shrink: 0;
+            margin-top: 3px;
+        }}
+        .fill-body {{
+            flex: 1;
+            min-width: 0;
+        }}
+        .fill-ar {{
+            font-family: 'Amiri', 'Traditional Arabic', serif;
+            font-size: 11.4pt;
+            line-height: 1.56;
+            color: #0f172a;
+            direction: rtl;
+            text-align: right;
+            unicode-bidi: isolate;
+        }}
+        .fill-tr {{
+            font-size: 8.15pt;
+            line-height: 1.32;
+            color: #475569;
+            margin-top: 1.5px;
+            text-align: left;
+            direction: ltr;
+        }}
+        .fill-blank {{
+            display: inline-block;
+            font-weight: 700;
+            color: {c_dark};
+            background: {c_gold_bg};
+            border-bottom: 2px solid {theme_hex};
+            border-radius: 3px 3px 0 0;
+            padding: 0 4px;
+            margin: 0 1px;
+        }}
+
+        /* Altı Çizili Kelime & Eş Anlam Değiştirme (.syn-list / .ar-underline) */
+        .ar-underline, .tedrib-ar u, .q-stem u {{
+            text-decoration: none !important;
+            border-bottom: 2px solid {theme_hex};
+            background: {c_pill_bg};
+            padding: 0 3.5px;
+            border-radius: 3px 3px 0 0;
+            font-weight: 700;
+            color: {c_dark};
+        }}
+        .syn-list {{
+            display: flex;
+            flex-direction: column;
+            gap: 3.8px;
+            margin: 4px 0 7px 0;
+        }}
+        .syn-row {{
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            background: #ffffff;
+            border: 1px solid {c_border};
+            border-left: 3.5px solid {theme_hex};
+            border-radius: 6px;
+            padding: 4.2px 8.5px;
+            break-inside: avoid;
+            page-break-inside: avoid;
+        }}
+        .syn-left {{
+            flex: 1;
+            min-width: 0;
+        }}
+        .syn-ar {{
+            font-family: 'Amiri', 'Traditional Arabic', serif;
+            font-size: 11.4pt;
+            line-height: 1.55;
+            color: #0f172a;
+            direction: rtl;
+            text-align: right;
+        }}
+        .syn-tr {{
+            font-size: 8.1pt;
+            color: #475569;
+            line-height: 1.3;
+            margin-top: 1px;
+        }}
+        .syn-arrow {{
+            font-size: 9.5pt;
+            font-weight: 800;
+            color: {c_gold_dark};
+            flex-shrink: 0;
+        }}
+        .syn-alt {{
+            background: {c_bg_tint};
+            border: 1px solid {c_pill_border};
+            border-radius: 5.5px;
+            padding: 4px 8px;
+            text-align: right;
+            flex-shrink: 0;
+            max-width: 38%;
+        }}
+        .syn-alt-ar {{
+            font-family: 'Amiri', 'Traditional Arabic', serif;
+            font-size: 11.2pt;
+            font-weight: 700;
+            color: {c_dark};
+            direction: rtl;
+            line-height: 1.4;
+        }}
+        .syn-alt-tr {{
+            font-size: 7.75pt;
+            color: #475569;
+            text-align: left;
+        }}
+
+        /* Çoktan Seçmeli RTL 3 Şık & Arapça Soru Başlıkları (.q-card içinde) */
+        .q-ar-stem {{
+            font-family: 'Amiri', 'Traditional Arabic', serif;
+            font-size: 11.4pt;
+            font-weight: 700;
+            color: #0f172a;
+            direction: rtl;
+            text-align: right;
+            line-height: 1.5;
+            width: 100%;
+        }}
+        .q-tr-sub {{
+            font-size: 8.1pt;
+            font-weight: 400;
+            font-style: italic;
+            color: #475569;
+            direction: ltr;
+            text-align: left;
+            line-height: 1.3;
+            margin-top: 1.5px;
+        }}
+        .q-options-rtl-3 {{
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 5px;
+            margin-top: 5px;
+            direction: rtl;
+        }}
+        .q-opt-rtl {{
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 5px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 5px;
+            padding: 3.5px 7px;
+            font-family: 'Amiri', 'Traditional Arabic', serif;
+            font-size: 10.8pt;
+            color: #334155;
+            direction: rtl;
+            line-height: 1.38;
+        }}
+        .q-opt-rtl.opt-correct {{
+            background: #f0fdf4;
+            border-color: #86efac;
+            color: #15803d;
+            font-weight: 700;
+        }}
+        .q-ans-ar {{
+            font-family: 'Amiri', 'Traditional Arabic', serif;
+            font-size: 11.0pt;
+            font-weight: 700;
+            color: {c_dark};
+            direction: rtl;
+            text-align: right;
+            line-height: 1.52;
+        }}
+        .q-ans-tr {{
+            font-size: 8.2pt;
+            color: #334155;
+            line-height: 1.36;
+            margin-top: 2px;
+            direction: ltr;
+            text-align: left;
+        }}
+
+        /* Eşleştirme & Zıt Anlam Çift Kartları (.pair-grid-2) */
+        .pair-grid-2 {{
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 5.5px 7.5px;
+            margin: 4px 0 8px 0;
+        }}
+        .pair-card {{
+            position: relative;
+            background: #ffffff;
+            border: 1px solid {c_border};
+            border-top: 2.5px solid {theme_hex};
+            border-radius: 6px;
+            padding: 5.5px 8.5px;
+            box-shadow: 0 1px 2px rgba(15, 23, 42, 0.025);
+            break-inside: avoid;
+            page-break-inside: avoid;
+        }}
+        .pair-top {{
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 6px;
+            direction: rtl;
+        }}
+        .pair-ar {{
+            font-family: 'Amiri', 'Traditional Arabic', serif;
+            font-size: 11.2pt;
+            font-weight: 700;
+            color: {c_dark};
+            direction: rtl;
+            text-align: right;
+            line-height: 1.48;
+            flex: 1;
+        }}
+        .pair-sep {{
+            font-size: 8.5pt;
+            font-weight: 800;
+            color: {c_gold_dark};
+            background: {c_gold_bg};
+            border: 1px solid {c_gold_border};
+            border-radius: 4px;
+            padding: 0 5px;
+            flex-shrink: 0;
+        }}
+        .pair-tr {{
+            font-size: 8.1pt;
+            color: #475569;
+            line-height: 1.32;
+            margin-top: 3px;
+            padding-top: 3px;
+            border-top: 1px dashed #e2e8f0;
+        }}
+
+        /* 2 Sütunlu Kompakt Yazmalı Bilgi Sorusu Izgarası (.qa-grid-2) */
+        .qa-grid-2 {{
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px 8px;
+            margin: 5px 0 9px 0;
+        }}
+        .qa-grid-2 .q-card {{
+            margin-bottom: 0;
+            padding: 6.5px 9px 6.5px 12px;
+        }}
+        .qa-grid-2 .q-ar-stem {{
+            font-size: 10.7pt;
+            line-height: 1.44;
+        }}
+        .qa-grid-2 .q-ans {{
+            padding: 4.5px 7.5px;
+            margin-top: 3.5px;
+        }}
+        .qa-grid-2 .q-ans-ar {{
+            font-size: 10.4pt;
+            line-height: 1.44;
+        }}
+        .qa-grid-2 .q-card.span-2 {{
+            grid-column: 1 / -1;
         }}
     </style>
 </head>
