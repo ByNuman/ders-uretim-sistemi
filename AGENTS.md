@@ -440,4 +440,22 @@ Bundan sonra üretilecek Final ve diğer tüm dönem **tekil Okuma PDF'leri** (`
    - **Ayrı İçindekiler Sayfası Yoktur:** Ana kapakta tüm derslerin sayfa aralığı ve tıklanabilir `LINK_GOTO` kartları bulunduğu için ayrıca bir İçindekiler sayfası konmaz.
    - **Çift Taraflı Baskı (Duplex) ve Çift Kapak Önleme:** `s. 1` Ana Kapak, `s. 2` Boş Sayfa (yalnızca boş kalır, yazı/kutu eklenmez), her ders kapağı tek (sağ) sayfada başlar (`c.cover_page % 2 == 1`). Tekil okuma PDF'lerinde hâlihazırda Baskı Dostu Lüks kapak varsa `_pdf_has_baski_lux_cover` ilk sayfayı otomatik atlar ve çift kapak basılmasını engeller; tüm içerik altlıkları global sayfa numarasına (`Sayfa X / Toplam`) yenilenir.
 
+---
+
+## KRİTİK KURAL 17: Haftalık Eklemeli (Aşamalı) Sınav Özeti Üretim Protokolü
+
+Dönem içi yoğunluğu azaltmak ve sınav haftasına her dersin özeti hazır girmek amacıyla, haftalık öğretmen notları ve sorumlu üniteler **tek bir canlı sınav özeti dosyasında bölüm bölüm biriktirilerek** işlenir:
+
+1. **Canlı Tek Dosya & Otomatik Bölüm Numaralandırma:**
+   - Her ders için `<D>/ders_anlatimlari/<DERS ADI>/<Ders Adı> - <Vize/Final> Öğretmen Notları.md` (veya dersin belirlenen sınav özeti `.md` dosyası) canlı ana kaynak olarak tutulur.
+   - Kullanıcı sınıf/dönem/sınav, ders adı ve haftayı bildirdiğinde asistan ilgili dersin `.md` dosyasını kontrol eder: dosya henüz yoksa ilk haftayı `# 1. BÖLÜM: <Konu Başlığı> (<H>. HAFTA)` şeklinde başlatır; dosya mevcutsa önceki bölümlere dokunmadan son bölümün arkasına `# N. BÖLÜM: <Konu Başlığı> (<H>. HAFTA)` olarak sıradaki bölümü ekler (`tools/okuma_pdf.py` sondaki `(<H>. HAFTA)` parantezini otomatik olarak ünite levhası sağ etiketine dönüştürür).
+   - Ders kitabından sorumlu ek üniteler (ör. 14. ve 15. üniteler) veya çeviri metinleri de istendiğinde aynı dosyaya sıradaki `# N. BÖLÜM:` olarak eklenir.
+2. **Kaynak Doğrulama, Sıfır Bilgi Kaybı ve Kural Uyumu:**
+   - Ham kaynak (`<D>/kaynaklar/ogretmen_notlari/<DERS ADI>/` veya `ders_kaynaklari/<DERS ADI>/`) eksiksiz okunur; âyet/sure numaraları, harekeli Arapça metinler ve hadisler kontrol edilerek tamamlanır (ham notta sehven farklı numara kaydedilmişse doğru Mushaf numarası esas alınır ve kısa not düşülür).
+   - Eklenen her bölümde Kural 7 (hoca/öğretmen ismi yasağı) ve Kural 15 (Okuma PDF bileşenleri, `.nass-board`, BiDi izolasyonu, çift katmanlı sıfır bilgi kaybı) eksiksiz uygulanır.
+3. **Okuma PDF Güncelleme & Dönem Sonu Görsel Kitapçık Ayrımı:**
+   - Yeni bölüm `.md` dosyasına eklendikten (ve kullanıcı isterse onayladıktan) sonra `python tools/okuma_pdf.py "<md_yolu>" --sinif X --donem Y --sinav Z` çalıştırılır; kapak, tıklanabilir ünite planı, sayfa numaraları ve `kaynaklar/özetlenmiş_dersler/<DERS ADI>/` yedeği otomatik güncellenir, üretilen sayfalar görsel olarak kontrol edilir.
+   - Görsel Ders Notu Kitapçığı (`build.py` — 20 soruluk piramit test, tam sayfa sözlük, 4'lü forma dengesi) her hafta yeniden üretilmez; tüm haftalar ve sorumlu üniteler tamamlandığında bu hazır `.md` dosyası üzerinden tek seferde üretilir.
+
+
 
